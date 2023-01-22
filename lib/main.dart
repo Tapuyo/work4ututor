@@ -63,8 +63,7 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return kIsWeb ? const WebMainPage():ScrollConfiguration(
           behavior: MyBehavior(),
-          child: SizedBox( height: MediaQuery.of(context).size.height,
-         width: MediaQuery.of(context).size.width,),
+          child: child!,
         );
       },
       title: 'Work4u',
