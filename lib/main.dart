@@ -9,11 +9,11 @@ import 'package:wokr4ututor/routes/route_generator.dart';
 import 'package:wokr4ututor/routes/routes.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await setupFlutterNotifications();
 }
-
 
 bool isFlutterLocalNotificationsInitialized = false;
 
@@ -29,27 +29,32 @@ Future<void> setupFlutterNotifications() async {
   isFlutterLocalNotificationsInitialized = true;
 }
 
-void main()async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: const FirebaseOptions(
-      apiKey: firebaseApiKey,
-      appId: firebaseAppId,
-      messagingSenderId: firebaseMessagingSenderId,
-      projectId: firebaseProjectId,
-    ),);
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: firebaseApiKey,
+        appId: firebaseAppId,
+        messagingSenderId: firebaseMessagingSenderId,
+        projectId: firebaseProjectId,
+      ),
+    );
+  } else {
+    await Firebase.initializeApp();
+  }
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(
-    MultiProvider(providers: [
+  runApp(MultiProvider(
+    providers: [
       ChangeNotifierProvider(create: (_) => InitProvider()),
-    ],child:  const MyApp(),)
-  
-  );
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +91,8 @@ class MyApp extends StatelessWidget {
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
-          ), systemOverlayStyle: SystemUiOverlayStyle.dark,
+          ),
+          systemOverlayStyle: SystemUiOverlayStyle.dark,
         ),
         dividerColor: Colors.grey[300],
         textTheme: TextTheme(
@@ -111,7 +117,6 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
-
 }
 
 class MyBehavior extends ScrollBehavior {
