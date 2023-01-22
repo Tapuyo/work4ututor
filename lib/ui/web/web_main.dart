@@ -10,8 +10,10 @@ class WebMainPage extends StatefulWidget {
 class _MainPageState extends State<WebMainPage> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body:  Center(child:  Text('Home Web')),
+
+    return  Container(
+      color: Colors.teal,
+      child:  Text('Home Web'),
     );
   }
 }

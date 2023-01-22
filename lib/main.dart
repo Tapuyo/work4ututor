@@ -7,6 +7,7 @@ import 'package:wokr4ututor/constant/constant.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/routes/route_generator.dart';
 import 'package:wokr4ututor/routes/routes.dart';
+import 'package:wokr4ututor/ui/web/web_main.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -60,9 +61,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       builder: (context, child) {
-        return ScrollConfiguration(
+        return kIsWeb ? const WebMainPage():ScrollConfiguration(
           behavior: MyBehavior(),
-          child: child!,
+          child: SizedBox( height: MediaQuery.of(context).size.height,
+         width: MediaQuery.of(context).size.width,),
         );
       },
       title: 'Work4u',
@@ -71,7 +73,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
-        platform: TargetPlatform.iOS,
+        platform: !kIsWeb ? TargetPlatform.iOS:TargetPlatform.fuchsia,
         scaffoldBackgroundColor: Colors.white,
         toggleableActiveColor: kColorPrimary,
         appBarTheme: const AppBarTheme(

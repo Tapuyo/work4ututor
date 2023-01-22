@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 
-const kColorBlue = Color(0xff1A61FF);
+const kColorBlue = Color.fromARGB(255, 31, 190, 172);
 const kColorDarkBlue = Color(0xff8E8E8E);
-const kColorTeal = Color.fromARGB(118, 48, 149, 119);
+const kColorTeal = Color.fromARGB(118, 0, 0, 0);
 
 const kInputTextStyle = TextStyle(
     fontSize: 14,
