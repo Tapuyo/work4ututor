@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "855430775722",
+    "project_id": "workforyou-7c3b7",
+    "storage_bucket": "workforyou-7c3b7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855430775722:android:1893202a92c34d9e5ae1d3",
+        "android_client_info": {
+          "package_name": "com.example.wokr4ututor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "855430775722-9hanberv3dokt8acoj77b4fh35evgqt6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQYBMsZhiEIycpRCgA3IYJJrtq1Y1u1Io"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "855430775722-9hanberv3dokt8acoj77b4fh35evgqt6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "855430775722-leedkb29ljeu3rss1mkemtq4rh7pne2n.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.wokr4ututor"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
