@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
           child: child!,
         );
       },
-      title: 'Work4u',
+      title: 'Work4uTutor',
       initialRoute: Routes.splash,
       onGenerateRoute: RouteGenerator.generateRoute,
       debugShowCheckedModeBanner: false,
