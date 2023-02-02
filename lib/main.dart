@@ -7,6 +7,9 @@ import 'package:wokr4ututor/constant/constant.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/routes/route_generator.dart';
 import 'package:wokr4ututor/routes/routes.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:wokr4ututor/ui/web/login/login.dart';
+import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
 import 'package:wokr4ututor/ui/web/web_main.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
@@ -31,8 +34,10 @@ Future<void> setupFlutterNotifications() async {
 }
 
 void main() async {
+  
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
+    usePathUrlStrategy();
     await Firebase.initializeApp(
       options: const FirebaseOptions(
         apiKey: firebaseApiKey,
@@ -61,7 +66,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       builder: (context, child) {
-        return kIsWeb ? const WebMainPage():ScrollConfiguration(
+        return kIsWeb ? TutorSignup():ScrollConfiguration(
           behavior: MyBehavior(),
           child: child!,
         );

@@ -41,7 +41,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
   Widget build(BuildContext context) {
     return TextFormField(
       keyboardType: widget.keyboardType,
-      obscureText: _obscureText ?? false,
+      obscureText: _obscureText,
       controller: widget.controller,
       enabled: widget.enabled ?? true,
       decoration: InputDecoration(
