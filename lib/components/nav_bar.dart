@@ -1,67 +1,281 @@
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/constant/constant.dart';
+import 'package:wokr4ututor/ui/web/signup/student_signup.dart';
+import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
 
 class CustomAppBar extends StatelessWidget {
+  const CustomAppBar({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 70,
-      decoration: BoxDecoration(
-        // color: Colors.transparent,
-        color: Color.fromARGB(255, 9, 93, 116),
-        borderRadius: BorderRadius.circular(0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: Offset(0, 3), // changes position of shadow
+      height: 100,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.transparent,
+      ),
+      padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+      child: Row(
+        children: <Widget>[
+          const SizedBox(
+            width: 200,
           ),
+          Container(
+            height: 200,
+            width: 240,
+            child: Image.asset(
+              "assets/images/worklogo.png",
+              alignment: Alignment.topCenter,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Container(
+            height: 38,
+            width: 120,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(1, 118, 132, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                onSurface: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              onPressed: () {
+                print('Pressed');
+              },
+              icon: const Icon(Icons.language_rounded),
+              label: const Text('LANGUAGE'),
+            ),
+          ),
+          const Spacer(),
+          // Center(
+          //   child: Container(
+          //     decoration:const BoxDecoration(
+          //       shape: BoxShape.circle,
+          //       color: Colors.white,
+          //     ),
+          //     child: IconButton(
+          //       icon: const Icon(Icons.person),
+          //       iconSize: 30,
+          //       color: const Color.fromARGB(255, 9, 93, 116),
+          //       tooltip: 'Log Out',
+          //       onPressed: () {},
+          //     ),
+          //   ),
+          // ),
+          Container(
+            height: 38,
+            width: 110,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(1, 118, 132, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                onSurface: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  // fontFamily: 'Avenir',
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              onPressed: () {
+                print('Pressed');
+              },
+              child: const Text('FIND TUTOR'),
+            ),
+          ),
+          const SizedBox(
+            width: 20,
+          ),
+          Container(
+            height: 38,
+            width: 140,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(1, 118, 132, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                onSurface: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  // fontFamily: 'Avenir',
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const StudentSignup()),
+                );
+              },
+              child: const Text('BECOME A STUDENT'),
+            ),
+          ),
+          const SizedBox(
+            width: 20,
+          ),
+          Container(
+            height: 38,
+            width: 135,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(1, 118, 132, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                onSurface: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  // fontFamily: 'Avenir',
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              onPressed: () {
+               Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const TutorSignup()),
+                );
+              },
+              child: const Text('BECOME A TUTOR'),
+            ),
+          ),
+          const SizedBox(
+            width: 20,
+          ),
+          Container(
+            height: 38,
+            width: 110,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(103, 195, 208, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                onSurface: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  // fontFamily: 'Avenir',
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              onPressed: () {
+                print('Pressed');
+              },
+              child: const Text('LOG IN'),
+            ),
+          ),
+          const SizedBox(
+            width: 200,
+          )
         ],
+      ),
+    );
+  }
+}
+
+class CustomAppBarLog extends StatelessWidget {
+  const CustomAppBarLog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 80,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Color.fromRGBO(55, 116, 135, 1),
       ),
       child: Row(
         children: <Widget>[
+          const SizedBox(
+            width: 200,
+          ),
           Container(
-            height: 150,
-            width: 500,
-            margin: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+            height: 180,
+            width: 250,
             child: Image.asset(
-              "assets/images/NewLogo3-removebg-preview.png",
-              height: 25,
+              "assets/images/worklogo.png",
               alignment: Alignment.topCenter,
+              fit: BoxFit.cover,
             ),
           ),
-          // Text(
-          //   "Foodi".toUpperCase(),
-          //   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          const Spacer(),
+          Center(
+            child: Container(
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.person),
+                iconSize: 30,
+                color: const Color.fromARGB(255, 9, 93, 116),
+                tooltip: 'Log Out',
+                onPressed: () {},
+              ),
+            ),
+          ),
+          // TextButton(
+          //   style: TextButton.styleFrom(
+          //     primary: Colors.white,
+          //     onSurface: Colors.white,
+          //     shape: const BeveledRectangleBorder(
+          //         borderRadius: BorderRadius.all(Radius.circular(5))),
+          //     // ignore: prefer_const_constructors
+          //     textStyle: TextStyle(
+          //       color: Colors.black,
+          //       fontFamily: 'Avenir',
+          //       fontSize: 18,
+          //       fontStyle: FontStyle.normal,
+          //       decoration: TextDecoration.none,
+          //     ),
+          //   ),
+          //   onPressed: () {
+          //     print('Pressed');
+          //   },
+          //   child: const Text('About Us'),
           // ),
-          Spacer(),
-
-          // DefaultButton(
-          //   text: "Get Started",
-          //   press: () {},
-          // ),
-           TextButton(
-    child: Text('About Us'),
-    style: TextButton.styleFrom(
-      primary: Colors.white,
-      onSurface: Colors.white,
-      shape: const BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
-      // ignore: prefer_const_constructors
-      textStyle: TextStyle(
-          color: Colors.black,
-          fontSize: 20,
-          fontStyle: FontStyle.normal,
-          decoration: TextDecoration.underline,
-      ),
-    ),
-    
-    onPressed: () {
-      print('Pressed');
-    },
-  ),
           const SizedBox(
-            width: 100,
+            width: 200,
           )
         ],
       ),

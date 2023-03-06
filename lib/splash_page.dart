@@ -17,7 +17,6 @@ class _SplashPageState extends State<SplashPage> {
     Timer(const Duration(seconds: 3), () => {
      });
     if (kIsWeb) {
-     
       Navigator.of(context).pushReplacementNamed(Routes.webMain);
     } else {
       Navigator.of(context).pushReplacementNamed(Routes.mobMain);

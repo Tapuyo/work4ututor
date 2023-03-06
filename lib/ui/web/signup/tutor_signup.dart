@@ -1,9 +1,8 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/material.dart';
+import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
 
 class TutorSignup extends StatefulWidget {
@@ -27,7 +26,6 @@ bool obscure = true;
 class _TutorSignupState extends State<TutorSignup> {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return MaterialApp(
       title: 'Work4ututor',
       theme: ThemeData(
@@ -45,20 +43,24 @@ class CoverScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Container(
-      height: size.height,
-      width: size.width,
-      decoration: const BoxDecoration(
-          image: DecorationImage(
-        image: AssetImage("assets/images/12.jpg"),
-        fit: BoxFit.cover,
-      )),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: const <Widget>[
-          SignUp(),
-          // It will cover 1/3 of free spaces
-        ],
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Container(
+        height: size.height,
+        width: size.width,
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+          image: AssetImage("assets/images/Teacher (3).png"),
+          fit: BoxFit.cover,
+        )),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: const <Widget>[
+            CustomAppBar(),
+            SignUp(),
+            // It will cover 1/3 of free spaces
+          ],
+        ),
       ),
     );
   }
@@ -72,10 +74,14 @@ class SignUp extends StatelessWidget {
     return Container(
       width: 370,
       alignment: Alignment.centerRight,
-      margin: const EdgeInsets.fromLTRB(200, 120, 200, 0),
+      margin: const EdgeInsets.fromLTRB(200, 50, 200, 0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(25),
+        border: Border.all(
+          color: Colors.black45,
+          width: .5,
+        ),
       ),
       child: Column(
         children: [
@@ -216,52 +222,32 @@ class SignUp extends StatelessWidget {
             child: TextButton(
               style: TextButton.styleFrom(
                 textStyle: const TextStyle(color: Colors.black),
-                backgroundColor: const Color.fromARGB(255, 12, 100, 82),
+                backgroundColor: Color.fromRGBO(103, 195, 208, 1),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24.0),
                 ),
               ),
               onPressed: () {
-                print(tName);
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => const TutorInfo()),
-                // );
                 FirebaseFirestore.instance.collection('user').add(
                     {'email': tEmail, 'password': tPassword, 'role': 'Tutor'});
+                FirebaseFirestore.instance.collection('tutor').add({
+                  'firstName': tEmail,
+                  'lastName': tPassword,
+                  'userID': 'Tutor'
+                });
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const TutorInfo()),
+                );
               },
               child: Text(
-                'Sign Up',
+                'Confirm Submission',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: 18,
                 ),
               ),
             ),
-
-            //            TextButton.icon(
-            //             style: TextButton.styleFrom(
-            //               textStyle: const TextStyle(color: Colors.black),
-            //               backgroundColor: const Color.fromARGB(255, 12, 100, 82),
-            //               shape: RoundedRectangleBorder(
-            //                 borderRadius: BorderRadius.circular(24.0),
-            //               ),
-            //             ),
-            //             onPressed: () => {
-            //               Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => const TutorInfo()),
-            // ),
-            //             },
-            //             icon:  const Icon(
-            //               Icons.login_rounded,
-            //               color: Color.fromARGB(255, 12, 100, 82),
-            //             ),
-            //             label:   Text(
-            //               style:  TextStyle(color: Colors.white, fontSize: 20,),
-            //               'Confirm Submission',
-            //             ),
-            //           ),
           ),
           Container(
             alignment: Alignment.center,
@@ -270,8 +256,8 @@ class SignUp extends StatelessWidget {
               "By signing up, you agree to Work4uTutor\nTerms of Service and Privacy Policy",
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     color: Color.fromARGB(255, 59, 59, 59),
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    fontWeight: FontWeight.normal,
                   ),
               textAlign: TextAlign.center,
             ),
@@ -281,43 +267,3 @@ class SignUp extends StatelessWidget {
     );
   }
 }
-// void showDialogWithFields() {
-//   showDialog(
-//     context: context,
-//     builder: (_) {
-//       var emailController = TextEditingController();
-//       var messageController = TextEditingController();
-//       return AlertDialog(
-//         title: Text('Contact Us'),
-//         content: ListView(
-//           shrinkWrap: true,
-//           children: [
-//             TextFormField(
-//               controller: emailController,
-//               decoration: InputDecoration(hintText: 'Email'),
-//             ),
-//             TextFormField(
-//               controller: messageController,
-//               decoration: InputDecoration(hintText: 'Message'),
-//             ),
-//           ],
-//         ),
-//         actions: [
-//           TextButton(
-//             onPressed: () => Navigator.pop(context),
-//             child: Text('Cancel'),
-//           ),
-//           TextButton(
-//             onPressed: () {
-//               // Send them to your email maybe?
-//               var email = emailController.text;
-//               var message = messageController.text;
-//               Navigator.pop(context);
-//             },
-//             child: Text('Send'),
-//           ),
-//         ],
-//       );
-//     },
-//   );
-// }

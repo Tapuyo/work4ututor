@@ -13,7 +13,7 @@ class _MainPageState extends State<WebMainPage> {
 
     return  Container(
       color: Colors.teal,
-      child:  Text('Home Web'),
+      child: const Text('Home Web'),
     );
   }
 }

@@ -1,6 +1,4 @@
-
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/components/nav_bar.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -18,7 +16,6 @@ bool obscure = true;
 class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return MaterialApp(
       title: 'Work4ututor',
       theme: ThemeData(
@@ -26,11 +23,10 @@ class _LoginPageState extends State<LoginPage> {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: Scaffold(
-          appBar: null,
+          // appBar: null,
           body: Center(
             child: Column(
-              children: <Widget>[
-                CustomAppBar(),
+              children: const <Widget>[
                 SignUp(),
                 // It will cover 1/3 of free spaces
               ],
@@ -56,8 +52,7 @@ class CoverScreen extends StatelessWidget {
       )),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
-        children: <Widget>[
-          CustomAppBar(),
+        children: const <Widget>[
           SignUp(),
           // It will cover 1/3 of free spaces
         ],
@@ -84,7 +79,7 @@ class SignUp extends StatelessWidget {
             color: Colors.grey.withOpacity(1),
             spreadRadius: 5,
             blurRadius: 7,
-            offset: Offset(0, 3), // changes position of shadow
+            offset: const Offset(0, 3), // changes position of shadow
           ),
         ],
       ),
@@ -106,7 +101,7 @@ class SignUp extends StatelessWidget {
             child: Text(
               " Welcome Back!",
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Color.fromARGB(255, 3, 63, 56),
+                    color: const Color.fromARGB(255, 3, 63, 56),
                     fontWeight: FontWeight.bold,
                   ),
               textAlign: TextAlign.center,
@@ -148,7 +143,7 @@ class SignUp extends StatelessWidget {
                         borderRadius: BorderRadius.circular(5.0),
                       ),
                       hintText: 'Password',
-                      suffixIcon: IconButton(
+                      suffixIcon: const IconButton(
                         onPressed: null,
                         icon: Icon(Icons.remove_red_eye_rounded),
                       ),
@@ -200,7 +195,7 @@ class SignUp extends StatelessWidget {
             child: Text(
               "Don't have an account? Register Now",
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Color.fromARGB(255, 59, 59, 59),
+                    color: const Color.fromARGB(255, 59, 59, 59),
                     fontSize: 12,
                     fontWeight: FontWeight.w300,
                   ),
