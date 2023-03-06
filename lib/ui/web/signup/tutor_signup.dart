@@ -37,9 +37,14 @@ class _TutorSignupState extends State<TutorSignup> {
   }
 }
 
-class CoverScreen extends StatelessWidget {
+class CoverScreen extends StatefulWidget {
   const CoverScreen({super.key});
 
+  @override
+  State<CoverScreen> createState() => _CoverScreenState();
+}
+
+class _CoverScreenState extends State<CoverScreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -50,7 +55,7 @@ class CoverScreen extends StatelessWidget {
         width: size.width,
         decoration: const BoxDecoration(
             image: DecorationImage(
-          image: AssetImage("assets/images/Teacher (3).png"),
+          image: AssetImage("assets/images/Teacher (4).png"),
           fit: BoxFit.cover,
         )),
         child: Column(
@@ -66,9 +71,14 @@ class CoverScreen extends StatelessWidget {
   }
 }
 
-class SignUp extends StatelessWidget {
+class SignUp extends StatefulWidget {
   const SignUp({super.key});
 
+  @override
+  State<SignUp> createState() => _SignUpState();
+}
+
+class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -110,6 +120,7 @@ class SignUp extends StatelessWidget {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
                         ),
+                        hintStyle: TextStyle(color: Colors.black),
                         hintText: 'Name',
                       ),
                       validator: (val) =>
@@ -130,6 +141,7 @@ class SignUp extends StatelessWidget {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
                         ),
+                        hintStyle: TextStyle(color: Colors.black),
                         hintText: 'Surname',
                       ),
                       validator: (val) =>
@@ -150,6 +162,7 @@ class SignUp extends StatelessWidget {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
                         ),
+                        hintStyle: TextStyle(color: Colors.black),
                         hintText: 'Email',
                       ),
                       validator: (val) =>
@@ -171,10 +184,23 @@ class SignUp extends StatelessWidget {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
                         ),
+                        hintStyle: TextStyle(color: Colors.black),
                         hintText: 'Password',
-                        suffixIcon: IconButton(
-                          onPressed: null,
-                          icon: Icon(Icons.remove_red_eye_rounded),
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.all(0),
+                          child: IconButton(
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            onPressed: () {
+                              // Update the state i.e. toogle the state of passwordVisible variable
+                              setState(() {
+                                obscure = !obscure;
+                              });
+                            },
+                            icon: Icon(Icons.remove_red_eye_rounded),
+                            iconSize: 20,
+                          ),
                         ),
                         suffixIconColor: Colors.black,
                       ),
@@ -197,10 +223,23 @@ class SignUp extends StatelessWidget {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
                         ),
+                        hintStyle: TextStyle(color: Colors.black),
                         hintText: 'Confirm Password',
-                        suffixIcon: IconButton(
-                          onPressed: null,
-                          icon: Icon(Icons.remove_red_eye_rounded),
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.all(0),
+                          child: IconButton(
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            onPressed: () {
+                              // Update the state i.e. toogle the state of passwordVisible variable
+                              setState(() {
+                                obscure = !obscure;
+                              });
+                            },
+                            icon: Icon(Icons.remove_red_eye_rounded),
+                            iconSize: 20,
+                          ),
                         ),
                         suffixIconColor: Colors.black,
                       ),

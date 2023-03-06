@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wokr4ututor/components/nav_bar.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -25,19 +26,19 @@ class _LoginPageState extends State<LoginPage> {
       home: Scaffold(
           // appBar: null,
           body: Center(
-            child: Column(
-              children: const <Widget>[
-                SignUp(),
-                // It will cover 1/3 of free spaces
-              ],
-            ),
-          )),
+        child: Column(
+          children: const <Widget>[
+            LogScreen(),
+            // It will cover 1/3 of free spaces
+          ],
+        ),
+      )),
     );
   }
 }
 
-class CoverScreen extends StatelessWidget {
-  const CoverScreen({super.key});
+class LogScreen extends StatelessWidget {
+  const LogScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,13 +48,14 @@ class CoverScreen extends StatelessWidget {
       width: size.width,
       decoration: const BoxDecoration(
           image: DecorationImage(
-        image: AssetImage("assets/images/log1.jpg"),
+        image: AssetImage("assets/images/Student (12).png"),
         fit: BoxFit.cover,
       )),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: const <Widget>[
-          SignUp(),
+          CustomAppBar(),
+          SigniN(),
           // It will cover 1/3 of free spaces
         ],
       ),
@@ -61,9 +63,14 @@ class CoverScreen extends StatelessWidget {
   }
 }
 
-class SignUp extends StatelessWidget {
-  const SignUp({super.key});
+class SigniN extends StatefulWidget {
+  const SigniN({super.key});
 
+  @override
+  State<SigniN> createState() => _SigniNState();
+}
+
+class _SigniNState extends State<SigniN> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -87,9 +94,21 @@ class SignUp extends StatelessWidget {
         children: [
           Container(
             alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color:const Color.fromRGBO(1, 118, 132, 1),
+              borderRadius: BorderRadius.circular(25),
+              // boxShadow: [
+              //   BoxShadow(
+              //     color:const Color.fromRGBO(1, 118, 132, 1).withOpacity(1),
+              //     spreadRadius: 5,
+              //     blurRadius: 7,
+              //     offset: const Offset(0, 3), // changes position of shadow
+              //   ),
+              // ],
+            ),
             padding: const EdgeInsets.fromLTRB(50, 15, 50, 10),
             child: Image.asset(
-              'assets/images/NewLogo3-removebg-preview.png',
+              'assets/images/worklogo.png',
               width: 350.0,
               height: 100.0,
               fit: BoxFit.contain,

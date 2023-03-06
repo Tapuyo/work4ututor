@@ -66,9 +66,14 @@ class SignScreen extends StatelessWidget {
   }
 }
 
-class StudentSignUp extends StatelessWidget {
+class StudentSignUp extends StatefulWidget {
   const StudentSignUp({super.key});
 
+  @override
+  State<StudentSignUp> createState() => _StudentSignUpState();
+}
+
+class _StudentSignUpState extends State<StudentSignUp> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -132,9 +137,21 @@ class StudentSignUp extends StatelessWidget {
                           borderRadius: BorderRadius.circular(5.0),
                         ),
                         hintText: 'Password',
-                        suffixIcon: IconButton(
-                          onPressed: null,
-                          icon: Icon(Icons.remove_red_eye_rounded),
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.all(0),
+                          child: IconButton(
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            hoverColor:Colors.transparent,
+                            onPressed: () {
+                              // Update the state i.e. toogle the state of passwordVisible variable
+                              setState(() {
+                                obscure = !obscure;
+                              });
+                            },
+                            icon: Icon(Icons.remove_red_eye_rounded),
+                            iconSize: 20,
+                          ),
                         ),
                         suffixIconColor: Colors.black,
                       ),
@@ -158,9 +175,21 @@ class StudentSignUp extends StatelessWidget {
                           borderRadius: BorderRadius.circular(5.0),
                         ),
                         hintText: 'Confirm Password',
-                        suffixIcon: IconButton(
-                          onPressed: null,
-                          icon: Icon(Icons.remove_red_eye_rounded),
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.all(0),
+                          child: IconButton(
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            hoverColor:Colors.transparent,
+                            onPressed: () {
+                              // Update the state i.e. toogle the state of passwordVisible variable
+                              setState(() {
+                                obscure = !obscure;
+                              });
+                            },
+                            icon: Icon(Icons.remove_red_eye_rounded),
+                            iconSize: 20,
+                          ),
                         ),
                         suffixIconColor: Colors.black,
                       ),
