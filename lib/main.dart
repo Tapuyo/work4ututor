@@ -10,7 +10,6 @@ import 'package:wokr4ututor/routes/routes.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -44,6 +43,7 @@ void main() async {
         appId: firebaseAppId,
         messagingSenderId: firebaseMessagingSenderId,
         projectId: firebaseProjectId,
+        storageBucket: storageBucket,
       ),
     );
   } else {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
+import 'package:wokr4ututor/ui/auth/auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -7,6 +8,9 @@ class LoginPage extends StatefulWidget {
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
+
+final AuthService _auth = AuthService();
+final formKey = GlobalKey<FormState>();
 
 String userPassword = '';
 String userEmail = '';
@@ -77,151 +81,149 @@ class _SigniNState extends State<SigniN> {
       width: 400,
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
       alignment: Alignment.center,
-      margin: const EdgeInsets.fromLTRB(200, 70, 200, 100),
+      margin: const EdgeInsets.fromLTRB(200, 50, 200, 100),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(25),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(1),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: const Offset(0, 3), // changes position of shadow
-          ),
-        ],
       ),
-      child: Column(
-        children: [
-          Container(
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color:const Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.circular(25),
-              // boxShadow: [
-              //   BoxShadow(
-              //     color:const Color.fromRGBO(1, 118, 132, 1).withOpacity(1),
-              //     spreadRadius: 5,
-              //     blurRadius: 7,
-              //     offset: const Offset(0, 3), // changes position of shadow
-              //   ),
-              // ],
+      child: Form(
+        key: formKey,
+        child: Column(
+          children: [
+            Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(1, 118, 132, 1),
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Image.asset(
+                'assets/images/worklogo.png',
+                width: 350.0,
+                height: 100.0,
+                fit: BoxFit.contain,
+              ),
             ),
-            padding: const EdgeInsets.fromLTRB(50, 15, 50, 10),
-            child: Image.asset(
-              'assets/images/worklogo.png',
-              width: 350.0,
-              height: 100.0,
-              fit: BoxFit.contain,
-            ),
-          ),
-          Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-            child: Text(
-              " Welcome Back!",
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: const Color.fromARGB(255, 3, 63, 56),
-                    fontWeight: FontWeight.bold,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(25, 10, 20, 10),
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 12,
-                ),
-                SizedBox(
-                  width: 350,
-                  height: 50,
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5.0),
-                      ),
-                      hintText: 'Email',
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
+              child: Text(
+                " Welcome Back!",
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
                     ),
-                    validator: (val) => val!.isEmpty ? 'Enter an email' : null,
-                    onChanged: (val) {
-                      userEmail = val;
-                    },
-                  ),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                SizedBox(
-                  width: 350,
-                  height: 50,
-                  child: TextFormField(
-                    obscureText: obscure,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5.0),
-                      ),
-                      hintText: 'Password',
-                      suffixIcon: const IconButton(
-                        onPressed: null,
-                        icon: Icon(Icons.remove_red_eye_rounded),
-                      ),
-                      suffixIconColor: Colors.black,
-                    ),
-                    validator: (val) =>
-                        val!.length < 6 ? 'Enter a 6+ valid password' : null,
-                    onChanged: (val) {
-                      userPassword = val;
-                    },
-                  ),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-              ],
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
-          FittedBox(
-            // Now it just take the required spaces
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-              width: 350,
-              height: 70,
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  textStyle: const TextStyle(color: Colors.black),
-                  backgroundColor: const Color.fromARGB(255, 9, 93, 116),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.0),
+            Container(
+              padding: const EdgeInsets.fromLTRB(25, 10, 20, 10),
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 12,
                   ),
-                ),
-                onPressed: () => {
-                  // Navigator.of(context).pushNamed(const SignInfo() as String),
-                },
-                child: Text(
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
+                  SizedBox(
+                    width: 380,
+                    height: 60,
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        hintText: 'Email',
+                      ),
+                      validator: (val) => val!.isEmpty ? 'Enter an email' : null,
+                      onChanged: (val) {
+                        userEmail = val;
+                      },
+                    ),
                   ),
-                  'Confirm Submission',
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  SizedBox(
+                    width: 380,
+                    height: 60,
+                    child: TextFormField(
+                      obscureText: obscure,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        hintText: 'Password',
+                        suffixIcon: const IconButton(
+                          onPressed: null,
+                          icon: Icon(Icons.remove_red_eye_rounded),
+                        ),
+                        suffixIconColor: Colors.black,
+                      ),
+                      validator: (val) =>
+                          val!.length < 6 ? 'Enter a 6+ valid password' : null,
+                      onChanged: (val) {
+                        userPassword = val;
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                ],
+              ),
+            ),
+            FittedBox(
+              // Now it just take the required spaces
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                width: 380,
+                height: 70,
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    textStyle: const TextStyle(color: Colors.black),
+                    backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                    shape: RoundedRectangleBorder(
+                      side: const BorderSide(
+                        color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(30.0),
+                    ),
+                  ),
+                  onPressed: ()  async{
+                     if (formKey.currentState!.validate()){
+                    dynamic result = await _auth.signinwEmailandPassword(userEmail, userPassword);
+                    if(result ==  null){
+                      setState(() {
+                        error = 'Could not sign in w/ those credential';
+                        print(error);
+                      });
+                    }
+                   }
+                  },
+                  child: Text(
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                    ),
+                    'Confirm Submission',
+                  ),
                 ),
               ),
             ),
-          ),
-          Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
-            child: Text(
-              "Don't have an account? Register Now",
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: const Color.fromARGB(255, 59, 59, 59),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w300,
-                  ),
-              textAlign: TextAlign.center,
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
+              child: Text(
+                "Don't have an account? Register Now",
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: const Color.fromARGB(255, 59, 59, 59),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w300,
+                    ),
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

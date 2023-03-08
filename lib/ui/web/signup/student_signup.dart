@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
+import 'package:wokr4ututor/services/services.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
 
 class StudentSignup extends StatefulWidget {
@@ -17,6 +18,7 @@ final formKey = GlobalKey<FormState>();
 String tName = '';
 String tLastName = '';
 String tEmail = '';
+String uType = "tutor";
 String tPassword = '';
 String tConPassword = '';
 
@@ -205,7 +207,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.fromLTRB(10, 25, 10, 10),
+            padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
             width: 320,
             height: 70,
             child: TextButton(
@@ -213,17 +215,15 @@ class _StudentSignUpState extends State<StudentSignUp> {
                 textStyle: const TextStyle(color: Colors.black),
                 backgroundColor: Color.fromRGBO(103, 195, 208, 1),
                 shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                    width: 1,
+                  ),
                   borderRadius: BorderRadius.circular(24.0),
                 ),
               ),
               onPressed: () {
-                FirebaseFirestore.instance.collection('user').add(
-                    {'email': tEmail, 'password': tPassword, 'role': 'Tutor'});
-                FirebaseFirestore.instance.collection('tutor').add({
-                  'firstName': tEmail,
-                  'lastName': tPassword,
-                  'userID': 'Tutor'
-                });
+                addUser(tEmail, tPassword,uType);
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const TutorInfo()),

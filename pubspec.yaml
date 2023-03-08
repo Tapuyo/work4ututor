@@ -51,6 +51,8 @@ dependencies:
   country_pickers: ^2.0.0
   flutter_native_timezone: ^2.0.0
   timezone: ^0.9.1
+  file_picker: ^5.2.5
+  firebase_storage: ^11.0.14
 
 dev_dependencies:
   flutter_test:
