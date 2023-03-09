@@ -53,6 +53,7 @@ dependencies:
   timezone: ^0.9.1
   file_picker: ^5.2.5
   firebase_storage: ^11.0.14
+  google_fonts: ^3.0.1
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,10 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
+import 'dart:typed_data';
+import 'package:google_fonts/google_fonts.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -81,10 +85,10 @@ class _SigniNState extends State<SigniN> {
       width: 400,
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
       alignment: Alignment.center,
-      margin: const EdgeInsets.fromLTRB(200, 50, 200, 100),
+      margin: const EdgeInsets.fromLTRB(200, 30, 200, 100),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(25),
+        color: Colors.white.withOpacity(.9),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Form(
         key: formKey,
@@ -93,30 +97,45 @@ class _SigniNState extends State<SigniN> {
             Container(
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(1, 118, 132, 1),
-                borderRadius: BorderRadius.circular(25),
+                // color: const Color.fromRGBO(1, 118, 132, 1),
+                borderRadius: BorderRadius.circular(15),
               ),
               child: Image.asset(
                 'assets/images/worklogo.png',
-                width: 350.0,
+                width: 300.0,
                 height: 100.0,
                 fit: BoxFit.contain,
               ),
             ),
             Container(
               alignment: Alignment.center,
-              padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-              child: Text(
-                " Welcome Back!",
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: Column(
+                children: [
+                  Text(
+                    " Welcome Back!",
+                    style: GoogleFonts.roboto(
+                      textStyle: Theme.of(context).textTheme.headlineMedium,
+                      color: Color.fromRGBO(1, 118, 132, 1),
+                      fontWeight: FontWeight.w600,
                     ),
-                textAlign: TextAlign.center,
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    " Have a great day ahead.",
+                    style: GoogleFonts.roboto(
+                      textStyle: Theme.of(context).textTheme.headlineSmall,
+                      color: Colors.black87,
+                      fontSize: 18,
+                      fontWeight: FontWeight.normal,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
             Container(
-              padding: const EdgeInsets.fromLTRB(25, 10, 20, 10),
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
               child: Column(
                 children: [
                   const SizedBox(
@@ -130,9 +149,11 @@ class _SigniNState extends State<SigniN> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
                         ),
+                        hintStyle: TextStyle(color: Colors.black, fontSize: 16),
                         hintText: 'Email',
                       ),
-                      validator: (val) => val!.isEmpty ? 'Enter an email' : null,
+                      validator: (val) =>
+                          val!.isEmpty ? 'Enter an email' : null,
                       onChanged: (val) {
                         userEmail = val;
                       },
@@ -150,6 +171,7 @@ class _SigniNState extends State<SigniN> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
                         ),
+                        hintStyle: TextStyle(color: Colors.black, fontSize: 16),
                         hintText: 'Password',
                         suffixIcon: const IconButton(
                           onPressed: null,
@@ -164,48 +186,61 @@ class _SigniNState extends State<SigniN> {
                       },
                     ),
                   ),
-                  const SizedBox(
-                    height: 15,
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        textStyle: const TextStyle(color: Colors.black),
+                      ),
+                      onPressed: () async {},
+                      child: Text(
+                        style: GoogleFonts.roboto(
+                          color: const Color.fromRGBO(1, 118, 132, 1),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        'Forgot your password?',
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            FittedBox(
-              // Now it just take the required spaces
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                width: 380,
-                height: 70,
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    textStyle: const TextStyle(color: Colors.black),
-                    backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
-                    shape: RoundedRectangleBorder(
-                      side: const BorderSide(
-                        color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(30.0),
+            Container(
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+              width: 380,
+              height: 75,
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  textStyle: const TextStyle(color: Colors.black),
+                  backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                  shape: RoundedRectangleBorder(
+                    side: const BorderSide(
+                      color:
+                          Color.fromRGBO(1, 118, 132, 1), // your color here
+                      width: 1,
                     ),
+                    borderRadius: BorderRadius.circular(30.0),
                   ),
-                  onPressed: ()  async{
-                     if (formKey.currentState!.validate()){
-                    dynamic result = await _auth.signinwEmailandPassword(userEmail, userPassword);
-                    if(result ==  null){
+                ),
+                onPressed: () async {
+                  if (formKey.currentState!.validate()) {
+                    dynamic result = await _auth.signinwEmailandPassword(
+                        userEmail, userPassword);
+                    if (result == null) {
                       setState(() {
                         error = 'Could not sign in w/ those credential';
                         print(error);
                       });
                     }
-                   }
-                  },
-                  child: Text(
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                    ),
-                    'Confirm Submission',
+                  }
+                },
+                child: Text(
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
                   ),
+                  'Confirm Submission',
                 ),
               ),
             ),
@@ -213,10 +248,10 @@ class _SigniNState extends State<SigniN> {
               alignment: Alignment.center,
               padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
               child: Text(
-                "Don't have an account? Register Now",
+                "By signing up, you agree to Work4uTutor\nTerms of Service and Privacy Policy",
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       color: const Color.fromARGB(255, 59, 59, 59),
-                      fontSize: 12,
+                      fontSize: 14,
                       fontWeight: FontWeight.w300,
                     ),
                 textAlign: TextAlign.center,

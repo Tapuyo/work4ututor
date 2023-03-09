@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:wokr4ututor/services/services.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
@@ -79,11 +80,11 @@ class _StudentSignUpState extends State<StudentSignUp> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 370,
+      width: 420,
       alignment: Alignment.centerRight,
       margin: const EdgeInsets.fromLTRB(200, 50, 200, 0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(.9),
         borderRadius: BorderRadius.circular(25),
         border: Border.all(
           color: Colors.black45,
@@ -94,122 +95,125 @@ class _StudentSignUpState extends State<StudentSignUp> {
         children: [
           Container(
             alignment: Alignment.center,
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 25),
+            padding: const EdgeInsets.fromLTRB(10, 15, 10, 25),
             child: Text(
               " Ready to learn from\nour expert tutor's and enjoy\nfriendly classes.",
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: GoogleFonts.roboto(
+                      textStyle: Theme.of(context).textTheme.headlineMedium,
+                      color: Color.fromRGBO(1, 118, 132, 1),
+                      fontSize: 30,
+                      fontWeight: FontWeight.w600,
+                    ),
               textAlign: TextAlign.center,
             ),
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(25, 10, 20, 10),
-            child: Card(
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: 320,
-                    height: 40,
-                    child: TextFormField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                        hintText: 'Email',
+            child: Column(
+              children: [
+                SizedBox(
+                  width: 380,
+                  height: 60,
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0),
                       ),
-                      validator: (val) =>
-                          val!.isEmpty ? 'Enter an email' : null,
-                      onChanged: (val) {
-                        tEmail = val;
-                      },
+                      hintStyle: TextStyle(color: Colors.black, fontSize: 16),
+                      hintText: 'Email',
                     ),
+                    validator: (val) =>
+                        val!.isEmpty ? 'Enter an email' : null,
+                    onChanged: (val) {
+                      tEmail = val;
+                    },
                   ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  SizedBox(
-                    width: 320,
-                    height: 40,
-                    child: TextFormField(
-                      obscureText: obscure,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                        hintText: 'Password',
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.all(0),
-                          child: IconButton(
-                            splashColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            hoverColor:Colors.transparent,
-                            onPressed: () {
-                              // Update the state i.e. toogle the state of passwordVisible variable
-                              setState(() {
-                                obscure = !obscure;
-                              });
-                            },
-                            icon: Icon(Icons.remove_red_eye_rounded),
-                            iconSize: 20,
-                          ),
-                        ),
-                        suffixIconColor: Colors.black,
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                SizedBox(
+                  width: 380,
+                  height: 60,
+                  child: TextFormField(
+                    obscureText: obscure,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0),
                       ),
-                      validator: (val) =>
-                          val!.length < 6 ? 'Enter a 6+ valid password' : null,
-                      onChanged: (val) {
-                        tName = val;
-                      },
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  SizedBox(
-                    width: 320,
-                    height: 40,
-                    child: TextFormField(
-                      obscureText: obscure,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0),
+                      hintStyle: TextStyle(color: Colors.black, fontSize: 16),
+                      hintText: 'Password',
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.all(0),
+                        child: IconButton(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          hoverColor:Colors.transparent,
+                          onPressed: () {
+                            // Update the state i.e. toogle the state of passwordVisible variable
+                            setState(() {
+                              obscure = !obscure;
+                            });
+                          },
+                          icon: Icon(Icons.remove_red_eye_rounded),
+                          iconSize: 20,
                         ),
-                        hintText: 'Confirm Password',
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.all(0),
-                          child: IconButton(
-                            splashColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            hoverColor:Colors.transparent,
-                            onPressed: () {
-                              // Update the state i.e. toogle the state of passwordVisible variable
-                              setState(() {
-                                obscure = !obscure;
-                              });
-                            },
-                            icon: Icon(Icons.remove_red_eye_rounded),
-                            iconSize: 20,
-                          ),
-                        ),
-                        suffixIconColor: Colors.black,
                       ),
-                      validator: (val) =>
-                          val != tPassword ? 'Password not Match' : null,
-                      onChanged: (val) {
-                        tName = val;
-                      },
+                      suffixIconColor: Colors.black,
                     ),
+                    validator: (val) =>
+                        val!.length < 6 ? 'Enter a 6+ valid password' : null,
+                    onChanged: (val) {
+                      tPassword = val;
+                    },
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                SizedBox(
+                  width: 380,
+                  height: 60,
+                  child: TextFormField(
+                    obscureText: obscure,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      hintStyle: TextStyle(color: Colors.black, fontSize: 16),
+                      hintText: 'Confirm Password',
+                      suffixIcon: Padding(
+                        padding: const EdgeInsets.all(0),
+                        child: IconButton(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          hoverColor:Colors.transparent,
+                          onPressed: () {
+                            // Update the state i.e. toogle the state of passwordVisible variable
+                            setState(() {
+                              obscure = !obscure;
+                            });
+                          },
+                          icon: Icon(Icons.remove_red_eye_rounded),
+                          iconSize: 20,
+                        ),
+                      ),
+                      suffixIconColor: Colors.black,
+                    ),
+                    validator: (val) =>
+                        val != tPassword ? 'Password not Match' : null,
+                    onChanged: (val) {
+                      tConPassword = val;
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-            width: 320,
-            height: 70,
+            width: 380,
+            height: 75,
             child: TextButton(
               style: TextButton.styleFrom(
                 textStyle: const TextStyle(color: Colors.black),
