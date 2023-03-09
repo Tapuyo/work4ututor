@@ -117,7 +117,8 @@ class CustomAppBar extends StatelessWidget {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const StudentSignup()),
+                  MaterialPageRoute(
+                      builder: (context) => const StudentSignup()),
                 );
               },
               child: const Text('BECOME A STUDENT'),
@@ -150,7 +151,7 @@ class CustomAppBar extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-               Navigator.pushReplacement(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => const TutorSignup()),
                 );
@@ -251,46 +252,59 @@ class CustomAppBarLog extends StatelessWidget {
     );
   }
 }
+
 class DashboardMenu extends StatelessWidget {
   const DashboardMenu({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Container(
-      height: 100,
+      height: size.height,
+      width: 300,
       alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        color: Colors.transparent,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: Colors.black45,
+          width: .5,
+        ),
       ),
       padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
       child: Column(
         children: <Widget>[
           const SizedBox(
-            width: 200,
+            width: 300,
           ),
-          SizedBox(
-            height: 200,
-            width: 240,
-            child: Image.asset(
-              "assets/images/worklogo.png",
-              alignment: Alignment.topCenter,
-              fit: BoxFit.cover,
-            ),
-          ),
+          // SizedBox(
+          //   height: 200,
+          //   width: 240,
+          //   child: Image.asset(
+          //     "assets/images/worklogo.png",
+          //     alignment: Alignment.topCenter,
+          //     fit: BoxFit.cover,
+          //   ),
+          // ),
           Container(
-            height: 38,
-            width: 120,
+            height: 45,
+            width: 220,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
               color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(20)),
+              borderRadius: BorderRadius.all(Radius.circular(25)),
             ),
             child: TextButton.icon(
               style: TextButton.styleFrom(
                 primary: Colors.white,
                 onSurface: Colors.white,
-                shape: const BeveledRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(
+                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(24.0),
+                ),
                 // ignore: prefer_const_constructors
                 textStyle: TextStyle(
                   color: Colors.black,
@@ -306,25 +320,32 @@ class DashboardMenu extends StatelessWidget {
               label: const Text('LANGUAGE'),
             ),
           ),
-          const Spacer(),
+          const SizedBox(
+            height: 20,
+          ),
           Container(
-            height: 38,
-            width: 110,
+            height: 45,
+            width: 220,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
               color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(20)),
+              borderRadius: BorderRadius.all(Radius.circular(25)),
             ),
-            child: TextButton(
+            child: TextButton.icon(
               style: TextButton.styleFrom(
                 primary: Colors.white,
                 onSurface: Colors.white,
-                shape: const BeveledRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(
+                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(24.0),
+                ),
                 // ignore: prefer_const_constructors
                 textStyle: TextStyle(
                   color: Colors.black,
-                  // fontFamily: 'Avenir',
                   fontSize: 12,
                   fontStyle: FontStyle.normal,
                   decoration: TextDecoration.none,
@@ -333,113 +354,202 @@ class DashboardMenu extends StatelessWidget {
               onPressed: () {
                 print('Pressed');
               },
-              child: const Text('FIND TUTOR'),
+              icon: const Icon(Icons.language_rounded),
+              label: const Text('LANGUAGE'),
             ),
           ),
           const SizedBox(
-            width: 20,
+            height: 20,
           ),
           Container(
-            height: 38,
-            width: 140,
+            height: 45,
+            width: 220,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
               color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(20)),
+              borderRadius: BorderRadius.all(Radius.circular(25)),
             ),
-            child: TextButton(
+            child: TextButton.icon(
               style: TextButton.styleFrom(
                 primary: Colors.white,
                 onSurface: Colors.white,
-                shape: const BeveledRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(
+                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(24.0),
+                ),
                 // ignore: prefer_const_constructors
                 textStyle: TextStyle(
                   color: Colors.black,
-                  // fontFamily: 'Avenir',
                   fontSize: 12,
                   fontStyle: FontStyle.normal,
                   decoration: TextDecoration.none,
                 ),
               ),
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const StudentSignup()),
-                );
+                print('Pressed');
               },
-              child: const Text('BECOME A STUDENT'),
+              icon: const Icon(Icons.language_rounded),
+              label: const Text('LANGUAGE'),
             ),
           ),
           const SizedBox(
-            width: 20,
+            height: 20,
           ),
           Container(
-            height: 38,
-            width: 135,
+            height: 45,
+            width: 220,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
               color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(20)),
+              borderRadius: BorderRadius.all(Radius.circular(25)),
             ),
-            child: TextButton(
+            child: TextButton.icon(
               style: TextButton.styleFrom(
                 primary: Colors.white,
                 onSurface: Colors.white,
-                shape: const BeveledRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(
+                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(24.0),
+                ),
                 // ignore: prefer_const_constructors
                 textStyle: TextStyle(
                   color: Colors.black,
-                  // fontFamily: 'Avenir',
                   fontSize: 12,
                   fontStyle: FontStyle.normal,
                   decoration: TextDecoration.none,
                 ),
               ),
               onPressed: () {
-               Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const TutorSignup()),
-                );
+                print('Pressed');
               },
-              child: const Text('BECOME A TUTOR'),
+              icon: const Icon(Icons.language_rounded),
+              label: const Text('LANGUAGE'),
             ),
           ),
           const SizedBox(
-            width: 20,
+            height: 20,
           ),
           Container(
-            height: 38,
-            width: 110,
+            height: 45,
+            width: 220,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
-              color: Color.fromRGBO(103, 195, 208, 1),
-              borderRadius: BorderRadius.all(Radius.circular(20)),
+              color: Color.fromRGBO(1, 118, 132, 1),
+              borderRadius: BorderRadius.all(Radius.circular(25)),
             ),
-            child: TextButton(
+            child: TextButton.icon(
               style: TextButton.styleFrom(
                 primary: Colors.white,
                 onSurface: Colors.white,
-                shape: const BeveledRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(
+                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(25.0),
+                ),
                 // ignore: prefer_const_constructors
                 textStyle: TextStyle(
                   color: Colors.black,
-                  // fontFamily: 'Avenir',
                   fontSize: 12,
                   fontStyle: FontStyle.normal,
                   decoration: TextDecoration.none,
                 ),
               ),
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
+                print('Pressed');
               },
-              child: const Text('LOG IN'),
+              icon: const Icon(Icons.language_rounded),
+              label: const Text('LANGUAGE'),
             ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Container(
+            height: 45,
+            width: 220,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(1, 118, 132, 1),
+              borderRadius: BorderRadius.all(Radius.circular(25)),
+            ),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                onSurface: Colors.white,
+                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(
+                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(25.0),
+                ),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              onPressed: () {
+                print('Pressed');
+              },
+              icon: const Icon(Icons.language_rounded),
+              label: const Text('LANGUAGE'),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Container(
+            height: 45,
+            width: 220,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(1, 118, 132, 1),
+              borderRadius: BorderRadius.all(Radius.circular(25)),
+            ),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                onSurface: Colors.white,
+                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(
+                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(25.0),
+                ),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              onPressed: () {
+                print('Pressed');
+              },
+              icon: const Icon(Icons.language_rounded),
+              label: const Text('LANGUAGE'),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
           ),
           const SizedBox(
             width: 200,

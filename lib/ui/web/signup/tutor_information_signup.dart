@@ -1,6 +1,7 @@
 import 'package:country_pickers/country.dart';
 import 'package:flutter/material.dart';
 import 'package:country_pickers/country_pickers.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:wokr4ututor/components/footer.dart';
 import 'dart:js' as js;
@@ -101,12 +102,12 @@ class _InputInfoState extends State<InputInfo> {
                     height: 130,
                     child: Text(
                       "Subcribe with your information",
-                      style:
-                          Theme.of(context).textTheme.headlineLarge?.copyWith(
-                                color: const Color.fromRGBO(1, 118, 132, 1),
-                                fontSize: 50,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      style: GoogleFonts.roboto(
+                        textStyle: Theme.of(context).textTheme.headlineMedium,
+                        color: const Color.fromRGBO(1, 118, 132, 1),
+                        fontSize: 60,
+                        fontWeight: FontWeight.w900,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -273,7 +274,7 @@ class _InputInfoState extends State<InputInfo> {
                         const SizedBox(
                           height: 14,
                         ),
-                        Container(
+                        SizedBox(
                           width: 600,
                           height: thieght,
                           child: Column(
@@ -281,7 +282,8 @@ class _InputInfoState extends State<InputInfo> {
                               Expanded(
                                 child: ListView.builder(
                                     primary: false,
-                                    physics: NeverScrollableScrollPhysics(),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
                                     itemCount: languageCount,
                                     itemBuilder: (context, index) {
                                       return Column(
@@ -317,10 +319,9 @@ class _InputInfoState extends State<InputInfo> {
                                               onChanged: (String? value) {
                                                 setState(() {
                                                   print(value);
-                                                  if (tlanguages.contains(
-                                                      value.toString())) {
-                                                    AlertDialog;
-                                                  }  else {
+                                                  if (tlanguages[index] ==
+                                                      (value.toString())) {
+                                                  } else {
                                                     tlanguages
                                                         .add(value.toString());
                                                   }
@@ -402,7 +403,7 @@ class _InputInfoState extends State<InputInfo> {
                         ),
                         Container(
                           width: 600,
-                          height: 50,
+                          height: 45,
                           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                           decoration: BoxDecoration(
                             color: const Color.fromRGBO(242, 242, 242, 1),
@@ -413,6 +414,7 @@ class _InputInfoState extends State<InputInfo> {
                               enabledBorder: InputBorder.none,
                             ),
                             value: dropdownvalue,
+                            hint: const Text("Select your subject"),
                             isExpanded: true,
                             icon: const Icon(Icons.arrow_drop_down),
                             items: tSubjects.map((String items) {
@@ -590,7 +592,15 @@ class _InputInfoState extends State<InputInfo> {
                                   decoration: TextDecoration.underline,
                                 ),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                setState(() {
+                                  languageCount++;
+                                  thieght = 45;
+                                  thieght = (thieght * languageCount) +
+                                      (14 * languageCount);
+                                  print(languageCount);
+                                });
+                              },
                               child: const Text('Add more subject'),
                             ),
                           ],
@@ -1069,7 +1079,7 @@ class _InputInfoState extends State<InputInfo> {
                             Row(
                               children: const [
                                 Text(
-                                  'why a student should you! (max 5000 characters)',
+                                  'why a student should choose you! (max 5000 characters)',
                                   style: TextStyle(
                                     color: Color.fromRGBO(0, 0, 0, 1),
                                     fontFamily: 'RobotoMono',
@@ -1137,7 +1147,7 @@ class _InputInfoState extends State<InputInfo> {
                                     ?.copyWith(
                                       color:
                                           const Color.fromARGB(255, 12, 90, 85),
-                                      fontSize: 15,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                     ),
                                 textAlign: TextAlign.center,
@@ -1147,13 +1157,13 @@ class _InputInfoState extends State<InputInfo> {
                         ),
                         Container(
                           padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                          width: 300,
-                          height: 70,
+                          width: 380,
+                          height: 75,
                           child: TextButton(
                             style: TextButton.styleFrom(
                               textStyle: const TextStyle(color: Colors.black),
                               backgroundColor:
-                                  const Color.fromRGBO(55, 116, 135, 1),
+                                  const Color.fromRGBO(103, 195, 208, 1),
                               shape: RoundedRectangleBorder(
                                 side: const BorderSide(
                                   color: Color.fromRGBO(
@@ -1165,7 +1175,7 @@ class _InputInfoState extends State<InputInfo> {
                             ),
                             onPressed: () => {},
                             child: const Text(
-                              'PAY NOW',
+                              'Proceed Now',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
@@ -1176,7 +1186,6 @@ class _InputInfoState extends State<InputInfo> {
                       ],
                     ),
                   ),
-                  const CustomFooter(),
                 ],
               ),
             ),
@@ -1187,38 +1196,11 @@ class _InputInfoState extends State<InputInfo> {
   }
 }
 
-class DialogExample extends StatelessWidget {
-  const DialogExample({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () => showDialog<String>(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text('AlertDialog Title'),
-          content: const Text('AlertDialog description'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.pop(context, 'Cancel'),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, 'OK'),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      ),
-      child: const Text('Show Dialog'),
-    );
-  }
-}
-
+//Display all the Countries
 _buildCountryPickerDropdownSoloExpanded() {
   String valueme = "Select your Country";
   return CountryPickerDropdown(
-    hint:const Text("Select your Country") ,
+    hint: const Text("Select your Country"),
     onValuePicked: (Country country) {
       valueme = country.toString();
     },
@@ -1235,6 +1217,7 @@ _buildCountryPickerDropdownSoloExpanded() {
   );
 }
 
+//Identifies the device timezone and datetime
 Future<void> setup() async {
   // var dtf = js.context['Intl'].callMethod('DateTimeFormat');
   // var ops = dtf.callMethod('resolvedOptions');
