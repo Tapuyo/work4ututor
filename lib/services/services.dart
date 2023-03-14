@@ -56,6 +56,8 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('user');
   final CollectionReference tutorCollection =
       FirebaseFirestore.instance.collection('tutor');
+  final CollectionReference studentCollection =
+      FirebaseFirestore.instance.collection('tutor');
 
   Future updateUserData(String email, String password, String role) async {
     return await dataCollection.doc(uid).set({
@@ -65,8 +67,36 @@ class DatabaseService {
     });
   }
 
-  Future updateTutorData(String name, String lastname, ) async {
+  Future updateTutorData(
+    String name,
+    String lastname,
+  ) async {
     return await tutorCollection.doc(uid).set({
+      "language": [],
+      "birthPlace": "",
+      "certificates": "",
+      "country": "",
+      "dateSign": "",
+      "extensionName": "",
+      "firstName": name,
+      "imageID": "",
+      "lastName": lastname,
+      "middleName": "",
+      "presentation": "",
+      "promotionalMessage": "",
+      "resume": "",
+      "status": "unsubscribe",
+      "tutorID": uid,
+      "userID": "",
+      "withdrawal": "",
+    });
+  }
+
+  Future updateStudentData(
+    String name,
+    String lastname,
+  ) async {
+    return await studentCollection.doc(uid).set({
       "language": [],
       "birthPlace": "",
       "certificates": "",

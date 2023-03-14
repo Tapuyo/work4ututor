@@ -8,8 +8,8 @@ const firebaseProjectId = 'workforyou-7c3b7';
 const storageBucket = 'workforyou-7c3b7.appspot.com';
 
 final ButtonStyle raisedButtonStyle = ElevatedButton.styleFrom(
-  onPrimary: Colors.black87,
-  primary: Colors.grey[300],
+  foregroundColor: Colors.black87,
+  backgroundColor: Colors.grey[300],
   minimumSize: const Size(88, 36),
   padding: const EdgeInsets.symmetric(horizontal: 16),
   shape: const RoundedRectangleBorder(

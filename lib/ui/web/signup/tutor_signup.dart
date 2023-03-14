@@ -109,11 +109,11 @@ class _SignUpState extends State<SignUp> {
               child: Text(
                 " Make yourself\navailable to students\nall over the world",
                 style: GoogleFonts.roboto(
-                      textStyle: Theme.of(context).textTheme.headlineMedium,
-                      color: Color.fromRGBO(1, 118, 132, 1),
-                      fontSize: 30,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  textStyle: Theme.of(context).textTheme.headlineMedium,
+                  color: Color.fromRGBO(1, 118, 132, 1),
+                  fontSize: 30,
+                  fontWeight: FontWeight.w600,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -286,14 +286,27 @@ class _SignUpState extends State<SignUp> {
                     if (result == null) {
                       setState(() {
                         error = 'Please supply a valid email';
-
                       });
                     } else {
                       setState(() {
-                        showDialog(
-                          context: context,
-                          builder: (_) => DialogShow(result.toString()),
-                        );
+                        if (result.toString().contains(
+                            "The email address is already in use by another account")) {
+                          result =
+                              "The email address is already in use by another account!\nPlease check your inputs.";
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) => DialogShow(result.toString()),
+                          );
+                        } else {
+                          result =
+                              "Account succesfully registered! Click okay to continue.";
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) => DialogShow(result.toString()),
+                          );
+                        }
                       });
                     }
                   }

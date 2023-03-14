@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wokr4ututor/components/dashboard_header.dart';
 
 import '../../../components/nav_bar.dart';
 
@@ -20,8 +21,10 @@ class _DashboardPageState extends State<DashboardPage> {
         width: size.width,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children:  <Widget>[
-            Column(
+          children:   <Widget>[
+            const DashboardHeader(),
+            const SizedBox(height: 5,),
+            Row(
               children: const [
                 DashboardMenu(),
               ],

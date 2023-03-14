@@ -2,6 +2,7 @@ import 'package:country_pickers/country.dart';
 import 'package:flutter/material.dart';
 import 'package:country_pickers/country_pickers.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:wokr4ututor/components/footer.dart';
 import 'dart:js' as js;
@@ -9,6 +10,8 @@ import 'dart:js' as js;
 import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:wokr4ututor/services/services.dart';
+
+import '../../../components/dialog.dart';
 
 void main() {
   tz.initializeTimeZones();
@@ -50,6 +53,7 @@ class _InputInfoState extends State<InputInfo> {
       .callMethod('DateTimeFormat')
       .callMethod('resolvedOptions');
   String? dropdownvalue;
+  String? dropdownvaluesubject;
   bool select = false;
 
 //tutor information
@@ -57,6 +61,7 @@ class _InputInfoState extends State<InputInfo> {
   String tCountry = "";
   String tCity = "";
   String tTimezone = "";
+  int age = 0;
   String contactNumber = "";
   var ulanguages = [
     'Filipino',
@@ -65,8 +70,13 @@ class _InputInfoState extends State<InputInfo> {
     'Chinese',
     'Japanese',
   ];
-  var tSubjects = [
+  var uSubjects = [
     'Others',
+    'Math',
+    'English',
+    'Geometry',
+    'Music',
+    'Language',
   ];
   var tServices = [
     'Others',
@@ -78,13 +88,86 @@ class _InputInfoState extends State<InputInfo> {
   String uPicture = "";
   List<String> uCertificates = [];
   List<String> tlanguages = [];
+  List<String> tSubjects = [];
   String uCV = "";
   String uVideo = "";
   String tAbout = "";
   bool shareInfo = false;
+  bool selection1 = false;
+  bool selection2 = false;
+  bool selection3 = false;
+  bool selection4 = false;
+  bool selection5 = false;
+  bool onlineclas = false;
+  bool inperson = false;
   int languageCount = 1;
-  double languagehieght = 250;
+  int subjectcount = 1;
+  double subjecthieght = 250;
   double thieght = 45;
+
+  //term
+  bool termStatus = false;
+  bool showme = false;
+  bool showmecustom = false;
+
+  DateTime selectedDate = DateTime.now();
+  String bdate = "Date of Birth";
+  String myage = "Age";
+  String guardianbdate = "Date of Birth";
+  String guardianage = "Age";
+
+  void _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(1950, 8),
+        lastDate: DateTime(5000));
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+        bdate = DateFormat("MMMM dd, yyyy").format(selectedDate);
+        calculateAge(picked);
+      });
+    }
+  }
+
+  void calculateAge(DateTime birthDate) {
+    DateTime currentDate = DateTime.now();
+    int currentage = currentDate.year - birthDate.year;
+    int month1 = currentDate.month;
+    int month2 = birthDate.month;
+    if (currentage < 0) {
+      print("Add notification here not valid date selection");
+    } else {
+      if (month2 > month1) {
+        currentage--;
+        setState(() {
+          age = currentage;
+          myage = age.toString();
+        });
+      } else if (month1 == month2) {
+        int day1 = currentDate.day;
+        int day2 = birthDate.day;
+        if (day2 > day1) {
+          currentage--;
+          setState(() {
+            age = currentage;
+            myage = age.toString();
+          });
+        } else if (day2 <= day1) {
+          setState(() {
+            age = currentage;
+            myage = age.toString();
+          });
+        }
+      } else if (month1 > month2) {
+        setState(() {
+          age = currentage;
+          myage = age.toString();
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -173,38 +256,79 @@ class _InputInfoState extends State<InputInfo> {
                         const SizedBox(
                           height: 14,
                         ),
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            children: [
-                              Checkbox(
-                                checkColor: Colors.white,
-                                activeColor: Colors.black,
-                                value: shareInfo,
-                                onChanged: (value) {
-                                  setState(() {
-                                    shareInfo = value!;
-                                  });
-                                },
+                        Row(
+                          children: [
+                            Container(
+                              width: 400,
+                              height: 45,
+                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                              decoration: BoxDecoration(
+                                color: const Color.fromRGBO(242, 242, 242, 1),
+                                borderRadius: BorderRadius.circular(5),
                               ),
-                              Text(
-                                "Share my personal information to any one.",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall
-                                    ?.copyWith(
-                                      color: Colors.black87,
-                                      fontFamily: 'RobotoMono',
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.normal,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    bdate.toString(),
+                                    style: const TextStyle(
+                                        fontSize: 16, color: Colors.black),
+                                  ),
+                                  const Spacer(),
+                                  IconButton(
+                                    tooltip: "Date of Birth",
+                                    hoverColor: Colors.transparent,
+                                    icon: const Icon(
+                                      Icons.calendar_month_outlined,
+                                      color: Colors.blue,
+                                      size: 33,
                                     ),
-                                textAlign: TextAlign.center,
+                                    onPressed: () {
+                                      _selectDate();
+                                    },
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                            const Spacer(),
+                            Container(
+                              width: 150,
+                              height: 45,
+                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                              decoration: BoxDecoration(
+                                color: const Color.fromRGBO(242, 242, 242, 1),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    myage.toString(),
+                                    style: const TextStyle(
+                                        fontSize: 16, color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(
-                          height: 14,
+                        CheckboxListTile(
+                          title: const Text(
+                            'Share my personal information to any one.',
+                            style: TextStyle(fontSize: 15),
+                          ),
+                          // subtitle: const Text(
+                          //     'A computer science portal for geeks.'),
+                          // secondary: const Icon(Icons.code),
+                          autofocus: false,
+                          activeColor: Colors.green,
+                          checkColor: Colors.white,
+                          selected: selection5,
+                          value: selection5,
+                          controlAffinity: ListTileControlAffinity.leading,
+                          onChanged: (value) {
+                            setState(() {
+                              selection5 = value!;
+                            });
+                          },
                         ),
                         Row(
                           children: [
@@ -344,8 +468,8 @@ class _InputInfoState extends State<InputInfo> {
                           children: [
                             TextButton(
                               style: TextButton.styleFrom(
-                                primary: Colors.red,
-                                onSurface: Colors.red,
+                                foregroundColor: Colors.red,
+                                disabledBackgroundColor: Colors.red,
                                 shape: const BeveledRectangleBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(5))),
@@ -401,176 +525,260 @@ class _InputInfoState extends State<InputInfo> {
                         const SizedBox(
                           height: 10,
                         ),
-                        Container(
+                        SizedBox(
                           width: 600,
-                          height: 45,
-                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                          decoration: BoxDecoration(
-                            color: const Color.fromRGBO(242, 242, 242, 1),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: DropdownButtonFormField(
-                            decoration: const InputDecoration(
-                              enabledBorder: InputBorder.none,
-                            ),
-                            value: dropdownvalue,
-                            hint: const Text("Select your subject"),
-                            isExpanded: true,
-                            icon: const Icon(Icons.arrow_drop_down),
-                            items: tSubjects.map((String items) {
-                              return DropdownMenuItem(
-                                value: items,
-                                child: Text(items),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                dropdownvalue = newValue!;
-                              });
-                            },
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 14,
-                        ),
-                        Visibility(
-                          visible: tlanguages.length > 0 ? true : false,
+                          height: subjecthieght,
                           child: Column(
                             children: [
-                              Row(
-                                children: [
-                                  Container(
-                                      width: 350,
-                                      height: 45,
-                                      alignment: Alignment.centerLeft,
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            242, 242, 242, 1),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Text("Fair for 2 classes")),
-                                  const Spacer(),
-                                  Container(
-                                    width: 100,
-                                    height: 45,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromRGBO(
-                                          242, 242, 242, 1),
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    child: TextFormField(
-                                      decoration: const InputDecoration(
-                                        border: InputBorder.none,
-                                        fillColor: Colors.grey,
-                                        hintText: 'Timezone',
-                                        hintStyle:
-                                            TextStyle(color: Colors.black),
-                                      ),
-                                      validator: (val) => val!.isEmpty
-                                          ? 'Enter an Timezone'
-                                          : null,
-                                      onChanged: (val) {
-                                        tTimezone = val;
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 14,
-                              ),
-                              Row(
-                                children: [
-                                  Container(
-                                      width: 350,
-                                      height: 45,
-                                      alignment: Alignment.centerLeft,
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            242, 242, 242, 1),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Text("Fair for 3 classes")),
-                                  const Spacer(),
-                                  Container(
-                                    width: 100,
-                                    height: 45,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromRGBO(
-                                          242, 242, 242, 1),
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    child: TextFormField(
-                                      decoration: const InputDecoration(
-                                        border: InputBorder.none,
-                                        fillColor: Colors.grey,
-                                        hintText: 'Timezone',
-                                        hintStyle:
-                                            TextStyle(color: Colors.black),
-                                      ),
-                                      validator: (val) => val!.isEmpty
-                                          ? 'Enter an Timezone'
-                                          : null,
-                                      onChanged: (val) {
-                                        tTimezone = val;
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 14,
-                              ),
-                              Row(
-                                children: [
-                                  Container(
-                                      width: 350,
-                                      height: 45,
-                                      alignment: Alignment.centerLeft,
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            242, 242, 242, 1),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Text("Fair for 5 classes")),
-                                  const Spacer(),
-                                  Container(
-                                    width: 100,
-                                    height: 45,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromRGBO(
-                                          242, 242, 242, 1),
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    child: TextFormField(
-                                      decoration: const InputDecoration(
-                                        border: InputBorder.none,
-                                        fillColor: Colors.grey,
-                                        hintText: 'Timezone',
-                                        hintStyle:
-                                            TextStyle(color: Colors.black),
-                                      ),
-                                      validator: (val) => val!.isEmpty
-                                          ? 'Enter an Timezone'
-                                          : null,
-                                      onChanged: (val) {
-                                        tTimezone = val;
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 14,
+                              Expanded(
+                                child: ListView.builder(
+                                  primary: false,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: subjectcount,
+                                  itemBuilder: (context, index) {
+                                    return Column(
+                                      children: [
+                                        Container(
+                                          width: 600,
+                                          height: 45,
+                                          padding: const EdgeInsets.fromLTRB(
+                                              10, 0, 10, 0),
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromRGBO(
+                                                242, 242, 242, 1),
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                          ),
+                                          child: DropdownButtonFormField(
+                                            decoration: const InputDecoration(
+                                              enabledBorder: InputBorder.none,
+                                            ),
+                                            value: dropdownvaluesubject,
+                                            hint: const Text(
+                                                "Select your subject"),
+                                            isExpanded: true,
+                                            icon: const Icon(
+                                                Icons.arrow_drop_down),
+                                            items:
+                                                uSubjects.map((String items) {
+                                              return DropdownMenuItem(
+                                                value: items,
+                                                child: Text(items),
+                                              );
+                                            }).toList(),
+                                            onChanged: (String? newValue) {
+                                              setState(() {
+                                                if (newValue == "Others") {
+                                                  showDialog(
+                                                    barrierDismissible: false,
+                                                    context: context,
+                                                    builder: (_) =>
+                                                        addsubject(context),
+                                                  );
+                                                }else if (newValue == "Language") {
+                                                  showDialog(
+                                                    barrierDismissible: false,
+                                                    context: context,
+                                                    builder: (_) =>
+                                                        chooseLanguage(context),
+                                                  );
+                                                }
+                                                if (tSubjects.isEmpty) {
+                                                  subjectcount == 1;
+                                                  tSubjects
+                                                      .add(newValue.toString());
+                                                  print(tSubjects);
+                                                } else {
+                                                  tSubjects
+                                                      .add(newValue.toString());
+                                                  print(tSubjects);
+                                                }
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 14,
+                                        ),
+                                        Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                    width: 350,
+                                                    height: 45,
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          const Color.fromRGBO(
+                                                              242, 242, 242, 1),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5),
+                                                    ),
+                                                    child: const Text(
+                                                        "Price for 2 classes")),
+                                                const Spacer(),
+                                                Container(
+                                                  width: 100,
+                                                  height: 45,
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          10, 0, 10, 0),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color.fromRGBO(
+                                                        242, 242, 242, 1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                  ),
+                                                  child: TextFormField(
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      border: InputBorder.none,
+                                                      fillColor: Colors.grey,
+                                                      hintText: '',
+                                                      hintStyle: TextStyle(
+                                                          color: Colors.black),
+                                                    ),
+                                                    validator: (val) =>
+                                                        val!.isEmpty
+                                                            ? 'Input price'
+                                                            : null,
+                                                    onChanged: (val) {
+                                                      tTimezone = val;
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 14,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                    width: 350,
+                                                    height: 45,
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          const Color.fromRGBO(
+                                                              242, 242, 242, 1),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5),
+                                                    ),
+                                                    child: const Text(
+                                                        "Price for 3 classes")),
+                                                const Spacer(),
+                                                Container(
+                                                  width: 100,
+                                                  height: 45,
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          10, 0, 10, 0),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color.fromRGBO(
+                                                        242, 242, 242, 1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                  ),
+                                                  child: TextFormField(
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      border: InputBorder.none,
+                                                      fillColor: Colors.grey,
+                                                      hintText: '',
+                                                      hintStyle: TextStyle(
+                                                          color: Colors.black),
+                                                    ),
+                                                    validator: (val) =>
+                                                        val!.isEmpty
+                                                            ? 'Input price'
+                                                            : null,
+                                                    onChanged: (val) {
+                                                      tTimezone = val;
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 14,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Container(
+                                                    width: 350,
+                                                    height: 45,
+                                                    alignment:
+                                                        Alignment.centerLeft,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          const Color.fromRGBO(
+                                                              242, 242, 242, 1),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5),
+                                                    ),
+                                                    child: const Text(
+                                                        "Price for 5 classes")),
+                                                const Spacer(),
+                                                Container(
+                                                  width: 100,
+                                                  height: 45,
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          10, 0, 10, 0),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color.fromRGBO(
+                                                        242, 242, 242, 1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                  ),
+                                                  child: TextFormField(
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      border: InputBorder.none,
+                                                      fillColor: Colors.grey,
+                                                      hintText: '',
+                                                      hintStyle: TextStyle(
+                                                          color: Colors.black),
+                                                    ),
+                                                    validator: (val) =>
+                                                        val!.isEmpty
+                                                            ? 'Input price'
+                                                            : null,
+                                                    onChanged: (val) {
+                                                      tTimezone = val;
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(
+                                              height: 14,
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
                               ),
                             ],
                           ),
@@ -579,8 +787,8 @@ class _InputInfoState extends State<InputInfo> {
                           children: [
                             TextButton(
                               style: TextButton.styleFrom(
-                                primary: Colors.red,
-                                onSurface: Colors.red,
+                                foregroundColor: Colors.red,
+                                disabledBackgroundColor: Colors.red,
                                 shape: const BeveledRectangleBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(5))),
@@ -594,11 +802,18 @@ class _InputInfoState extends State<InputInfo> {
                               ),
                               onPressed: () {
                                 setState(() {
-                                  languageCount++;
-                                  thieght = 45;
-                                  thieght = (thieght * languageCount) +
-                                      (14 * languageCount);
-                                  print(languageCount);
+                                  // if (subjectcount != tSubjects.length) {
+                                  // subjecthieght = 250;
+                                  // subjecthieght =
+                                  //     (subjecthieght * subjectcount);
+                                  // print(tSubjects.length);
+                                  // } else {
+                                  subjectcount++;
+                                  subjecthieght = 250;
+                                  subjecthieght =
+                                      (subjecthieght * subjectcount);
+                                  print(tSubjects.length);
+                                  // }
                                 });
                               },
                               child: const Text('Add more subject'),
@@ -644,27 +859,71 @@ class _InputInfoState extends State<InputInfo> {
                                   width: 250,
                                   height: 45,
                                   alignment: Alignment.centerLeft,
-                                  child: RadioListTile(
-                                    title: const Text("Recovery Lessons"),
-                                    value: false,
-                                    groupValue: "male",
-                                    onChanged: (value) {
-                                      setState(() {});
-                                    },
+                                  child: Theme(
+                                    data: ThemeData(
+                                      checkboxTheme: CheckboxThemeData(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                    child: ListTileTheme(
+                                      child: CheckboxListTile(
+                                        title: const Text('Recovery Lessons'),
+                                        // subtitle: const Text(
+                                        //     'A computer science portal for geeks.'),
+                                        // secondary: const Icon(Icons.code),
+                                        autofocus: false,
+                                        activeColor: Colors.green,
+                                        checkColor: Colors.white,
+                                        selected: selection1,
+                                        value: selection1,
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selection1 = value!;
+                                          });
+                                        },
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 Container(
                                   width: 320,
                                   height: 45,
                                   alignment: Alignment.centerLeft,
-                                  child: RadioListTile(
-                                    title: const Text(
-                                        "Kids with learning difficulties"),
-                                    value: false,
-                                    groupValue: "male",
-                                    onChanged: (value) {
-                                      setState(() {});
-                                    },
+                                  child: Theme(
+                                    data: ThemeData(
+                                      checkboxTheme: CheckboxThemeData(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                    child: ListTileTheme(
+                                      child: CheckboxListTile(
+                                        title: const Text(
+                                            'Kids with learning difficulties'),
+                                        // subtitle: const Text(
+                                        //     'A computer science portal for geeks.'),
+                                        // secondary: const Icon(Icons.code),
+                                        autofocus: false,
+                                        activeColor: Colors.green,
+                                        checkColor: Colors.white,
+                                        selected: selection2,
+                                        value: selection2,
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selection2 = value!;
+                                          });
+                                        },
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -675,26 +934,70 @@ class _InputInfoState extends State<InputInfo> {
                                   width: 250,
                                   height: 45,
                                   alignment: Alignment.centerLeft,
-                                  child: RadioListTile(
-                                    title: const Text("Pre Exams Classes"),
-                                    value: false,
-                                    groupValue: "male",
-                                    onChanged: (value) {
-                                      setState(() {});
-                                    },
+                                  child: Theme(
+                                    data: ThemeData(
+                                      checkboxTheme: CheckboxThemeData(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                    child: ListTileTheme(
+                                      child: CheckboxListTile(
+                                        title: const Text('Pre Exam Classes'),
+                                        // subtitle: const Text(
+                                        //     'A computer science portal for geeks.'),
+                                        // secondary: const Icon(Icons.code),
+                                        autofocus: false,
+                                        activeColor: Colors.green,
+                                        checkColor: Colors.white,
+                                        selected: selection3,
+                                        value: selection3,
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selection3 = value!;
+                                          });
+                                        },
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 Container(
                                   width: 250,
                                   height: 45,
                                   alignment: Alignment.centerLeft,
-                                  child: RadioListTile(
-                                    title: const Text("Deaf Language"),
-                                    value: false,
-                                    groupValue: "male",
-                                    onChanged: (value) {
-                                      setState(() {});
-                                    },
+                                  child: Theme(
+                                    data: ThemeData(
+                                      checkboxTheme: CheckboxThemeData(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                    child: ListTileTheme(
+                                      child: CheckboxListTile(
+                                        title: const Text('Deaf Language'),
+                                        // subtitle: const Text(
+                                        //     'A computer science portal for geeks.'),
+                                        // secondary: const Icon(Icons.code),
+                                        autofocus: false,
+                                        activeColor: Colors.green,
+                                        checkColor: Colors.white,
+                                        selected: selection4,
+                                        value: selection4,
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selection4 = value!;
+                                          });
+                                        },
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -705,13 +1008,35 @@ class _InputInfoState extends State<InputInfo> {
                                   width: 250,
                                   height: 45,
                                   alignment: Alignment.centerLeft,
-                                  child: RadioListTile(
-                                    title: const Text("Own Program"),
-                                    value: false,
-                                    groupValue: "male",
-                                    onChanged: (value) {
-                                      setState(() {});
-                                    },
+                                  child: Theme(
+                                    data: ThemeData(
+                                      checkboxTheme: CheckboxThemeData(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                    child: ListTileTheme(
+                                      child: CheckboxListTile(
+                                        title: const Text('Own Program'),
+                                        // subtitle: const Text(
+                                        //     'A computer science portal for geeks.'),
+                                        // secondary: const Icon(Icons.code),
+                                        autofocus: false,
+                                        activeColor: Colors.green,
+                                        checkColor: Colors.white,
+                                        selected: selection5,
+                                        value: selection5,
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selection5 = value!;
+                                          });
+                                        },
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -755,26 +1080,68 @@ class _InputInfoState extends State<InputInfo> {
                               width: 250,
                               height: 45,
                               alignment: Alignment.centerLeft,
-                              child: RadioListTile(
-                                title: const Text("Online Classes"),
-                                value: false,
-                                groupValue: "male",
-                                onChanged: (value) {
-                                  setState(() {});
-                                },
+                              child: Theme(
+                                data: ThemeData(
+                                  checkboxTheme: CheckboxThemeData(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                child: ListTileTheme(
+                                  child: CheckboxListTile(
+                                    title: const Text('Online Classes'),
+                                    // subtitle: const Text(
+                                    //     'A computer science portal for geeks.'),
+                                    // secondary: const Icon(Icons.code),
+                                    autofocus: false,
+                                    activeColor: Colors.green,
+                                    checkColor: Colors.white,
+                                    selected: onlineclas,
+                                    value: onlineclas,
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        onlineclas = value!;
+                                      });
+                                    },
+                                  ),
+                                ),
                               ),
                             ),
                             Container(
                               width: 320,
                               height: 45,
                               alignment: Alignment.centerLeft,
-                              child: RadioListTile(
-                                title: const Text("In Person Classes"),
-                                value: false,
-                                groupValue: "male",
-                                onChanged: (value) {
-                                  setState(() {});
-                                },
+                              child: Theme(
+                                data: ThemeData(
+                                  checkboxTheme: CheckboxThemeData(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                child: ListTileTheme(
+                                  child: CheckboxListTile(
+                                    title: const Text('In Person Classes'),
+                                    // subtitle: const Text(
+                                    //     'A computer science portal for geeks.'),
+                                    // secondary: const Icon(Icons.code),
+                                    autofocus: false,
+                                    activeColor: Colors.green,
+                                    checkColor: Colors.white,
+                                    selected: inperson,
+                                    value: inperson,
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        inperson = value!;
+                                      });
+                                    },
+                                  ),
+                                ),
                               ),
                             ),
                           ],
@@ -1124,35 +1491,27 @@ class _InputInfoState extends State<InputInfo> {
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          height: 14,
-                        ),
                         Container(
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            children: [
-                              const SizedBox(
-                                width: 100,
-                                height: 50,
-                                child: Checkbox(
-                                  onChanged: null,
-                                  value: false,
-                                ),
-                              ),
-                              Text(
-                                "Terms and Conditions",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall
-                                    ?.copyWith(
-                                      color:
-                                          const Color.fromARGB(255, 12, 90, 85),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
+                          alignment: Alignment.topLeft,
+                          child: CheckboxListTile(
+                            title: const Text(
+                              'Agree to Work4uTutor Terms & Condition and Privacy Policy.',
+                              style: TextStyle(fontSize: 15),
+                            ),
+                            // subtitle: const Text(
+                            //     'A computer science portal for geeks.'),
+                            // secondary: const Icon(Icons.code),
+                            autofocus: false,
+                            activeColor: Colors.green,
+                            checkColor: Colors.white,
+                            selected: termStatus,
+                            value: termStatus,
+                            controlAffinity: ListTileControlAffinity.leading,
+                            onChanged: (value) {
+                              setState(() {
+                                termStatus = value!;
+                              });
+                            },
                           ),
                         ),
                         Container(
@@ -1170,7 +1529,7 @@ class _InputInfoState extends State<InputInfo> {
                                       1, 118, 132, 1), // your color here
                                   width: 1,
                                 ),
-                                borderRadius: BorderRadius.circular(30.0),
+                                borderRadius: BorderRadius.circular(40.0),
                               ),
                             ),
                             onPressed: () => {},
