@@ -1,13 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/components/dialog.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
-import 'package:wokr4ututor/services/services.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
 
 class TutorSignup extends StatefulWidget {
   const TutorSignup({Key? key}) : super(key: key);

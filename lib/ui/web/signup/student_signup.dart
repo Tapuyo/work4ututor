@@ -3,9 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
-import 'package:wokr4ututor/services/services.dart';
 import 'package:wokr4ututor/ui/web/signup/student_information_signup.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
 
 class StudentSignup extends StatefulWidget {
   const StudentSignup({Key? key}) : super(key: key);

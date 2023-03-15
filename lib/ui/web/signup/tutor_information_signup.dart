@@ -1,10 +1,11 @@
+// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, unused_local_variable
+
 import 'package:country_pickers/country.dart';
 import 'package:flutter/material.dart';
 import 'package:country_pickers/country_pickers.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
-import 'package:wokr4ututor/components/footer.dart';
 import 'dart:js' as js;
 
 import 'package:wokr4ututor/components/nav_bar.dart';
@@ -312,7 +313,7 @@ class _InputInfoState extends State<InputInfo> {
                         ),
                         CheckboxListTile(
                           title: const Text(
-                            'Share my personal information to any one.',
+                            'Share my personal information to any user.',
                             style: TextStyle(fontSize: 15),
                           ),
                           // subtitle: const Text(
@@ -569,19 +570,9 @@ class _InputInfoState extends State<InputInfo> {
                                             onChanged: (String? newValue) {
                                               setState(() {
                                                 if (newValue == "Others") {
-                                                  showDialog(
-                                                    barrierDismissible: false,
-                                                    context: context,
-                                                    builder: (_) =>
-                                                        addsubject(context),
-                                                  );
+                                                        addsubject(context);
                                                 }else if (newValue == "Language") {
-                                                  showDialog(
-                                                    barrierDismissible: false,
-                                                    context: context,
-                                                    builder: (_) =>
-                                                        chooseLanguage(context),
-                                                  );
+                                                        chooseLanguage(context);
                                                 }
                                                 if (tSubjects.isEmpty) {
                                                   subjectcount == 1;
@@ -906,7 +897,7 @@ class _InputInfoState extends State<InputInfo> {
                                     child: ListTileTheme(
                                       child: CheckboxListTile(
                                         title: const Text(
-                                            'Kids with learning difficulties'),
+                                            'Kids with Learning Difficulties'),
                                         // subtitle: const Text(
                                         //     'A computer science portal for geeks.'),
                                         // secondary: const Icon(Icons.code),

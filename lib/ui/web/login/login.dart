@@ -1,9 +1,8 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
-import 'dart:typed_data';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/ui/web/login/forgotpassword.dart';
 

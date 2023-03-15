@@ -1,11 +1,11 @@
+// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print
+
 import 'package:country_pickers/country.dart';
 import 'package:flutter/material.dart';
 import 'package:country_pickers/country_pickers.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/data/latest.dart' as tz;
-import 'package:wokr4ututor/components/footer.dart';
 import 'dart:js' as js;
 
 import 'package:wokr4ututor/components/nav_bar.dart';

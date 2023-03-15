@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
-import '../utils/themes.dart';
-
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
@@ -36,7 +34,7 @@ class CustomButton extends StatelessWidget {
           children: <Widget>[
             Text(
               text,
-              style: Theme.of(context).textTheme.button?.copyWith(
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: Colors.white,
                   fontSize:
                       textSize),

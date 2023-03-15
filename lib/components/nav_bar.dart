@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
 import 'package:wokr4ututor/ui/web/signup/student_signup.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
+import 'package:wokr4ututor/utils/themes.dart';
 
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({Key? key}) : super(key: key);
@@ -52,7 +52,6 @@ class CustomAppBar extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
               },
               icon: const Icon(Icons.language_rounded),
               label: const Text('LANGUAGE'),
@@ -82,7 +81,6 @@ class CustomAppBar extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
               },
               child: const Text('FIND TUTOR'),
             ),
@@ -263,7 +261,7 @@ class DashboardMenu extends StatelessWidget {
         color: Colors.white,
         border: Border.all(
           color: Colors.black45,
-          width: .5,
+          width: .1,
         ),
         borderRadius: const BorderRadius.only(
           topRight: Radius.circular(5.0),
@@ -281,17 +279,18 @@ class DashboardMenu extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               shape: BoxShape.rectangle,
-              color: const Color.fromRGBO(1, 118, 132, 1),
+              color: kColorPrimary,
               borderRadius: BorderRadius.circular(5.0),
             ),
-            child: Text(
-              "Tutor Desk",
-              style: GoogleFonts.nunitoSans(
-                color: Colors.white,
-                fontSize: 25,
-                fontWeight: FontWeight.normal,
-              ),
+            child: SizedBox(
+            height: 150,
+            width: 170,
+            child: Image.asset(
+              "assets/images/TUTOR_S_DESK_NO BG.png",
+              alignment: Alignment.topCenter,
+              fit: BoxFit.fitWidth,
             ),
+          ),
           ),
           const SizedBox(
             height: 20,
@@ -301,7 +300,7 @@ class DashboardMenu extends StatelessWidget {
             width: 240,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
+              color:kColorSecondary,
               borderRadius: BorderRadius.all(Radius.circular(25)),
             ),
             child: TextButton.icon(
@@ -327,7 +326,6 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
               },
               icon: const Icon(
                 Icons.calendar_month,
@@ -373,7 +371,6 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
               },
               icon: const Icon(
                 Icons.wechat,
@@ -419,7 +416,6 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
               },
               icon: const Icon(
                 Icons.question_answer,
@@ -465,7 +461,6 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
               },
               icon: const Icon(
                 Icons.supervised_user_circle,
@@ -511,7 +506,6 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
               },
               icon: const Icon(
                 Icons.feedback,
@@ -557,7 +551,6 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
               },
               icon: const Icon(
                 Icons.settings,
@@ -603,7 +596,6 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
               },
               icon: const Icon(
                 Icons.help_outline_rounded,
@@ -649,7 +641,6 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
               },
               icon: const Icon(
                 Icons.logout_outlined,

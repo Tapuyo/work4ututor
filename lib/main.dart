@@ -7,13 +7,11 @@ import 'package:wokr4ututor/constant/constant.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/routes/route_generator.dart';
 import 'package:wokr4ututor/routes/routes.dart';
+// ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
-import 'package:wokr4ututor/ui/web/signup/student_information_signup.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_dashboard.dart';
 import 'package:wokr4ututor/utils/themes.dart';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -68,7 +66,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       builder: (context, child) {
-        return kIsWeb ? const TutorInfo():ScrollConfiguration(
+        return kIsWeb ? const LoginPage():ScrollConfiguration(
           behavior: MyBehavior(),
           child: child!,
         );
@@ -92,7 +90,7 @@ class MyApp extends StatelessWidget {
           ),
           // ignore: deprecated_member_use
           textTheme: TextTheme(
-            headline6: TextStyle(
+            titleLarge: TextStyle(
               color: kColorDarkBlue,
               fontFamily: 'NunitoSans',
               fontSize: 16,
@@ -103,11 +101,11 @@ class MyApp extends StatelessWidget {
         ),
         dividerColor: Colors.grey[300],
         textTheme: TextTheme(
-          button: kTextStyleButton,
-          subtitle1: kTextStyleSubtitle1.copyWith(color: kColorPrimaryDark),
-          subtitle2: kTextStyleSubtitle2.copyWith(color: kColorPrimaryDark),
-          bodyText2: kTextStyleBody2.copyWith(color: kColorPrimaryDark),
-          headline6: kTextStyleHeadline6.copyWith(color: kColorPrimaryDark),
+          labelLarge: kTextStyleButton,
+          titleMedium: kTextStyleSubtitle1.copyWith(color: kColorPrimaryDark),
+          titleSmall: kTextStyleSubtitle2.copyWith(color: kColorPrimaryDark),
+          bodyMedium: kTextStyleBody2.copyWith(color: kColorPrimaryDark),
+          titleLarge: kTextStyleHeadline6.copyWith(color: kColorPrimaryDark),
         ),
         iconTheme: const IconThemeData(
           color: kColorPrimary,

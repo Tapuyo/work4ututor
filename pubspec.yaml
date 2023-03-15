@@ -54,6 +54,11 @@ dependencies:
   file_picker: ^5.2.5
   firebase_storage: ^11.0.14
   google_fonts: ^3.0.1
+  table_calendar: ^3.0.8
+  flutter_rating_bar: ^4.0.1
+  pdf: ^3.9.0
+  printing: ^5.10.1
+  dio: ^5.0.2
 
 dev_dependencies:
   flutter_test:

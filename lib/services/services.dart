@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -14,10 +13,10 @@ uploadData() async {
 
     UploadTask task =
         FirebaseStorage.instance.ref().child("userID/$filename").putData(file!);
-    print("Uploaded");
+    // print("Uploaded");
     return filename;
   } else {
-    print("Error");
+    // print("Error");
   }
 }
 
