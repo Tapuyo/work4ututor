@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       builder: (context, child) {
-        return kIsWeb ? const DashboardPage():ScrollConfiguration(
+        return kIsWeb ? const LoginPage():ScrollConfiguration(
           behavior: MyBehavior(),
           child: child!,
         );
