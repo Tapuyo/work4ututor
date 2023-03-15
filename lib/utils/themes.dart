@@ -14,7 +14,7 @@ const kInputTextStyle = TextStyle(
 
 const kColorPrimary =  Color.fromRGBO(55, 116, 135, 1);
 const kColorPrimaryDark = Color(0xff757575);
-const kColorSecondary = Color.fromRGBO(6, 178, 182, 1);
+const kColorSecondary = Color.fromRGBO(5, 179, 180, 1);
 
 const kTextStyleButton = TextStyle(
   color: kColorPrimary,

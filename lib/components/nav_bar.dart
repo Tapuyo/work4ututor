@@ -354,7 +354,7 @@ class DashboardMenu extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -399,7 +399,7 @@ class DashboardMenu extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -444,7 +444,7 @@ class DashboardMenu extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -489,7 +489,7 @@ class DashboardMenu extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -534,7 +534,7 @@ class DashboardMenu extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -579,7 +579,7 @@ class DashboardMenu extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -624,7 +624,7 @@ class DashboardMenu extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
