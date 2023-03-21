@@ -47,7 +47,7 @@ addStudentInfo(String tEmail, tPassword, uType) {
       .collection('user')
       .add({'email': tEmail, 'password': tPassword, 'role': uType});
   FirebaseFirestore.instance
-      .collection('tutor')
+      .collection('students')
       .add({'firstName': tEmail, 'lastName': tPassword, 'userID': 'Tutor'});
 }
 
@@ -60,7 +60,7 @@ class DatabaseService {
   final CollectionReference tutorCollection =
       FirebaseFirestore.instance.collection('tutor');
   final CollectionReference studentCollection =
-      FirebaseFirestore.instance.collection('tutor');
+      FirebaseFirestore.instance.collection('student');
 
   Future updateUserData(String email, String password, String role) async {
     return await dataCollection.doc(uid).set({

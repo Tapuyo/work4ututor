@@ -3,15 +3,15 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../utils/themes.dart';
 
-class PerformancePage extends StatefulWidget {
-  const PerformancePage({super.key});
+class MessagePage extends StatefulWidget {
+  const MessagePage({super.key});
 
   @override
-  State<PerformancePage> createState() => _PerformancePageState();
+  State<MessagePage> createState() => _MessagePageState();
 }
 
-class _PerformancePageState extends State<PerformancePage> {
-  @override
+class _MessagePageState extends State<MessagePage> {
+   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return SingleChildScrollView(
@@ -48,7 +48,7 @@ class _PerformancePageState extends State<PerformancePage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    "STUDENTS ENROLLED",
+                    "Messages",
                     style: GoogleFonts.arimo(
                       color: Colors.white,
                       fontSize: 25,

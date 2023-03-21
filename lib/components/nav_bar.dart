@@ -4,6 +4,8 @@ import 'package:wokr4ututor/ui/web/signup/student_signup.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
+import '../ui/auth/auth.dart';
+
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({Key? key}) : super(key: key);
 
@@ -195,8 +197,8 @@ class CustomAppBar extends StatelessWidget {
 }
 
 class CustomAppBarLog extends StatelessWidget {
-  const CustomAppBarLog({Key? key}) : super(key: key);
-
+   CustomAppBarLog({Key? key}) : super(key: key);
+ final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -245,8 +247,8 @@ class CustomAppBarLog extends StatelessWidget {
 }
 
 class DashboardMenu extends StatelessWidget {
-  const DashboardMenu({Key? key}) : super(key: key);
-
+   DashboardMenu({Key? key}) : super(key: key);
+ final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -637,7 +639,9 @@ class DashboardMenu extends StatelessWidget {
                   decoration: TextDecoration.none,
                 ),
               ),
-              onPressed: () {
+              onPressed: () async {
+                dynamic result = await _auth.signOutAnon();
+                print(result.toString());
               },
               icon: const Icon(
                 Icons.logout_outlined,

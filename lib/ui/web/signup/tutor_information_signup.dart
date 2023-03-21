@@ -193,7 +193,7 @@ class _InputInfoState extends State<InputInfo> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          const CustomAppBarLog(),
+           CustomAppBarLog(),
           Expanded(
             child: SingleChildScrollView(
               child: Column(

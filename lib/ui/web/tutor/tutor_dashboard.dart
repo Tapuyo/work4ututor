@@ -28,7 +28,7 @@ class _DashboardPageState extends State<DashboardPage> {
              const DashboardHeader(uid: "",name: "Angelo Jordans",),
             const SizedBox(height: 2,),
             Row(
-              children:  const <Widget>[
+              children:   <Widget>[
                 DashboardMenu(),
               //   SizedBox(width: 5,),
               //   TableBasicsExample1(),

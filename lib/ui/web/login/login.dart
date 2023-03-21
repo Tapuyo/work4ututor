@@ -252,11 +252,11 @@ class _SigniNState extends State<SigniN> {
                           print("Status Report$status Error");
                         } else {
                           print("Status Report$status Yeeh");
-                           Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>  DashboardPage(uid: result.uid ,name: "Angelo Jordans",)),
-                        );
+                        //    Navigator.pushReplacement(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) =>  DashboardPage(uid: result.uid ,name: "Angelo Jordans",)),
+                        // );
                         }
                       });
                     } else {
@@ -269,11 +269,11 @@ class _SigniNState extends State<SigniN> {
                       } else {
                         print("Status Report$status Yeeh");
                       }
-                       Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>  DashboardPage(uid: result.uid ,name: "Angelo Jordans",)),
-                        );
+                      //  Navigator.pushReplacement(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) =>  DashboardPage(uid: result.uid ,name: "Angelo Jordans",)),
+                      //   );
                       });
                     }
                   }
