@@ -54,6 +54,7 @@ dependencies:
   file_picker: ^5.2.5
   firebase_storage: ^11.0.14
   google_fonts: ^3.0.1
+  font_awesome_flutter: ^10.4.0
 
 dev_dependencies:
   flutter_test:

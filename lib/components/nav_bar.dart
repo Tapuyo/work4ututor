@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:provider/provider.dart';
+import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
 import 'package:wokr4ututor/ui/web/signup/student_signup.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
@@ -253,15 +256,16 @@ class CustomAppBarLog extends StatelessWidget {
   }
 }
 
-class DashboardMenu extends StatelessWidget {
+class DashboardMenu extends HookWidget{
   const DashboardMenu({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    
     Size size = MediaQuery.of(context).size;
     return Container(
       height: size.height,
-      width: 300,
+      width: 250,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -270,21 +274,23 @@ class DashboardMenu extends StatelessWidget {
           width: .5,
         ),
       ),
-      padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
       child: Column(
         children: <Widget>[
-          const SizedBox(
-            width: 300,
+          GestureDetector(
+            onTap: (){
+               final provider = context.read<InitProvider>();
+              provider.setMenuIndex(0);
+            },
+            child: const SizedBox(
+               height: 66,
+               width: 250,
+              child:  ColoredBox(
+                color:  Color.fromRGBO(1, 118, 132, 1),
+                
+              ),
+            ),
           ),
-          // SizedBox(
-          //   height: 200,
-          //   width: 240,
-          //   child: Image.asset(
-          //     "assets/images/worklogo.png",
-          //     alignment: Alignment.topCenter,
-          //     fit: BoxFit.cover,
-          //   ),
-          // ),
+          const SizedBox(height: 20,),
           Container(
             height: 45,
             width: 220,
@@ -314,48 +320,11 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
+                final provider = context.read<InitProvider>();
+                provider.setMenuIndex(1);
               },
               icon: const Icon(Icons.language_rounded),
-              label: const Text('LANGUAGE'),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
-            height: 45,
-            width: 220,
-            decoration: const BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(25)),
-            ),
-            child: TextButton.icon(
-              style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
-                // ignore: prefer_const_constructors
-                textStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                  fontStyle: FontStyle.normal,
-                  decoration: TextDecoration.none,
-                ),
-              ),
-              onPressed: () {
-                print('Pressed');
-              },
-              icon: const Icon(Icons.language_rounded),
-              label: const Text('LANGUAGE'),
+              label: const Text('SCHEDULE'),
             ),
           ),
           const SizedBox(
@@ -390,10 +359,11 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
+                final provider = context.read<InitProvider>();
+                provider.setMenuIndex(2);
               },
               icon: const Icon(Icons.language_rounded),
-              label: const Text('LANGUAGE'),
+              label: const Text('MESSAGES'),
             ),
           ),
           const SizedBox(
@@ -428,10 +398,128 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
+                final provider = context.read<InitProvider>();
+                 provider.setMenuIndex(3);
               },
               icon: const Icon(Icons.language_rounded),
-              label: const Text('LANGUAGE'),
+              label: const Text('CLASSES INQUIRY'),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Container(
+            height: 45,
+            width: 220,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(1, 118, 132, 1),
+              borderRadius: BorderRadius.all(Radius.circular(25)),
+            ),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                onSurface: Colors.white,
+                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(
+                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(24.0),
+                ),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              onPressed: () {
+                final provider = context.read<InitProvider>();
+                 provider.setMenuIndex(4);
+              },
+              icon: const Icon(Icons.language_rounded),
+              label: const Text('STUDENTS ENROLLED'),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Container(
+            height: 45,
+            width: 220,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(1, 118, 132, 1),
+              borderRadius: BorderRadius.all(Radius.circular(25)),
+            ),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                onSurface: Colors.white,
+                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(
+                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(25.0),
+                ),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              onPressed: () {
+                final provider = context.read<InitProvider>();
+                 provider.setMenuIndex(5);
+              },
+              icon: const Icon(Icons.language_rounded),
+              label: const Text('PERFORMANCE'),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Container(
+            height: 45,
+            width: 220,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(1, 118, 132, 1),
+              borderRadius: BorderRadius.all(Radius.circular(25)),
+            ),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                primary: Colors.white,
+                onSurface: Colors.white,
+                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(
+                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(25.0),
+                ),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              onPressed: () {
+                final provider = context.read<InitProvider>();
+                 provider.setMenuIndex(6);
+              },
+              icon: const Icon(Icons.language_rounded),
+              label: const Text('SETTING'),
             ),
           ),
           const SizedBox(
@@ -469,9 +557,10 @@ class DashboardMenu extends StatelessWidget {
                 print('Pressed');
               },
               icon: const Icon(Icons.language_rounded),
-              label: const Text('LANGUAGE'),
+              label: const Text('HELP'),
             ),
           ),
+          
           const SizedBox(
             height: 20,
           ),
@@ -507,49 +596,8 @@ class DashboardMenu extends StatelessWidget {
                 print('Pressed');
               },
               icon: const Icon(Icons.language_rounded),
-              label: const Text('LANGUAGE'),
+              label: const Text('LOGOUT'),
             ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
-            height: 45,
-            width: 220,
-            decoration: const BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(25)),
-            ),
-            child: TextButton.icon(
-              style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-                // ignore: prefer_const_constructors
-                textStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                  fontStyle: FontStyle.normal,
-                  decoration: TextDecoration.none,
-                ),
-              ),
-              onPressed: () {
-                print('Pressed');
-              },
-              icon: const Icon(Icons.language_rounded),
-              label: const Text('LANGUAGE'),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
           ),
           const SizedBox(
             width: 200,
