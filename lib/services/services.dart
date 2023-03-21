@@ -1,9 +1,12 @@
+// ignore_for_file: unused_local_variable
+
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+
+import '../data_class/tutor_info_class.dart';
 
 uploadData() async {
   FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -14,10 +17,10 @@ uploadData() async {
 
     UploadTask task =
         FirebaseStorage.instance.ref().child("userID/$filename").putData(file!);
-    print("Uploaded");
+    // print("Uploaded");
     return filename;
   } else {
-    print("Error");
+    // print("Error");
   }
 }
 
@@ -56,6 +59,8 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('user');
   final CollectionReference tutorCollection =
       FirebaseFirestore.instance.collection('tutor');
+  final CollectionReference studentCollection =
+      FirebaseFirestore.instance.collection('tutor');
 
   Future updateUserData(String email, String password, String role) async {
     return await dataCollection.doc(uid).set({
@@ -65,7 +70,10 @@ class DatabaseService {
     });
   }
 
-  Future updateTutorData(String name, String lastname, ) async {
+  Future updateTutorData(
+    String name,
+    String lastname,
+  ) async {
     return await tutorCollection.doc(uid).set({
       "language": [],
       "birthPlace": "",
@@ -86,4 +94,43 @@ class DatabaseService {
       "withdrawal": "",
     });
   }
+
+  Future updateStudentData(
+    String name,
+    String lastname,
+  ) async {
+    return await studentCollection.doc(uid).set({
+      "language": [],
+      "birthPlace": "",
+      "certificates": "",
+      "country": "",
+      "dateSign": "",
+      "extensionName": "",
+      "firstName": name,
+      "imageID": "",
+      "lastName": lastname,
+      "middleName": "",
+      "presentation": "",
+      "promotionalMessage": "",
+      "resume": "",
+      "status": "unsubscribe",
+      "tutorID": uid,
+      "userID": "",
+      "withdrawal": "",
+    });
+  }
+    getTutorInfo() async {
+    try{await FirebaseFirestore.instance
+        .collection('tutor')
+        .where(uid, isEqualTo: uid)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      return querySnapshot.docs.map((tutordata) {
+        return tutordata['status'].toString();
+      });
+      });
+  }catch(e){
+    return null;
+  }
+}
 }

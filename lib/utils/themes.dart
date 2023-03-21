@@ -15,9 +15,9 @@ const kInputTextStyle = TextStyle(
     fontFamily: 'NunitoSans');
 
 
-const kColorPrimary = Color(0xff1A61FF);
+const kColorPrimary =  Color.fromRGBO(55, 116, 135, 1);
 const kColorPrimaryDark = Color(0xff757575);
-const kColorSecondary = Color(0xff50a4de);
+const kColorSecondary = Color.fromRGBO(5, 179, 180, 1);
 
 const kTextStyleButton = TextStyle(
   color: kColorPrimary,

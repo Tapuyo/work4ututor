@@ -10,6 +10,15 @@ import '../../../components/nav_bar.dart';
 
 class DashboardPage extends HookWidget {
   const DashboardPage({Key? key}) : super(key: key);
+import 'package:wokr4ututor/components/dashboard_header.dart';
+import 'package:wokr4ututor/ui/web/tutor/tutor_schedule.dart';
+
+import '../../../components/nav_bar.dart';
+
+class DashboardPage extends StatefulWidget {
+   final String uid;
+  final String name; 
+  const DashboardPage({Key? key, required this.uid, required this.name}) : super(key: key);
 
   @override
    Widget build(BuildContext context) {
@@ -18,7 +27,7 @@ class DashboardPage extends HookWidget {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Container(
+      body: SizedBox(
         height: size.height,
         width: size.width,
         child: Row(
@@ -32,6 +41,17 @@ class DashboardPage extends HookWidget {
                   ],
                 ),
                 // It will cover 1/3 of free spaces
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+             const DashboardHeader(uid: "",name: "Angelo Jordans",),
+            const SizedBox(height: 2,),
+            Row(
+              children:  const <Widget>[
+                DashboardMenu(),
+              //   SizedBox(width: 5,),
+              //   TableBasicsExample1(),
+              //  SizedBox(width: 5,),
               ],
             ),
             //Contains

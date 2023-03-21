@@ -1,16 +1,18 @@
 // // ignore_for_file: avoid_print
 
+// ignore_for_file: avoid_print
+
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:wokr4ututor/services/data_classes.dart';
 import 'package:wokr4ututor/services/services.dart';
+import '../../data_class/user_class.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   //create user obj based on firebaseuser
   Users? _userFromFirebaseUser(User? user) {
-    // ignore: unnecessary_null_comparison
     if (user != null) {
+      print("User Data:$user");
       return Users(uid: user.uid);
     }
     return null;
@@ -69,7 +71,7 @@ class AuthService {
       return _userFromFirebaseUser(user);
     } catch (e) {
       print(e.toString());
-      return e.toString();
+      return null;
     }
   }
 }

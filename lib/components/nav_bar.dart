@@ -5,6 +5,7 @@ import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
 import 'package:wokr4ututor/ui/web/signup/student_signup.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
+import 'package:wokr4ututor/utils/themes.dart';
 
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({Key? key}) : super(key: key);
@@ -17,17 +18,16 @@ class CustomAppBar extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
-      padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          const SizedBox(
-            width: 200,
-          ),
-          SizedBox(
-            height: 200,
+          const Spacer(),
+          Container(
+            margin: const EdgeInsets.only(top: 0),
             width: 240,
             child: Image.asset(
-              "assets/images/worklogo.png",
+              "assets/images/WORK4U_NO_BG.png",
               alignment: Alignment.topCenter,
               fit: BoxFit.cover,
             ),
@@ -42,8 +42,7 @@ class CustomAppBar extends StatelessWidget {
             ),
             child: TextButton.icon(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
+              foregroundColor: Colors.white,
                 shape: const BeveledRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
@@ -55,7 +54,6 @@ class CustomAppBar extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
               },
               icon: const Icon(Icons.language_rounded),
               label: const Text('LANGUAGE'),
@@ -72,8 +70,7 @@ class CustomAppBar extends StatelessWidget {
             ),
             child: TextButton(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
+              foregroundColor: Colors.white,
                 shape: const BeveledRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
@@ -86,7 +83,6 @@ class CustomAppBar extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
               },
               child: const Text('FIND TUTOR'),
             ),
@@ -104,8 +100,7 @@ class CustomAppBar extends StatelessWidget {
             ),
             child: TextButton(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
+              foregroundColor: Colors.white,
                 shape: const BeveledRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
@@ -140,8 +135,7 @@ class CustomAppBar extends StatelessWidget {
             ),
             child: TextButton(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
+              foregroundColor: Colors.white,
                 shape: const BeveledRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
@@ -175,8 +169,7 @@ class CustomAppBar extends StatelessWidget {
             ),
             child: TextButton(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
+              foregroundColor: Colors.white,
                 shape: const BeveledRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
@@ -197,9 +190,7 @@ class CustomAppBar extends StatelessWidget {
               child: const Text('LOG IN'),
             ),
           ),
-          const SizedBox(
-            width: 200,
-          )
+          const Spacer(),
         ],
       ),
     );
@@ -266,12 +257,18 @@ class DashboardMenu extends HookWidget{
     return Container(
       height: size.height,
       width: 250,
+      height: size.height - 75,
+      width: 300,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(
           color: Colors.black45,
-          width: .5,
+          width: .1,
+        ),
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(5.0),
+          topLeft: Radius.circular(5.0),
         ),
       ),
       child: Column(
@@ -292,18 +289,42 @@ class DashboardMenu extends HookWidget{
           ),
           const SizedBox(height: 20,),
           Container(
-            height: 45,
-            width: 220,
+            height: 50,
+            width: 300,
+            alignment: Alignment.center,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
+              color: kColorPrimary,
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(0),bottomLeft: Radius.circular(0),topRight: Radius.circular(5),bottomRight: Radius.circular(5)),
+            ),
+            child: SizedBox(
+            height: 150,
+            width: 170,
+            child: Image.asset(
+              "assets/images/TUTOR_S_DESK_NO BG.png",
+              alignment: Alignment.topCenter,
+              fit: BoxFit.contain,
+            ),
+          ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Container(
+            height: 50,
+            width: 240,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color:kColorSecondary,
               borderRadius: BorderRadius.all(Radius.circular(25)),
             ),
             child: TextButton.icon(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                padding: const EdgeInsets.only(left: 50),
+                alignment: Alignment.centerLeft,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: Colors.white,
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -325,14 +346,23 @@ class DashboardMenu extends HookWidget{
               },
               icon: const Icon(Icons.language_rounded),
               label: const Text('SCHEDULE'),
+              },
+              icon: const Icon(
+                Icons.calendar_month,
+                size: 30,
+              ),
+              label: const Text(
+                'SCHEDULE',
+                style: TextStyle(fontSize: 15),
+              ),
             ),
           ),
           const SizedBox(
             height: 20,
           ),
           Container(
-            height: 45,
-            width: 220,
+            height: 50,
+            width: 240,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
               color: Color.fromRGBO(1, 118, 132, 1),
@@ -340,9 +370,11 @@ class DashboardMenu extends HookWidget{
             ),
             child: TextButton.icon(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                padding: const EdgeInsets.only(left: 50),
+                alignment: Alignment.centerLeft,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: Colors.white,
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -364,14 +396,23 @@ class DashboardMenu extends HookWidget{
               },
               icon: const Icon(Icons.language_rounded),
               label: const Text('MESSAGES'),
+              },
+              icon: const Icon(
+                Icons.wechat,
+                size: 30,
+              ),
+              label: const Text(
+                'MESSAGES',
+                style: TextStyle(fontSize: 15),
+              ),
             ),
           ),
           const SizedBox(
             height: 20,
           ),
           Container(
-            height: 45,
-            width: 220,
+            height: 50,
+            width: 240,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
               color: Color.fromRGBO(1, 118, 132, 1),
@@ -379,9 +420,11 @@ class DashboardMenu extends HookWidget{
             ),
             child: TextButton.icon(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                padding: const EdgeInsets.only(left: 50),
+                alignment: Alignment.centerLeft,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: Colors.white,
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -403,14 +446,23 @@ class DashboardMenu extends HookWidget{
               },
               icon: const Icon(Icons.language_rounded),
               label: const Text('CLASSES INQUIRY'),
+              },
+              icon: const Icon(
+                Icons.question_answer,
+                size: 30,
+              ),
+              label: const Text(
+                'CLASSES\nINQUIRY',
+                style: TextStyle(fontSize: 15),
+              ),
             ),
           ),
           const SizedBox(
             height: 20,
           ),
           Container(
-            height: 45,
-            width: 220,
+            height: 50,
+            width: 240,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
               color: Color.fromRGBO(1, 118, 132, 1),
@@ -418,9 +470,11 @@ class DashboardMenu extends HookWidget{
             ),
             child: TextButton.icon(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                padding: const EdgeInsets.only(left: 50),
+                alignment: Alignment.centerLeft,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: Colors.white,
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -442,14 +496,23 @@ class DashboardMenu extends HookWidget{
               },
               icon: const Icon(Icons.language_rounded),
               label: const Text('STUDENTS ENROLLED'),
+              },
+              icon: const Icon(
+                Icons.supervised_user_circle,
+                size: 30,
+              ),
+              label: const Text(
+                'STUDENTS\nENROLLED',
+                style: TextStyle(fontSize: 15),
+              ),
             ),
           ),
           const SizedBox(
             height: 20,
           ),
           Container(
-            height: 45,
-            width: 220,
+            height: 50,
+            width: 240,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
               color: Color.fromRGBO(1, 118, 132, 1),
@@ -457,15 +520,17 @@ class DashboardMenu extends HookWidget{
             ),
             child: TextButton.icon(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                padding: const EdgeInsets.only(left: 50),
+                alignment: Alignment.centerLeft,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: Colors.white,
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
                     width: 1,
                   ),
-                  borderRadius: BorderRadius.circular(25.0),
+                  borderRadius: BorderRadius.circular(24.0),
                 ),
                 // ignore: prefer_const_constructors
                 textStyle: TextStyle(
@@ -481,14 +546,23 @@ class DashboardMenu extends HookWidget{
               },
               icon: const Icon(Icons.language_rounded),
               label: const Text('PERFORMANCE'),
+              },
+              icon: const Icon(
+                Icons.feedback,
+                size: 30,
+              ),
+              label: const Text(
+                'PERFORMANCE',
+                style: TextStyle(fontSize: 15),
+              ),
             ),
           ),
           const SizedBox(
             height: 20,
           ),
           Container(
-            height: 45,
-            width: 220,
+            height: 50,
+            width: 240,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
               color: Color.fromRGBO(1, 118, 132, 1),
@@ -496,15 +570,17 @@ class DashboardMenu extends HookWidget{
             ),
             child: TextButton.icon(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                padding: const EdgeInsets.only(left: 50),
+                alignment: Alignment.centerLeft,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: Colors.white,
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
                     width: 1,
                   ),
-                  borderRadius: BorderRadius.circular(25.0),
+                  borderRadius: BorderRadius.circular(24.0),
                 ),
                 // ignore: prefer_const_constructors
                 textStyle: TextStyle(
@@ -520,14 +596,23 @@ class DashboardMenu extends HookWidget{
               },
               icon: const Icon(Icons.language_rounded),
               label: const Text('SETTING'),
+              },
+              icon: const Icon(
+                Icons.settings,
+                size: 30,
+              ),
+              label: const Text(
+                'SETTINGS',
+                style: TextStyle(fontSize: 15),
+              ),
             ),
           ),
           const SizedBox(
             height: 20,
           ),
           Container(
-            height: 45,
-            width: 220,
+            height: 50,
+            width: 240,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
               color: Color.fromRGBO(1, 118, 132, 1),
@@ -535,15 +620,17 @@ class DashboardMenu extends HookWidget{
             ),
             child: TextButton.icon(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                padding: const EdgeInsets.only(left: 50),
+                alignment: Alignment.centerLeft,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: Colors.white,
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
                     width: 1,
                   ),
-                  borderRadius: BorderRadius.circular(25.0),
+                  borderRadius: BorderRadius.circular(24.0),
                 ),
                 // ignore: prefer_const_constructors
                 textStyle: TextStyle(
@@ -554,10 +641,17 @@ class DashboardMenu extends HookWidget{
                 ),
               ),
               onPressed: () {
-                print('Pressed');
               },
               icon: const Icon(Icons.language_rounded),
               label: const Text('HELP'),
+              icon: const Icon(
+                Icons.help_outline_rounded,
+                size: 30,
+              ),
+              label: const Text(
+                'HELP',
+                style: TextStyle(fontSize: 15),
+              ),
             ),
           ),
           
@@ -567,6 +661,8 @@ class DashboardMenu extends HookWidget{
           Container(
             height: 45,
             width: 220,
+            height: 50,
+            width: 240,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
               color: Color.fromRGBO(1, 118, 132, 1),
@@ -577,12 +673,18 @@ class DashboardMenu extends HookWidget{
                 primary: Colors.white,
                 onSurface: Colors.white,
                 backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                padding: const EdgeInsets.only(left: 50),
+                alignment: Alignment.centerLeft,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: Colors.white,
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
                     width: 1,
                   ),
                   borderRadius: BorderRadius.circular(25.0),
+                  borderRadius: BorderRadius.circular(24.0),
                 ),
                 // ignore: prefer_const_constructors
                 textStyle: TextStyle(
@@ -597,6 +699,15 @@ class DashboardMenu extends HookWidget{
               },
               icon: const Icon(Icons.language_rounded),
               label: const Text('LOGOUT'),
+              },
+              icon: const Icon(
+                Icons.logout_outlined,
+                size: 30,
+              ),
+              label: const Text(
+                'LOG OUT',
+                style: TextStyle(fontSize: 15),
+              ),
             ),
           ),
           const SizedBox(

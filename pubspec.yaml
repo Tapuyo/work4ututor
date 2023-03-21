@@ -50,11 +50,14 @@ dependencies:
   firebase_auth: ^4.2.5
   country_pickers: ^2.0.0
   flutter_native_timezone: ^2.0.0
-  timezone: ^0.9.1
+  # timezone: ^0.9.1
   file_picker: ^5.2.5
   firebase_storage: ^11.0.14
   google_fonts: ^3.0.1
   font_awesome_flutter: ^10.4.0
+  table_calendar: ^3.0.8
+  flutter_rating_bar: ^4.0.1
+  syncfusion_flutter_pdfviewer: ^20.3.47
 
 dev_dependencies:
   flutter_test:
