@@ -10,7 +10,8 @@ import 'package:wokr4ututor/routes/routes.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_dashboard.dart';
+import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
+import 'package:wokr4ututor/ui/web/terms/termpage.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -125,7 +126,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyBehavior extends ScrollBehavior {
-  @override
+
   Widget buildViewportChrome(
       BuildContext context, Widget child, AxisDirection axisDirection) {
     return child;

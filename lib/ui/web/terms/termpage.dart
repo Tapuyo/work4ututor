@@ -1,74 +1,145 @@
-// import 'dart:typed_data';
-// import 'dart:convert';
-// import 'dart:io';
-// import 'package:http/http.dart' as http;
-// import 'package:flutter/material.dart';
-// import 'package:pdf/pdf.dart';
-// import 'package:dio/dio.dart';
-// import 'package:printing/printing.dart';
+import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
-// class TermPage extends StatefulWidget {
-//   const TermPage({super.key});
+/// Represents Homepage for Navigation
+class TermPage extends StatefulWidget {
+  @override
+  _TermPage createState() => _TermPage();
+}
 
-//   @override
-//   State<TermPage> createState() => _TermPageState();
-// }
+class _TermPage extends State<TermPage> {
+  PdfViewerController? _pdfViewerController;
+  bool selection1 = false;
+  bool selection2 = false;
+  bool selection3 = false;
+  bool selection4 = false;
 
-// class _TermPageState extends State<TermPage> {
-//   String murl =
-//       'https://drinklink.ae/oathygow/2020/12/Terms-of-Service-DrinkLink.pdf';
-//   @override
-//   Widget build(BuildContext context) {
-//    return Scaffold(
-//       appBar:  AppBar(
-//         backgroundColor: Color(0xFF2b2b61),
-//         title:  Text(
-//           "Terms of Service",
-//           style: TextStyle(fontSize: 20, color: Colors.white),
-//         ),
-//         leading: IconButton(
-//           icon: const Icon(
-//             Icons.arrow_back,
-//             color: Colors.white,
-//           ),
-//           onPressed: () {
-//             // Navigator.pushReplacement(
-//             //   context,
-//             //   MaterialPageRoute(builder: (context) => HomePage()),
-//             // );
-//           },
-//         ),
-//       ),
-//       body: FutureBuilder<Uint8List>(
-//         future: _fetchPdfContent(murl),
-//         builder: (context, snapshot) {
-//           if (snapshot.hasData) {
-//             return PdfPreview(
-//               allowPrinting: false,
-//               allowSharing: false,
-//               canChangePageFormat: false,
-//               initialPageFormat:
-//                   PdfPageFormat(100 * PdfPageFormat.mm, 120 * PdfPageFormat.mm),
-//               build: (format) => snapshot.data,
-//             );
-//           }
-//           return Center(
-//             child: CircularProgressIndicator(),
-//           );
-//         },
-//       )
-//     );
-//   }
-// }
-// Future<Uint8List> _fetchPdfContent(final String url) async {
-//     try {
-//       final Response<List<int>> response = await Dio().get<List<int>>(
-//         url,
-//         options: Options(responseType: ResponseType.bytes),
-//       );
-//       return Uint8List.fromList(response);
-//     } catch (e) {
-//       print(e);
-//       return null;
-//     }
-//   }
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () => Future.value(false),
+      child: Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+        ),
+        elevation: 0,
+        child: Container(
+          alignment: Alignment.center,
+          width: 600,
+          child: Column(
+            children: [
+              Container(
+                width: 600,
+                height: 50,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20)),
+                  color: Color.fromRGBO(1, 118, 132, 1),
+                ),
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.all(10),
+                child: const Text(
+                  "Terms & Condition",
+                  style: TextStyle(fontSize: 20, color: Colors.white),
+                ),
+              ),
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: 600,
+                      height: 450,
+                      child: SfPdfViewer.asset(
+                          'assets/images/Terms and Conditions Work4uTutor.pdf'),
+                    ),
+                    CheckboxListTile(
+                      title: const Text(
+                        'I agree to conduct all the lesson in accourdance to work4u terms and condition.',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      // subtitle: const Text(
+                      //     'A computer science portal for geeks.'),
+                      // secondary: const Icon(Icons.code),
+                      autofocus: false,
+                      activeColor: Colors.green,
+                      checkColor: Colors.white,
+                      selected: selection1,
+                      value: selection1,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      onChanged: (value) {
+                        setState(() {
+                          selection1 = value!;
+                        });
+                      },
+                    ),
+                    CheckboxListTile(
+                      title: const Text(
+                        'I agree not to share any inappropriate, offensive, abusive, or containing nudity contents to students and tutors.',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      // subtitle: const Text(
+                      //     'A computer science portal for geeks.'),
+                      // secondary: const Icon(Icons.code),
+                      autofocus: false,
+                      activeColor: Colors.green,
+                      checkColor: Colors.white,
+                      selected: selection2,
+                      value: selection2,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      onChanged: (value) {
+                        setState(() {
+                          selection2 = value!;
+                        });
+                      },
+                    ),
+                    CheckboxListTile(
+                      title: const Text(
+                        'I agree that work4ututor wont have any responsibility on this and i will be the sole responsible for the content deliver during the lessons.',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      // subtitle: const Text(
+                      //     'A computer science portal for geeks.'),
+                      // secondary: const Icon(Icons.code),
+                      autofocus: false,
+                      activeColor: Colors.green,
+                      checkColor: Colors.white,
+                      selected: selection3,
+                      value: selection3,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      onChanged: (value) {
+                        setState(() {
+                          selection3 = value!;
+                        });
+                      },
+                    ),
+                    CheckboxListTile(
+                      title: const Text(
+                        'I am aware that work4ututor will seek legal action and report to the appropriate authorities in case breach of this terms and condition.',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      // subtitle: const Text(
+                      //     'A computer science portal for geeks.'),
+                      // secondary: const Icon(Icons.code),
+                      autofocus: false,
+                      activeColor: Colors.green,
+                      checkColor: Colors.white,
+                      selected: selection4,
+                      value: selection4,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      onChanged: (value) {
+                        setState(() {
+                          selection4 = value!;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -1,8 +1,12 @@
+// ignore_for_file: unused_local_variable
+
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+
+import '../data_class/tutor_info_class.dart';
 
 uploadData() async {
   FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -115,4 +119,18 @@ class DatabaseService {
       "withdrawal": "",
     });
   }
+    getTutorInfo() async {
+    try{await FirebaseFirestore.instance
+        .collection('tutor')
+        .where(uid, isEqualTo: uid)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      return querySnapshot.docs.map((tutordata) {
+        return tutordata['status'].toString();
+      });
+      });
+  }catch(e){
+    return null;
+  }
+}
 }

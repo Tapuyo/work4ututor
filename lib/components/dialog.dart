@@ -1,4 +1,6 @@
 
+// ignore_for_file: unused_local_variable, non_constant_identifier_names, prefer_typing_uninitialized_variables
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';

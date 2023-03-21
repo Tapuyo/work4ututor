@@ -4,8 +4,10 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
 class TableBasicsExample1 extends StatefulWidget {
+  const TableBasicsExample1({super.key});
+
   @override
-  _TableBasicsExample1State createState() => _TableBasicsExample1State();
+  State<TableBasicsExample1> createState() => _TableBasicsExample1State();
 }
 
 class _TableBasicsExample1State extends State<TableBasicsExample1> {
@@ -421,7 +423,7 @@ Container buildCalendarDay({
     color: backColor,
     width: 100,
     height: 55,
-    padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+    padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
     child: Center(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -443,7 +445,7 @@ AnimatedContainer buildCalendarDayMarker({
   required Color backColor,
 }) {
   return AnimatedContainer(
-    duration: Duration(milliseconds: 300),
+    duration:const  Duration(milliseconds: 300),
     decoration: BoxDecoration(
       shape: BoxShape.rectangle,
       color: backColor,
@@ -453,7 +455,7 @@ AnimatedContainer buildCalendarDayMarker({
     child: Center(
       child: Text(
         text,
-        style: TextStyle().copyWith(
+        style: const TextStyle().copyWith(
           color: Colors.white,
           fontSize: 10.0,
         ),

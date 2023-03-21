@@ -1,23 +1,20 @@
 // ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, unused_local_variable
 
+import 'dart:convert';
+
 import 'package:country_pickers/country.dart';
 import 'package:flutter/material.dart';
 import 'package:country_pickers/country_pickers.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'dart:js' as js;
-
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:wokr4ututor/services/services.dart';
+import 'package:wokr4ututor/ui/web/tutor/tutor_dashboard.dart';
 
 import '../../../components/dialog.dart';
 
-void main() {
-  tz.initializeTimeZones();
-  setup();
-}
 
 class TutorInfo extends StatefulWidget {
   const TutorInfo({Key? key}) : super(key: key);
@@ -48,6 +45,11 @@ class InputInfo extends StatefulWidget {
 }
 
 class _InputInfoState extends State<InputInfo> {
+  void main() {
+     super.initState();
+    _initData();
+}
+
 // timezone
   var dtf = js.context['Intl'].callMethod('DateTimeFormat');
   var ops = js.context['Intl']
@@ -61,7 +63,7 @@ class _InputInfoState extends State<InputInfo> {
   String tcontactNumber = "";
   String tCountry = "";
   String tCity = "";
-  String tTimezone = "";
+    List<String> tTimezone = [];
   int age = 0;
   String contactNumber = "";
   var ulanguages = [
@@ -167,6 +169,21 @@ class _InputInfoState extends State<InputInfo> {
           myage = age.toString();
         });
       }
+    }
+  }
+  
+  String _timezone = 'Unknown';
+  List<String> _availableTimezones = <String>[];
+
+   Future<void> _initData() async {
+    
+    try {
+      _availableTimezones = await FlutterNativeTimezone.getAvailableTimezones();
+      _availableTimezones.sort();
+      tTimezone = _availableTimezones;
+      print(tTimezone.toString());
+    } catch (e) {
+      print('Could not get available timezones');
     }
   }
 
@@ -375,27 +392,42 @@ class _InputInfoState extends State<InputInfo> {
                           height: 14,
                         ),
                         Container(
-                          width: 600,
-                          height: 45,
-                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                          decoration: BoxDecoration(
-                            color: const Color.fromRGBO(242, 242, 242, 1),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              fillColor: Colors.grey,
-                              hintText: 'Timezone',
-                              hintStyle: TextStyle(color: Colors.black),
-                            ),
-                            validator: (val) =>
-                                val!.isEmpty ? 'Enter an Timezone' : null,
-                            onChanged: (val) {
-                              tTimezone = val;
-                            },
-                          ),
-                        ),
+                                            width: 600,
+                                            height: 45,
+                                            padding: const EdgeInsets.fromLTRB(
+                                                10, 0, 10, 0),
+                                            decoration: BoxDecoration(
+                                              color: const Color.fromRGBO(
+                                                  242, 242, 242, 1),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                            child: DropdownButtonFormField(
+                                              decoration: const InputDecoration(
+                                                enabledBorder: InputBorder.none,
+                                              ),
+                                              value: dropdownvalue,
+                                              hint: const Text(
+                                                  "Timezone"),
+                                              isExpanded: true,
+                                              icon: const Icon(
+                                                  Icons.arrow_drop_down),
+                                              items: tTimezone
+                                                  .map((String items) {
+                                                return DropdownMenuItem(
+                                                  value: items,
+                                                  child: Text(items),
+                                                );
+                                              }).toList(),
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  tTimezone.clear();
+                                                  tTimezone.add(val.toString());
+                                                  dropdownvalue = val.toString();
+                                                });
+                                              },
+                                            ),
+                                          ),
                         const SizedBox(
                           height: 14,
                         ),
@@ -641,7 +673,7 @@ class _InputInfoState extends State<InputInfo> {
                                                             ? 'Input price'
                                                             : null,
                                                     onChanged: (val) {
-                                                      tTimezone = val;
+                                                      // tTimezone = val;
                                                     },
                                                   ),
                                                 ),
@@ -698,7 +730,7 @@ class _InputInfoState extends State<InputInfo> {
                                                             ? 'Input price'
                                                             : null,
                                                     onChanged: (val) {
-                                                      tTimezone = val;
+                                                      // tTimezone = val;
                                                     },
                                                   ),
                                                 ),
@@ -755,7 +787,7 @@ class _InputInfoState extends State<InputInfo> {
                                                             ? 'Input price'
                                                             : null,
                                                     onChanged: (val) {
-                                                      tTimezone = val;
+                                                      // tTimezone = val;
                                                     },
                                                   ),
                                                 ),
@@ -1523,7 +1555,12 @@ class _InputInfoState extends State<InputInfo> {
                                 borderRadius: BorderRadius.circular(40.0),
                               ),
                             ),
-                            onPressed: () => {},
+                            onPressed: () => {
+                              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DashboardPage(uid: "" ,name: "Angelo Jordans",)),
+                ),
+                            },
                             child: const Text(
                               'Proceed Now',
                               style: TextStyle(
@@ -1544,15 +1581,19 @@ class _InputInfoState extends State<InputInfo> {
       ),
     );
   }
-}
 
 //Display all the Countries
 _buildCountryPickerDropdownSoloExpanded() {
   String valueme = "Select your Country";
   return CountryPickerDropdown(
     hint: const Text("Select your Country"),
+    // initialValue: valueme,
     onValuePicked: (Country country) {
       valueme = country.toString();
+      setState(() {
+         _initData();
+      });
+     
     },
     itemBuilder: (Country country) {
       return Row(
@@ -1567,13 +1608,16 @@ _buildCountryPickerDropdownSoloExpanded() {
   );
 }
 
-//Identifies the device timezone and datetime
-Future<void> setup() async {
-  // var dtf = js.context['Intl'].callMethod('DateTimeFormat');
-  // var ops = dtf.callMethod('resolvedOptions');
-  // print(ops['timeZone']);
-  tz.initializeTimeZones();
-  // var istanbulTimeZone = tz.getLocation(ops['timeZone']);
-  // var now = tz.TZDateTime.now(istanbulTimeZone);
-  // print(now);
 }
+//Identifies the device timezone and datetime
+// Future<void> setup() async {
+//   // var dtf = js.context['Intl'].callMethod('DateTimeFormat');
+//   // var ops = dtf.callMethod('resolvedOptions');
+//   // print(ops['timeZone']);
+//   tz.initializeTimeZone();
+//   var response = tz.timeZoneDatabase;
+//   Map data = jsonDecode(response as String);
+//   // var istanbulTimeZone = tz.getLocation(ops['timeZone']);
+//   // var now = tz.TZDateTime.now(istanbulTimeZone);
+//   print(data);
+// }

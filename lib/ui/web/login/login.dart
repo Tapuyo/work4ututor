@@ -1,10 +1,17 @@
 // ignore_for_file: prefer_const_constructors, avoid_print
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
+import 'package:wokr4ututor/services/services.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/ui/web/login/forgotpassword.dart';
+import 'package:wokr4ututor/ui/web/terms/termpage.dart';
+
+import '../../../data_class/user_class.dart';
+import '../../../utils/themes.dart';
+import '../tutor/tutor_dashboard.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -174,13 +181,13 @@ class _SigniNState extends State<SigniN> {
                         ),
                         hintStyle: TextStyle(color: Colors.black, fontSize: 16),
                         hintText: 'Password',
-                        suffixIcon:  IconButton(
+                        suffixIcon: IconButton(
                           onPressed: () {
-                              // Update the state i.e. toogle the state of passwordVisible variable
-                              setState(() {
-                                obscure = !obscure;
-                              });
-                            },
+                            // Update the state i.e. toogle the state of passwordVisible variable
+                            setState(() {
+                              obscure = !obscure;
+                            });
+                          },
                           icon: Icon(Icons.remove_red_eye_rounded),
                         ),
                         suffixIconColor: Colors.black,
@@ -224,8 +231,7 @@ class _SigniNState extends State<SigniN> {
                   backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
                   shape: RoundedRectangleBorder(
                     side: const BorderSide(
-                      color:
-                          Color.fromRGBO(1, 118, 132, 1), // your color here
+                      color: Color.fromRGBO(1, 118, 132, 1), // your color here
                       width: 1,
                     ),
                     borderRadius: BorderRadius.circular(30.0),
@@ -233,12 +239,41 @@ class _SigniNState extends State<SigniN> {
                 ),
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
-                    dynamic result = await _auth.signinwEmailandPassword(
+                    Users result = await _auth.signinwEmailandPassword(
                         userEmail, userPassword);
                     if (result == null) {
                       setState(() {
                         error = 'Could not sign in w/ those credential';
                         print(error);
+                        print(result.uid);
+                        dynamic status =
+                            DatabaseService(uid: result.uid).getTutorInfo();
+                        if (status.isEmpty) {
+                          print("Status Report$status Error");
+                        } else {
+                          print("Status Report$status Yeeh");
+                           Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>  DashboardPage(uid: result.uid ,name: "Angelo Jordans",)),
+                        );
+                        }
+                      });
+                    } else {
+                      setState(() {
+                        print(result.uid);
+                      dynamic status =
+                          DatabaseService(uid: result.uid).getTutorInfo();
+                      if (status == null) {
+                        print(status);
+                      } else {
+                        print("Status Report$status Yeeh");
+                      }
+                       Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>  DashboardPage(uid: result.uid ,name: "Angelo Jordans",)),
+                        );
                       });
                     }
                   }
@@ -255,14 +290,53 @@ class _SigniNState extends State<SigniN> {
             Container(
               alignment: Alignment.center,
               padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
-              child: Text(
-                "By signing up, you agree to Work4uTutor\nTerms of Service and Privacy Policy",
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: const Color.fromARGB(255, 59, 59, 59),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
-                    ),
+              child: RichText(
                 textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: Color.fromARGB(255, 59, 59, 59),
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                      ),
+                  children: <TextSpan>[
+                    TextSpan(text: 'By signing up, you agree to Work4uTutor '),
+                    TextSpan(
+                        text: 'Terms of Service',
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: kColorSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            setState(() {
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (_) => TermPage());
+                            });
+                          }),
+                    TextSpan(text: ' and that you have read our '),
+                    TextSpan(
+                        text: 'Privacy Policy',
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: kColorSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            setState(() {
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (_) => TermPage());
+                            });
+                          }),
+                  ],
+                ),
               ),
             ),
           ],

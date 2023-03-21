@@ -5,7 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../utils/themes.dart';
 
 class DashboardHeader extends StatelessWidget {
-  const DashboardHeader({Key? key}) : super(key: key);
+  final String uid;
+  final String name; 
+  const DashboardHeader({Key? key, required this.uid, required this.name}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +22,7 @@ class DashboardHeader extends StatelessWidget {
       child: Row(
         children: <Widget>[
           SizedBox(
-            height: 150,
-            width: 210,
+            width: 190,
             child: Image.asset(
               "assets/images/worklogo.png",
               alignment: Alignment.topCenter,
@@ -34,11 +35,11 @@ class DashboardHeader extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                "Marian Rivers",
+                name.toString(),
                 style: GoogleFonts.nunito(
                   color: Colors.black,
                   fontSize: 15,
-                  fontWeight: FontWeight.normal,
+                  fontWeight: FontWeight.w600,
                 ),
                           ),
                 RatingBar(

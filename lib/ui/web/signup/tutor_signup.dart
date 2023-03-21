@@ -1,10 +1,14 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/components/dialog.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
+import 'package:wokr4ututor/utils/themes.dart';
+
+import '../terms/termpage.dart';
 
 class TutorSignup extends StatefulWidget {
   const TutorSignup({Key? key}) : super(key: key);
@@ -320,14 +324,53 @@ class _SignUpState extends State<SignUp> {
             Container(
               alignment: Alignment.center,
               padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
-              child: Text(
-                "By signing up, you agree to Work4uTutor\nTerms of Service and Privacy Policy",
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Color.fromARGB(255, 59, 59, 59),
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
-                    ),
+              child: RichText(
                 textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: Color.fromARGB(255, 59, 59, 59),
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                      ),
+                  children: <TextSpan>[
+                    TextSpan(text: 'By signing up, you agree to Work4uTutor '),
+                    TextSpan(
+                        text: 'Terms of Service',
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: kColorSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            setState(() {
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (_) => TermPage());
+                            });
+                          }),
+                    TextSpan(text: ' and that you have read our '),
+                    TextSpan(
+                        text: 'Privacy Policy',
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: kColorSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            setState(() {
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (_) => TermPage());
+                            });
+                          }),
+                  ],
+                ),
               ),
             ),
           ],

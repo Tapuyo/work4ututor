@@ -15,17 +15,16 @@ class CustomAppBar extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
-      padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          const SizedBox(
-            width: 200,
-          ),
-          SizedBox(
-            height: 200,
+          const Spacer(),
+          Container(
+            margin: const EdgeInsets.only(top: 0),
             width: 240,
             child: Image.asset(
-              "assets/images/worklogo.png",
+              "assets/images/WORK4U_NO_BG.png",
               alignment: Alignment.topCenter,
               fit: BoxFit.cover,
             ),
@@ -188,9 +187,7 @@ class CustomAppBar extends StatelessWidget {
               child: const Text('LOG IN'),
             ),
           ),
-          const SizedBox(
-            width: 200,
-          )
+          const Spacer(),
         ],
       ),
     );
@@ -277,10 +274,10 @@ class DashboardMenu extends StatelessWidget {
             height: 50,
             width: 300,
             alignment: Alignment.center,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
               color: kColorPrimary,
-              borderRadius: BorderRadius.circular(5.0),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(0),bottomLeft: Radius.circular(0),topRight: Radius.circular(5),bottomRight: Radius.circular(5)),
             ),
             child: SizedBox(
             height: 150,
@@ -288,7 +285,7 @@ class DashboardMenu extends StatelessWidget {
             child: Image.asset(
               "assets/images/TUTOR_S_DESK_NO BG.png",
               alignment: Alignment.topCenter,
-              fit: BoxFit.fitWidth,
+              fit: BoxFit.contain,
             ),
           ),
           ),
@@ -309,7 +306,7 @@ class DashboardMenu extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
+                backgroundColor: kColorSecondary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here

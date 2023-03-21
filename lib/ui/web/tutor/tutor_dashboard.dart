@@ -5,7 +5,9 @@ import 'package:wokr4ututor/ui/web/tutor/tutor_schedule.dart';
 import '../../../components/nav_bar.dart';
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({Key? key}) : super(key: key);
+   final String uid;
+  final String name; 
+  const DashboardPage({Key? key, required this.uid, required this.name}) : super(key: key);
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -23,14 +25,14 @@ class _DashboardPageState extends State<DashboardPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const DashboardHeader(),
+             const DashboardHeader(uid: "",name: "Angelo Jordans",),
             const SizedBox(height: 2,),
             Row(
-              children:  <Widget>[
-                const DashboardMenu(),
-                const SizedBox(width: 5,),
-               TableBasicsExample1(),
-               const SizedBox(width: 5,),
+              children:  const <Widget>[
+                DashboardMenu(),
+              //   SizedBox(width: 5,),
+              //   TableBasicsExample1(),
+              //  SizedBox(width: 5,),
               ],
             ),
             // It will cover 1/3 of free spaces

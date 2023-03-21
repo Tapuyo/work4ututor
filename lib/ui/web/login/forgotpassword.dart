@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
   @override
-  void passwordResetDialog (BuildContext context) {
+ passwordResetDialog (BuildContext context) {
    showDialog(
                             barrierDismissible: false,
                             context: context,
