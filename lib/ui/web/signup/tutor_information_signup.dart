@@ -1558,7 +1558,7 @@ class _InputInfoState extends State<InputInfo> {
                             onPressed: () => {
                               Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const DashboardPage(uid: "" ,name: "Angelo Jordans",)),
+                  MaterialPageRoute(builder: (context) => const DashboardPage()),
                 ),
                             },
                             child: const Text(

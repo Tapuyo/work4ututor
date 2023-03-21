@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:provider/provider.dart';
+import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
 import 'package:wokr4ututor/ui/web/signup/student_signup.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
@@ -246,11 +249,12 @@ class CustomAppBarLog extends StatelessWidget {
   }
 }
 
-class DashboardMenu extends StatelessWidget {
+class DashboardMenu extends HookWidget{
    DashboardMenu({Key? key}) : super(key: key);
  final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
+    
     Size size = MediaQuery.of(context).size;
     return Container(
       height: size.height - 75,
@@ -269,9 +273,21 @@ class DashboardMenu extends StatelessWidget {
       ),
       child: Column(
         children: <Widget>[
-          const SizedBox(
-            width: 300,
+          GestureDetector(
+            onTap: (){
+               final provider = context.read<InitProvider>();
+              provider.setMenuIndex(0);
+            },
+            child: const SizedBox(
+               height: 66,
+               width: 250,
+              child:  ColoredBox(
+                color:  Color.fromRGBO(1, 118, 132, 1),
+                
+              ),
+            ),
           ),
+          const SizedBox(height: 20,),
           Container(
             height: 50,
             width: 300,
@@ -325,6 +341,8 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
+                final provider = context.read<InitProvider>();
+                provider.setMenuIndex(1);
               },
               icon: const Icon(
                 Icons.calendar_month,
@@ -370,6 +388,8 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
+                final provider = context.read<InitProvider>();
+                provider.setMenuIndex(2);
               },
               icon: const Icon(
                 Icons.wechat,
@@ -415,6 +435,8 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
+                final provider = context.read<InitProvider>();
+                 provider.setMenuIndex(3);
               },
               icon: const Icon(
                 Icons.question_answer,
@@ -460,6 +482,8 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
+                final provider = context.read<InitProvider>();
+                 provider.setMenuIndex(4);
               },
               icon: const Icon(
                 Icons.supervised_user_circle,
@@ -505,6 +529,8 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
+                final provider = context.read<InitProvider>();
+                 provider.setMenuIndex(5);
               },
               icon: const Icon(
                 Icons.feedback,
@@ -550,6 +576,8 @@ class DashboardMenu extends StatelessWidget {
                 ),
               ),
               onPressed: () {
+                final provider = context.read<InitProvider>();
+                 provider.setMenuIndex(6);
               },
               icon: const Icon(
                 Icons.settings,
@@ -606,6 +634,7 @@ class DashboardMenu extends StatelessWidget {
               ),
             ),
           ),
+          
           const SizedBox(
             height: 20,
           ),
