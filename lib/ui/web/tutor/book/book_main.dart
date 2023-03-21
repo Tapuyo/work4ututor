@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:provider/provider.dart';
-import 'package:wokr4ututor/provider/init_provider.dart';
 
 
 class BookMain extends HookWidget {
