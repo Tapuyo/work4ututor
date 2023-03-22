@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 const kColorBlue = Color.fromARGB(255, 2, 130, 115);
 const kColorLight = Color.fromRGBO(103, 195, 208, 1);
-const kColorYellow = Color.fromRGBO(255, 225, 2, 1);
+const kColorYellow = Color.fromRGBO(244, 174, 22, 1);
 const kColorDarkBlue = Color(0xff8E8E8E);
 const kColorDarkRed = Color.fromARGB(255, 194, 35, 35);
 const kColorTeal = Color.fromARGB(118, 0, 0, 0);

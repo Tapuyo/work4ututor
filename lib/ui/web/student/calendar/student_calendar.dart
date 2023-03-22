@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class DashboardMenu extends StatelessWidget {
-   DashboardMenu({Key? key}) : super(key: key);
+class StudentCalendar extends StatelessWidget {
+   StudentCalendar({Key? key}) : super(key: key);
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;

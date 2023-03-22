@@ -14,6 +14,7 @@ import 'package:wokr4ututor/services/services.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_dashboard.dart';
 
 import '../../../components/dialog.dart';
+import '../terms/termpage.dart';
 
 
 class TutorInfo extends StatefulWidget {
@@ -193,7 +194,7 @@ class _InputInfoState extends State<InputInfo> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          const CustomAppBarLog(),
+           CustomAppBarLog(),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -1534,6 +1535,12 @@ class _InputInfoState extends State<InputInfo> {
                               setState(() {
                                 termStatus = value!;
                               });
+                                 setState(() {
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (_) => TermPage());
+                            });
                             },
                           ),
                         ),
@@ -1558,7 +1565,7 @@ class _InputInfoState extends State<InputInfo> {
                             onPressed: () => {
                               Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const DashboardPage(uid: "" ,name: "Angelo Jordans",)),
+                  MaterialPageRoute(builder: (context) => const DashboardPage()),
                 ),
                             },
                             child: const Text(

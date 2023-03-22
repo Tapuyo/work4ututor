@@ -13,11 +13,10 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
+    return Padding(
+       padding: const EdgeInsets.only(left: 10, right: 10),
       child: Container(
         alignment: Alignment.topCenter,
-        padding: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(
@@ -29,7 +28,7 @@ class _SettingsPageState extends State<SettingsPage> {
             topLeft: Radius.circular(5.0),
           ),
         ),
-        width: size.width - 310,
+        width: size.width - 320,
         height: size.height - 75,
         child: Column(
           children: <Widget>[
@@ -48,7 +47,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: [
                   Text(
                     "SETTINGS",
-                    style: GoogleFonts.arimo(
+                    style: GoogleFonts.roboto(
                       color: Colors.white,
                       fontSize: 25,
                       fontWeight: FontWeight.normal,

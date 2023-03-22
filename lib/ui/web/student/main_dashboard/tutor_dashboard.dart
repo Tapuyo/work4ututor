@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/components/dashboard_header.dart';
+import 'package:wokr4ututor/components/students_navbar.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/ui/web/tutor/book/book_main.dart';
 import 'package:wokr4ututor/ui/web/tutor/classes/classes_main.dart';
@@ -13,11 +14,10 @@ import 'package:wokr4ututor/ui/web/tutor/tutor_schedule.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_settings.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_students.dart';
 
-import '../../../components/nav_bar.dart';
-import '../help/help.dart';
+import '../../help/help.dart';
 
-class DashboardPage extends HookWidget {
-  const DashboardPage({Key? key}) : super(key: key);
+class StudentDashboardPage extends HookWidget {
+  const StudentDashboardPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class DashboardPage extends HookWidget {
                 alignment: Alignment.topLeft,
                 child: Row(
                   children: [
-                    DashboardMenu(),
+                    StudentsMenu(),
                     //Contains
                     if (menuIndex == 0) ...[
                       const ClassesMain()

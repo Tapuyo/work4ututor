@@ -37,6 +37,7 @@ class AuthService {
 
   Future signOutAnon() async {
     try {
+      print("Success");
       return await _auth.signOut();
     } catch (e) {
       print(e.toString());
@@ -50,6 +51,7 @@ class AuthService {
       UserCredential result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       User? user = result.user;
+      print("I am the user:$user");
       return _userFromFirebaseUser(user);
     } catch (e) {
       print(e.toString());

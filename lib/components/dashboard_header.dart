@@ -35,7 +35,7 @@ class DashboardHeader extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                name.toString(),
+                name.isNotEmpty ? name.toString(): "Username Here",
                 style: GoogleFonts.nunito(
                   color: Colors.black,
                   fontSize: 15,

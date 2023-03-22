@@ -58,6 +58,7 @@ dependencies:
   table_calendar: ^3.0.8
   flutter_rating_bar: ^4.0.1
   syncfusion_flutter_pdfviewer: ^20.3.47
+  flutter_spinkit: ^5.1.0
 
 dev_dependencies:
   flutter_test:

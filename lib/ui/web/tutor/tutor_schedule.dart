@@ -18,11 +18,10 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, right: 10),
       child: Container(
         alignment: Alignment.topCenter,
-        padding: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(
@@ -34,7 +33,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
             topLeft: Radius.circular(5.0),
           ),
         ),
-        width: size.width - 310,
+        width: size.width - 320,
         height: size.height - 75,
         child: Column(
           children: <Widget>[
@@ -53,7 +52,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                 children: [
                   Text(
                     "SCHEDULE",
-                    style: GoogleFonts.arimo(
+                    style: GoogleFonts.roboto(
                       color: Colors.white,
                       fontSize: 25,
                       fontWeight: FontWeight.normal,
@@ -72,13 +71,12 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.all(10),
                         alignment: Alignment.center,
-                        foregroundColor: const Color.fromRGBO(
-                                1, 118, 132, 1), 
+                        foregroundColor: const Color.fromRGBO(1, 118, 132, 1),
                         disabledBackgroundColor: Colors.white,
-                        backgroundColor:  Colors.white,
+                        backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           side: const BorderSide(
-                            color:kColorPrimary, // your color here
+                            color: kColorPrimary, // your color here
                             width: 1,
                           ),
                           borderRadius: BorderRadius.circular(24.0),
@@ -97,7 +95,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                       icon: const Icon(
                         Icons.calendar_month,
                         size: 15,
-                        color: kColorPrimary, 
+                        color: kColorPrimary,
                       ),
                       label: const Text(
                         'Set Up Calendar',
@@ -109,7 +107,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
               ),
             ),
             const SizedBox(
-              height: 20,
+              height: 5,
             ),
             SizedBox(
               width: size.width - 315,
@@ -124,8 +122,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                   borderRadius: BorderRadius.all(
                     Radius.circular(10),
                   ),
-                  side: BorderSide(
-                      color: kColorPrimary, width: 3),
+                  side: BorderSide(color: kColorPrimary, width: 4),
                 ),
                 child: TableCalendar(
                   shouldFillViewport: true,
@@ -136,10 +133,12 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                   daysOfWeekHeight: 40,
                   rowHeight: 80,
                   headerStyle: const HeaderStyle(
-                    titleTextStyle:
-                        TextStyle(color: Colors.white, fontSize: 30.0, fontWeight: FontWeight.bold),
+                    titleTextStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 30.0,
+                        fontWeight: FontWeight.bold),
                     decoration: BoxDecoration(
-                        color:kColorPrimary,
+                        color: kColorPrimary,
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(10),
                             topRight: Radius.circular(10))),
@@ -261,62 +260,77 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Container(
-                  width: 50,
-                  height: 50,
+                  width: 30,
+                  height: 30,
                   decoration: BoxDecoration(
-                    color: Colors.green,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .5,
-                    ),
+                    color: const Color.fromRGBO(21, 228, 28, 1).withOpacity(.48),
+                    // border: Border.all(
+                    //   color: Colors.black45,
+                    //   width: .5,
+                    // ),
                     borderRadius: BorderRadius.circular(100),
                   ),
+                ),
+                const SizedBox(
+                  width: 2,
                 ),
                 Text(
                   "AVAILABLE",
                   style: GoogleFonts.roboto(
                     color: Colors.black,
-                    fontSize: 25,
+                    fontSize: 18,
                     fontWeight: FontWeight.normal,
                   ),
                 ),
+                const SizedBox(
+                  width: 5,
+                ),
                 Container(
-                  width: 50,
-                  height: 50,
+                  width: 30,
+                  height: 30,
                   decoration: BoxDecoration(
-                    color: Colors.blue,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .5,
-                    ),
+                    color: const Color.fromRGBO(130, 189, 218, 1),
+                    // border: Border.all(
+                    //   color: Colors.black45,
+                    //   width: .5,
+                    // ),
                     borderRadius: BorderRadius.circular(100),
                   ),
+                ),
+                const SizedBox(
+                  width: 2,
                 ),
                 Text(
                   "FULLY BOOKED",
                   style: GoogleFonts.roboto(
                     color: Colors.black,
-                    fontSize: 25,
+                    fontSize: 18,
                     fontWeight: FontWeight.normal,
                   ),
                 ),
+                const SizedBox(
+                  width: 5,
+                ),
                 Container(
-                  width: 50,
-                  height: 50,
+                  width: 30,
+                  height: 30,
                   decoration: BoxDecoration(
-                    color: Colors.red,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .5,
-                    ),
+                    color: const Color.fromRGBO(232, 154, 154, 1),
+                    // border: Border.all(
+                    //   color: Colors.black45,
+                    //   width: .5,
+                    // ),
                     borderRadius: BorderRadius.circular(100),
                   ),
+                ),
+                const SizedBox(
+                  width: 2,
                 ),
                 Text(
                   "BLOCKED",
                   style: GoogleFonts.roboto(
                     color: Colors.black,
-                    fontSize: 25,
+                    fontSize: 18,
                     fontWeight: FontWeight.normal,
                   ),
                 ),
@@ -445,7 +459,7 @@ AnimatedContainer buildCalendarDayMarker({
   required Color backColor,
 }) {
   return AnimatedContainer(
-    duration:const  Duration(milliseconds: 300),
+    duration: const Duration(milliseconds: 300),
     decoration: BoxDecoration(
       shape: BoxShape.rectangle,
       color: backColor,
