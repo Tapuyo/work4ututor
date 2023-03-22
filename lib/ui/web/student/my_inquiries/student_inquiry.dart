@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wokr4ututor/utils/themes.dart';
 
-import '../../../utils/themes.dart';
-
-class MessagePage extends StatefulWidget {
-  const MessagePage({super.key});
+class StudentInquirysPage extends StatefulWidget {
+  const StudentInquirysPage({super.key});
 
   @override
-  State<MessagePage> createState() => _MessagePageState();
+  State<StudentInquirysPage> createState() => _StudentInquirysPageState();
 }
 
-class _MessagePageState extends State<MessagePage> {
-   @override
+class _StudentInquirysPageState extends State<StudentInquirysPage> {
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
+    return Padding(
+       padding: const EdgeInsets.only(left: 10, right: 10),
       child: Container(
         alignment: Alignment.topCenter,
-        padding: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(
@@ -30,7 +28,7 @@ class _MessagePageState extends State<MessagePage> {
             topLeft: Radius.circular(5.0),
           ),
         ),
-        width: size.width - 310,
+        width: size.width - 320,
         height: size.height - 75,
         child: Column(
           children: <Widget>[
@@ -48,8 +46,8 @@ class _MessagePageState extends State<MessagePage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    "Messages",
-                    style: GoogleFonts.arimo(
+                    "SETTINGS",
+                    style: GoogleFonts.roboto(
                       color: Colors.white,
                       fontSize: 25,
                       fontWeight: FontWeight.normal,

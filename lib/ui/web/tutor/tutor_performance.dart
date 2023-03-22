@@ -14,11 +14,10 @@ class _PerformancePageState extends State<PerformancePage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, right: 10),
       child: Container(
         alignment: Alignment.topCenter,
-        padding: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(
@@ -30,7 +29,7 @@ class _PerformancePageState extends State<PerformancePage> {
             topLeft: Radius.circular(5.0),
           ),
         ),
-        width: size.width - 310,
+        width: size.width - 320,
         height: size.height - 75,
         child: Column(
           children: <Widget>[
@@ -48,8 +47,8 @@ class _PerformancePageState extends State<PerformancePage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    "STUDENTS ENROLLED",
-                    style: GoogleFonts.arimo(
+                    "PERFORMANCE",
+                    style: GoogleFonts.roboto(
                       color: Colors.white,
                       fontSize: 25,
                       fontWeight: FontWeight.normal,
