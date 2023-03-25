@@ -22,6 +22,6 @@ class _MainPageState extends State<WebMainPage> {
 //     print( user );
 //     return DashboardPage(uid: user.uid, name: "",);
 //    }
-return Placeholder();
+return const DashboardPage();
   }
 }

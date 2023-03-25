@@ -14,8 +14,6 @@ class DashboardHeader extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Container(
       width: size.width,
-      height: 60,
-      padding: const EdgeInsets.fromLTRB(50, 0, 10, 0),
       decoration: const BoxDecoration(
         color: kColorPrimary,
       ),
@@ -33,13 +31,15 @@ class DashboardHeader extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(10.0,10,3,10),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                 name.isNotEmpty ? name.toString(): "Username Here",
-                style: GoogleFonts.nunito(
-                  color: Colors.black,
+                style: GoogleFonts.roboto(
+                  color: Colors.white,
                   fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.normal,
                 ),
                           ),
                 RatingBar(
