@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:wokr4ututor/components/dashboard_header.dart';
 import 'package:wokr4ututor/components/students_navbar.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
+import 'package:wokr4ututor/ui/web/student/main_dashboard/students_classes.dart';
 import 'package:wokr4ututor/ui/web/tutor/book/book_main.dart';
 import 'package:wokr4ututor/ui/web/tutor/classes/classes_main.dart';
 import 'package:wokr4ututor/ui/web/tutor/classes_inquiry.dart';
@@ -43,7 +44,7 @@ class StudentDashboardPage extends HookWidget {
                     StudentsMenu(),
                     //Contains
                     if (menuIndex == 0) ...[
-                      const ClassesMain()
+                      const StudentsMainDashboard()
                     ] else if (menuIndex == 1) ...[
                       const TableBasicsExample1()
                     ] else if (menuIndex == 2) ...[

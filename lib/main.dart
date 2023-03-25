@@ -12,6 +12,7 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
+import 'package:wokr4ututor/ui/web/student/main_dashboard/student_dashboard.dart';
 import 'package:wokr4ututor/ui/web/terms/termpage.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_dashboard.dart';
 import 'package:wokr4ututor/ui/web/web_main.dart';
@@ -76,61 +77,21 @@ class MyApp extends StatelessWidget {
     //   initialData: null,
     //   child:  
       MaterialApp(
-        builder: (context, child) {
-          return kIsWeb ? const DashboardPage():ScrollConfiguration(
-            behavior: MyBehavior(),
-            child: child!,
-          );
-        },
+        // builder: (context, child) {
+        //   return kIsWeb ? const DashboardPage():ScrollConfiguration(
+        //     behavior: MyBehavior(),
+        //     child: child!,
+        //   );
+        // },
         title: 'Work4uTutor',
         initialRoute: Routes.splash,
         onGenerateRoute: RouteGenerator.generateRoute,
         debugShowCheckedModeBanner: false,
-        // theme: ThemeData(
-        //   brightness: Brightness.light,
-        //   platform: !kIsWeb ? TargetPlatform.iOS:TargetPlatform.fuchsia,
-        //   scaffoldBackgroundColor: Colors.white,
-        //   appBarTheme: const AppBarTheme(
-        //     elevation: 1,
-        //     color: Colors.white,
-        //     iconTheme: IconThemeData(
-        //       color: kColorPrimary,
-        //     ),
-        //     actionsIconTheme: IconThemeData(
-        //       color: kColorPrimary,
-        //     ),
-        //     // ignore: deprecated_member_use
-        //     textTheme: TextTheme(
-        //       titleLarge: TextStyle(
-        //         color: kColorDarkBlue,
-        //         fontFamily: 'NunitoSans',
-        //         fontSize: 16,
-        //         fontWeight: FontWeight.w600,
-        //       ),
-        //     ),
-        //     systemOverlayStyle: SystemUiOverlayStyle.dark,
-        //   ),
-        //   dividerColor: Colors.grey[300],
-        //   textTheme: TextTheme(
-        //     labelLarge: kTextStyleButton,
-        //     titleMedium: kTextStyleSubtitle1.copyWith(color: kColorPrimaryDark),
-        //     titleSmall: kTextStyleSubtitle2.copyWith(color: kColorPrimaryDark),
-        //     bodyMedium: kTextStyleBody2.copyWith(color: kColorPrimaryDark),
-        //     titleLarge: kTextStyleHeadline6.copyWith(color: kColorPrimaryDark),
-        //   ),
-        //   iconTheme: const IconThemeData(
-        //     color: kColorPrimary,
-        //   ),
-        //   fontFamily: 'NunitoSans',
-        //   cardTheme: CardTheme(
-        //     elevation: 0,
-        //     color: Color(0xffEBF2F5),
-        //     shape: RoundedRectangleBorder(
-        //       borderRadius: BorderRadius.circular(4),
-        //       //side: BorderSide(width: 1, color: Colors.grey[200]),
-        //     ),
-        //   ),
-        // ),
+        theme: ThemeData(
+        fontFamily: "Nunito",
+        canvasColor: Colors.white,
+        primarySwatch: Colors.indigo,
+      ),
         home:  WebMainPage(),
       );
     // );

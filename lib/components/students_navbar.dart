@@ -98,7 +98,7 @@ class StudentsMenu extends HookWidget {
                 size: 30,
               ),
               label: const Text(
-                'SCHEDULE',
+                'CLASSES',
                 style: TextStyle(fontSize: 15),
               ),
             ),
@@ -188,11 +188,11 @@ class StudentsMenu extends HookWidget {
                 provider.setMenuIndex(3);
               },
               icon: const Icon(
-                Icons.question_answer,
+                Icons.person_add,
                 size: 30,
               ),
               label: const Text(
-                'CLASSES\nINQUIRY',
+                'BOOK CLASS',
                 style: TextStyle(fontSize: 15),
               ),
             ),
@@ -239,54 +239,7 @@ class StudentsMenu extends HookWidget {
                 size: 30,
               ),
               label: const Text(
-                'STUDENTS\nENROLLED',
-                style: TextStyle(fontSize: 15),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
-            height: 50,
-            width: 240,
-            decoration: const BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(25)),
-            ),
-            child: TextButton.icon(
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.only(left: 50),
-                alignment: Alignment.centerLeft,
-                foregroundColor: Colors.white,
-                disabledBackgroundColor: Colors.white,
-                backgroundColor: kColorSecondary,
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
-                // ignore: prefer_const_constructors
-                textStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                  fontStyle: FontStyle.normal,
-                  decoration: TextDecoration.none,
-                ),
-              ),
-              onPressed: () {
-                final provider = context.read<InitProvider>();
-                provider.setMenuIndex(5);
-              },
-              icon: const Icon(
-                Icons.feedback,
-                size: 30,
-              ),
-              label: const Text(
-                'PERFORMANCE',
+                'MY INQUIRIES',
                 style: TextStyle(fontSize: 15),
               ),
             ),
