@@ -19,7 +19,7 @@ class DatabaseService1 {
         withdrawal: tutordata['withdrawal'] ?? '',
         status: tutordata['status'] ?? '',
         extensionName: tutordata['extensionName'] ?? '',
-        dateSign: DateTime.now(),
+        dateSign: DateTime.now().toString(),
         firstName: tutordata['firstName'] ?? '',
         imageID: tutordata['imageID'] ?? '',
         language: tutordata['language'] ?? '',
@@ -31,6 +31,11 @@ class DatabaseService1 {
       );
     }).toList();
   }
+
+  Stream<List<TutorInformation>> get tutorlist{
+  return dataCollection.snapshots().map(_getTutorInformation);
+  
+}
 
   Future<void> getTutorInfo() async {
     await FirebaseFirestore.instance

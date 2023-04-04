@@ -11,7 +11,7 @@ import 'package:wokr4ututor/ui/web/terms/termpage.dart';
 
 import '../../../data_class/user_class.dart';
 import '../../../utils/themes.dart';
-import '../tutor/tutor_dashboard.dart';
+import '../tutor/tutor_dashboard/tutor_dashboard.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);

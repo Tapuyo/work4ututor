@@ -7,13 +7,13 @@ import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/ui/web/student/main_dashboard/students_classes.dart';
 import 'package:wokr4ututor/ui/web/tutor/book/book_main.dart';
 import 'package:wokr4ututor/ui/web/tutor/classes/classes_main.dart';
-import 'package:wokr4ututor/ui/web/tutor/classes_inquiry.dart';
+import 'package:wokr4ututor/ui/web/tutor/classes/classes_inquiry.dart';
 import 'package:wokr4ututor/ui/web/tutor/mesages/message_main.dart';
 import 'package:wokr4ututor/ui/web/tutor/mesages/messages.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_performance.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_schedule.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_settings.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_students.dart';
+import 'package:wokr4ututor/ui/web/tutor/performance/tutor_performance.dart';
+import 'package:wokr4ututor/ui/web/tutor/calendar/tutor_schedule.dart';
+import 'package:wokr4ututor/ui/web/tutor/settings/tutor_settings.dart';
+import 'package:wokr4ututor/ui/web/tutor/classes/tutor_students.dart';
 
 import '../../help/help.dart';
 

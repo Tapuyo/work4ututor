@@ -11,10 +11,10 @@ import 'dart:js' as js;
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:wokr4ututor/services/services.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_dashboard.dart';
 
 import '../../../components/dialog.dart';
 import '../terms/termpage.dart';
+import '../tutor/tutor_dashboard/tutor_dashboard.dart';
 
 
 class TutorInfo extends StatefulWidget {

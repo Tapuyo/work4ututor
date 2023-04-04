@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
+import 'package:wokr4ututor/ui/web/search_tutor/find_tutors.dart';
 import 'package:wokr4ututor/ui/web/signup/student_signup.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
 import 'package:wokr4ututor/utils/themes.dart';
@@ -85,7 +86,12 @@ class CustomAppBar extends StatelessWidget {
                   decoration: TextDecoration.none,
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FindTutor()),
+                );
+              },
               child: const Text('FIND TUTOR'),
             ),
           ),
@@ -248,420 +254,610 @@ class CustomAppBarLog extends StatelessWidget {
   }
 }
 
-  Widget navbarmenu(BuildContext context) {
+Widget navbarmenu(BuildContext context) {
   final AuthService _auth = AuthService();
-    return Column(
-      children: <Widget>[
-        GestureDetector(
-          onTap: () {
+  return Column(
+    children: <Widget>[
+      GestureDetector(
+        onTap: () {
+          final provider = context.read<InitProvider>();
+          provider.setMenuIndex(0);
+        },
+        child: Container(
+          height: 50,
+          width: 240,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+            shape: BoxShape.rectangle,
+            color: kColorPrimary,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(5),
+                bottomLeft: Radius.circular(5),
+                topRight: Radius.circular(5),
+                bottomRight: Radius.circular(5)),
+          ),
+          child: SizedBox(
+            height: 170,
+            width: 200,
+            child: Image.asset(
+              "assets/images/TUTOR_S_DESK_NO BG.png",
+              alignment: Alignment.topCenter,
+              fit: BoxFit.fill,
+            ),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: kColorSecondary,
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: kColorSecondary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () {
             final provider = context.read<InitProvider>();
-            provider.setMenuIndex(0);
+            provider.setMenuIndex(1);
           },
-          child: Container(
-            height: 50,
+          icon: const Icon(
+            Icons.calendar_month,
+            size: 30,
+          ),
+          label: const Text(
+            'SCHEDULE',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Color.fromRGBO(1, 118, 132, 1),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: kColorSecondary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () {
+            final provider = context.read<InitProvider>();
+            provider.setMenuIndex(3);
+          },
+          icon: const Icon(
+            Icons.question_answer,
+            size: 30,
+          ),
+          label: const Text(
+            'CLASSES\nINQUIRY',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Color.fromRGBO(1, 118, 132, 1),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: kColorSecondary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () {
+            final provider = context.read<InitProvider>();
+            provider.setMenuIndex(4);
+          },
+          icon: const Icon(
+            Icons.supervised_user_circle,
+            size: 30,
+          ),
+          label: const Text(
+            'STUDENTS\nENROLLED',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Color.fromRGBO(1, 118, 132, 1),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: kColorSecondary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () {
+            final provider = context.read<InitProvider>();
+            provider.setMenuIndex(5);
+          },
+          icon: const Icon(
+            Icons.feedback,
+            size: 30,
+          ),
+          label: const Text(
+            'PERFORMANCE',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Color.fromRGBO(1, 118, 132, 1),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: kColorSecondary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () {
+            final provider = context.read<InitProvider>();
+            provider.setMenuIndex(6);
+          },
+          icon: const Icon(
+            Icons.settings,
+            size: 30,
+          ),
+          label: const Text(
+            'SETTINGS',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Color.fromRGBO(1, 118, 132, 1),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: kColorSecondary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () {
+            final provider = context.read<InitProvider>();
+            provider.setMenuIndex(7);
+          },
+          icon: const Icon(
+            Icons.help_outline_rounded,
+            size: 30,
+          ),
+          label: const Text(
+            'HELP',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Color.fromRGBO(1, 118, 132, 1),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: kColorSecondary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () async {
+            dynamic result = await _auth.signOutAnon();
+            print(result.toString());
+          },
+          icon: const Icon(
+            Icons.logout_outlined,
+            size: 30,
+          ),
+          label: const Text(
+            'LOG OUT',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 100,
+      ),
+      Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
+        child: RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Color.fromARGB(255, 59, 59, 59),
+                  fontSize: 12,
+                  fontWeight: FontWeight.normal,
+                ),
+            children: <TextSpan>[
+              TextSpan(
+                  text: 'Terms of Service',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: kColorSecondary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                      ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (_) => TermPage());
+                    }),
+              const TextSpan(text: ' / '),
+              TextSpan(
+                  text: 'Privacy Policy',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: kColorSecondary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                      ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (_) => TermPage());
+                    }),
+              const TextSpan(text: '\nCopyrights @ 2023 Work4uTutor'),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+class FindTutorNavbar extends StatelessWidget {
+  const FindTutorNavbar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 100,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.transparent,
+      ),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          const Spacer(),
+          Container(
+            margin: const EdgeInsets.only(right: 20),
             width: 240,
-            alignment: Alignment.center,
+            child: Image.asset(
+              "assets/images/worklogo.png",
+              alignment: Alignment.topCenter,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Container(
+            height: 38,
+            width: 120,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
-              color: kColorPrimary,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(5),
-                  bottomLeft: Radius.circular(5),
-                  topRight: Radius.circular(5),
-                  bottomRight: Radius.circular(5)),
+              color: Color.fromRGBO(19, 132, 150, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
             ),
-            child: SizedBox(
-              height: 170,
-              width: 200,
-              child: Image.asset(
-                "assets/images/TUTOR_S_DESK_NO BG.png",
-                alignment: Alignment.topCenter,
-                fit: BoxFit.fill,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Container(
-          height: 50,
-          width: 240,
-          decoration: const BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: kColorSecondary,
-            borderRadius: BorderRadius.all(Radius.circular(25)),
-          ),
-          child: TextButton.icon(
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.only(left: 50),
-              alignment: Alignment.centerLeft,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.white,
-              backgroundColor: kColorSecondary,
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(
-                  color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                  width: 1,
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
                 ),
-                borderRadius: BorderRadius.circular(24.0),
               ),
-              // ignore: prefer_const_constructors
-              textStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 12,
-                fontStyle: FontStyle.normal,
-                decoration: TextDecoration.none,
-              ),
-            ),
-            onPressed: () {
-              final provider = context.read<InitProvider>();
-              provider.setMenuIndex(1);
-            },
-            icon: const Icon(
-              Icons.calendar_month,
-              size: 30,
-            ),
-            label: const Text(
-              'SCHEDULE',
-              style: TextStyle(fontSize: 15),
+              onPressed: () {},
+              icon: const Icon(Icons.language_rounded),
+              label: const Text('LANGUAGE'),
             ),
           ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Container(
-          height: 50,
-          width: 240,
-          decoration: const BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: Color.fromRGBO(1, 118, 132, 1),
-            borderRadius: BorderRadius.all(Radius.circular(25)),
-          ),
-          child: TextButton.icon(
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.only(left: 50),
-              alignment: Alignment.centerLeft,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.white,
-              backgroundColor: kColorSecondary,
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(
-                  color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                  width: 1,
+          const Spacer(),
+          Container(
+            height: 38,
+            width: 110,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(19, 132, 150, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  // fontFamily: 'Avenir',
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
                 ),
-                borderRadius: BorderRadius.circular(24.0),
               ),
-              // ignore: prefer_const_constructors
-              textStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 12,
-                fontStyle: FontStyle.normal,
-                decoration: TextDecoration.none,
-              ),
-            ),
-            onPressed: () {
-              final provider = context.read<InitProvider>();
-              provider.setMenuIndex(3);
-            },
-            icon: const Icon(
-              Icons.question_answer,
-              size: 30,
-            ),
-            label: const Text(
-              'CLASSES\nINQUIRY',
-              style: TextStyle(fontSize: 15),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FindTutor()),
+                );
+              },
+              child: const Text('FIND TUTOR'),
             ),
           ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Container(
-          height: 50,
-          width: 240,
-          decoration: const BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: Color.fromRGBO(1, 118, 132, 1),
-            borderRadius: BorderRadius.all(Radius.circular(25)),
+          const SizedBox(
+            width: 20,
           ),
-          child: TextButton.icon(
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.only(left: 50),
-              alignment: Alignment.centerLeft,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.white,
-              backgroundColor: kColorSecondary,
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(
-                  color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                  width: 1,
+          Container(
+            height: 38,
+            width: 140,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(19, 132, 150, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  // fontFamily: 'Avenir',
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
                 ),
-                borderRadius: BorderRadius.circular(24.0),
               ),
-              // ignore: prefer_const_constructors
-              textStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 12,
-                fontStyle: FontStyle.normal,
-                decoration: TextDecoration.none,
-              ),
-            ),
-            onPressed: () {
-              final provider = context.read<InitProvider>();
-              provider.setMenuIndex(4);
-            },
-            icon: const Icon(
-              Icons.supervised_user_circle,
-              size: 30,
-            ),
-            label: const Text(
-              'STUDENTS\nENROLLED',
-              style: TextStyle(fontSize: 15),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const StudentSignup()),
+                );
+              },
+              child: const Text('BECOME A STUDENT'),
             ),
           ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Container(
-          height: 50,
-          width: 240,
-          decoration: const BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: Color.fromRGBO(1, 118, 132, 1),
-            borderRadius: BorderRadius.all(Radius.circular(25)),
+          const SizedBox(
+            width: 20,
           ),
-          child: TextButton.icon(
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.only(left: 50),
-              alignment: Alignment.centerLeft,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.white,
-              backgroundColor: kColorSecondary,
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(
-                  color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                  width: 1,
+          Container(
+            height: 38,
+            width: 135,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(19, 132, 150, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  // fontFamily: 'Avenir',
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
                 ),
-                borderRadius: BorderRadius.circular(24.0),
               ),
-              // ignore: prefer_const_constructors
-              textStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 12,
-                fontStyle: FontStyle.normal,
-                decoration: TextDecoration.none,
-              ),
-            ),
-            onPressed: () {
-              final provider = context.read<InitProvider>();
-              provider.setMenuIndex(5);
-            },
-            icon: const Icon(
-              Icons.feedback,
-              size: 30,
-            ),
-            label: const Text(
-              'PERFORMANCE',
-              style: TextStyle(fontSize: 15),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const TutorSignup()),
+                );
+              },
+              child: const Text('BECOME A TUTOR'),
             ),
           ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Container(
-          height: 50,
-          width: 240,
-          decoration: const BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: Color.fromRGBO(1, 118, 132, 1),
-            borderRadius: BorderRadius.all(Radius.circular(25)),
+          const SizedBox(
+            width: 20,
           ),
-          child: TextButton.icon(
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.only(left: 50),
-              alignment: Alignment.centerLeft,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.white,
-              backgroundColor: kColorSecondary,
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(
-                  color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                  width: 1,
+          Container(
+            height: 38,
+            width: 110,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(103, 195, 208, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  // fontFamily: 'Avenir',
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
                 ),
-                borderRadius: BorderRadius.circular(24.0),
               ),
-              // ignore: prefer_const_constructors
-              textStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 12,
-                fontStyle: FontStyle.normal,
-                decoration: TextDecoration.none,
-              ),
-            ),
-            onPressed: () {
-              final provider = context.read<InitProvider>();
-              provider.setMenuIndex(6);
-            },
-            icon: const Icon(
-              Icons.settings,
-              size: 30,
-            ),
-            label: const Text(
-              'SETTINGS',
-              style: TextStyle(fontSize: 15),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+              },
+              child: const Text('LOG IN'),
             ),
           ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Container(
-          height: 50,
-          width: 240,
-          decoration: const BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: Color.fromRGBO(1, 118, 132, 1),
-            borderRadius: BorderRadius.all(Radius.circular(25)),
-          ),
-          child: TextButton.icon(
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.only(left: 50),
-              alignment: Alignment.centerLeft,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.white,
-              backgroundColor: kColorSecondary,
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(
-                  color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                  width: 1,
-                ),
-                borderRadius: BorderRadius.circular(24.0),
-              ),
-              // ignore: prefer_const_constructors
-              textStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 12,
-                fontStyle: FontStyle.normal,
-                decoration: TextDecoration.none,
-              ),
-            ),
-            onPressed: () {
-              final provider = context.read<InitProvider>();
-              provider.setMenuIndex(7);
-            },
-            icon: const Icon(
-              Icons.help_outline_rounded,
-              size: 30,
-            ),
-            label: const Text(
-              'HELP',
-              style: TextStyle(fontSize: 15),
-            ),
-          ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Container(
-          height: 50,
-          width: 240,
-          decoration: const BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: Color.fromRGBO(1, 118, 132, 1),
-            borderRadius: BorderRadius.all(Radius.circular(25)),
-          ),
-          child: TextButton.icon(
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.only(left: 50),
-              alignment: Alignment.centerLeft,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.white,
-              backgroundColor: kColorSecondary,
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(
-                  color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                  width: 1,
-                ),
-                borderRadius: BorderRadius.circular(24.0),
-              ),
-              // ignore: prefer_const_constructors
-              textStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 12,
-                fontStyle: FontStyle.normal,
-                decoration: TextDecoration.none,
-              ),
-            ),
-            onPressed: () async {
-              dynamic result = await _auth.signOutAnon();
-              print(result.toString());
-            },
-            icon: const Icon(
-              Icons.logout_outlined,
-              size: 30,
-            ),
-            label: const Text(
-              'LOG OUT',
-              style: TextStyle(fontSize: 15),
-            ),
-          ),
-        ),
-        const SizedBox(
-          height: 100,
-        ),
-        Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
-          child: RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Color.fromARGB(255, 59, 59, 59),
-                    fontSize: 12,
-                    fontWeight: FontWeight.normal,
-                  ),
-              children: <TextSpan>[
-                TextSpan(
-                    text: 'Terms of Service',
-                    style:
-                        Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              color: kColorSecondary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.normal,
-                            ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        showDialog(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (_) => TermPage());
-                      }),
-                const TextSpan(text: ' / '),
-                TextSpan(
-                    text: 'Privacy Policy',
-                    style:
-                        Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              color: kColorSecondary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.normal,
-                            ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        showDialog(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (_) => TermPage());
-                      }),
-                const TextSpan(text: '\nCopyrights @ 2023 Work4uTutor'),
-              ],
-            ),
-          ),
-        ),
-      ],
+          const Spacer(),
+        ],
+      ),
     );
   }
-
+}

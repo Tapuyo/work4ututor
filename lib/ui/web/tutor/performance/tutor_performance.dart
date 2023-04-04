@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:wokr4ututor/utils/themes.dart';
 
-class StudentsEnrolled extends StatefulWidget {
-  const StudentsEnrolled({super.key});
+import '../../../../utils/themes.dart';
+
+class PerformancePage extends StatefulWidget {
+  const PerformancePage({super.key});
 
   @override
-  State<StudentsEnrolled> createState() => _StudentsEnrolledState();
+  State<PerformancePage> createState() => _PerformancePageState();
 }
 
-class _StudentsEnrolledState extends State<StudentsEnrolled> {
+class _PerformancePageState extends State<PerformancePage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Padding(
-     padding: const EdgeInsets.only(left: 10, right: 10),
+      padding: const EdgeInsets.only(left: 10, right: 10),
       child: Container(
         alignment: Alignment.topCenter,
         decoration: BoxDecoration(
@@ -46,7 +47,7 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    "STUDENTS ENROLLED",
+                    "PERFORMANCE",
                     style: GoogleFonts.roboto(
                       color: Colors.white,
                       fontSize: 25,

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_dashboard.dart';
 
 import '../../data_class/user_class.dart';
+import 'tutor/tutor_dashboard/tutor_dashboard.dart';
 
 class WebMainPage extends StatefulWidget {
   const WebMainPage({Key? key}) : super(key: key);
@@ -22,6 +22,6 @@ class _MainPageState extends State<WebMainPage> {
 //     print( user );
 //     return DashboardPage(uid: user.uid, name: "",);
 //    }
-return const DashboardPage();
+return const LoginPage();
   }
 }

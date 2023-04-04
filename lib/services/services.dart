@@ -62,6 +62,34 @@ class DatabaseService {
   final CollectionReference studentCollection =
       FirebaseFirestore.instance.collection('student');
 
+  List<TutorInformation> _getTutorInformation(QuerySnapshot snapshot) {
+    return snapshot.docs.map((tutordata) {
+      return TutorInformation(
+        birthPlace: tutordata['birthPlace'] ?? '',
+        country: tutordata['country'] ?? '',
+        certificates: tutordata['certificates'] ?? '',
+        resume: tutordata['resume'] ?? '',
+        promotionalMessage: tutordata['promotionalMessage'] ?? '',
+        withdrawal: tutordata['withdrawal'] ?? '',
+        status: tutordata['status'] ?? '',
+        extensionName: tutordata['extensionName'] ?? '',
+        dateSign: DateTime.now().toString(),
+        firstName: tutordata['firstName'] ?? '',
+        imageID: tutordata['imageID'] ?? '',
+        language: tutordata['language'] ?? '',
+        lastname: tutordata['lastName'] ?? '',
+        middleName: tutordata['middleName'] ?? '',
+        presentation: tutordata['presentation'] ?? '',
+        tutorID: tutordata['tutorID'] ?? '',
+        userId: tutordata['userID'] ?? '',
+      );
+    }).toList();
+  }
+
+  Stream<List<TutorInformation>> get tutorlist {
+    return tutorCollection.snapshots().map(_getTutorInformation);
+  }
+
   Future updateUserData(String email, String password, String role) async {
     return await dataCollection.doc(uid).set({
       'email': email,
@@ -119,18 +147,20 @@ class DatabaseService {
       "withdrawal": "",
     });
   }
-    getTutorInfo() async {
-    try{await FirebaseFirestore.instance
-        .collection('tutor')
-        .where(uid, isEqualTo: uid)
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      return querySnapshot.docs.map((tutordata) {
-        return tutordata['status'].toString();
+
+  getTutorInfo() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('tutor')
+          .where(uid, isEqualTo: uid)
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        return querySnapshot.docs.map((tutordata) {
+          return tutordata['status'].toString();
+        });
       });
-      });
-  }catch(e){
-    return null;
+    } catch (e) {
+      return null;
+    }
   }
-}
 }

@@ -6,18 +6,18 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/ui/web/tutor/classes/classes_main.dart';
-import 'package:wokr4ututor/ui/web/tutor/classes_inquiry.dart';
+import 'package:wokr4ututor/ui/web/tutor/classes/classes_inquiry.dart';
 import 'package:wokr4ututor/ui/web/tutor/mesages/messages.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_performance.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_schedule.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_settings.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_students.dart';
+import 'package:wokr4ututor/ui/web/tutor/performance/tutor_performance.dart';
+import 'package:wokr4ututor/ui/web/tutor/calendar/tutor_schedule.dart';
+import 'package:wokr4ututor/ui/web/tutor/settings/tutor_settings.dart';
+import 'package:wokr4ututor/ui/web/tutor/classes/tutor_students.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
-import '../../../components/nav_bar.dart';
-import '../../../constant/constant.dart';
-import '../../../shared_components/responsive_builder.dart';
-import '../help/help.dart';
+import '../../../../components/nav_bar.dart';
+import '../../../../constant/constant.dart';
+import '../../../../shared_components/responsive_builder.dart';
+import '../../help/help.dart';
 
 class DashboardPage extends HookWidget {
   const DashboardPage({Key? key}) : super(key: key);
@@ -196,7 +196,9 @@ class DashboardPage extends HookWidget {
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.height,
-                  child: const VerticalDivider(),
+                  child: const VerticalDivider(
+                    thickness: 1,
+                  ),
                 ),
                 Flexible(
                   flex: 13,
