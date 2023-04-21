@@ -1,10 +1,15 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
+import 'package:wokr4ututor/ui/web/search_tutor/find_tutors.dart';
 import 'package:wokr4ututor/ui/web/signup/student_signup.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
+import 'package:wokr4ututor/utils/themes.dart';
+
+import '../ui/auth/auth.dart';
+import '../ui/web/terms/termpage.dart';
 
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({Key? key}) : super(key: key);
@@ -17,17 +22,16 @@ class CustomAppBar extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
-      padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          const SizedBox(
-            width: 200,
-          ),
-          SizedBox(
-            height: 200,
+          const Spacer(),
+          Container(
+            margin: const EdgeInsets.only(top: 0),
             width: 240,
             child: Image.asset(
-              "assets/images/worklogo.png",
+              "assets/images/WORK4U_NO_BG.png",
               alignment: Alignment.topCenter,
               fit: BoxFit.cover,
             ),
@@ -42,8 +46,7 @@ class CustomAppBar extends StatelessWidget {
             ),
             child: TextButton.icon(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
+                foregroundColor: Colors.white,
                 shape: const BeveledRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
@@ -54,9 +57,7 @@ class CustomAppBar extends StatelessWidget {
                   decoration: TextDecoration.none,
                 ),
               ),
-              onPressed: () {
-                print('Pressed');
-              },
+              onPressed: () {},
               icon: const Icon(Icons.language_rounded),
               label: const Text('LANGUAGE'),
             ),
@@ -72,8 +73,7 @@ class CustomAppBar extends StatelessWidget {
             ),
             child: TextButton(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
+                foregroundColor: Colors.white,
                 shape: const BeveledRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
@@ -86,7 +86,10 @@ class CustomAppBar extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                print('Pressed');
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FindTutor()),
+                );
               },
               child: const Text('FIND TUTOR'),
             ),
@@ -104,8 +107,7 @@ class CustomAppBar extends StatelessWidget {
             ),
             child: TextButton(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
+                foregroundColor: Colors.white,
                 shape: const BeveledRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
@@ -140,8 +142,7 @@ class CustomAppBar extends StatelessWidget {
             ),
             child: TextButton(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
+                foregroundColor: Colors.white,
                 shape: const BeveledRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
@@ -175,8 +176,7 @@ class CustomAppBar extends StatelessWidget {
             ),
             child: TextButton(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
+                foregroundColor: Colors.white,
                 shape: const BeveledRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
@@ -197,9 +197,7 @@ class CustomAppBar extends StatelessWidget {
               child: const Text('LOG IN'),
             ),
           ),
-          const SizedBox(
-            width: 200,
-          )
+          const Spacer(),
         ],
       ),
     );
@@ -208,7 +206,6 @@ class CustomAppBar extends StatelessWidget {
 
 class CustomAppBarLog extends StatelessWidget {
   const CustomAppBarLog({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -256,61 +253,460 @@ class CustomAppBarLog extends StatelessWidget {
   }
 }
 
-class DashboardMenu extends HookWidget{
-  const DashboardMenu({Key? key}) : super(key: key);
+Widget navbarmenu(BuildContext context) {
+  // ignore: no_leading_underscores_for_local_identifiers
+  final AuthService _auth = AuthService();
+  return Column(
+    children: <Widget>[
+      GestureDetector(
+        onTap: () {
+          final provider = context.read<InitProvider>();
+          provider.setMenuIndex(0);
+        },
+        child: Container(
+          height: 50,
+          width: 240,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+            shape: BoxShape.rectangle,
+            color: kColorPrimary,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(5),
+                bottomLeft: Radius.circular(5),
+                topRight: Radius.circular(5),
+                bottomRight: Radius.circular(5)),
+          ),
+          child: SizedBox(
+            height: 170,
+            width: 200,
+            child: Image.asset(
+              "assets/images/TUTOR_S_DESK_NO BG.png",
+              alignment: Alignment.topCenter,
+              fit: BoxFit.fill,
+            ),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: kColorSecondary,
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: kColorSecondary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () {
+            final provider = context.read<InitProvider>();
+            provider.setMenuIndex(1);
+          },
+          icon: const Icon(
+            Icons.calendar_month,
+            size: 30,
+          ),
+          label: const Text(
+            'SCHEDULE',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Color.fromRGBO(1, 118, 132, 1),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: kColorSecondary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () {
+            final provider = context.read<InitProvider>();
+            provider.setMenuIndex(3);
+          },
+          icon: const Icon(
+            Icons.question_answer,
+            size: 30,
+          ),
+          label: const Text(
+            'CLASSES\nINQUIRY',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Color.fromRGBO(1, 118, 132, 1),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: kColorSecondary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () {
+            final provider = context.read<InitProvider>();
+            provider.setMenuIndex(4);
+          },
+          icon: const Icon(
+            Icons.supervised_user_circle,
+            size: 30,
+          ),
+          label: const Text(
+            'STUDENTS\nENROLLED',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Color.fromRGBO(1, 118, 132, 1),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: kColorSecondary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () {
+            final provider = context.read<InitProvider>();
+            provider.setMenuIndex(5);
+          },
+          icon: const Icon(
+            Icons.feedback,
+            size: 30,
+          ),
+          label: const Text(
+            'PERFORMANCE',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Color.fromRGBO(1, 118, 132, 1),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: kColorSecondary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () {
+            final provider = context.read<InitProvider>();
+            provider.setMenuIndex(6);
+          },
+          icon: const Icon(
+            Icons.settings,
+            size: 30,
+          ),
+          label: const Text(
+            'SETTINGS',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Color.fromRGBO(1, 118, 132, 1),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: kColorSecondary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () {
+            final provider = context.read<InitProvider>();
+            provider.setMenuIndex(7);
+          },
+          icon: const Icon(
+            Icons.help_outline_rounded,
+            size: 30,
+          ),
+          label: const Text(
+            'HELP',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Color.fromRGBO(1, 118, 132, 1),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: kColorSecondary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () async {
+            dynamic result = await _auth.signOutAnon();
+            print(result.toString());
+          },
+          icon: const Icon(
+            Icons.logout_outlined,
+            size: 30,
+          ),
+          label: const Text(
+            'LOG OUT',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 100,
+      ),
+      Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
+        child: RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color:const  Color.fromARGB(255, 59, 59, 59),
+                  fontSize: 12,
+                  fontWeight: FontWeight.normal,
+                ),
+            children: <TextSpan>[
+              TextSpan(
+                  text: 'Terms of Service',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: kColorSecondary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                      ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (_) => TermPage());
+                    }),
+              const TextSpan(text: ' / '),
+              TextSpan(
+                  text: 'Privacy Policy',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: kColorSecondary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                      ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (_) => TermPage());
+                    }),
+              const TextSpan(text: '\nCopyrights @ 2023 Work4uTutor'),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+class FindTutorNavbar extends StatelessWidget {
+  const FindTutorNavbar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    
-    Size size = MediaQuery.of(context).size;
     return Container(
-      height: size.height,
-      width: 250,
+      height: 100,
       alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(
-          color: Colors.black45,
-          width: .5,
-        ),
+      decoration: const BoxDecoration(
+        color: Colors.transparent,
       ),
-      child: Column(
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          GestureDetector(
-            onTap: (){
-               final provider = context.read<InitProvider>();
-              provider.setMenuIndex(0);
-            },
-            child: const SizedBox(
-               height: 66,
-               width: 250,
-              child:  ColoredBox(
-                color:  Color.fromRGBO(1, 118, 132, 1),
-                
-              ),
+          const Spacer(),
+          Container(
+            margin: const EdgeInsets.only(right: 20),
+            width: 240,
+            child: Image.asset(
+              "assets/images/worklogo.png",
+              alignment: Alignment.topCenter,
+              fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(height: 20,),
           Container(
-            height: 45,
-            width: 220,
+            height: 38,
+            width: 120,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(25)),
+              color: Color.fromRGBO(19, 132, 150, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
             ),
             child: TextButton.icon(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
+                foregroundColor: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
                 textStyle: TextStyle(
                   color: Colors.black,
@@ -319,289 +715,147 @@ class DashboardMenu extends HookWidget{
                   decoration: TextDecoration.none,
                 ),
               ),
-              onPressed: () {
-                final provider = context.read<InitProvider>();
-                provider.setMenuIndex(1);
-              },
+              onPressed: () {},
               icon: const Icon(Icons.language_rounded),
-              label: const Text('SCHEDULE'),
+              label: const Text('LANGUAGE'),
             ),
           ),
-          const SizedBox(
-            height: 20,
-          ),
+          const Spacer(),
           Container(
-            height: 45,
-            width: 220,
+            height: 38,
+            width: 110,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(25)),
+              color: Color.fromRGBO(19, 132, 150, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
             ),
-            child: TextButton.icon(
+            child: TextButton(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
+                foregroundColor: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
                 textStyle: TextStyle(
                   color: Colors.black,
+                  // fontFamily: 'Avenir',
                   fontSize: 12,
                   fontStyle: FontStyle.normal,
                   decoration: TextDecoration.none,
                 ),
               ),
               onPressed: () {
-                final provider = context.read<InitProvider>();
-                provider.setMenuIndex(2);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const FindTutor()),
+                );
               },
-              icon: const Icon(Icons.language_rounded),
-              label: const Text('MESSAGES'),
+              child: const Text('FIND TUTOR'),
             ),
           ),
           const SizedBox(
-            height: 20,
+            width: 20,
           ),
           Container(
-            height: 45,
-            width: 220,
+            height: 38,
+            width: 140,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(25)),
+              color: Color.fromRGBO(19, 132, 150, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
             ),
-            child: TextButton.icon(
+            child: TextButton(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
+                foregroundColor: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
                 textStyle: TextStyle(
                   color: Colors.black,
+                  // fontFamily: 'Avenir',
                   fontSize: 12,
                   fontStyle: FontStyle.normal,
                   decoration: TextDecoration.none,
                 ),
               ),
               onPressed: () {
-                final provider = context.read<InitProvider>();
-                 provider.setMenuIndex(3);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const StudentSignup()),
+                );
               },
-              icon: const Icon(Icons.language_rounded),
-              label: const Text('CLASSES INQUIRY'),
+              child: const Text('BECOME A STUDENT'),
             ),
           ),
           const SizedBox(
-            height: 20,
+            width: 20,
           ),
           Container(
-            height: 45,
-            width: 220,
+            height: 38,
+            width: 135,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(25)),
+              color: Color.fromRGBO(19, 132, 150, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
             ),
-            child: TextButton.icon(
+            child: TextButton(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
+                foregroundColor: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
                 textStyle: TextStyle(
                   color: Colors.black,
+                  // fontFamily: 'Avenir',
                   fontSize: 12,
                   fontStyle: FontStyle.normal,
                   decoration: TextDecoration.none,
                 ),
               ),
               onPressed: () {
-                final provider = context.read<InitProvider>();
-                 provider.setMenuIndex(4);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const TutorSignup()),
+                );
               },
-              icon: const Icon(Icons.language_rounded),
-              label: const Text('STUDENTS ENROLLED'),
+              child: const Text('BECOME A TUTOR'),
             ),
           ),
           const SizedBox(
-            height: 20,
+            width: 20,
           ),
           Container(
-            height: 45,
-            width: 220,
+            height: 38,
+            width: 110,
             decoration: const BoxDecoration(
               shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(25)),
+              color: Color.fromRGBO(103, 195, 208, 1),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
             ),
-            child: TextButton.icon(
+            child: TextButton(
               style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
+                foregroundColor: Colors.white,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
                 // ignore: prefer_const_constructors
                 textStyle: TextStyle(
                   color: Colors.black,
+                  // fontFamily: 'Avenir',
                   fontSize: 12,
                   fontStyle: FontStyle.normal,
                   decoration: TextDecoration.none,
                 ),
               ),
               onPressed: () {
-                final provider = context.read<InitProvider>();
-                 provider.setMenuIndex(5);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
               },
-              icon: const Icon(Icons.language_rounded),
-              label: const Text('PERFORMANCE'),
+              child: const Text('LOG IN'),
             ),
           ),
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
-            height: 45,
-            width: 220,
-            decoration: const BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(25)),
-            ),
-            child: TextButton.icon(
-              style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-                // ignore: prefer_const_constructors
-                textStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                  fontStyle: FontStyle.normal,
-                  decoration: TextDecoration.none,
-                ),
-              ),
-              onPressed: () {
-                final provider = context.read<InitProvider>();
-                 provider.setMenuIndex(6);
-              },
-              icon: const Icon(Icons.language_rounded),
-              label: const Text('SETTING'),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
-            height: 45,
-            width: 220,
-            decoration: const BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(25)),
-            ),
-            child: TextButton.icon(
-              style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-                // ignore: prefer_const_constructors
-                textStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                  fontStyle: FontStyle.normal,
-                  decoration: TextDecoration.none,
-                ),
-              ),
-              onPressed: () {
-                print('Pressed');
-              },
-              icon: const Icon(Icons.language_rounded),
-              label: const Text('HELP'),
-            ),
-          ),
-          
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
-            height: 45,
-            width: 220,
-            decoration: const BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(25)),
-            ),
-            child: TextButton.icon(
-              style: TextButton.styleFrom(
-                primary: Colors.white,
-                onSurface: Colors.white,
-                backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-                // ignore: prefer_const_constructors
-                textStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                  fontStyle: FontStyle.normal,
-                  decoration: TextDecoration.none,
-                ),
-              ),
-              onPressed: () {
-                print('Pressed');
-              },
-              icon: const Icon(Icons.language_rounded),
-              label: const Text('LOGOUT'),
-            ),
-          ),
-          const SizedBox(
-            width: 200,
-          )
+          const Spacer(),
         ],
       ),
     );

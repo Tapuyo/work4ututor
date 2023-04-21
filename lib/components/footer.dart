@@ -30,8 +30,8 @@ class CustomFooter extends StatelessWidget {
           const Spacer(),
           TextButton(
             style: TextButton.styleFrom(
-              primary: Colors.white,
-              onSurface: Colors.white,
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.white,
               shape: const BeveledRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(5))),
               // ignore: prefer_const_constructors

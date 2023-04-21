@@ -1,19 +1,25 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/constant/constant.dart';
+import 'package:wokr4ututor/provider/chatmessagedisplay.dart';
+import 'package:wokr4ututor/provider/classes_inquirey_provider.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
+import 'package:wokr4ututor/provider/inquirydisplay_provider.dart';
+import 'package:wokr4ututor/provider/search_provider.dart';
+import 'package:wokr4ututor/provider/user_id_provider.dart';
 import 'package:wokr4ututor/routes/route_generator.dart';
 import 'package:wokr4ututor/routes/routes.dart';
+// ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
-import 'package:wokr4ututor/ui/web/login/login.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_dashboard.dart';
-import 'package:wokr4ututor/utils/themes.dart';
-import 'dart:typed_data';
+import 'package:wokr4ututor/services/services.dart';
+import 'package:wokr4ututor/ui/auth/auth.dart';
+import 'package:wokr4ututor/ui/web/web_main.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+
+import 'data_class/tutor_info_class.dart';
+import 'data_class/user_class.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await setupFlutterNotifications();
@@ -55,6 +61,14 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => InitProvider()),
+      StreamProvider<List<TutorInformation>>.value(
+      value: DatabaseService(uid: '').tutorlist,
+      initialData: const [],),
+      ChangeNotifierProvider(create: (_) => SearchTutorProvider()),
+      ChangeNotifierProvider(create: (_) => UserIDProvider()),
+      ChangeNotifierProvider(create: (_) => InquiryDisplayProvider()),
+      ChangeNotifierProvider(create: (_) => ChatDisplayProvider()),
+      ChangeNotifierProvider(create: (_) => ClassesInquiryProvider()),
     ],
     child: const MyApp(),
   ));
@@ -65,69 +79,35 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      builder: (context, child) {
-        return kIsWeb ? const DashboardPage():ScrollConfiguration(
-          behavior: MyBehavior(),
-          child: child!,
-        );
-      },
-      title: 'Work4uTutor',
-      initialRoute: Routes.splash,
-      onGenerateRoute: RouteGenerator.generateRoute,
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.light,
-        platform: !kIsWeb ? TargetPlatform.iOS:TargetPlatform.fuchsia,
-        scaffoldBackgroundColor: Colors.white,
-        toggleableActiveColor: kColorPrimary,
-        appBarTheme: const AppBarTheme(
-          elevation: 1,
-          color: Colors.white,
-          iconTheme: IconThemeData(
-            color: kColorPrimary,
-          ),
-          actionsIconTheme: IconThemeData(
-            color: kColorPrimary,
-          ),
-          // ignore: deprecated_member_use
-          textTheme: TextTheme(
-            headline6: TextStyle(
-              color: kColorDarkBlue,
-              fontFamily: 'NunitoSans',
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          systemOverlayStyle: SystemUiOverlayStyle.dark,
-        ),
-        dividerColor: Colors.grey[300],
-        textTheme: TextTheme(
-          button: kTextStyleButton,
-          subtitle1: kTextStyleSubtitle1.copyWith(color: kColorPrimaryDark),
-          subtitle2: kTextStyleSubtitle2.copyWith(color: kColorPrimaryDark),
-          bodyText2: kTextStyleBody2.copyWith(color: kColorPrimaryDark),
-          headline6: kTextStyleHeadline6.copyWith(color: kColorPrimaryDark),
-        ),
-        iconTheme: const IconThemeData(
-          color: kColorPrimary,
-        ),
-        fontFamily: 'NunitoSans',
-        cardTheme: CardTheme(
-          elevation: 0,
-          color: const Color(0xffEBF2F5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4),
-            //side: BorderSide(width: 1, color: Colors.grey[200]),
-          ),
-        ),
+    return
+     StreamProvider<Users?>.value(
+      value: AuthService().user,
+      initialData: null,
+      child:  
+      MaterialApp(
+        // builder: (context, child) {
+        //   return kIsWeb ? const DashboardPage():ScrollConfiguration(
+        //     behavior: MyBehavior(),
+        //     child: child!,
+        //   );
+        // },
+        title: 'Work4uTutor',
+        initialRoute: Routes.splash,
+        onGenerateRoute: RouteGenerator.generateRoute,
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+        fontFamily: "Nunito",
+        canvasColor: Colors.white,
+        primarySwatch: Colors.indigo,
+      ),
+        home: const WebMainPage(),
       ),
     );
   }
 }
 
 class MyBehavior extends ScrollBehavior {
-  @override
+
   Widget buildViewportChrome(
       BuildContext context, Widget child, AxisDirection axisDirection) {
     return child;

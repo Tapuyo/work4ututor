@@ -1,13 +1,14 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/components/dialog.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
-import 'package:wokr4ututor/services/services.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
+import 'package:wokr4ututor/utils/themes.dart';
+
+import '../terms/termpage.dart';
 
 class TutorSignup extends StatefulWidget {
   const TutorSignup({Key? key}) : super(key: key);
@@ -109,11 +110,11 @@ class _SignUpState extends State<SignUp> {
               child: Text(
                 " Make yourself\navailable to students\nall over the world",
                 style: GoogleFonts.roboto(
-                      textStyle: Theme.of(context).textTheme.headlineMedium,
-                      color: Color.fromRGBO(1, 118, 132, 1),
-                      fontSize: 30,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  textStyle: Theme.of(context).textTheme.headlineMedium,
+                  color: Color.fromRGBO(1, 118, 132, 1),
+                  fontSize: 30,
+                  fontWeight: FontWeight.w600,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -286,14 +287,27 @@ class _SignUpState extends State<SignUp> {
                     if (result == null) {
                       setState(() {
                         error = 'Please supply a valid email';
-
                       });
                     } else {
                       setState(() {
-                        showDialog(
-                          context: context,
-                          builder: (_) => DialogShow(result.toString()),
-                        );
+                        if (result.toString().contains(
+                            "The email address is already in use by another account")) {
+                          result =
+                              "The email address is already in use by another account!\nPlease check your inputs.";
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) => DialogShow(result.toString()),
+                          );
+                        } else {
+                          result =
+                              "Account succesfully registered! Click okay to continue.";
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) => DialogShow(result.toString()),
+                          );
+                        }
                       });
                     }
                   }
@@ -310,14 +324,53 @@ class _SignUpState extends State<SignUp> {
             Container(
               alignment: Alignment.center,
               padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
-              child: Text(
-                "By signing up, you agree to Work4uTutor\nTerms of Service and Privacy Policy",
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Color.fromARGB(255, 59, 59, 59),
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
-                    ),
+              child: RichText(
                 textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: Color.fromARGB(255, 59, 59, 59),
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                      ),
+                  children: <TextSpan>[
+                    TextSpan(text: 'By signing up, you agree to Work4uTutor '),
+                    TextSpan(
+                        text: 'Terms of Service',
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: kColorSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            setState(() {
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (_) => TermPage());
+                            });
+                          }),
+                    TextSpan(text: ' and that you have read our '),
+                    TextSpan(
+                        text: 'Privacy Policy',
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: kColorSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            setState(() {
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (_) => TermPage());
+                            });
+                          }),
+                  ],
+                ),
               ),
             ),
           ],

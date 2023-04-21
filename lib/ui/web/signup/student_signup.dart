@@ -1,11 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
-import 'package:wokr4ututor/services/services.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
+import 'package:wokr4ututor/ui/web/signup/student_information_signup.dart';
+
+import '../../../utils/themes.dart';
+import '../terms/termpage.dart';
 
 class StudentSignup extends StatefulWidget {
   const StudentSignup({Key? key}) : super(key: key);
@@ -19,7 +21,7 @@ final formKey = GlobalKey<FormState>();
 String tName = '';
 String tLastName = '';
 String tEmail = '';
-String uType = "tutor";
+String uType = "student";
 String tPassword = '';
 String tConPassword = '';
 
@@ -95,7 +97,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
         children: [
           Container(
             alignment: Alignment.center,
-            padding: const EdgeInsets.fromLTRB(10, 15, 10, 25),
+            padding: const EdgeInsets.fromLTRB(10, 20, 10, 25),
             child: Text(
               " Ready to learn from\nour expert tutor's and enjoy\nfriendly classes.",
               style: GoogleFonts.roboto(
@@ -227,11 +229,42 @@ class _StudentSignUpState extends State<StudentSignUp> {
                 ),
               ),
               onPressed: () {
-                addUser(tEmail, tPassword,uType);
+                // addUser(tEmail, tPassword,uType);
+                                  // if (formKey.currentState!.validate()) {
+                    // dynamic result = await _auth.registerwEmailandPassword(
+                    //     tEmail, tPassword, "tutor", tName, tLastName);
+                    // if (result == null) {
+                    //   setState(() {
+                    //     error = 'Please supply a valid email';
+                    //   });
+                    // } else {
+                    //   setState(() {
+                    //     if (result.toString().contains(
+                    //         "The email address is already in use by another account")) {
+                    //       result =
+                    //           "The email address is already in use by another account!\nPlease check your inputs.";
+                    //       showDialog(
+                    //         barrierDismissible: false,
+                    //         context: context,
+                    //         builder: (_) => DialogShow(result.toString()),
+                    //       );
+                    //     } else {
+                    //       result =
+                    //           "Account succesfully registered! Click okay to continue.";
+                    //       showDialog(
+                    //         barrierDismissible: false,
+                    //         context: context,
+                    //         builder: (_) => DialogShow(result.toString()),
+                    //       );
+                    //     }
+                    //   });
+                    // }
+                    
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const TutorInfo()),
+                  MaterialPageRoute(builder: (context) => const StudentInfo()),
                 );
+                  // }
               },
               child: Text(
                 'Confirm Submission',
@@ -243,18 +276,57 @@ class _StudentSignUpState extends State<StudentSignUp> {
             ),
           ),
           Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
-            child: Text(
-              "By signing up, you agree to Work4uTutor\nTerms of Service and Privacy Policy",
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Color.fromARGB(255, 59, 59, 59),
-                    fontSize: 12,
-                    fontWeight: FontWeight.normal,
-                  ),
-              textAlign: TextAlign.center,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
+              child: RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: Color.fromARGB(255, 59, 59, 59),
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                      ),
+                  children: <TextSpan>[
+                    TextSpan(text: 'By signing up, you agree to Work4uTutor '),
+                    TextSpan(
+                        text: 'Terms of Service',
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: kColorSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            setState(() {
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (_) => TermPage());
+                            });
+                          }),
+                    TextSpan(text: ' and that you have read our '),
+                    TextSpan(
+                        text: 'Privacy Policy',
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: kColorSecondary,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            setState(() {
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (_) => TermPage());
+                            });
+                          }),
+                  ],
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );
