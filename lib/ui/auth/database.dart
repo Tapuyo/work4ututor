@@ -1,51 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../data_class/tutor_info_class.dart';
 
-class DatabaseService1 {
-  final String uid;
-  DatabaseService1({required this.uid});
+import 'package:wokr4ututor/services/services.dart';
+class UserDataService{
+  final String userUID;
+  UserDataService({required this.userUID});
 
   final CollectionReference dataCollection =
       FirebaseFirestore.instance.collection('tutor');
 
-  List<TutorInformation> _getTutorInformation(QuerySnapshot snapshot) {
-    return snapshot.docs.map((tutordata) {
-      return TutorInformation(
-        birthPlace: tutordata['birthPlace'] ?? '',
-        country: tutordata['country'] ?? '',
-        certificates: tutordata['certificates'] ?? '',
-        resume: tutordata['resume'] ?? '',
-        promotionalMessage: tutordata['promotionalMessage'] ?? '',
-        withdrawal: tutordata['withdrawal'] ?? '',
-        status: tutordata['status'] ?? '',
-        extensionName: tutordata['extensionName'] ?? '',
-        dateSign: DateTime.now().toString(),
-        firstName: tutordata['firstName'] ?? '',
-        imageID: tutordata['imageID'] ?? '',
-        language: tutordata['language'] ?? '',
-        lastname: tutordata['lastname'] ?? '',
-        middleName: tutordata['middleName'] ?? '',
-        presentation: tutordata['presentation'] ?? '',
-        tutorID: tutordata['tutorID'] ?? '',
-        userId: tutordata['userId'] ?? '',
-      );
-    }).toList();
+   Future addScheduleTimeavailable() async {
+    try {
+      //create a new document for the user with the uid
+      await DatabaseService(uid: userUID)
+          .addTutoravailbaleDays();
+      return userUID;
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
   }
-
-  Stream<List<TutorInformation>> get tutorlist{
-  return dataCollection.snapshots().map(_getTutorInformation);
   
-}
-
-  Future<void> getTutorInfo() async {
-    await FirebaseFirestore.instance
-        .collection('tutor')
-        .where(uid, isEqualTo: uid)
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      return querySnapshot.docs.map((tutordata) {
-        return tutordata['status'] ?? '';
-      });
-    });
+  Future addDayoffs() async {
+    try {
+      //create a new document for the user with the uid
+      await DatabaseService(uid: userUID)
+          .addDayoffs();
+      return userUID;
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:wokr4ututor/ui/web/tutor/calendar/setup_calendar.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
 import '../../../../provider/init_provider.dart';
@@ -17,7 +19,8 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-
+  String selectedDate = DateFormat('MMMM dd,').format(DateTime.now());
+  int count = 0;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -27,6 +30,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
       child: Column(
         children: [
           Card(
+            margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
             elevation: 5,
             child: Column(
               children: <Widget>[
@@ -84,7 +88,12 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                             ),
                           ),
                           onPressed: () {
-                            Navigator.pop(context);
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return const CalendarSetup();
+                              },
+                            );
                           },
                           icon: const Icon(
                             Icons.calendar_month,
@@ -105,10 +114,11 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                   children: [
                     Flexible(
                       flex: 12,
-                      child: Container(
+                      child: SizedBox(
                         width: size.width - 320,
                         height: 500,
                         child: Card(
+                          margin: const EdgeInsets.fromLTRB(0, 5, 0, 0),
                           elevation: 0.0,
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(
@@ -272,19 +282,19 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                         //todos Update the date strings here
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
-                              "March, 28",
-                              style: TextStyle(
+                              selectedDate,
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 5,
                             ),
-                            Text(
-                              "(6 Classes today)",
+                            const Text(
+                              "(0 Classes today)",
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.normal,
@@ -298,91 +308,117 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                         SizedBox(
                           width: 600,
                           height: 500,
-                          child: ListView.builder(
-                              itemCount: 6,
+                          child:count != 0 ? ListView.builder(
+                              itemCount: count,
                               itemBuilder: (context, index) {
-                                return InkWell(
-                                  onTap: () {},
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                      top: 0.0,
-                                      left: 10,
-                                      right: 10,
-                                      bottom: 8.0,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        const Text(
-                                          "08:45",
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: 15,
-                                        ),
-                                        Card(
-                                          color: index % 2 == 0
-                                              ? kCalendarColorFB
-                                              : kCalendarColorAB,
-                                          margin: const EdgeInsets.fromLTRB(
-                                              20.0, 6.0, 20.0, 0.0),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Row(
-                                              children: [
-                                                CircleAvatar(
-                                                  radius: 25.0,
-                                                  backgroundColor:
-                                                      Colors.transparent,
-                                                  child: Image.asset(
-                                                    'assets/images/login.png',
-                                                    width: 300.0,
-                                                    height: 100.0,
-                                                    fit: BoxFit.contain,
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  width: 10,
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: const [
-                                                    Text(
-                                                      "Melvin Jhon Selma",
-                                                      style: TextStyle(
-                                                          fontSize: 18,
-                                                          fontWeight:
-                                                              FontWeight.w400),
-                                                    ),
-                                                    Text('Chemistry'),
-                                                  ],
-                                                ),
-                                                const SizedBox(
-                                                  width: 30,
-                                                ),
-                                                const Padding(
-                                                  padding: EdgeInsets.only(
-                                                      bottom: 12.0),
-                                                  child: Text('First Class'),
-                                                ),
-                                              ],
+                                  return InkWell(
+                                    onTap: () {},
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        top: 0.0,
+                                        left: 10,
+                                        right: 10,
+                                        bottom: 8.0,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          const Text(
+                                            "08:45",
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w800,
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                          const SizedBox(
+                                            width: 15,
+                                          ),
+                                          Card(
+                                            color: index % 2 == 0
+                                                ? kCalendarColorFB
+                                                : kCalendarColorAB,
+                                            margin: const EdgeInsets.fromLTRB(
+                                                20.0, 6.0, 20.0, 0.0),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                children: [
+                                                  CircleAvatar(
+                                                    radius: 25.0,
+                                                    backgroundColor:
+                                                        Colors.transparent,
+                                                    child: Image.asset(
+                                                      'assets/images/login.png',
+                                                      width: 300.0,
+                                                      height: 100.0,
+                                                      fit: BoxFit.contain,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: const [
+                                                      Text(
+                                                        "Melvin Jhon Selma",
+                                                        style: TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w400),
+                                                      ),
+                                                      Text('Chemistry'),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 30,
+                                                  ),
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 12.0),
+                                                    child: Text('First Class'),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                );
-                              }),
+                                  );
+                                }
+                              ) : Center(
+                                   child: Column(
+                                     mainAxisAlignment:
+                                         MainAxisAlignment.start,
+                                     crossAxisAlignment:
+                                         CrossAxisAlignment.center,
+                                     children: [
+                                       Image.asset(
+                                         'assets/images/5836.png',
+                                         width: 250.0,
+                                         height: 150.0,
+                                         fit: BoxFit.fill,
+                                       ),
+                                       const Text(
+                                         "No Classes Today",
+                                         textAlign: TextAlign.left,
+                                         style: TextStyle(
+                                             fontSize: 18,
+                                             fontWeight: FontWeight.w600, color: Colors.red),
+                                       ),
+                                     ],
+                                   ),
+                                 ),
                         ),
                       ]),
                     ),
@@ -391,7 +427,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                 Flexible(
                     flex: 6,
                     child: Column(
-                      children: [
+                      children: const [
                         // if (listIndex == 0) ...[
                         //   classClick(context)
                         // ] else if (listIndex == 1) ...[

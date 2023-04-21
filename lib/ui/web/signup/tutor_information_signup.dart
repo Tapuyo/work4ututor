@@ -1,6 +1,6 @@
 // ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, unused_local_variable
 
-import 'dart:convert';
+import 'dart:math';
 
 import 'package:country_pickers/country.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +13,7 @@ import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:wokr4ututor/services/services.dart';
 
 import '../../../components/dialog.dart';
+import '../../../shared_components/alphacode3.dart';
 import '../terms/termpage.dart';
 import '../tutor/tutor_dashboard/tutor_dashboard.dart';
 
@@ -187,14 +188,14 @@ class _InputInfoState extends State<InputInfo> {
       print('Could not get available timezones');
     }
   }
-
+ String tutorIDNumber = 'STU*********';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         children: [
-           CustomAppBarLog(),
+          const CustomAppBarLog(),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -219,6 +220,59 @@ class _InputInfoState extends State<InputInfo> {
                     width: 600,
                     child: Column(
                       children: <Widget>[
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: const [
+                            Text(
+                              "Tutor Identification Number",
+                              style: TextStyle(
+                                color: Color.fromRGBO(0, 0, 0, 1),
+                                fontFamily: 'RobotoMono',
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
+                             Text(
+                              "(Auto Generated once Country is selected!)*",
+                              style: TextStyle(
+                                color: Color.fromRGBO(0, 0, 0, 1),
+                                fontFamily: 'RobotoMono',
+                                fontWeight: FontWeight.normal,
+                                fontSize: 15,
+                                fontStyle: FontStyle.italic,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              width: 200,
+                              height: 45,
+                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                              decoration: BoxDecoration(
+                                color:  const Color.fromRGBO(242, 242, 242, 1),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    tutorIDNumber.toString(),
+                                    style: const TextStyle(
+                                        fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(
                           height: 10,
                         ),
@@ -359,7 +413,31 @@ class _InputInfoState extends State<InputInfo> {
                                 color: const Color.fromRGBO(242, 242, 242, 1),
                                 borderRadius: BorderRadius.circular(5),
                               ),
-                              child: _buildCountryPickerDropdownSoloExpanded(),
+                              child:  CountryPickerDropdown(
+                                onValuePicked: (Country country) {
+                                  final alpha3Code =
+                                      getAlpha3Code(country.name);
+                                  Random random = Random();
+                                  int randomNumber =
+                                      random.nextInt(1000000) + 1;
+                                       String currentyear = DateFormat('yyyy').format(DateTime.now());
+                                  //todo please replace the random number with legnth of students enrolled
+                                  setState(() {
+                                    tutorIDNumber =
+                                        'TTR$alpha3Code$currentyear$randomNumber';
+                                  });
+                                },
+                                itemBuilder: (Country country) {
+                                  return Row(
+                                    children: <Widget>[
+                                      Expanded(child: Text(country.name)),
+                                    ],
+                                  );
+                                },
+                                itemHeight: 50,
+                                isExpanded: true,
+                                icon: const Icon(Icons.arrow_drop_down),
+                              ),
                               // country.name
                             ),
                             const SizedBox(
@@ -1565,7 +1643,7 @@ class _InputInfoState extends State<InputInfo> {
                             onPressed: () => {
                               Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const DashboardPage()),
+                  MaterialPageRoute(builder: (context) =>  DashboardPage()),
                 ),
                             },
                             child: const Text(

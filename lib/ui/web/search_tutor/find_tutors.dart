@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/data_class/tutor_info_class.dart';
@@ -8,8 +7,6 @@ import 'package:wokr4ututor/ui/web/search_tutor/tutor_list.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
 import '../../../components/nav_bar.dart';
-import '../../../provider/init_provider.dart';
-import '../../../services/services.dart';
 import '../signup/student_signup.dart';
 
 class FindTutor extends StatefulWidget {
@@ -72,6 +69,8 @@ final TextEditingController _typeAheadController4 = TextEditingController();
 final TextEditingController _typeAheadController5 = TextEditingController();
 
 bool filtervisible = true;
+double _pricevalue = 0;
+int _rating = 0;
 
 class _FindTutorState extends State<FindTutor> {
   @override
@@ -82,553 +81,103 @@ class _FindTutorState extends State<FindTutor> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: const Color.fromRGBO(55, 116, 135, 1),
         elevation: 3,
         toolbarHeight: 100,
         title: const FindTutorNavbar(),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(100, 50, 100, 0),
-          child: SizedBox(
-            width: size.width,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Flexible(
-                      flex: size.width > 1350 ? 3 : 4,
-                      child: SingleChildScrollView(
-                        controller: ScrollController(),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      filtervisible = !filtervisible;
-                                    });
-                                  },
-                                  child: const Icon(
-                                    Icons.filter_list,
-                                    size: 30,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      filtervisible = !filtervisible;
-                                    });
-                                  },
-                                  child: const Text(
-                                    "Filters",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w900),
-                                  ),
-                                ),
-                                const Spacer(),
-                                InkWell(
-                                  onTap: () {
-                                    _typeAheadController.text = '';
-                                    _typeAheadController1.text = '';
-                                    _typeAheadController2.text = '';
-                                    _typeAheadController3.text = '';
-                                    _typeAheadController4.text = '';
-                                    _typeAheadController5.text = '';
-                                  },
-                                  child: const Icon(
-                                    Icons.clear,
-                                    size: 30,
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    _typeAheadController.text = '';
-                                    _typeAheadController1.text = '';
-                                    _typeAheadController2.text = '';
-                                    _typeAheadController3.text = '';
-                                    _typeAheadController4.text = '';
-                                    _typeAheadController5.text = '';
-                                  },
-                                  child: const Text(
-                                    "Clear",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w900),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Visibility(
-                              visible: filtervisible ? true : false,
-                              child: Column(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(100, 25, 100, 0),
+            child: SizedBox(
+              width: size.width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Flexible(
+                        flex: size.width > 1350 ? 3 : 4,
+                        child: SingleChildScrollView(
+                          controller: ScrollController(),
+                          child: Column(
+                            children: [
+                              Row(
                                 children: [
-                                  Container(
-                                    height: 45,
-                                    width: 200,
-                                    padding: const EdgeInsets.only(
-                                        right: 20, left: 20),
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.rectangle,
-                                      color: kColorLight,
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                    ),
-                                    child: TypeAheadField(
-                                      hideOnEmpty: false,
-                                      textFieldConfiguration:
-                                          TextFieldConfiguration(
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                        ),
-                                        autofocus: false,
-                                        controller: _typeAheadController,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          hintText: 'COUNTRY',
-                                          hintStyle: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      ),
-                                      suggestionsCallback: (pattern) {
-                                        return items.where((item) => item
-                                            .toLowerCase()
-                                            .contains(pattern.toLowerCase()));
-                                      },
-                                      itemBuilder: (context, suggestion) {
-                                        return ListTile(
-                                          title: Text(
-                                            suggestion.toString(),
-                                          ),
-                                        );
-                                      },
-                                      onSuggestionSelected: (selectedItem) {
-                                        print('Selected item: $selectedItem');
-                                        setState(() {
-                                          _typeAheadController.text =
-                                              selectedItem.toString();
-                                        });
-                                      },
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        filtervisible = !filtervisible;
+                                      });
+                                    },
+                                    child: const Icon(
+                                      Icons.filter_list,
+                                      size: 25,
                                     ),
                                   ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    height: 45,
-                                    width: 200,
-                                    padding: const EdgeInsets.only(
-                                        right: 20, left: 20),
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.rectangle,
-                                      color: kColorLight,
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                    ),
-                                    child: TypeAheadField(
-                                      hideOnEmpty: false,
-                                      textFieldConfiguration:
-                                          TextFieldConfiguration(
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                        ),
-                                        autofocus: false,
-                                        controller: _typeAheadController1,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          hintText: 'CITY',
-                                          hintStyle: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      ),
-                                      suggestionsCallback: (pattern) {
-                                        return city.where((item) => item
-                                            .toLowerCase()
-                                            .contains(pattern.toLowerCase()));
-                                      },
-                                      itemBuilder: (context, suggestion) {
-                                        return ListTile(
-                                          title: Text(
-                                            suggestion.toString(),
-                                          ),
-                                        );
-                                      },
-                                      onSuggestionSelected: (selectedItem) {
-                                        print('Selected item: $selectedItem');
-                                        setState(() {
-                                          _typeAheadController1.text =
-                                              selectedItem.toString();
-                                        });
-                                      },
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        filtervisible = !filtervisible;
+                                      });
+                                    },
+                                    child: const Text(
+                                      "Filters",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w900),
                                     ),
                                   ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    height: 45,
-                                    width: 200,
-                                    padding: const EdgeInsets.only(
-                                        right: 20, left: 20),
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.rectangle,
-                                      color: kColorLight,
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                    ),
-                                    child: TypeAheadField(
-                                      hideOnEmpty: false,
-                                      textFieldConfiguration:
-                                          TextFieldConfiguration(
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                        ),
-                                        autofocus: false,
-                                        controller: _typeAheadController2,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          hintText: 'LANGUAGE',
-                                          hintStyle: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      ),
-                                      suggestionsCallback: (pattern) {
-                                        return languages.where((item) => item
-                                            .toLowerCase()
-                                            .contains(pattern.toLowerCase()));
-                                      },
-                                      itemBuilder: (context, suggestion) {
-                                        return ListTile(
-                                          title: Text(
-                                            suggestion.toString(),
-                                          ),
-                                        );
-                                      },
-                                      onSuggestionSelected: (selectedItem) {
-                                        print('Selected item: $selectedItem');
-                                        setState(() {
-                                          _typeAheadController2.text =
-                                              selectedItem.toString();
-                                        });
-                                      },
+                                  const Spacer(),
+                                  InkWell(
+                                    onTap: () {
+                                      _typeAheadController.text = '';
+                                      _typeAheadController1.text = '';
+                                      _typeAheadController2.text = '';
+                                      _typeAheadController3.text = '';
+                                      _typeAheadController4.text = '';
+                                      _typeAheadController5.text = '';
+                                    },
+                                    child: const Icon(
+                                      Icons.clear,
+                                      size: 25,
                                     ),
                                   ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    height: 45,
-                                    width: 200,
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.rectangle,
-                                      color: kColorLight,
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                    ),
-                                    child: TextButton(
-                                      style: TextButton.styleFrom(
-                                        foregroundColor: Colors.white,
-                                        shape: const BeveledRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(5))),
-                                        textStyle: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 15,
-                                          fontStyle: FontStyle.normal,
-                                          decoration: TextDecoration.none,
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        // Navigator.pushReplacement(
-                                        //   context,
-                                        //   MaterialPageRoute(
-                                        //       builder: (context) =>
-                                        //           const StudentSignup()),
-                                        // );
-                                      },
-                                      child: const Text(
-                                        'PRICING',
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    height: 45,
-                                    width: 200,
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.rectangle,
-                                      color: kColorLight,
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                    ),
-                                    child: TextButton(
-                                      style: TextButton.styleFrom(
-                                        foregroundColor: Colors.white,
-                                        shape: const BeveledRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(5))),
-                                        textStyle: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 15,
-                                          fontStyle: FontStyle.normal,
-                                          decoration: TextDecoration.none,
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        // Navigator.pushReplacement(
-                                        //   context,
-                                        //   MaterialPageRoute(
-                                        //       builder: (context) =>
-                                        //           const StudentSignup()),
-                                        // );
-                                      },
-                                      child: const Text(
-                                        'RATING',
-                                        textAlign: TextAlign.left,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    height: 45,
-                                    width: 200,
-                                    padding: const EdgeInsets.only(
-                                        right: 20, left: 20),
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.rectangle,
-                                      color: kColorLight,
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                    ),
-                                    child: TypeAheadField(
-                                      hideOnEmpty: false,
-                                      textFieldConfiguration:
-                                          TextFieldConfiguration(
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                        ),
-                                        autofocus: false,
-                                        controller: _typeAheadController3,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          hintText: 'SUBJECT',
-                                          hintStyle: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      ),
-                                      suggestionsCallback: (pattern) {
-                                        return subjects.where((item) => item
-                                            .toLowerCase()
-                                            .contains(pattern.toLowerCase()));
-                                      },
-                                      itemBuilder: (context, suggestion) {
-                                        return ListTile(
-                                          title: Text(
-                                            suggestion.toString(),
-                                          ),
-                                        );
-                                      },
-                                      onSuggestionSelected: (selectedItem) {
-                                        print('Selected item: $selectedItem');
-                                        setState(() {
-                                          _typeAheadController3.text =
-                                              selectedItem.toString();
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    height: 45,
-                                    width: 200,
-                                    padding: const EdgeInsets.only(
-                                        right: 20, left: 20),
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.rectangle,
-                                      color: kColorLight,
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                    ),
-                                    child: TypeAheadField(
-                                      hideOnEmpty: false,
-                                      textFieldConfiguration:
-                                          TextFieldConfiguration(
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                        ),
-                                        autofocus: false,
-                                        controller: _typeAheadController4,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          hintText: 'SERVICE PROVIDED',
-                                          hintStyle: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      ),
-                                      suggestionsCallback: (pattern) {
-                                        return provided.where((item) => item
-                                            .toLowerCase()
-                                            .contains(pattern.toLowerCase()));
-                                      },
-                                      itemBuilder: (context, suggestion) {
-                                        return ListTile(
-                                          title: Text(
-                                            suggestion.toString(),
-                                          ),
-                                        );
-                                      },
-                                      onSuggestionSelected: (selectedItem) {
-                                        print('Selected item: $selectedItem');
-                                        setState(() {
-                                          _typeAheadController4.text =
-                                              selectedItem.toString();
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  Container(
-                                    height: 45,
-                                    width: 200,
-                                    padding: const EdgeInsets.only(
-                                        right: 20, left: 20),
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.rectangle,
-                                      color: kColorLight,
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                    ),
-                                    child: TypeAheadField(
-                                      hideOnEmpty: false,
-                                      textFieldConfiguration:
-                                          TextFieldConfiguration(
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                        ),
-                                        autofocus: false,
-                                        controller: _typeAheadController5,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          hintText: 'TYPE OF CLASS',
-                                          hintStyle: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      ),
-                                      suggestionsCallback: (pattern) {
-                                        return typeofclass.where((item) => item
-                                            .toLowerCase()
-                                            .contains(pattern.toLowerCase()));
-                                      },
-                                      itemBuilder: (context, suggestion) {
-                                        return ListTile(
-                                          title: Text(
-                                            suggestion.toString(),
-                                          ),
-                                        );
-                                      },
-                                      onSuggestionSelected: (selectedItem) {
-                                        print('Selected item: $selectedItem');
-                                        setState(() {
-                                          _typeAheadController5.text =
-                                              selectedItem.toString();
-                                        });
-                                      },
+                                  InkWell(
+                                    onTap: () {
+                                      _typeAheadController.text = '';
+                                      _typeAheadController1.text = '';
+                                      _typeAheadController2.text = '';
+                                      _typeAheadController3.text = '';
+                                      _typeAheadController4.text = '';
+                                      _typeAheadController5.text = '';
+                                    },
+                                    child: const Text(
+                                      "Clear",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w900),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 20,
-                      // height: MediaQuery.of(context).size.height,
-                      // child: const VerticalDivider(
-                      //   thickness: 1,
-                      // ),
-                    ),
-                    Flexible(
-                      flex: 15,
-                      child: SingleChildScrollView(
-                        controller: ScrollController(),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: size.width - 505,
-                                  height: 60,
-                                  child: TextFormField(
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20.0),
-                                      ),
-                                      hintStyle: const TextStyle(
-                                          color: Colors.black, fontSize: 16),
-                                      hintText: 'Search',
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              SizedBox(
+                                width: 220,
+                                height: 50,
+                                child: TextFormField(
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
                                     ),
-                                    validator: (val) => val!.isEmpty
-                                        ? 'Enter your search filter'
-                                        : null,
-                                    onChanged: (val) {
-                                      tName = val;
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 15,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 10.0),
-                                  child: Container(
-                                    width: 50,
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.rectangle,
-                                      borderRadius: BorderRadius.circular(10.0),
-                                      border: Border.all(color: Colors.black),
-                                    ),
-                                    child: Material(
-                                      color: Colors.white,
+                                    suffixIcon: Padding(
+                                      padding: const EdgeInsets.all(0.0),
                                       child: InkWell(
-                                        splashColor: kColorLight,
                                         onTap: () {
                                           setState(() {
                                             final provider = context
@@ -641,73 +190,684 @@ class _FindTutorState extends State<FindTutor> {
                                             );
                                           });
                                         },
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: const <Widget>[
-                                            Icon(Icons.search), // <-- Icon
-                                            Text("Search"), // <-- Text
-                                          ],
+                                        child: const Icon(
+                                          Icons.search_rounded,
+                                          color: Colors.grey,
                                         ),
                                       ),
                                     ),
+                                    hintStyle: const TextStyle(
+                                        color: Colors.black, fontSize: 16),
+                                    hintText: 'Search',
                                   ),
-                                )
-                              ],
-                            ),
-                            TutorList(
-                              tutorslist: tutorsinfo,
-                              keyword: setSearch,
-                              displayRange: displayRange,
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Container(
-                              height: 45,
-                              width: 200,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                color: kColorLight,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20)),
-                              ),
-                              child: TextButton(
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  shape: const BeveledRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5))),
-                                  textStyle: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                    fontStyle: FontStyle.normal,
-                                    decoration: TextDecoration.none,
-                                  ),
+                                  validator: (val) => val!.isEmpty
+                                      ? 'Enter your search filter'
+                                      : null,
+                                  onChanged: (val) {
+                                    tName = val;
+                                  },
                                 ),
-                                onPressed: () {
-                                  // Navigator.pushReplacement(
-                                  //   context,
-                                  //   MaterialPageRoute(
-                                  //       builder: (context) =>
-                                  //           const StudentSignup()),
-                                  // );
-                                },
-                                child: const Text('Display More'),
                               ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                          ],
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Visibility(
+                                visible: filtervisible ? true : false,
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      height: 50,
+                                      width: 220,
+                                      padding: const EdgeInsets.only(
+                                          right: 20, left: 20),
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        color: kColorLight,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20)),
+                                      ),
+                                      child: TypeAheadField(
+                                        hideOnEmpty: false,
+                                        textFieldConfiguration:
+                                            TextFieldConfiguration(
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                          ),
+                                          autofocus: false,
+                                          controller: _typeAheadController,
+                                          decoration: const InputDecoration(
+                                            border: InputBorder.none,
+                                            hintText: 'Country',
+                                            hintStyle: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                        ),
+                                        suggestionsCallback: (pattern) {
+                                          return items.where((item) => item
+                                              .toLowerCase()
+                                              .contains(pattern.toLowerCase()));
+                                        },
+                                        itemBuilder: (context, suggestion) {
+                                          return ListTile(
+                                            title: Text(
+                                              suggestion.toString(),
+                                            ),
+                                          );
+                                        },
+                                        onSuggestionSelected: (selectedItem) {
+                                          print('Selected item: $selectedItem');
+                                          setState(() {
+                                            _typeAheadController.text =
+                                                selectedItem.toString();
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Container(
+                                      height: 50,
+                                      width: 220,
+                                      padding: const EdgeInsets.only(
+                                          right: 20, left: 20),
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        color: kColorLight,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20)),
+                                      ),
+                                      child: TypeAheadField(
+                                        hideOnEmpty: false,
+                                        textFieldConfiguration:
+                                            TextFieldConfiguration(
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                          ),
+                                          autofocus: false,
+                                          controller: _typeAheadController1,
+                                          decoration: const InputDecoration(
+                                            border: InputBorder.none,
+                                            hintText: 'City',
+                                            hintStyle: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                        ),
+                                        suggestionsCallback: (pattern) {
+                                          return city.where((item) => item
+                                              .toLowerCase()
+                                              .contains(pattern.toLowerCase()));
+                                        },
+                                        itemBuilder: (context, suggestion) {
+                                          return ListTile(
+                                            title: Text(
+                                              suggestion.toString(),
+                                            ),
+                                          );
+                                        },
+                                        onSuggestionSelected: (selectedItem) {
+                                          print('Selected item: $selectedItem');
+                                          setState(() {
+                                            _typeAheadController1.text =
+                                                selectedItem.toString();
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Container(
+                                      height: 50,
+                                      width: 220,
+                                      padding: const EdgeInsets.only(
+                                          right: 20, left: 20),
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        color: kColorLight,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20)),
+                                      ),
+                                      child: TypeAheadField(
+                                        hideOnEmpty: false,
+                                        textFieldConfiguration:
+                                            TextFieldConfiguration(
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                          ),
+                                          autofocus: false,
+                                          controller: _typeAheadController2,
+                                          decoration: const InputDecoration(
+                                            border: InputBorder.none,
+                                            hintText: 'Language',
+                                            hintStyle: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                        ),
+                                        suggestionsCallback: (pattern) {
+                                          return languages.where((item) => item
+                                              .toLowerCase()
+                                              .contains(pattern.toLowerCase()));
+                                        },
+                                        itemBuilder: (context, suggestion) {
+                                          return ListTile(
+                                            title: Text(
+                                              suggestion.toString(),
+                                            ),
+                                          );
+                                        },
+                                        onSuggestionSelected: (selectedItem) {
+                                          print('Selected item: $selectedItem');
+                                          setState(() {
+                                            _typeAheadController2.text =
+                                                selectedItem.toString();
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Container(
+                                        height: 50,
+                                        width: 220,
+                                        padding: const EdgeInsets.only(
+                                            right: 20, left: 20, top: 2),
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.rectangle,
+                                          color: kColorLight,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20)),
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                             Text(
+                                              'Pricing: $_pricevalue',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 15,
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                SliderTheme(
+                                                  data: SliderTheme.of(context)
+                                                      .copyWith(
+                                                    trackHeight: 5.0,
+                                                    trackShape:
+                                                        const RoundedRectSliderTrackShape(),
+                                                    activeTrackColor:
+                                                        kColorPrimary,
+                                                    inactiveTrackColor:
+                                                        Colors.white,
+                                                    thumbShape:
+                                                        const RoundSliderThumbShape(
+                                                      enabledThumbRadius: 10.0,
+                                                      pressedElevation: 0.0,
+                                                    ),
+                                                    thumbColor: kColorPrimary,
+                                                    overlayColor:
+                                                        Colors.transparent,
+                                                    overlayShape:
+                                                        const RoundSliderOverlayShape(
+                                                            overlayRadius: 0.0),
+                                                    tickMarkShape:
+                                                        const RoundSliderTickMarkShape(),
+                                                    activeTickMarkColor:
+                                                        kColorPrimaryDark,
+                                                    inactiveTickMarkColor:
+                                                        Colors.white,
+                                                    valueIndicatorShape:
+                                                        const PaddleSliderValueIndicatorShape(),
+                                                    valueIndicatorColor:
+                                                        Colors.black,
+                                                    valueIndicatorTextStyle:
+                                                        const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12.0,
+                                                    ),
+                                                  ),
+                                                  child: Slider(
+                                                    min: 0.0,
+                                                    max: 500.0,
+                                                    value: _pricevalue,
+                                                    divisions: 500,
+                                                    label:
+                                                        '${_pricevalue.round()}',
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        _pricevalue = value;
+                                                      });
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        )),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Container(
+                                      height: 50,
+                                      width: 220,
+                                      padding: const EdgeInsets.only(
+                                          right: 20, left: 20, top: 2),
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        color: kColorLight,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20)),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                           Text(
+                                            'Rating: $_rating',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              IconButton(
+                                                padding: EdgeInsets.zero,
+                                                constraints: const BoxConstraints(),
+                                                icon: Icon(
+                                                  _rating >= 1
+                                                      ? Icons.star
+                                                      : Icons.star_border,
+                                                  color: _rating >= 1
+                                                      ? Colors.orange
+                                                      : Colors.white,
+                                                  size: 20,
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    if (_rating > 1 ||
+                                                        _rating == 0) {
+                                                      _rating = 1;
+                                                    }else{
+                                                      _rating = 0;
+                                                    }
+                                                  });
+                                                },
+                                              ),
+                                              IconButton(
+                                                padding: EdgeInsets.zero,
+                                                constraints: const BoxConstraints(),
+                                                icon: Icon(
+                                                  _rating >= 2
+                                                      ? Icons.star
+                                                      : Icons.star_border,
+                                                  color: _rating >= 2
+                                                      ? Colors.orange
+                                                      : Colors.white,
+                                                  size: 20,
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _rating = 2;
+                                                  });
+                                                },
+                                              ),
+                                              IconButton(
+                                                padding: EdgeInsets.zero,
+                                                constraints: const BoxConstraints(),
+                                                icon: Icon(
+                                                  _rating >= 3
+                                                      ? Icons.star
+                                                      : Icons.star_border,
+                                                  color: _rating >= 3
+                                                      ? Colors.orange
+                                                      : Colors.white,
+                                                  size: 20,
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _rating = 3;
+                                                  });
+                                                },
+                                              ),
+                                              IconButton(
+                                                padding: EdgeInsets.zero,
+                                                constraints: const BoxConstraints(),
+                                                icon: Icon(
+                                                  _rating >= 4
+                                                      ? Icons.star
+                                                      : Icons.star_border,
+                                                  color: _rating >= 4
+                                                      ? Colors.orange
+                                                      : Colors.white,
+                                                  size: 20,
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _rating = 4;
+                                                  });
+                                                },
+                                              ),
+                                              IconButton(
+                                                padding: EdgeInsets.zero,
+                                                constraints: const BoxConstraints(),
+                                                icon: Icon(
+                                                  _rating >= 5
+                                                      ? Icons.star
+                                                      : Icons.star_border,
+                                                  color: _rating >= 5
+                                                      ? Colors.orange
+                                                      : Colors.white,
+                                                  size: 20,
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _rating = 5;
+                                                  });
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Container(
+                                      height: 50,
+                                      width: 220,
+                                      padding: const EdgeInsets.only(
+                                          right: 20, left: 20),
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        color: kColorLight,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20)),
+                                      ),
+                                      child: TypeAheadField(
+                                        hideOnEmpty: false,
+                                        textFieldConfiguration:
+                                            TextFieldConfiguration(
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                          ),
+                                          autofocus: false,
+                                          controller: _typeAheadController3,
+                                          decoration: const InputDecoration(
+                                            border: InputBorder.none,
+                                            hintText: 'Subject',
+                                            hintStyle: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                        ),
+                                        suggestionsCallback: (pattern) {
+                                          return subjects.where((item) => item
+                                              .toLowerCase()
+                                              .contains(pattern.toLowerCase()));
+                                        },
+                                        itemBuilder: (context, suggestion) {
+                                          return ListTile(
+                                            title: Text(
+                                              suggestion.toString(),
+                                            ),
+                                          );
+                                        },
+                                        onSuggestionSelected: (selectedItem) {
+                                          print('Selected item: $selectedItem');
+                                          setState(() {
+                                            _typeAheadController3.text =
+                                                selectedItem.toString();
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Container(
+                                      height: 50,
+                                      width: 220,
+                                      padding: const EdgeInsets.only(
+                                          right: 20, left: 20),
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        color: kColorLight,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20)),
+                                      ),
+                                      child: TypeAheadField(
+                                        hideOnEmpty: false,
+                                        textFieldConfiguration:
+                                            TextFieldConfiguration(
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                          ),
+                                          autofocus: false,
+                                          controller: _typeAheadController4,
+                                          decoration: const InputDecoration(
+                                            border: InputBorder.none,
+                                            hintText: 'Service Provided',
+                                            hintStyle: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                        ),
+                                        suggestionsCallback: (pattern) {
+                                          return provided.where((item) => item
+                                              .toLowerCase()
+                                              .contains(pattern.toLowerCase()));
+                                        },
+                                        itemBuilder: (context, suggestion) {
+                                          return ListTile(
+                                            title: Text(
+                                              suggestion.toString(),
+                                            ),
+                                          );
+                                        },
+                                        onSuggestionSelected: (selectedItem) {
+                                          print('Selected item: $selectedItem');
+                                          setState(() {
+                                            _typeAheadController4.text =
+                                                selectedItem.toString();
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Container(
+                                      height: 50,
+                                      width: 220,
+                                      padding: const EdgeInsets.only(
+                                          right: 20, left: 20),
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        color: kColorLight,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20)),
+                                      ),
+                                      child: TypeAheadField(
+                                        hideOnEmpty: false,
+                                        textFieldConfiguration:
+                                            TextFieldConfiguration(
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                          ),
+                                          autofocus: false,
+                                          controller: _typeAheadController5,
+                                          decoration: const InputDecoration(
+                                            border: InputBorder.none,
+                                            hintText: 'Type of Class',
+                                            hintStyle: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                        ),
+                                        suggestionsCallback: (pattern) {
+                                          return typeofclass.where((item) =>
+                                              item.toLowerCase().contains(
+                                                  pattern.toLowerCase()));
+                                        },
+                                        itemBuilder: (context, suggestion) {
+                                          return ListTile(
+                                            title: Text(
+                                              suggestion.toString(),
+                                            ),
+                                          );
+                                        },
+                                        onSuggestionSelected: (selectedItem) {
+                                          print('Selected item: $selectedItem');
+                                          setState(() {
+                                            _typeAheadController5.text =
+                                                selectedItem.toString();
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                      SizedBox(
+                        width: 20,
+                        height: MediaQuery.of(context).size.height,
+                        child: const VerticalDivider(
+                          thickness: 1,
+                        ),
+                      ),
+                      Flexible(
+                        flex: 15,
+                        child: SingleChildScrollView(
+                          controller: ScrollController(),
+                          child: Column(
+                            children: [
+                              TutorList(
+                                tutorslist: tutorsinfo,
+                                keyword: setSearch,
+                                displayRange: displayRange,
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Container(
+                                height: 45,
+                                width: 200,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.rectangle,
+                                  color: kColorLight,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                ),
+                                child: TextButton(
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    shape: const BeveledRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5))),
+                                    textStyle: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 15,
+                                      fontStyle: FontStyle.normal,
+                                      decoration: TextDecoration.none,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    // Navigator.pushReplacement(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //       builder: (context) =>
+                                    //           const StudentSignup()),
+                                    // );
+                                  },
+                                  child: const Text('Display More'),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class ListItems extends StatelessWidget {
+  const ListItems({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scrollbar(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: ListView(
+          padding: const EdgeInsets.all(8),
+          children: [
+            TextFormField(
+              decoration: const InputDecoration(hintText: "search"),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SecondRoute extends StatelessWidget {
+  const SecondRoute({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Second Route'),
+        automaticallyImplyLeading: false,
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Go back!'),
         ),
       ),
     );

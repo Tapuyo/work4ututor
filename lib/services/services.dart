@@ -163,4 +163,19 @@ class DatabaseService {
       return null;
     }
   }
+  //Adding Schedule to database
+
+addTutoravailbaleDays() async{
+  return await FirebaseFirestore.instance
+      .collection('tutorSchedule').doc(uid).set({'availableDays': ['Monday', 'Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],});
 }
+addDayoffs() async{
+  return await FirebaseFirestore.instance
+      .collection('tutorSchedule').doc(uid).update({'availableDays': ['Monday', 'Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],});
+}
+}
+// FirebaseFirestore.instance.collection('collection');
+// collection 
+//     .doc('foo_id') // <-- Doc ID where data should be updated.
+//     .update(newData);
+

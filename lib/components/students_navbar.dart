@@ -395,7 +395,7 @@ class StudentsMenu extends HookWidget {
               textAlign: TextAlign.center,
               text: TextSpan(
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Color.fromARGB(255, 59, 59, 59),
+                      color: const Color.fromARGB(255, 59, 59, 59),
                       fontSize: 12,
                       fontWeight: FontWeight.normal,
                     ),

@@ -4,7 +4,7 @@ class InitProvider with ChangeNotifier{
   bool refresh = false;
 
   int _menuIndex = 0;
-  int _listindex = 0;
+  final int _listindex = 0;
   
   String _tName = '';
   

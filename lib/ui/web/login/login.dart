@@ -2,7 +2,9 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
+import 'package:wokr4ututor/provider/user_id_provider.dart';
 import 'package:wokr4ututor/services/services.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +12,7 @@ import 'package:wokr4ututor/ui/web/login/forgotpassword.dart';
 import 'package:wokr4ututor/ui/web/terms/termpage.dart';
 
 import '../../../data_class/user_class.dart';
+import '../../../shared_components/alphacode3.dart';
 import '../../../utils/themes.dart';
 import '../tutor/tutor_dashboard/tutor_dashboard.dart';
 
@@ -164,6 +167,8 @@ class _SigniNState extends State<SigniN> {
                           val!.isEmpty ? 'Enter an email' : null,
                       onChanged: (val) {
                         userEmail = val;
+                        final alpha3Code = getAlpha3Code(val);
+                        print(alpha3Code);
                       },
                     ),
                   ),
@@ -238,44 +243,19 @@ class _SigniNState extends State<SigniN> {
                   ),
                 ),
                 onPressed: () async {
-                  if (formKey.currentState!.validate()) {
-                    Users result = await _auth.signinwEmailandPassword(
-                        userEmail, userPassword);
-                    if (result == null) {
-                      setState(() {
-                        error = 'Could not sign in w/ those credential';
-                        print(error);
-                        print(result.uid);
-                        dynamic status =
-                            DatabaseService(uid: result.uid).getTutorInfo();
-                        if (status.isEmpty) {
-                          print("Status Report$status Error");
-                        } else {
-                          print("Status Report$status Yeeh");
-                        //    Navigator.pushReplacement(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) =>  DashboardPage(uid: result.uid ,name: "Angelo Jordans",)),
-                        // );
-                        }
-                      });
-                    } else {
-                      setState(() {
-                        print(result.uid);
-                      dynamic status =
-                          DatabaseService(uid: result.uid).getTutorInfo();
-                      if (status == null) {
-                        print(status);
-                      } else {
-                        print("Status Report$status Yeeh");
-                      }
-                      //  Navigator.pushReplacement(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) =>  DashboardPage(uid: result.uid ,name: "Angelo Jordans",)),
-                      //   );
-                      });
-                    }
+                  Users result = await _auth.signinwEmailandPassword(
+                      userEmail, userPassword);
+                  if (result == null) {
+                    setState(() {
+                      error = 'Could not sign in w/ those credential';
+                      print(error);
+                    });
+                  } else {
+                    setState(() {
+                      print(result.uid);
+                      final provider = context.read<UserIDProvider>();
+                      provider.setUserID(result.uid);
+                    });
                   }
                 },
                 child: Text(

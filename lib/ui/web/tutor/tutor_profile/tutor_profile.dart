@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:wokr4ututor/components/dialog.dart';
+import 'package:wokr4ututor/ui/web/tutor/tutor_profile/viewschedule.dart';
 
 import '../../../../components/nav_bar.dart';
 import '../../../../utils/themes.dart';
+import 'book_lesson.dart';
+import 'contact_teacher.dart';
+import 'view_file.dart';
 
 class TutorProfile extends StatefulWidget {
   const TutorProfile({super.key});
@@ -29,10 +34,10 @@ class _TutorProfileState extends State<TutorProfile> {
     const double fillStop = (100 - fillPercent) / 100;
     const List<double> stops = [0.0, fillStop, fillStop, 1.0];
     Size size = MediaQuery.of(context).size;
+    bool selection5 = false;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         backgroundColor: const Color.fromRGBO(55, 116, 135, 1),
         elevation: 0,
         toolbarHeight: 100,
@@ -79,7 +84,18 @@ class _TutorProfileState extends State<TutorProfile> {
                                     child: Align(
                                       alignment: Alignment.topRight,
                                       child: InkWell(
-                                          onTap: () {},
+                                          onTap: () {
+                                            showDialog<DateTime>(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return const ViewFile();
+                                              },
+                                            ).then((selectedDate) {
+                                              if (selectedDate != null) {
+                                                // Do something with the selected date
+                                              }
+                                            });
+                                          },
                                           child: Container(
                                             height: 300,
                                             width: 300,
@@ -108,7 +124,19 @@ class _TutorProfileState extends State<TutorProfile> {
                                             child: Align(
                                               alignment: Alignment.topRight,
                                               child: InkWell(
-                                                onTap: () {},
+                                                onTap: () {
+                                                  showDialog<DateTime>(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return const ViewFile();
+                                                  },
+                                                ).then((selectedDate) {
+                                                  if (selectedDate != null) {
+                                                    // Do something with the selected date
+                                                  }
+                                                });
+                                                },
                                                 child: const Icon(
                                                   Icons.arrow_left,
                                                   size: 25,
@@ -123,7 +151,19 @@ class _TutorProfileState extends State<TutorProfile> {
                                             child: Align(
                                               alignment: Alignment.topRight,
                                               child: InkWell(
-                                                  onTap: () {},
+                                                  onTap: () {
+                                                    showDialog<DateTime>(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return const ViewFile();
+                                                  },
+                                                ).then((selectedDate) {
+                                                  if (selectedDate != null) {
+                                                    // Do something with the selected date
+                                                  }
+                                                });
+                                                  },
                                                   child: Container(
                                                     height: 60,
                                                     width: 60,
@@ -147,7 +187,19 @@ class _TutorProfileState extends State<TutorProfile> {
                                             child: Align(
                                               alignment: Alignment.topRight,
                                               child: InkWell(
-                                                  onTap: () {},
+                                                  onTap: () {
+                                                    showDialog<DateTime>(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return const ViewFile();
+                                                  },
+                                                ).then((selectedDate) {
+                                                  if (selectedDate != null) {
+                                                    // Do something with the selected date
+                                                  }
+                                                });
+                                                  },
                                                   child: Container(
                                                     height: 60,
                                                     width: 60,
@@ -235,8 +287,8 @@ class _TutorProfileState extends State<TutorProfile> {
                                             MainAxisAlignment.start,
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
-                                        children: const [
-                                          Align(
+                                        children: [
+                                          const Align(
                                             alignment: Alignment.topLeft,
                                             child: Text(
                                               'Service Provided',
@@ -245,17 +297,39 @@ class _TutorProfileState extends State<TutorProfile> {
                                                   fontWeight: FontWeight.w900),
                                             ),
                                           ),
-                                          //     Container(
-                                          // width: 500,
-                                          // height: 100,
-                                          //       child: GridView.count(
-                                          //           mainAxisSpacing: 5,
-                                          //           crossAxisSpacing: 5,
-                                          //           crossAxisCount: 2,
-                                          //           children: List.generate(2,
-                                          //               (index) {
-                                          //           })),
-                                          //     )
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Container(
+                                            width: 500,
+                                            height: 70,
+                                            color: Colors.transparent,
+                                            child: GridView.builder(
+                                                gridDelegate:
+                                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                                  mainAxisSpacing: 0,
+                                                  crossAxisSpacing: 0,
+                                                  childAspectRatio: (1 / .2),
+                                                  crossAxisCount: 3,
+                                                ),
+                                                itemCount: 4,
+                                                itemBuilder:
+                                                    (BuildContext context,
+                                                        int index) {
+                                                  return Row(
+                                                    children: const [
+                                                      Radio(
+                                                        value: true,
+                                                        groupValue: true,
+                                                        onChanged: null,
+                                                        activeColor:
+                                                            kColorPrimary,
+                                                      ),
+                                                      Text('Add info here')
+                                                    ],
+                                                  );
+                                                }),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -328,7 +402,9 @@ class _TutorProfileState extends State<TutorProfile> {
                                             },
                                             child: const Text(
                                               '2 Classes',
-                                              style: TextStyle(fontSize: 15, color: Colors.black),
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.black),
                                             ),
                                           ),
                                         ),
@@ -376,7 +452,9 @@ class _TutorProfileState extends State<TutorProfile> {
                                             },
                                             child: const Text(
                                               '3 Classes',
-                                              style: TextStyle(fontSize: 15, color: Colors.black),
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.black),
                                             ),
                                           ),
                                         ),
@@ -424,7 +502,9 @@ class _TutorProfileState extends State<TutorProfile> {
                                             },
                                             child: const Text(
                                               '5 classes',
-                                              style: TextStyle(fontSize: 15, color: Colors.black),
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.black),
                                             ),
                                           ),
                                         ),
@@ -461,65 +541,285 @@ class _TutorProfileState extends State<TutorProfile> {
                                             },
                                             child: const Text(
                                               'Customize',
-                                              style: TextStyle(fontSize: 15, color: Colors.black),
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.black),
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(5),
-                                    child: Container(
-                                      width: 400,
-                                      height: 40,
-                                      color: Colors.blue,
-                                      child: GridView.count(
-                                         shrinkWrap: true,
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
-                                          mainAxisSpacing: 5,
-                                          crossAxisSpacing: 5,
+                                  Container(
+                                    width: 500,
+                                    height: 60,
+                                    color: Colors.transparent,
+                                    child: GridView.builder(
+                                        padding: EdgeInsets.zero,
+                                        gridDelegate:
+                                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                          mainAxisSpacing: 0,
+                                          crossAxisSpacing: 0,
+                                          childAspectRatio: (1 / .2),
                                           crossAxisCount: 3,
-                                          children: List.generate(3, (index) {
-                                            bool selection5 = false;
-                                            return Padding(
-                                              padding: EdgeInsets.all(5),
-                                              child: Align(
-                                                alignment: Alignment.center,
-                                                child: Container(
-                                                  width: 120,
-                                                  height: 20,
-                                                  color: Colors.yellow,
-                                                  child: CheckboxListTile(
-                                                    title: const Text(
-                                                      'Math',
-                                                      style:
-                                                          TextStyle(fontSize: 15),
-                                                    ),
-                                                    // subtitle: const Text(
-                                                    //     'A computer science portal for geeks.'),
-                                                    // secondary: const Icon(Icons.code),
-                                                    autofocus: false,
-                                                    activeColor: Colors.green,
-                                                    checkColor: Colors.white,
-                                                    selected: selection5,
-                                                    value: selection5,
-                                                    controlAffinity:
-                                                        ListTileControlAffinity
-                                                            .leading,
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        selection5 = value!;
-                                                      });
-                                                    },
-                                                  ),
+                                        ),
+                                        itemCount: 3,
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          return CheckboxListTile(
+                                            title: const Text(
+                                              'Math',
+                                              style: TextStyle(fontSize: 15),
+                                            ),
+                                            autofocus: false,
+                                            activeColor: Colors.green,
+                                            checkColor: Colors.white,
+                                            selected: selection5,
+                                            value: selection5,
+                                            controlAffinity:
+                                                ListTileControlAffinity.leading,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                selection5 = value!;
+                                              });
+                                            },
+                                          );
+                                        }),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.all(10.0),
+                                    child: Text(
+                                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+                                      textAlign: TextAlign.justify,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: const [
+                                      Text(
+                                        'Price: \$ 10.00',
+                                        textAlign: TextAlign.justify,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Column(
+                                        children: [
+                                          Container(
+                                            height: 30,
+                                            width: 120,
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.rectangle,
+                                              color: kColorLight,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20)),
+                                            ),
+                                            child: TextButton(
+                                              style: TextButton.styleFrom(
+                                                foregroundColor: Colors.white,
+                                                shape:
+                                                    const BeveledRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5))),
+                                                textStyle: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 12,
+                                                  fontStyle: FontStyle.normal,
+                                                  decoration:
+                                                      TextDecoration.none,
                                                 ),
                                               ),
-                                            );
-                                          })),
-                                    ),
-                                  )
+                                              onPressed: () {
+                                                showDialog<DateTime>(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return const BookLesson();
+                                                  },
+                                                ).then((selectedDate) {
+                                                  if (selectedDate != null) {
+                                                    // Do something with the selected date
+                                                  }
+                                                });
+                                              },
+                                              child: const Text(
+                                                'Buy Lesson',
+                                                textAlign: TextAlign.left,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Container(
+                                            height: 30,
+                                            width: 120,
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.rectangle,
+                                              color: kColorLight,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20)),
+                                            ),
+                                            child: TextButton(
+                                              style: TextButton.styleFrom(
+                                                foregroundColor: Colors.white,
+                                                shape:
+                                                    const BeveledRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5))),
+                                                textStyle: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 12,
+                                                  fontStyle: FontStyle.normal,
+                                                  decoration:
+                                                      TextDecoration.none,
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                showDialog<DateTime>(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return const BookLesson();
+                                                  },
+                                                ).then((selectedDate) {
+                                                  if (selectedDate != null) {
+                                                    // Do something with the selected date
+                                                  }
+                                                });
+                                              },
+                                              child: const Text(
+                                                'Book Trial',
+                                                textAlign: TextAlign.left,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const Spacer(),
+                                      Column(
+                                        children: [
+                                          Container(
+                                            height: 30,
+                                            width: 120,
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.rectangle,
+                                              color: kColorLight,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20)),
+                                            ),
+                                            child: TextButton(
+                                              style: TextButton.styleFrom(
+                                                foregroundColor: Colors.white,
+                                                shape:
+                                                    const BeveledRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5))),
+                                                textStyle: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 12,
+                                                  fontStyle: FontStyle.normal,
+                                                  decoration:
+                                                      TextDecoration.none,
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                showDialog<DateTime>(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return const ContactTeacher();
+                                                  },
+                                                ).then((selectedDate) {
+                                                  if (selectedDate != null) {
+                                                    // Do something with the selected date
+                                                  }
+                                                });
+                                              },
+                                              child: const Text(
+                                                'Contact Teacher',
+                                                textAlign: TextAlign.left,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Container(
+                                            height: 30,
+                                            width: 120,
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.rectangle,
+                                              color: kColorLight,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20)),
+                                            ),
+                                            child: TextButton(
+                                              style: TextButton.styleFrom(
+                                                foregroundColor: Colors.white,
+                                                shape:
+                                                    const BeveledRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5))),
+                                                textStyle: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 12,
+                                                  fontStyle: FontStyle.normal,
+                                                  decoration:
+                                                      TextDecoration.none,
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                showDialog<DateTime>(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return CalendarDialog();
+                                                  },
+                                                ).then((selectedDate) {
+                                                  if (selectedDate != null) {
+                                                    // Do something with the selected date
+                                                  }
+                                                });
+                                              },
+                                              child: const Text(
+                                                'View Schedule',
+                                                textAlign: TextAlign.left,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ),
@@ -618,6 +918,90 @@ class _TutorProfileState extends State<TutorProfile> {
                                           fontWeight: FontWeight.normal,
                                         ),
                                       ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      Column(
+                                        children: [
+                                          const Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              'Reviews',
+                                              textAlign: TextAlign.left,
+                                              style: TextStyle(
+                                                  fontSize: 25,
+                                                  color: kColorPrimary,
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          SizedBox(
+                                            child: Row(
+                                              children: [
+                                                CircleAvatar(
+                                                  radius: 20.0,
+                                                  backgroundColor:
+                                                      Colors.transparent,
+                                                  child: Image.asset(
+                                                    'assets/images/login.png',
+                                                    width: 300.0,
+                                                    height: 100.0,
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  width: 10,
+                                                ),
+                                                const Text(
+                                                  "Melvin Jhon",
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
+                                                ),
+                                                Spacer(),
+                                                RatingBar(
+                                                    initialRating: 4.5,
+                                                    minRating: 0,
+                                                    maxRating: 5,
+                                                    direction: Axis.horizontal,
+                                                    allowHalfRating: true,
+                                                    itemCount: 5,
+                                                    itemSize: 20,
+                                                    ratingWidget: RatingWidget(
+                                                        full: const Icon(
+                                                            Icons.star,
+                                                            color:
+                                                                Colors.orange),
+                                                        half: const Icon(
+                                                          Icons.star_half,
+                                                          color: Colors.orange,
+                                                        ),
+                                                        empty: const Icon(
+                                                          Icons.star_outline,
+                                                          color: Colors.orange,
+                                                        )),
+                                                    onRatingUpdate: (value) {
+                                                      // _ratingValue = value;
+                                                    }),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          const Text(
+                                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+                                            textAlign: TextAlign.justify,
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                          ),
+                                        ],
+                                      )
                                     ]),
                               ),
                             ),

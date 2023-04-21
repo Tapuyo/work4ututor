@@ -8,7 +8,7 @@ const kColorDarkBlue = Color(0xff8E8E8E);
 const kColorDarkRed = Color.fromARGB(255, 194, 35, 35);
 const kColorTeal = Color.fromARGB(118, 0, 0, 0);
 const ksecondarytextColor =Color.fromRGBO(72, 76, 99, 1);
-const kCalendarColorFB =  Color.fromRGBO(130, 189, 218, 1);
+const kCalendarColorFB =  Color.fromRGBO(213,231,255,1);
 final kCalendarColorAB =  const Color.fromRGBO(21, 228, 28, 1).withOpacity(.48);
 const kCalendarColorB = Color.fromRGBO(232, 154, 154, 1);
 

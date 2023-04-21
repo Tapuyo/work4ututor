@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_web_libraries_in_flutter, avoid_print
 
+import 'dart:math';
+
 import 'package:country_pickers/country.dart';
 import 'package:flutter/material.dart';
 import 'package:country_pickers/country_pickers.dart';
@@ -10,6 +12,7 @@ import 'dart:js' as js;
 import 'package:wokr4ututor/components/nav_bar.dart';
 
 import '../../../services/services.dart';
+import '../../../shared_components/alphacode3.dart';
 
 // void main() {
 //   tz.initializeTimeZones();
@@ -100,6 +103,7 @@ class _InputInfoState extends State<InputInfo> {
   double thieght = 45;
 
   DateTime selectedDate = DateTime.now();
+  String studentIDNumber = 'STU*********';
   String bdate = "Date of Birth";
   String myage = "Age";
   String guardianbdate = "Date of Birth";
@@ -166,7 +170,7 @@ class _InputInfoState extends State<InputInfo> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-           CustomAppBarLog(),
+          const CustomAppBarLog(),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -191,6 +195,56 @@ class _InputInfoState extends State<InputInfo> {
                     width: 600,
                     child: Column(
                       children: <Widget>[
+                        Row(
+                          children: const [
+                            Text(
+                              "Student Identification Number",
+                              style: TextStyle(
+                                color: Color.fromRGBO(0, 0, 0, 1),
+                                fontFamily: 'RobotoMono',
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
+                             Text(
+                              "(Auto Generated once Country is selected!)*",
+                              style: TextStyle(
+                                color: Color.fromRGBO(0, 0, 0, 1),
+                                fontFamily: 'RobotoMono',
+                                fontWeight: FontWeight.normal,
+                                fontSize: 15,
+                                fontStyle: FontStyle.italic,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              width: 200,
+                              height: 45,
+                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                              decoration: BoxDecoration(
+                                color:  const Color.fromRGBO(242, 242, 242, 1),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    studentIDNumber.toString(),
+                                    style: const TextStyle(
+                                        fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(
                           height: 10,
                         ),
@@ -331,7 +385,31 @@ class _InputInfoState extends State<InputInfo> {
                                 color: const Color.fromRGBO(242, 242, 242, 1),
                                 borderRadius: BorderRadius.circular(5),
                               ),
-                              child: _buildCountryPickerDropdownSoloExpanded(),
+                              child: CountryPickerDropdown(
+                                onValuePicked: (Country country) {
+                                  final alpha3Code =
+                                      getAlpha3Code(country.name);
+                                  Random random = Random();
+                                  int randomNumber =
+                                      random.nextInt(1000000) + 1;
+                                       String currentyear = DateFormat('yyyy').format(DateTime.now());
+                                  //todo please replace the random number with legnth of students enrolled
+                                  setState(() {
+                                    studentIDNumber =
+                                        'STU$alpha3Code$currentyear$randomNumber';
+                                  });
+                                },
+                                itemBuilder: (Country country) {
+                                  return Row(
+                                    children: <Widget>[
+                                      Expanded(child: Text(country.name)),
+                                    ],
+                                  );
+                                },
+                                itemHeight: 50,
+                                isExpanded: true,
+                                icon: const Icon(Icons.arrow_drop_down),
+                              ),
                               // country.name
                             ),
                             const SizedBox(
@@ -951,21 +1029,6 @@ class _InputInfoState extends State<InputInfo> {
   }
 }
 
-_buildCountryPickerDropdownSoloExpanded() {
-  return CountryPickerDropdown(
-    onValuePicked: (Country country) {},
-    itemBuilder: (Country country) {
-      return Row(
-        children: <Widget>[
-          Expanded(child: Text(country.name)),
-        ],
-      );
-    },
-    itemHeight: 50,
-    isExpanded: true,
-    icon: const Icon(Icons.arrow_drop_down),
-  );
-}
 
 // Future<void> setup() async {
 //   // var dtf = js.context['Intl'].callMethod('DateTimeFormat');

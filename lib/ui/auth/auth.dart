@@ -12,7 +12,6 @@ class AuthService {
   //create user obj based on firebaseuser
   Users? _userFromFirebaseUser(User? user) {
     if (user != null) {
-      print("User Data:$user");
       return Users(uid: user.uid);
     }
     return null;
@@ -71,6 +70,30 @@ class AuthService {
           .updateUserData(email, password, role);
       await DatabaseService(uid: user.uid).updateTutorData(name, lastname);
       return _userFromFirebaseUser(user);
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
+  Future addScheduleTimeavailable() async {
+    try {
+      //create a new document for the user with the uid
+      await DatabaseService(uid: '93SBKEHBf8KJhZjE7vIeI')
+          .addTutoravailbaleDays();
+      return '93SBKEHBf8KJhZjE7vIeI';
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+  
+  Future addDayoffs() async {
+    try {
+      //create a new document for the user with the uid
+      await DatabaseService(uid: '93SBKEHBf8KJhZjE7vIeI')
+          .addDayoffs();
+      return '93SBKEHBf8KJhZjE7vIeI';
     } catch (e) {
       print(e.toString());
       return null;

@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
 
 class DialogShow extends StatelessWidget {
@@ -279,6 +280,43 @@ addsubject(BuildContext context) {
           ),
         ],
       ),
+   );
+    }
+   );
+}
+
+showCalendar(BuildContext context) {
+  String? subjectName;
+  String? SubjectDescription;
+  return showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      context = context;
+    return WillPopScope(
+      onWillPop: () => Future.value(false),
+      child: AlertDialog(
+      title: const Text('Select a date'),
+      content: TableCalendar(
+        focusedDay: DateTime.now(),
+        firstDay: DateTime.utc(2021, 01, 01),
+        lastDay: DateTime.utc(2030, 12, 31),
+        selectedDayPredicate: (day) {
+          return isSameDay(DateTime.now(), day);
+        },
+        onDaySelected: (selectedDay, focusedDay) {
+            // DateTime.now() = selectedDay;
+        },
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            // Navigator.of(context).pop(_selectedDate);
+          },
+          child: const Text('OK'),
+        ),
+      ],
+    ),
    );
     }
    );

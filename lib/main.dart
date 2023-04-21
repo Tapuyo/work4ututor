@@ -1,23 +1,20 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/constant/constant.dart';
+import 'package:wokr4ututor/provider/chatmessagedisplay.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
+import 'package:wokr4ututor/provider/inquirydisplay_provider.dart';
 import 'package:wokr4ututor/provider/search_provider.dart';
+import 'package:wokr4ututor/provider/user_id_provider.dart';
 import 'package:wokr4ututor/routes/route_generator.dart';
 import 'package:wokr4ututor/routes/routes.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:wokr4ututor/services/services.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
-import 'package:wokr4ututor/ui/web/login/login.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
-import 'package:wokr4ututor/ui/web/student/main_dashboard/student_dashboard.dart';
-import 'package:wokr4ututor/ui/web/terms/termpage.dart';
 import 'package:wokr4ututor/ui/web/web_main.dart';
-import 'package:wokr4ututor/utils/themes.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'data_class/tutor_info_class.dart';
@@ -67,6 +64,9 @@ void main() async {
       value: DatabaseService(uid: '').tutorlist,
       initialData: const [],),
       ChangeNotifierProvider(create: (_) => SearchTutorProvider()),
+      ChangeNotifierProvider(create: (_) => UserIDProvider()),
+      ChangeNotifierProvider(create: (_) => InquiryDisplayProvider()),
+      ChangeNotifierProvider(create: (_) => ChatDisplayProvider()),
     ],
     child: const MyApp(),
   ));
@@ -78,10 +78,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return
-    //  StreamProvider<Users?>.value(
-    //   value: AuthService().user,
-    //   initialData: null,
-    //   child:  
+     StreamProvider<Users?>.value(
+      value: AuthService().user,
+      initialData: null,
+      child:  
       MaterialApp(
         // builder: (context, child) {
         //   return kIsWeb ? const DashboardPage():ScrollConfiguration(
@@ -98,9 +98,9 @@ class MyApp extends StatelessWidget {
         canvasColor: Colors.white,
         primarySwatch: Colors.indigo,
       ),
-        home:  WebMainPage(),
-      );
-    // );
+        home: const WebMainPage(),
+      ),
+    );
   }
 }
 

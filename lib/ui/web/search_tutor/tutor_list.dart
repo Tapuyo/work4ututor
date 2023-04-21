@@ -2,10 +2,7 @@ import 'dart:math';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:provider/provider.dart';
 import 'package:wokr4ututor/ui/web/search_tutor/find_tutors.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_profile/tutor_profile.dart';
 import 'package:wokr4ututor/utils/themes.dart';
@@ -48,6 +45,7 @@ class _TutorListState extends State<TutorList> {
     return results;
   }
 
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     if (widget.keyword.isEmpty) {
@@ -68,6 +66,7 @@ class _TutorListState extends State<TutorList> {
 
     return _foundUsers.isNotEmpty
         ? Material(
+          color: Colors.white,
             child: SizedBox(
               width: size.width - 400,
               height: size.height,
@@ -163,7 +162,7 @@ class _TutorListState extends State<TutorList> {
                                                                 FontWeight
                                                                     .w500),
                                                       ),
-                                                      Spacer(),
+                                                      const Spacer(),
                                                       RatingBar(
                                                           initialRating: random
                                                                   .nextInt(4) +

@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
@@ -206,7 +205,7 @@ class CustomAppBar extends StatelessWidget {
 }
 
 class CustomAppBarLog extends StatelessWidget {
-  CustomAppBarLog({Key? key}) : super(key: key);
+  const CustomAppBarLog({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -255,6 +254,7 @@ class CustomAppBarLog extends StatelessWidget {
 }
 
 Widget navbarmenu(BuildContext context) {
+  // ignore: no_leading_underscores_for_local_identifiers
   final AuthService _auth = AuthService();
   return Column(
     children: <Widget>[
@@ -626,7 +626,7 @@ Widget navbarmenu(BuildContext context) {
           textAlign: TextAlign.center,
           text: TextSpan(
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Color.fromARGB(255, 59, 59, 59),
+                  color:const  Color.fromARGB(255, 59, 59, 59),
                   fontSize: 12,
                   fontWeight: FontWeight.normal,
                 ),
