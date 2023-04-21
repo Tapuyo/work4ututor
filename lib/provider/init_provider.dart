@@ -14,7 +14,7 @@ class InitProvider with ChangeNotifier{
   bool get isRefresh => refresh;
   String get tName => _tName;
 
- void billRefresh() {
+ void setRefresh() {
     refresh = !refresh;
     notifyListeners();
   }

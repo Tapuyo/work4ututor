@@ -14,11 +14,14 @@ class TutorList extends StatefulWidget {
   final List<TutorInformation> tutorslist;
   final String keyword;
   final int displayRange;
+  final bool isLoading;
   const TutorList(
       {super.key,
       required this.tutorslist,
       required this.keyword,
-      required this.displayRange});
+      required this.displayRange,
+      required this.isLoading,
+      });
 
   @override
   State<TutorList> createState() => _TutorListState();
@@ -36,12 +39,14 @@ class _TutorListState extends State<TutorList> {
   }
 
   _runFilter(String enteredKeyword) {
+  
     print(enteredKeyword);
     List<TutorInformation> results = [];
     results = widget.tutorslist
         .where((user) =>
             user.firstName.toLowerCase().contains(enteredKeyword.toLowerCase()))
         .toList();
+   
     return results;
   }
 
@@ -64,7 +69,7 @@ class _TutorListState extends State<TutorList> {
       }
     }
 
-    return _foundUsers.isNotEmpty
+    return widget.isLoading! ? const Center(child: CircularProgressIndicator(),): _foundUsers.isNotEmpty
         ? Material(
           color: Colors.white,
             child: SizedBox(

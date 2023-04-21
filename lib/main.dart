@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/constant/constant.dart';
 import 'package:wokr4ututor/provider/chatmessagedisplay.dart';
+import 'package:wokr4ututor/provider/classes_inquirey_provider.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/provider/inquirydisplay_provider.dart';
 import 'package:wokr4ututor/provider/search_provider.dart';
@@ -67,6 +68,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => UserIDProvider()),
       ChangeNotifierProvider(create: (_) => InquiryDisplayProvider()),
       ChangeNotifierProvider(create: (_) => ChatDisplayProvider()),
+      ChangeNotifierProvider(create: (_) => ClassesInquiryProvider()),
     ],
     child: const MyApp(),
   ));

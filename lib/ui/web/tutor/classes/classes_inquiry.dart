@@ -1,73 +1,95 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:wokr4ututor/provider/classes_inquirey_provider.dart';
 import 'package:wokr4ututor/provider/inquirydisplay_provider.dart';
+import 'package:wokr4ututor/provider/user_id_provider.dart';
 import 'package:wokr4ututor/ui/web/tutor/classes/view_inquiry.dart';
 
+import '../../../../data_class/classes_inquiry_model.dart';
 import '../../../../utils/themes.dart';
 
-class ClassInquiry extends StatefulWidget {
-  const ClassInquiry({super.key});
+class ClassInquiry extends HookWidget {
+  ClassInquiry({super.key});
 
-  @override
-  State<ClassInquiry> createState() => _ClassInquiryState();
-}
-
-class _ClassInquiryState extends State<ClassInquiry> {
   DateTime? _fromselectedDate;
   DateTime? _toselectedDate;
-  void _pickDateDialog() {
-    showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            //which date will display when user open the picker
-            firstDate: DateTime(1950),
-            //what will be the previous supported year in picker
-            lastDate: DateTime
-                .now()) //what will be the up to supported date in picker
-        .then((pickedDate) {
-      //then usually do the future job
-      if (pickedDate == null) {
-        //if user tap cancel then this function will stop
-        return;
-      }
-      setState(() {
-        //for rebuilding the ui
-        _fromselectedDate = pickedDate;
-      });
-    });
-  }
 
-  void _topickDateDialog() {
-    showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            //which date will display when user open the picker
-            firstDate: DateTime(1950),
-            //what will be the previous supported year in picker
-            lastDate: DateTime
-                .now()) //what will be the up to supported date in picker
-        .then((pickedDate) {
-      //then usually do the future job
-      if (pickedDate == null) {
-        //if user tap cancel then this function will stop
-        return;
-      }
-      setState(() {
-        //for rebuilding the ui
-        _toselectedDate = pickedDate;
-      });
-    });
-  }
+  // void _pickDateDialog() {
+  //   showDatePicker(
+  //           context: context,
+  //           initialDate: DateTime.now(),
+  //           //which date will display when user open the picker
+  //           firstDate: DateTime(1950),
+  //           //what will be the previous supported year in picker
+  //           lastDate: DateTime
+  //               .now()) //what will be the up to supported date in picker
+  //       .then((pickedDate) {
+  //     //then usually do the future job
+  //     if (pickedDate == null) {
+  //       //if user tap cancel then this function will stop
+  //       return;
+  //     }
+  //     setState(() {
+  //       //for rebuilding the ui
+  //       _fromselectedDate = pickedDate;
+  //     });
+  //   });
+  // }
+
+  // void _topickDateDialog() {
+  //   showDatePicker(
+  //           context: context,
+  //           initialDate: DateTime.now(),
+  //           //which date will display when user open the picker
+  //           firstDate: DateTime(1950),
+  //           //what will be the previous supported year in picker
+  //           lastDate: DateTime
+  //               .now()) //what will be the up to supported date in picker
+  //       .then((pickedDate) {
+  //     //then usually do the future job
+  //     if (pickedDate == null) {
+  //       //if user tap cancel then this function will stop
+  //       return;
+  //     }
+  //     setState(() {
+  //       //for rebuilding the ui
+  //       _toselectedDate = pickedDate;
+  //     });
+  //   });
+  // }
 
   bool select = false;
 
   String dropdownValue = 'English';
   Color buttonColor = kCalendarColorAB;
+
   @override
   Widget build(BuildContext context) {
-    final bool display = context.select((InquiryDisplayProvider p) => p.openDisplay);
+    final provider = context.read<ClassesInquiryProvider>();
+
+    final List<ClassesInquiryModel> classesInquiry =
+        context.select((ClassesInquiryProvider p) => p.classesInquiry);
+
+    final bool isLoading =
+        context.select((ClassesInquiryProvider p) => p.onLoading);
+
+    final bool isRefresh =
+        context.select((ClassesInquiryProvider p) => p.isrefresh);
+    final String userId = context.select((UserIDProvider p) => p.userID);
+
+
+    useEffect(() {
+      Future.microtask(() async {
+        provider.getClassInquiry(context,userId);
+      });
+      return;
+    }, [isRefresh]);
+
+    final bool display =
+        context.select((InquiryDisplayProvider p) => p.openDisplay);
     Size size = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10),
@@ -166,7 +188,7 @@ class _ClassInquiryState extends State<ClassInquiry> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      _pickDateDialog();
+                                      // _pickDateDialog();
                                     },
                                     child: const Icon(
                                       Icons.calendar_month,
@@ -203,7 +225,7 @@ class _ClassInquiryState extends State<ClassInquiry> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      _pickDateDialog();
+                                      // _pickDateDialog();
                                     },
                                     child: const Icon(
                                       Icons.calendar_month,
@@ -241,9 +263,9 @@ class _ClassInquiryState extends State<ClassInquiry> {
                                 elevation: 10,
                                 value: dropdownValue,
                                 onChanged: (newValue) {
-                                  setState(() {
-                                    dropdownValue = newValue!;
-                                  });
+                                  // setState(() {
+                                  //   dropdownValue = newValue!;
+                                  // });
                                 },
                                 underline: Container(),
                                 items: <String>[
@@ -300,150 +322,167 @@ class _ClassInquiryState extends State<ClassInquiry> {
                   ),
                   side: BorderSide(width: .1),
                 ),
-                child: display != true ? Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        top: 5.0,
-                        left: 10,
-                        right: 10,
-                        bottom: 5.0,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                child: display != true
+                    ? Column(
                         children: [
-                          Checkbox(
-                            checkColor: Colors.black,
-                            activeColor: Colors.green,
-                            value: select,
-                            onChanged: (value) {
-                              setState(() {
-                                select = value!;
-                              });
-                            },
-                          ),
-                          const SizedBox(
-                            width: 15,
-                          ),
-                          InkWell(
-                              onTap: () {},
-                              child: const Icon(
-                                Icons.delete,
-                                size: 25,
-                                color: Colors.red,
-                              )),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          InkWell(
-                              onTap: () {},
-                              child: const Icon(
-                                Icons.refresh,
-                                size: 25,
-                                color: Colors.grey,
-                              )),
-                          const Spacer(
-                              // flex: 2,
-                              ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      child: Divider(
-                        height: 1,
-                        thickness: 2,
-                      ),
-                    ),
-                    Container(
-                      width: size.width - 320,
-                      height: size.height - 175,
-                      child: ListView.builder(
-                        itemCount: 100,
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              InkWell(
-                                highlightColor: kCalendarColorFB,
-                                splashColor: kColorPrimary,
-                                focusColor: Colors.green.withOpacity(0.0),
-                                hoverColor: Colors.grey[200],
-                                onTap: () {
-                                  final provider =
-                                      context.read<InquiryDisplayProvider>();
-                                  provider.setOpen(true);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 0.0,
-                                    left: 10,
-                                    right: 10,
-                                    bottom: 8.0,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Checkbox(
-                                        checkColor: Colors.black,
-                                        activeColor: Colors.red,
-                                        value: select,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            select = value!;
-                                          });
-                                        },
-                                      ),
-                                      const SizedBox(
-                                        width: 15,
-                                      ),
-                                      const Text(
-                                        "Melvin Jhon",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                      const Spacer(
-                                        flex: 2,
-                                      ),
-                                      const Text(
-                                        "Chemistry Class Inquiry-----",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w700),
-                                      ),
-                                      const Text(
-                                          'Melvin asked for 6 classes of chemistry subject....'),
-                                      const Spacer(
-                                        flex: 2,
-                                      ),
-                                      Text(DateFormat('MMMM dd, yyyy').format(DateTime.now())),
-                                      const Spacer(
-                                        flex: 1,
-                                      ),
-                                      const Text('(Responded)', style: TextStyle(fontWeight: FontWeight.bold),),
-                                    ],
-                                  ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              top: 5.0,
+                              left: 10,
+                              right: 10,
+                              bottom: 5.0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Checkbox(
+                                  checkColor: Colors.black,
+                                  activeColor: Colors.green,
+                                  value: select,
+                                  onChanged: (value) {
+                                    // setState(() {
+                                    //   select = value!;
+                                    // });
+                                  },
                                 ),
-                              ),
-                              const Divider(
-                                height: 1,
-                                thickness: 1,
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ) : const ViewInquiry(),
+                                const SizedBox(
+                                  width: 15,
+                                ),
+                                InkWell(
+                                    onTap: () {},
+                                    child: const Icon(
+                                      Icons.delete,
+                                      size: 25,
+                                      color: Colors.red,
+                                    )),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                InkWell(
+                                    onTap: () {},
+                                    child: const Icon(
+                                      Icons.refresh,
+                                      size: 25,
+                                      color: Colors.grey,
+                                    )),
+                                const Spacer(
+                                    // flex: 2,
+                                    ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            child: Divider(
+                              height: 1,
+                              thickness: 2,
+                            ),
+                          ),
+                          SizedBox(
+                            width: size.width - 320,
+                            height: size.height - 175,
+                            child: isLoading ? const Center(child: CircularProgressIndicator(),): ListView.builder(
+                              itemCount: classesInquiry.length,
+                              itemBuilder: (context, index) {
+                                return classInquiryItems(
+                                  select: select,
+                                  classInquiry: classesInquiry[index],
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      )
+                    : const ViewInquiry(),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class classInquiryItems extends StatelessWidget {
+  const classInquiryItems(
+      {super.key, required this.select, required this.classInquiry});
+
+  final bool select;
+  final ClassesInquiryModel classInquiry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        InkWell(
+          highlightColor: kCalendarColorFB,
+          splashColor: kColorPrimary,
+          focusColor: Colors.green.withOpacity(0.0),
+          hoverColor: Colors.grey[200],
+          onTap: () {
+            final provider = context.read<InquiryDisplayProvider>();
+            provider.setOpen(true);
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(
+              top: 0.0,
+              left: 10,
+              right: 10,
+              bottom: 8.0,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Checkbox(
+                  checkColor: Colors.black,
+                  activeColor: Colors.red,
+                  value: select,
+                  onChanged: (value) {
+                    // setState(() {
+                    //   select = value!;
+                    // });
+                  },
+                ),
+                const SizedBox(
+                  width: 15,
+                ),
+                Text(
+                  classInquiry.studentName,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const Spacer(
+                  flex: 2,
+                ),
+                Text(
+                  classInquiry.className,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w700),
+                ),
+                Text(classInquiry.message),
+                const Spacer(
+                  flex: 2,
+                ),
+                Text(DateFormat('MMMM dd, yyyy').format(classInquiry.dateTime)),
+                const Spacer(
+                  flex: 1,
+                ),
+                const Text(
+                  '(Responded)',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const Divider(
+          height: 1,
+          thickness: 1,
+        ),
+      ],
     );
   }
 }

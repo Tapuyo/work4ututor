@@ -187,6 +187,7 @@ class _FindTutorState extends State<FindTutor> {
                                               tutorslist: tutorsinfo,
                                               keyword: setSearch,
                                               displayRange: displayRange,
+                                              isLoading: false,
                                             );
                                           });
                                         },
@@ -777,6 +778,7 @@ class _FindTutorState extends State<FindTutor> {
                                 tutorslist: tutorsinfo,
                                 keyword: setSearch,
                                 displayRange: displayRange,
+                                isLoading: false,
                               ),
                               const SizedBox(
                                 height: 20,

@@ -182,7 +182,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ] else if (menuIndex == 2) ...[
                         const MessagePage()
                       ] else if (menuIndex == 3) ...[
-                        const ClassInquiry()
+                         ClassInquiry()
                       ] else if (menuIndex == 4) ...[
                         const StudentsEnrolled()
                       ] else if (menuIndex == 5) ...[
@@ -228,7 +228,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             ] else if (menuIndex == 2) ...[
                               const MessagePage()
                             ] else if (menuIndex == 3) ...[
-                              const ClassInquiry()
+                               ClassInquiry()
                             ] else if (menuIndex == 4) ...[
                               const StudentsEnrolled()
                             ] else if (menuIndex == 5) ...[
