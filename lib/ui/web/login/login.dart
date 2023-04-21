@@ -244,7 +244,8 @@ class _SigniNState extends State<SigniN> {
                 ),
                 onPressed: () async {
                   Users result = await _auth.signinwEmailandPassword(
-                      userEmail, userPassword);
+                      // use this one //userEmail, userPassword);
+                      'mjselma@gmail.com', '123456');
                   if (result == null) {
                     setState(() {
                       error = 'Could not sign in w/ those credential';

@@ -408,20 +408,6 @@ class _ClassInquiryState extends State<ClassInquiry> {
                                       const Spacer(
                                         flex: 2,
                                       ),
-                                      // CircleAvatar(
-                                      //   radius: 25.0,
-                                      //   backgroundColor:
-                                      //       Colors.transparent,
-                                      //   child: Image.asset(
-                                      //     'assets/images/login.png',
-                                      //     width: 300.0,
-                                      //     height: 100.0,
-                                      //     fit: BoxFit.contain,
-                                      //   ),
-                                      // ),
-                                      // const SizedBox(
-                                      //   width: 10,
-                                      // ),
                                       const Text(
                                         "Chemistry Class Inquiry-----",
                                         style: TextStyle(
@@ -433,7 +419,11 @@ class _ClassInquiryState extends State<ClassInquiry> {
                                       const Spacer(
                                         flex: 2,
                                       ),
-                                      Text(DateTime.now().toString()),
+                                      Text(DateFormat('MMMM dd, yyyy').format(DateTime.now())),
+                                      const Spacer(
+                                        flex: 1,
+                                      ),
+                                      const Text('(Responded)', style: TextStyle(fontWeight: FontWeight.bold),),
                                     ],
                                   ),
                                 ),
