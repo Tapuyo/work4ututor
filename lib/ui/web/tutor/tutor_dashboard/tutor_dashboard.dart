@@ -198,7 +198,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ] else if (menuIndex == 2) ...[
                         const MessagePage()
                       ] else if (menuIndex == 3) ...[
-                        const ClassInquiry()
+                         ClassInquiry()
                       ] else if (menuIndex == 4) ...[
                         const StudentsEnrolled()
                       ] else if (menuIndex == 5) ...[
@@ -211,6 +211,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         const ClassesMain()
                       ],
                     ],
+<<<<<<< HEAD
                   );
                 },
                 desktopBuilder: (context, constraints) {
@@ -225,6 +226,54 @@ class _DashboardPageState extends State<DashboardPage> {
                               margin: const EdgeInsets.fromLTRB(0, 0, 4, 0),
                               elevation: 4,
                               child: navbarmenu(context)),
+=======
+                  ),
+                );
+              },
+              desktopBuilder: (context, constraints) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Flexible(
+                      flex: constraints.maxWidth > 1350 ? 3 : 4,
+                      child: SingleChildScrollView(
+                        controller: ScrollController(),
+                        child: Card(
+                            margin: const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                            elevation: 4,
+                            child: navbarmenu(context)),
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height,
+                    ),
+                    Flexible(
+                      flex: 13,
+                      child: SingleChildScrollView(
+                        controller: ScrollController(),
+                        child: Column(
+                          children: [
+                            if (menuIndex == 0) ...[
+                              const ClassesMain()
+                            ] else if (menuIndex == 1) ...[
+                              const TableBasicsExample1()
+                            ] else if (menuIndex == 2) ...[
+                              const MessagePage()
+                            ] else if (menuIndex == 3) ...[
+                               ClassInquiry()
+                            ] else if (menuIndex == 4) ...[
+                              const StudentsEnrolled()
+                            ] else if (menuIndex == 5) ...[
+                              const PerformancePage()
+                            ] else if (menuIndex == 6) ...[
+                              const SettingsPage()
+                            ] else if (menuIndex == 7) ...[
+                              const HelpPage()
+                            ] else ...[
+                              const ClassesMain()
+                            ],
+                          ],
+>>>>>>> cc634483a05a7203fc7fa2ee53a2fa5309f678cc
                         ),
                       ),
                       SizedBox(
