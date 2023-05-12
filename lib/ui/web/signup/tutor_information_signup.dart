@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, unused_local_variable
+// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, unused_local_variable, unused_field, prefer_final_fields, unused_element
 
 import 'dart:math';
 
@@ -1617,7 +1617,7 @@ class _InputInfoState extends State<InputInfo> {
                               showDialog(
                                   barrierDismissible: false,
                                   context: context,
-                                  builder: (_) => TermPage());
+                                  builder: (_) => const TermPage());
                             });
                             },
                           ),

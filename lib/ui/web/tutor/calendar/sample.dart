@@ -1,6 +1,10 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 
 class ReactionButton extends StatefulWidget {
+  const ReactionButton({super.key});
+
   @override
   _ReactionButtonState createState() => _ReactionButtonState();
 }
@@ -19,7 +23,7 @@ class _ReactionButtonState extends State<ReactionButton> {
           Container(
             width: double.infinity,
             height: 60,
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(30),
@@ -49,10 +53,10 @@ class _ReactionButtonState extends State<ReactionButton> {
           ),
           _isReactionShown
               ? Container(
-                  margin: EdgeInsets.only(top: 68, right: 16),
+                  margin: const EdgeInsets.only(top: 68, right: 16),
                   width: 200,
                   height: 60,
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
@@ -61,7 +65,7 @@ class _ReactionButtonState extends State<ReactionButton> {
                         color: Colors.grey.withOpacity(0.5),
                         spreadRadius: 1,
                         blurRadius: 5,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -94,11 +98,11 @@ class _ReactionButtonState extends State<ReactionButton> {
                     }).toList(),
                   ),
                 )
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
               Container(
             width: double.infinity,
             height: 60,
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(30),
@@ -128,10 +132,10 @@ class _ReactionButtonState extends State<ReactionButton> {
           ),
           _isReactionShown
               ? Container(
-                  margin: EdgeInsets.only(top: 68, right: 16),
+                  margin: const EdgeInsets.only(top: 68, right: 16),
                   width: 200,
                   height: 60,
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
@@ -140,7 +144,7 @@ class _ReactionButtonState extends State<ReactionButton> {
                         color: Colors.grey.withOpacity(0.5),
                         spreadRadius: 1,
                         blurRadius: 5,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -173,11 +177,11 @@ class _ReactionButtonState extends State<ReactionButton> {
                     }).toList(),
                   ),
                 )
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
               Container(
             width: double.infinity,
             height: 60,
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(30),
@@ -207,10 +211,10 @@ class _ReactionButtonState extends State<ReactionButton> {
           ),
           _isReactionShown
               ? Container(
-                  margin: EdgeInsets.only(top: 68, right: 16),
+                  margin: const EdgeInsets.only(top: 68, right: 16),
                   width: 200,
                   height: 60,
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
@@ -219,7 +223,7 @@ class _ReactionButtonState extends State<ReactionButton> {
                         color: Colors.grey.withOpacity(0.5),
                         spreadRadius: 1,
                         blurRadius: 5,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -252,11 +256,11 @@ class _ReactionButtonState extends State<ReactionButton> {
                     }).toList(),
                   ),
                 )
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
               Container(
             width: double.infinity,
             height: 60,
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: Colors.grey[200],
               borderRadius: BorderRadius.circular(30),
@@ -286,10 +290,10 @@ class _ReactionButtonState extends State<ReactionButton> {
           ),
           _isReactionShown
               ? Container(
-                  margin: EdgeInsets.only(top: 68, right: 16),
+                  margin: const EdgeInsets.only(top: 68, right: 16),
                   width: 200,
                   height: 60,
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
@@ -298,7 +302,7 @@ class _ReactionButtonState extends State<ReactionButton> {
                         color: Colors.grey.withOpacity(0.5),
                         spreadRadius: 1,
                         blurRadius: 5,
-                        offset: Offset(0, 2),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -331,7 +335,7 @@ class _ReactionButtonState extends State<ReactionButton> {
                     }).toList(),
                   ),
                 )
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
         ],
       ),
        ],

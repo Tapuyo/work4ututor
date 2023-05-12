@@ -1,10 +1,11 @@
+// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, sized_box_for_whitespace
+
 import 'dart:math';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:wokr4ututor/ui/web/search_tutor/find_tutors.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_profile/tutor_profile.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 import 'dart:html' as html;
 

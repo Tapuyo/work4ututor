@@ -1,15 +1,11 @@
+// ignore_for_file: unused_field, prefer_final_fields, unused_local_variable, sized_box_for_whitespace
+
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../utils/themes.dart';
-import '../tutor_profile/book_lesson.dart';
-import '../tutor_profile/contact_teacher.dart';
 import '../tutor_profile/view_file.dart';
-import '../tutor_profile/viewschedule.dart';
 
 class ViewClassInfo extends StatefulWidget {
   const ViewClassInfo({super.key});

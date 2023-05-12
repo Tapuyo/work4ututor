@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -413,7 +415,7 @@ class StudentsMenu extends HookWidget {
                           showDialog(
                               barrierDismissible: false,
                               context: context,
-                              builder: (_) => TermPage());
+                              builder: (_) => const TermPage());
                         }),
                   const TextSpan(text: ' / '),
                   TextSpan(
@@ -429,7 +431,7 @@ class StudentsMenu extends HookWidget {
                           showDialog(
                               barrierDismissible: false,
                               context: context,
-                              builder: (_) => TermPage());
+                              builder: (_) => const TermPage());
                         }),
                   const TextSpan(text: '\nCopyrights @ 2023 Work4uTutor'),
                 ],

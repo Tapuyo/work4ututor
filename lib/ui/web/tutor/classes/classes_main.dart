@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import, sized_box_for_whitespace
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -112,7 +114,7 @@ class ClassesMain extends HookWidget {
                               boxShadow: [
                                 BoxShadow(
                                     color: kColorYellow.withOpacity(0.5),
-                                    offset: Offset(5, 7),
+                                    offset: const Offset(5, 7),
                                     blurRadius: 1.5,
                                     spreadRadius: -2)
                               ],
@@ -606,7 +608,7 @@ class ClassesMain extends HookWidget {
                                 boxShadow: [
                                   BoxShadow(
                                       color: kColorYellow.withOpacity(0.5),
-                                      offset: Offset(5, 7),
+                                      offset: const Offset(5, 7),
                                       blurRadius: 1.5,
                                       spreadRadius: -2)
                                 ],
@@ -1095,7 +1097,7 @@ class ClassesMain extends HookWidget {
                               boxShadow: [
                                 BoxShadow(
                                     color: kColorYellow.withOpacity(0.5),
-                                    offset: Offset(5, 7),
+                                    offset: const Offset(5, 7),
                                     blurRadius: 1.5,
                                     spreadRadius: -2)
                               ],

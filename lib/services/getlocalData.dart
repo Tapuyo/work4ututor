@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, unused_element
+
 import 'package:hive/hive.dart';
 
 final _userinfo = Hive.box('userID');

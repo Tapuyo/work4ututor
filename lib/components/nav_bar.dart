@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -643,7 +645,7 @@ Widget navbarmenu(BuildContext context) {
                       showDialog(
                           barrierDismissible: false,
                           context: context,
-                          builder: (_) => TermPage());
+                          builder: (_) => const TermPage());
                     }),
               const TextSpan(text: ' / '),
               TextSpan(
@@ -658,7 +660,7 @@ Widget navbarmenu(BuildContext context) {
                       showDialog(
                           barrierDismissible: false,
                           context: context,
-                          builder: (_) => TermPage());
+                          builder: (_) => const TermPage());
                     }),
               const TextSpan(text: '\nCopyrights @ 2023 Work4uTutor'),
             ],

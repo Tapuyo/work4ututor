@@ -1,16 +1,13 @@
+// ignore_for_file: prefer_final_fields, unused_field, unrelated_type_equality_checks, sized_box_for_whitespace, avoid_print, no_leading_underscores_for_local_identifiers, unnecessary_null_comparison
+
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/ui/auth/database.dart';
 
-import '../../../../data_class/user_class.dart';
 import '../../../../provider/user_id_provider.dart';
 import '../../../../utils/themes.dart';
-import '../../../auth/auth.dart';
-
 class CalendarSetup extends StatefulWidget {
   const CalendarSetup({super.key});
 
@@ -222,7 +219,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                             });
                           },
                         ),
-                        Text('Apply as weekly day off'),
+                        const Text('Apply as weekly day off'),
                         const SizedBox(
                           width: 5,
                         ),
@@ -240,7 +237,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                             });
                           },
                         ),
-                        Text('Apply for specific date'),
+                        const Text('Apply for specific date'),
                       ],
                     ),
                     Row(
@@ -462,7 +459,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                             });
                           },
                         ),
-                        Text('Apply for every available day'),
+                        const Text('Apply for every available day'),
                       ],
                     ),
                     Row(
@@ -482,7 +479,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                             });
                           },
                         ),
-                        Text('Apply for specific day'),
+                        const Text('Apply for specific day'),
                         Checkbox(
                           value: _checkboxavailabledateTime,
                           onChanged: (value) {
@@ -498,7 +495,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                             });
                           },
                         ),
-                        Text('Apply for specific date'),
+                        const Text('Apply for specific date'),
                       ],
                     ),
                     Row(
@@ -780,7 +777,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                             });
                           },
                         ),
-                        Text('Apply for every available day'),
+                        const Text('Apply for every available day'),
                       ],
                     ),
                     Row(
@@ -800,7 +797,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                             });
                           },
                         ),
-                        Text('Apply for specific days'),
+                        const Text('Apply for specific days'),
                         Checkbox(
                           value: _checkboxavailabledateblock,
                           onChanged: (value) {
@@ -816,7 +813,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                             });
                           },
                         ),
-                        Text('Apply for specific date'),
+                        const Text('Apply for specific date'),
                       ],
                     ),
                     Row(

@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 
 class CameraPage extends StatelessWidget {
@@ -10,7 +12,7 @@ class CameraPage extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: const [
               TextField(
                 decoration: InputDecoration(
                   labelText: "To",

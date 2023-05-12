@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/data_class/classes_inquiry_model.dart';
 import 'package:wokr4ututor/provider/classes_inquirey_provider.dart';
-import 'package:wokr4ututor/provider/user_id_provider.dart';
 
 class ClassesInquiry {
   static Future<void> getClassesInquiry(BuildContext context, String userId) async {

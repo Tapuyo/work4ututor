@@ -1,6 +1,7 @@
+// ignore_for_file: sized_box_for_whitespace, must_be_immutable, camel_case_types
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/provider/classes_inquirey_provider.dart';

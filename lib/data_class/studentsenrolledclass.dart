@@ -1,4 +1,3 @@
-import 'classesdataclass.dart';
 
 class StudentsList {
   // final List<ClassesData> classInfo;
