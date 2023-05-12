@@ -68,8 +68,6 @@ class ClassInquiry extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
-=======
     final provider = context.read<ClassesInquiryProvider>();
 
     final List<ClassesInquiryModel> classesInquiry =
@@ -90,7 +88,6 @@ class ClassInquiry extends HookWidget {
       return;
     }, [isRefresh]);
 
->>>>>>> cc634483a05a7203fc7fa2ee53a2fa5309f678cc
     final bool display =
         context.select((InquiryDisplayProvider p) => p.openDisplay);
     Size size = MediaQuery.of(context).size;
@@ -344,15 +341,9 @@ class ClassInquiry extends HookWidget {
                                   activeColor: Colors.green,
                                   value: select,
                                   onChanged: (value) {
-<<<<<<< HEAD
-                                    setState(() {
-                                      select = value!;
-                                    });
-=======
                                     // setState(() {
                                     //   select = value!;
                                     // });
->>>>>>> cc634483a05a7203fc7fa2ee53a2fa5309f678cc
                                   },
                                 ),
                                 const SizedBox(
@@ -387,101 +378,6 @@ class ClassInquiry extends HookWidget {
                               thickness: 2,
                             ),
                           ),
-<<<<<<< HEAD
-                          Container(
-                            width: size.width - 320,
-                            height: size.height - 175,
-                            child: ScrollConfiguration(
-                              behavior: ScrollConfiguration.of(context)
-                                  .copyWith(scrollbars: false),
-                              child: ListView.builder(
-                                itemCount: 100,
-                                itemBuilder: (context, index) {
-                                  return Column(
-                                    children: [
-                                      InkWell(
-                                        highlightColor: kCalendarColorFB,
-                                        splashColor: kColorPrimary,
-                                        focusColor:
-                                            Colors.green.withOpacity(0.0),
-                                        hoverColor: Colors.grey[200],
-                                        onTap: () {
-                                          final provider = context
-                                              .read<InquiryDisplayProvider>();
-                                          provider.setOpen(true);
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            top: 0.0,
-                                            left: 10,
-                                            right: 10,
-                                            bottom: 8.0,
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Checkbox(
-                                                checkColor: Colors.black,
-                                                activeColor: Colors.red,
-                                                value: select,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    select = value!;
-                                                  });
-                                                },
-                                              ),
-                                              const SizedBox(
-                                                width: 15,
-                                              ),
-                                              const Text(
-                                                "Melvin Jhon",
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w800,
-                                                ),
-                                              ),
-                                              const Spacer(
-                                                flex: 2,
-                                              ),
-                                              const Text(
-                                                "Chemistry Class Inquiry-----",
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.w700),
-                                              ),
-                                              const Text(
-                                                  'Melvin asked for 6 classes of chemistry subject....'),
-                                              const Spacer(
-                                                flex: 2,
-                                              ),
-                                              Text(DateFormat('MMMM dd, yyyy')
-                                                  .format(DateTime.now())),
-                                              const Spacer(
-                                                flex: 1,
-                                              ),
-                                              const Text(
-                                                '(Responded)',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      const Divider(
-                                        height: 1,
-                                        thickness: 1,
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
-=======
                           SizedBox(
                             width: size.width - 320,
                             height: size.height - 175,
@@ -493,7 +389,6 @@ class ClassInquiry extends HookWidget {
                                   classInquiry: classesInquiry[index],
                                 );
                               },
->>>>>>> cc634483a05a7203fc7fa2ee53a2fa5309f678cc
                             ),
                           ),
                         ],

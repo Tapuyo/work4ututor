@@ -3,7 +3,10 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 /// Represents Homepage for Navigation
 class TermPage extends StatefulWidget {
+  const TermPage({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _TermPage createState() => _TermPage();
 }
 

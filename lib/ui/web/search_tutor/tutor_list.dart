@@ -70,7 +70,7 @@ class _TutorListState extends State<TutorList> {
       }
     }
 
-    return widget.isLoading! ? const Center(child: CircularProgressIndicator(),): _foundUsers.isNotEmpty
+    return widget.isLoading? const Center(child: CircularProgressIndicator(),): _foundUsers.isNotEmpty
         ? Material(
           color: Colors.white,
             child: SizedBox(
