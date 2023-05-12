@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:wokr4ututor/data_class/studentsEnrolledclass.dart';
+import 'package:wokr4ututor/ui/web/tutor/classes/view_classinfo.dart';
 import 'package:wokr4ututor/utils/themes.dart';
+
+import '../../../../provider/classinfo_provider.dart';
+import '../../../../services/services.dart';
 
 class StudentsEnrolled extends StatefulWidget {
   const StudentsEnrolled({super.key});
@@ -63,6 +69,8 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
   bool select = false;
   @override
   Widget build(BuildContext context) {
+    final bool open = context.select((ViewClassDisplayProvider p) => p.openClassInfo);
+    final enrolleelist = Provider.of<List<StudentsList>>(context);
     Size size = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10),
@@ -345,7 +353,7 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
                   ),
                   side: BorderSide(width: .1),
                 ),
-                child: Column(
+                child: open == false ? Column(
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(
@@ -444,7 +452,7 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
                       width: size.width - 320,
                       height: size.height - 175,
                       child: ListView.builder(
-                        itemCount: 6,
+                        itemCount: 3,
                         itemBuilder: (context, index) {
                           return Column(
                             children: [
@@ -457,7 +465,11 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
                                   splashColor: kColorPrimary,
                                   focusColor: Colors.green.withOpacity(0.0),
                                   hoverColor: kColorLight,
-                                  onTap: () {},
+                                  onTap: () {
+                                    final provider =
+                                      context.read<ViewClassDisplayProvider>();
+                                  provider.setViewClassinfo(true);
+                                  },
                                   child: Padding(
                                     padding: const EdgeInsets.only(
                                       top: 5.0,
@@ -495,9 +507,9 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
                                                 fit: BoxFit.contain,
                                               ),
                                             ),
-                                            title: const Text(
-                                              "Melvin Jhon Selma",
-                                              style: TextStyle(
+                                            title:  const Text(
+                                              'Melvin Jhon Selma',
+                                              style:  TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.w700,
                                               ),
@@ -651,7 +663,7 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
                       ),
                     ),
                   ],
-                ),
+                ) : const ViewClassInfo(),
               ),
             ),
           ],

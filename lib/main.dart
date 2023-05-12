@@ -1,9 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/constant/constant.dart';
+import 'package:wokr4ututor/data_class/studentsEnrolledclass.dart';
 import 'package:wokr4ututor/provider/chatmessagedisplay.dart';
+import 'package:wokr4ututor/provider/classinfo_provider.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/provider/inquirydisplay_provider.dart';
 import 'package:wokr4ututor/provider/search_provider.dart';
@@ -56,6 +60,9 @@ void main() async {
     await Firebase.initializeApp();
   }
 
+  await Hive.initFlutter();
+  await Hive.openBox('userID');
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(MultiProvider(
     providers: [
@@ -63,14 +70,20 @@ void main() async {
       StreamProvider<List<TutorInformation>>.value(
       value: DatabaseService(uid: '').tutorlist,
       initialData: const [],),
+      StreamProvider<List<StudentsList>>.value(
+      value: DatabaseService(uid: 'YnLdZm2n7bPZSTbXS0VvHgG0Jor2').enrolleelist,
+      initialData: const [],),
       ChangeNotifierProvider(create: (_) => SearchTutorProvider()),
       ChangeNotifierProvider(create: (_) => UserIDProvider()),
       ChangeNotifierProvider(create: (_) => InquiryDisplayProvider()),
       ChangeNotifierProvider(create: (_) => ChatDisplayProvider()),
+      ChangeNotifierProvider(create: (_) => ViewClassDisplayProvider()),
     ],
     child: const MyApp(),
   ));
 }
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -91,7 +104,7 @@ class MyApp extends StatelessWidget {
         // },
         title: 'Work4uTutor',
         initialRoute: Routes.splash,
-        onGenerateRoute: RouteGenerator.generateRoute,
+        // onGenerateRoute: RouteGenerator.generateRoute,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
         fontFamily: "Nunito",

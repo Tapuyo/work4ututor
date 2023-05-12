@@ -2,6 +2,7 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:wokr4ututor/provider/user_id_provider.dart';
@@ -254,8 +255,12 @@ class _SigniNState extends State<SigniN> {
                   } else {
                     setState(() {
                       print(result.uid);
-                      final provider = context.read<UserIDProvider>();
-                      provider.setUserID(result.uid);
+                      // final provider = context.read<UserIDProvider>();
+                      // provider.setUserID(result.uid);
+                     _auth.adduserInfo({
+                        "userID": result.uid,
+                        "userStatus": 'tutor'
+                      });
                     });
                   }
                 },

@@ -346,6 +346,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                         ),
                         InkWell(
                           onTap: () async {
+                            print('This is the userID:$userID');
                             final UserDataService _userid = UserDataService(userUID: userID);
                             final result =
                                 await _userid.addScheduleTimeavailable();
@@ -703,8 +704,19 @@ class _CalendarSetupState extends State<CalendarSetup> {
                         Flexible(
                           flex: 10,
                           child: InkWell(
-                            onTap: () {
-                              //add formula
+                            onTap: () async{
+                               final UserDataService _userid = UserDataService(userUID: userID);
+                           if(_userid == null){
+                            print('empty');
+                           }else{
+                            final result =
+                                await _userid.addBlockDates();
+                            if (result == null) {
+                              print('error');
+                            } else {
+                              print('success');
+                            }
+                           }
                             },
                             child: const Text(
                               'Clear Selection',
@@ -971,8 +983,19 @@ class _CalendarSetupState extends State<CalendarSetup> {
                           width: 5,
                         ),
                         InkWell(
-                          onTap: () {
-                            //add formula
+                          onTap: () async{
+                           final UserDataService _userid = UserDataService(userUID: userID);
+                           if(_userid == null){
+                            print('empty');
+                           }else{
+                            final result =
+                                await _userid.addBlockDates();
+                            if (result == null) {
+                              print('error');
+                            } else {
+                              print('success');
+                            }
+                           }
                           },
                           child: const Text(
                             'Add',

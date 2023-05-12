@@ -3,6 +3,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hive/hive.dart';
 import 'package:wokr4ututor/services/services.dart';
 import '../../data_class/user_class.dart';
 
@@ -75,28 +76,10 @@ class AuthService {
       return null;
     }
   }
-
-  Future addScheduleTimeavailable() async {
-    try {
-      //create a new document for the user with the uid
-      await DatabaseService(uid: '93SBKEHBf8KJhZjE7vIeI')
-          .addTutoravailbaleDays();
-      return '93SBKEHBf8KJhZjE7vIeI';
-    } catch (e) {
-      print(e.toString());
-      return null;
-    }
-  }
   
-  Future addDayoffs() async {
-    try {
-      //create a new document for the user with the uid
-      await DatabaseService(uid: '93SBKEHBf8KJhZjE7vIeI')
-          .addDayoffs();
-      return '93SBKEHBf8KJhZjE7vIeI';
-    } catch (e) {
-      print(e.toString());
-      return null;
-    }
-  }
+final _userinfo = Hive.box('userID');
+Future<void> adduserInfo(Map<String, dynamic> newData) async {
+  await _userinfo.add(newData);
+  print('Saving Successful');
+}
 }

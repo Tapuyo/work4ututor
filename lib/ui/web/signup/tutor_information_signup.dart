@@ -12,7 +12,7 @@ import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:wokr4ututor/services/services.dart';
 
-import '../../../components/dialog.dart';
+import '../../../components/tutordialog.dart';
 import '../../../shared_components/alphacode3.dart';
 import '../terms/termpage.dart';
 import '../tutor/tutor_dashboard/tutor_dashboard.dart';

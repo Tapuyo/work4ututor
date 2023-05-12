@@ -74,14 +74,14 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                             backgroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               side: const BorderSide(
-                                color: kColorPrimary, // your color here
+                                color: Colors.deepPurple, // your color here
                                 width: 1,
                               ),
                               borderRadius: BorderRadius.circular(24.0),
                             ),
                             // ignore: prefer_const_constructors
                             textStyle: TextStyle(
-                              color: kColorPrimary,
+                              color: Colors.deepPurple,
                               fontSize: 12,
                               fontStyle: FontStyle.normal,
                               decoration: TextDecoration.none,
@@ -130,13 +130,13 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                             onHover: (event) {},
                             cursor: SystemMouseCursors.click,
                             child: TableCalendar(
-                              shouldFillViewport: true,
+                              shouldFillViewport: false,
                               firstDay: DateTime(1950, 8),
                               lastDay: DateTime(5000),
                               focusedDay: _focusedDay,
                               calendarFormat: _calendarFormat,
-                              daysOfWeekHeight: 30,
-                              rowHeight: 30,
+                              daysOfWeekHeight: 60,
+                              rowHeight: 60,
                               headerStyle: const HeaderStyle(
                                 titleTextStyle: TextStyle(
                                     color: Colors.white,
@@ -174,11 +174,11 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                               calendarStyle: CalendarStyle(
                                 // Weekend dates color (Sat & Sun Column)
                                 weekendTextStyle: const TextStyle(
-                                    color: Colors.red,
+                                    color: Colors.black,
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold),
                                 outsideDaysVisible: true,
-                                cellMargin: const EdgeInsets.all(5),
+                                cellMargin: const EdgeInsets.fromLTRB(5,5,5,0),
                                 rowDecoration: const BoxDecoration(
                                   color: Colors.white,
                                 ),
@@ -188,6 +188,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                   borderRadius: BorderRadius.circular(5),
                                   border: Border.all(
                                     color: const Color(0xFF616161),
+                                    width: .5
                                   ),
                                 ),
                                 weekendDecoration: BoxDecoration(
@@ -196,6 +197,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                   borderRadius: BorderRadius.circular(5),
                                   border: Border.all(
                                     color: const Color(0xFF616161),
+                                     width: .5
                                   ),
                                 ),
                                 defaultTextStyle: const TextStyle(
@@ -204,15 +206,23 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                   fontWeight: FontWeight.bold,
                                 ),
                                 // highlighted color for today
-                                // todayDecoration: BoxDecoration(
-                                //   color: AppColors.eggPlant,
-                                //   shape: BoxShape.circle,
-                                // ),
+                                todayDecoration: BoxDecoration(
+                                  color: kColorLight,
+                                  shape: BoxShape.rectangle,
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                    color: const Color(0xFF616161),
+                                  ),
+                                ),
                                 // highlighted color for selected day
-                                // selectedDecoration: BoxDecoration(
-                                //   color: AppColors.blackCoffee,
-                                //   shape: BoxShape.circle,
-                                // ),
+                                selectedDecoration: BoxDecoration(
+                                  color:kColorLight,
+                                  shape: BoxShape.rectangle,
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                    color: const Color(0xFF616161),
+                                  ),
+                                ),
                               ),
                               selectedDayPredicate: (day) {
                                 // Use `selectedDayPredicate` to determine which day is currently selected.
@@ -231,7 +241,101 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                   });
                                 }
                               },
-                              // calendarBuilders: calendarBuilder(),
+                              
+                              calendarBuilders: CalendarBuilders(
+                                markerBuilder: (context, day, events) =>
+                                    events.isNotEmpty
+                                        ?  Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            Container(
+                                                width: 30,
+                                                height: 18,
+                                                alignment: Alignment.center,
+                                                decoration:  BoxDecoration(
+                                                  color: kCalendarColorAB,
+                                                ),
+                                                child: Text(
+                                                  '${events.length}',
+                                                  style: const TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                              Container(
+                                                width: 30,
+                                                height: 18,
+                                                alignment: Alignment.center,
+                                                decoration:  const BoxDecoration(
+                                                  color: kCalendarColorFB,
+                                                ),
+                                                child: Text(
+                                                  '${events.length}',
+                                                  style: const TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                              Container(
+                                                width: 30,
+                                                height: 18,
+                                                alignment: Alignment.center,
+                                                decoration: const BoxDecoration(
+                                                  color: kCalendarColorB,
+                                                ),
+                                                child: Text(
+                                                  '${events.length}',
+                                                  style: const TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                          ],
+                                        )
+                                        : Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            Container(
+                                                width: 30,
+                                                height: 18,
+                                                alignment: Alignment.center,
+                                                decoration:  BoxDecoration(
+                                                  color: kCalendarColorAB,
+                                                ),
+                                                child: Text(
+                                                  '${events.length}',
+                                                  style: const TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                              Container(
+                                                width: 30,
+                                                height: 18,
+                                                alignment: Alignment.center,
+                                                decoration:  const BoxDecoration(
+                                                  color: kCalendarColorFB,
+                                                ),
+                                                child: Text(
+                                                  '${events.length}',
+                                                  style: const TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                              Container(
+                                                width: 30,
+                                                height: 18,
+                                                alignment: Alignment.center,
+                                                decoration: const BoxDecoration(
+                                                  color: kCalendarColorB,
+                                                ),
+                                                child: Text(
+                                                  '${events.length}',
+                                                  style: const TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                              ),
                               onFormatChanged: (format) {
                                 if (_calendarFormat != format) {
                                   // Call `setState()` when updating calendar format
@@ -308,117 +412,120 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                         SizedBox(
                           width: 600,
                           height: 500,
-                          child:count != 0 ? ListView.builder(
-                              itemCount: count,
-                              itemBuilder: (context, index) {
-                                  return InkWell(
-                                    onTap: () {},
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        top: 0.0,
-                                        left: 10,
-                                        right: 10,
-                                        bottom: 8.0,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          const Text(
-                                            "08:45",
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w800,
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            width: 15,
-                                          ),
-                                          Card(
-                                            color: index % 2 == 0
-                                                ? kCalendarColorFB
-                                                : kCalendarColorAB,
-                                            margin: const EdgeInsets.fromLTRB(
-                                                20.0, 6.0, 20.0, 0.0),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Row(
-                                                children: [
-                                                  CircleAvatar(
-                                                    radius: 25.0,
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    child: Image.asset(
-                                                      'assets/images/login.png',
-                                                      width: 300.0,
-                                                      height: 100.0,
-                                                      fit: BoxFit.contain,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 10,
-                                                  ),
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    children: const [
-                                                      Text(
-                                                        "Melvin Jhon Selma",
-                                                        style: TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w400),
-                                                      ),
-                                                      Text('Chemistry'),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 30,
-                                                  ),
-                                                  const Padding(
-                                                    padding: EdgeInsets.only(
-                                                        bottom: 12.0),
-                                                    child: Text('First Class'),
-                                                  ),
-                                                ],
+                          child: count != 0
+                              ? ListView.builder(
+                                  itemCount: count,
+                                  itemBuilder: (context, index) {
+                                    return InkWell(
+                                      onTap: () {},
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                          top: 0.0,
+                                          left: 10,
+                                          right: 10,
+                                          bottom: 8.0,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            const Text(
+                                              "08:45",
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w800,
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                            const SizedBox(
+                                              width: 15,
+                                            ),
+                                            Card(
+                                              color: index % 2 == 0
+                                                  ? kCalendarColorFB
+                                                  : kCalendarColorAB,
+                                              margin: const EdgeInsets.fromLTRB(
+                                                  20.0, 6.0, 20.0, 0.0),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Row(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      radius: 25.0,
+                                                      backgroundColor:
+                                                          Colors.transparent,
+                                                      child: Image.asset(
+                                                        'assets/images/login.png',
+                                                        width: 300.0,
+                                                        height: 100.0,
+                                                        fit: BoxFit.contain,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      children: const [
+                                                        Text(
+                                                          "Melvin Jhon Selma",
+                                                          style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400),
+                                                        ),
+                                                        Text('Chemistry'),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 30,
+                                                    ),
+                                                    const Padding(
+                                                      padding: EdgeInsets.only(
+                                                          bottom: 12.0),
+                                                      child:
+                                                          Text('First Class'),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                }
-                              ) : Center(
-                                   child: Column(
-                                     mainAxisAlignment:
-                                         MainAxisAlignment.start,
-                                     crossAxisAlignment:
-                                         CrossAxisAlignment.center,
-                                     children: [
-                                       Image.asset(
-                                         'assets/images/5836.png',
-                                         width: 250.0,
-                                         height: 150.0,
-                                         fit: BoxFit.fill,
-                                       ),
-                                       const Text(
-                                         "No Classes Today",
-                                         textAlign: TextAlign.left,
-                                         style: TextStyle(
-                                             fontSize: 18,
-                                             fontWeight: FontWeight.w600, color: Colors.red),
-                                       ),
-                                     ],
-                                   ),
-                                 ),
+                                    );
+                                  })
+                              : Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/5836.png',
+                                        width: 250.0,
+                                        height: 150.0,
+                                        fit: BoxFit.fill,
+                                      ),
+                                      const Text(
+                                        "No Classes Today",
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.red),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                         ),
                       ]),
                     ),
@@ -460,87 +567,17 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
 
 CalendarBuilders calendarBuilder() {
   return CalendarBuilders(
-      // selectedDayBuilder: (context, date, _) {
-      //   return DaisyWidget().buildCalendarDay(
-      //       day: date.day.toString(), backColor: DaisyColors.main4Color);
-      // },
-      todayBuilder: (
-    context,
-    day,
-    focusedDay,
-  ) {
-    return buildCalendarDay(
-        day: DateTime.now().day.toString(), text: '3', backColor: Colors.green);
-  }
-      // final children = <Widget>[];
-      // children.add(
-      //   Positioned(
-      //     bottom: 1,
-      //     child: Text("3 Classes"),
-      //   ),
-      // );
-
-      // dayBuilder: (context, date, _) {
-      //   return DaisyWidget().buildCalendarDay(
-      //       day: date.day.toString(), backColor: Colors.white);
-      // },
-      // weekendDayBuilder: (context, date, _) {
-      //   return DaisyWidget().buildCalendarDay(
-      //       day: date.day.toString(),
-      //       backColor: Colors.white,
-      //       color: Colors.red);
-      // },
-      // outsideDayBuilder: (context, date, _) {
-      //   return DaisyWidget().buildCalendarDay(
-      //       day: date.day.toString(),
-      //       backColor: Colors.blue,
-      //       color: Colors.red);
-      // },
-      // outsideHolidayDayBuilder: (context, date, _) {
-      //   return DaisyWidget().buildCalendarDay(
-      //       day: date.day.toString(),
-      //       backColor: Colors.deepOrange,
-      //       color: Colors.red);
-      // },
-      // holidayDayBuilder: (context, date, _) {
-      //   return DaisyWidget().buildCalendarDay(
-      //       day: date.day.toString(),
-      //       backColor: Colors.purple,
-      //       color: Colors.red);
-      // },
-      // outsideWeekendDayBuilder: (context, date, _) {
-      //   return DaisyWidget().buildCalendarDay(
-      //       day: date.day.toString(),
-      //       backColor: Colors.pinkAccent,
-      //       color: Colors.black);
-      // },
-      // dowWeekdayBuilder: (context, date) {
-      //   return DaisyWidget().buildCalendarDay(
-      //       day: date.toString(), backColor: Colors.yellow, color: Colors.red);
-      // },
-      // dowWeekendBuilder: (context, date) {
-      //   return DaisyWidget().buildCalendarDay(
-      //       day: date.toString(), backColor: Colors.green, color: Colors.red);
-      // },
-      // unavailableDayBuilder: (context, date, _) {
-      //   return DaisyWidget().buildCalendarDay(
-      //       day: date.day.toString(),
-      //       backColor: Colors.red,
-      //       color: DaisyColors.serveColor);
-      // },
-      // markerBuilder: (context, date, events, holidays) {
-      //   final children = <Widget>[];
-      //   if (events.isNotEmpty) {
-      //     children.add(
-      //       Positioned(
-      //         bottom: 1,
-      //         child: _buildEventsMarkerNum(date),
-      //       ),
-      //     );
-      //   }
-      //   return children;
-      // },
-      );
+    todayBuilder: (
+      context,
+      day,
+      focusedDay,
+    ) {
+      return buildCalendarDay(
+          day: DateTime.now().day.toString(),
+          text: '3',
+          backColor: Colors.green);
+    },
+  );
 }
 
 Container buildCalendarDay({
@@ -751,7 +788,7 @@ Widget tableLedger(BuildContext context) {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    "3",
+                    "0",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   )
@@ -787,7 +824,7 @@ Widget tableLedger(BuildContext context) {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    "2",
+                    "0",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   )
@@ -823,7 +860,7 @@ Widget tableLedger(BuildContext context) {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    "4",
+                    "0",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   )

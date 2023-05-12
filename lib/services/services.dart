@@ -5,7 +5,9 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:intl/intl.dart';
 
+import '../data_class/studentsEnrolledclass.dart';
 import '../data_class/tutor_info_class.dart';
 
 uploadData() async {
@@ -61,6 +63,8 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('tutor');
   final CollectionReference studentCollection =
       FirebaseFirestore.instance.collection('student');
+  final CollectionReference enrolleeCollection =
+      FirebaseFirestore.instance.collection('studentsEnrolled');
 
   List<TutorInformation> _getTutorInformation(QuerySnapshot snapshot) {
     return snapshot.docs.map((tutordata) {
@@ -88,6 +92,43 @@ class DatabaseService {
 
   Stream<List<TutorInformation>> get tutorlist {
     return tutorCollection.snapshots().map(_getTutorInformation);
+  }
+
+  List<StudentsList> _getStudentsEnrolled(QuerySnapshot snapshot) {
+    return snapshot.docs.map((enrolleedata) {
+      return StudentsList(
+        address: enrolleedata['address'] ?? '',
+        dateEnrolled: enrolleedata['dateEnrolled'] ?? '',
+        numberofClasses: enrolleedata['numberofClasses'] ?? '',
+        price: enrolleedata['price'] ?? '',
+        status: enrolleedata['status'] ?? '',
+        studentID: enrolleedata['studentID'] ?? '',
+        studentName: enrolleedata['studentName'] ?? '',
+        subjectName: enrolleedata['subjectName'] ?? '',
+      );
+    }).toList();
+  }
+
+  //
+//   Stream<List<TutorInformation>> getListUserCampaigns() async* {
+// final collection = FirebaseFirestore.instance.collection('student');
+// final List list_of_users = await collection.get().then((value) => value.docs);
+// for (int i = 0; i < list_of_users.length; i++) {
+//   FirebaseFirestore.instance.collection("UserData")
+//       .doc(list_of_users[i].id.toString())
+//       .collection("studentsEnrolled")
+//       .snapshots()
+//       .listen(CreateListofAllUserCampaigns);
+// }
+// yield UserCampaignList;
+//   }
+
+  Stream<List<StudentsList>> get enrolleelist {
+    return enrolleeCollection
+        .doc('YnLdZm2n7bPZSTbXS0VvHgG0Jor2')
+        .collection('students')
+        .snapshots()
+        .map(_getStudentsEnrolled);
   }
 
   Future updateUserData(String email, String password, String role) async {
@@ -165,17 +206,76 @@ class DatabaseService {
   }
   //Adding Schedule to database
 
-addTutoravailbaleDays() async{
-  return await FirebaseFirestore.instance
-      .collection('tutorSchedule').doc(uid).set({'availableDays': ['Monday', 'Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],});
-}
-addDayoffs() async{
-  return await FirebaseFirestore.instance
-      .collection('tutorSchedule').doc(uid).update({'availableDays': ['Monday', 'Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],});
-}
-}
-// FirebaseFirestore.instance.collection('collection');
-// collection 
-//     .doc('foo_id') // <-- Doc ID where data should be updated.
-//     .update(newData);
+  addTutoravailbaleDays() async {
+    return await FirebaseFirestore.instance
+        .collection('tutorSchedule')
+        .doc(uid)
+        .update({
+      'availableDays': [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+    });
+  }
 
+  addDayoffs() async {
+    return await FirebaseFirestore.instance
+        .collection('tutorSchedule')
+        .doc(uid)
+        .update({
+      'availableDays': [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ],
+    });
+  }
+
+  addBlockDates() async {
+    return await FirebaseFirestore.instance
+        .collection('tutorSchedule')
+        .doc(uid)
+        .collection('blockDates')
+        .doc()
+        .set({
+      'description': 'Vaction Holiday',
+      'from': DateTime.now(),
+      'to': DateTime.now()
+    });
+  }
+
+  addTimea() async {
+    return await FirebaseFirestore.instance
+        .collection('tutorSchedule')
+        .doc(uid)
+        .collection('blockDates')
+        .doc()
+        .set({
+      'description': 'Vaction Holiday',
+      'from': DateTime.now(),
+      'to': DateTime.now()
+    });
+  }
+
+  addTimeavailable() async {
+    return await FirebaseFirestore.instance
+        .collection('tutorSchedule')
+        .doc(uid)
+        .collection('timeAvailable')
+        .doc()
+        .set({
+      'description': 'Available Days',
+      'from': DateFormat('HH:MM').format(DateTime.now()),
+      'to': DateFormat('HH:MM').format(DateTime.now())
+    });
+  }
+}

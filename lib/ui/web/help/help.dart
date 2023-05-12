@@ -11,11 +11,11 @@ class HelpPage extends StatefulWidget {
 }
 
 class _HelpPageState extends State<HelpPage> {
-    @override
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Padding(
-       padding: const EdgeInsets.only(left: 10, right: 10),
+      padding: const EdgeInsets.only(left: 10, right: 10),
       child: Container(
         alignment: Alignment.topCenter,
         decoration: BoxDecoration(
@@ -55,6 +55,106 @@ class _HelpPageState extends State<HelpPage> {
                     ),
                   ),
                   const Spacer(),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Container(
+              width: 600,
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+              child: Column(
+                children: [
+                  const Text(
+                    "\"We are always here to help you. Feel free to get in touch with us, for any question you might have. A member of our team will reply to you within 24 hours.\"",
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                    ),
+                    textAlign: TextAlign.justify,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'To:',
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Subject:',
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    width: 600,
+                    height: 350,
+                    child: const TextField(
+                      textAlignVertical: TextAlignVertical.top,
+                      maxLines: null,
+                      expands: true,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter your message....',
+                      ),
+                    ),
+                  ),
+                   const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        width: 100,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            shape: const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5))),
+                          ),
+                          onPressed: () {},
+                          child: Row(
+                            children: const [
+                              Icon(
+                                Icons.attach_file,
+                                color: Colors.black,
+                              ),
+                              Text(
+                                'Attach',
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      SizedBox(
+                        width: 100,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: kColorPrimary,
+                            shape: const RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5))),
+                          ),
+                          onPressed: () {},
+                          child: const Text('Send'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             )

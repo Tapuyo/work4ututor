@@ -6,9 +6,10 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:wokr4ututor/ui/web/search_tutor/find_tutors.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_profile/tutor_profile.dart';
 import 'package:wokr4ututor/utils/themes.dart';
-
+import 'dart:html' as html;
 
 import '../../../data_class/tutor_info_class.dart';
+import '../../../routes/routes.dart';
 
 class TutorList extends StatefulWidget {
   final List<TutorInformation> tutorslist;
@@ -81,11 +82,12 @@ class _TutorListState extends State<TutorList> {
                       elevation: 2,
                       child: InkWell(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const TutorProfile()),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //       builder: (context) => const TutorProfile()),
+                          // );
+                          html.window.open(Routes.tutorInfo,"");
                         },
                         child: Container(
                           width: (size.width - 400) / 3 - 20,

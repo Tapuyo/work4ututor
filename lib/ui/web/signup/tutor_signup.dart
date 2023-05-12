@@ -3,7 +3,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:wokr4ututor/components/dialog.dart';
+import 'package:wokr4ututor/components/tutordialog.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
 import 'package:wokr4ututor/utils/themes.dart';
@@ -29,6 +29,7 @@ String tConPassword = '';
 
 String error = '';
 bool obscure = true;
+bool confirmobscure = true;
 
 class _TutorSignupState extends State<TutorSignup> {
   @override
@@ -155,7 +156,7 @@ class _SignUpState extends State<SignUp> {
                         hintText: 'Lastname',
                       ),
                       validator: (val) =>
-                          val!.isEmpty ? 'Enter your Surname' : null,
+                          val!.isEmpty ? 'Enter your Lastname' : null,
                       onChanged: (val) {
                         tLastName = val;
                       },
@@ -228,7 +229,7 @@ class _SignUpState extends State<SignUp> {
                     width: 380,
                     height: 60,
                     child: TextFormField(
-                      obscureText: obscure,
+                      obscureText: confirmobscure,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
@@ -244,7 +245,7 @@ class _SignUpState extends State<SignUp> {
                             onPressed: () {
                               // Update the state i.e. toogle the state of passwordVisible variable
                               setState(() {
-                                obscure = !obscure;
+                                confirmobscure = !confirmobscure;
                               });
                             },
                             icon: Icon(Icons.remove_red_eye_rounded),
@@ -284,9 +285,16 @@ class _SignUpState extends State<SignUp> {
                   if (formKey.currentState!.validate()) {
                     dynamic result = await _auth.registerwEmailandPassword(
                         tEmail, tPassword, "tutor", tName, tLastName);
+                        print(result.toString());
                     if (result == null) {
                       setState(() {
-                        error = 'Please supply a valid email';
+                       result =
+                              "Email is badly formatted or already in use!\nPlease check your inputs.";
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) => DialogShow(result.toString()),
+                          );
                       });
                     } else {
                       setState(() {

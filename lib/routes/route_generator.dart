@@ -5,6 +5,7 @@ import 'package:wokr4ututor/ui/mobile/mob_main.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
 import 'package:wokr4ututor/ui/web/web_main.dart';
 
+import '../ui/web/tutor/tutor_profile/tutor_profile.dart';
 import 'routes.dart';
 
 class RouteGenerator {
@@ -23,6 +24,9 @@ class RouteGenerator {
 
       case Routes.tutorSignup:
         return CupertinoPageRoute(builder: (_) => const TutorSignup());
+
+        case Routes.tutorInfo:
+        return CupertinoPageRoute(builder: (_) => const TutorProfile());
 
       default:
         return _errorRoute();

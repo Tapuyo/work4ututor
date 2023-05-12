@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wokr4ututor/data_class/tutor_info_class.dart';
+import 'package:wokr4ututor/ui/web/tutor/settings/classes_pricing.dart';
+import 'package:wokr4ututor/ui/web/tutor/settings/payments_withdrawals.dart';
+import 'package:wokr4ututor/ui/web/tutor/settings/personal_information.dart';
+import 'package:wokr4ututor/ui/web/tutor/settings/tutor_information.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -10,11 +15,12 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  String settingsView = '/personalinfo';
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Padding(
-       padding: const EdgeInsets.only(left: 10, right: 10),
+      padding: const EdgeInsets.only(left: 10, right: 10),
       child: Container(
         alignment: Alignment.topCenter,
         decoration: BoxDecoration(
@@ -29,7 +35,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         width: size.width - 320,
-        height: size.height - 75,
+        height: size.height,
         child: Column(
           children: <Widget>[
             Container(
@@ -39,24 +45,132 @@ class _SettingsPageState extends State<SettingsPage> {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 shape: BoxShape.rectangle,
-                color: kColorPrimary,
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(5.0),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text(
-                    "SETTINGS",
-                    style: GoogleFonts.roboto(
-                      color: Colors.white,
-                      fontSize: 25,
-                      fontWeight: FontWeight.normal,
+                  SizedBox(
+                    width: 200,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: settingsView == "/personalinfo"
+                            ? kColorPrimary
+                            : Colors.white,
+                        disabledForegroundColor: Colors.blueGrey,
+                        disabledBackgroundColor: Colors.blueGrey,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          settingsView = "/personalinfo";
+                        });
+                      },
+                      child: Text(
+                        'Personal Information',
+                        style: TextStyle(
+                            color: settingsView == "/personalinfo"
+                                ? Colors.white
+                                : Colors.black),
+                      ),
                     ),
                   ),
-                  const Spacer(),
+                  SizedBox(
+                    width: 200,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: settingsView == "/tutorinfo"
+                            ? kColorPrimary
+                            : Colors.white,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          settingsView = "/tutorinfo";
+                        });
+                      },
+                      child: Text(
+                        'Tutor Information',
+                        style: TextStyle(
+                            color: settingsView == "/tutorinfo"
+                                ? Colors.white
+                                : Colors.black),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 200,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: settingsView == "/classespricing"
+                            ? kColorPrimary
+                            : Colors.white,
+                        disabledForegroundColor: Colors.blueGrey,
+                        disabledBackgroundColor: Colors.blueGrey,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          settingsView = "/classespricing";
+                        });
+                      },
+                      child: Text(
+                        'Classes and Pricing',
+                        style: TextStyle(
+                            color: settingsView == "/classespricing"
+                                ? Colors.white
+                                : Colors.black),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 200,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: settingsView == "/withdrawals"
+                            ? kColorPrimary
+                            : Colors.white,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          settingsView = "/withdrawals";
+                        });
+                      },
+                      child: Text(
+                        'Payments & Withdrawals',
+                        style: TextStyle(
+                            color: settingsView == "/withdrawals"
+                                ? Colors.white
+                                : Colors.black),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            )
+            ),
+            const SizedBox(
+              height: 10,
+              child: Divider(color: Colors.grey),
+            ),
+            if (settingsView == "/personalinfo") ...{
+              const PersonalInformation(),
+            }else if(settingsView == "/tutorinfo") ...{
+              const TutorInfoSettings(),
+            }else if(settingsView == "/classespricing") ...{
+              const ClassesPricing(),
+            }else if(settingsView == "/withdrawals") ...{
+              const PaymentsWithdrwals(),
+            }
           ],
         ),
       ),

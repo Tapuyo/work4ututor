@@ -67,7 +67,8 @@ class _ClassInquiryState extends State<ClassInquiry> {
   Color buttonColor = kCalendarColorAB;
   @override
   Widget build(BuildContext context) {
-    final bool display = context.select((InquiryDisplayProvider p) => p.openDisplay);
+    final bool display =
+        context.select((InquiryDisplayProvider p) => p.openDisplay);
     Size size = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10),
@@ -300,145 +301,160 @@ class _ClassInquiryState extends State<ClassInquiry> {
                   ),
                   side: BorderSide(width: .1),
                 ),
-                child: display != true ? Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        top: 5.0,
-                        left: 10,
-                        right: 10,
-                        bottom: 5.0,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                child: display != true
+                    ? Column(
                         children: [
-                          Checkbox(
-                            checkColor: Colors.black,
-                            activeColor: Colors.green,
-                            value: select,
-                            onChanged: (value) {
-                              setState(() {
-                                select = value!;
-                              });
-                            },
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              top: 5.0,
+                              left: 10,
+                              right: 10,
+                              bottom: 5.0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Checkbox(
+                                  checkColor: Colors.black,
+                                  activeColor: Colors.green,
+                                  value: select,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      select = value!;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(
+                                  width: 15,
+                                ),
+                                InkWell(
+                                    onTap: () {},
+                                    child: const Icon(
+                                      Icons.delete,
+                                      size: 25,
+                                      color: Colors.red,
+                                    )),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                InkWell(
+                                    onTap: () {},
+                                    child: const Icon(
+                                      Icons.refresh,
+                                      size: 25,
+                                      color: Colors.grey,
+                                    )),
+                                const Spacer(
+                                    // flex: 2,
+                                    ),
+                              ],
+                            ),
                           ),
                           const SizedBox(
-                            width: 15,
+                            child: Divider(
+                              height: 1,
+                              thickness: 2,
+                            ),
                           ),
-                          InkWell(
-                              onTap: () {},
-                              child: const Icon(
-                                Icons.delete,
-                                size: 25,
-                                color: Colors.red,
-                              )),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          InkWell(
-                              onTap: () {},
-                              child: const Icon(
-                                Icons.refresh,
-                                size: 25,
-                                color: Colors.grey,
-                              )),
-                          const Spacer(
-                              // flex: 2,
-                              ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      child: Divider(
-                        height: 1,
-                        thickness: 2,
-                      ),
-                    ),
-                    Container(
-                      width: size.width - 320,
-                      height: size.height - 175,
-                      child: ListView.builder(
-                        itemCount: 100,
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              InkWell(
-                                highlightColor: kCalendarColorFB,
-                                splashColor: kColorPrimary,
-                                focusColor: Colors.green.withOpacity(0.0),
-                                hoverColor: Colors.grey[200],
-                                onTap: () {
-                                  final provider =
-                                      context.read<InquiryDisplayProvider>();
-                                  provider.setOpen(true);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 0.0,
-                                    left: 10,
-                                    right: 10,
-                                    bottom: 8.0,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                          Container(
+                            width: size.width - 320,
+                            height: size.height - 175,
+                            child: ScrollConfiguration(
+                              behavior: ScrollConfiguration.of(context)
+                                  .copyWith(scrollbars: false),
+                              child: ListView.builder(
+                                itemCount: 100,
+                                itemBuilder: (context, index) {
+                                  return Column(
                                     children: [
-                                      Checkbox(
-                                        checkColor: Colors.black,
-                                        activeColor: Colors.red,
-                                        value: select,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            select = value!;
-                                          });
+                                      InkWell(
+                                        highlightColor: kCalendarColorFB,
+                                        splashColor: kColorPrimary,
+                                        focusColor:
+                                            Colors.green.withOpacity(0.0),
+                                        hoverColor: Colors.grey[200],
+                                        onTap: () {
+                                          final provider = context
+                                              .read<InquiryDisplayProvider>();
+                                          provider.setOpen(true);
                                         },
-                                      ),
-                                      const SizedBox(
-                                        width: 15,
-                                      ),
-                                      const Text(
-                                        "Melvin Jhon",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w800,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 0.0,
+                                            left: 10,
+                                            right: 10,
+                                            bottom: 8.0,
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Checkbox(
+                                                checkColor: Colors.black,
+                                                activeColor: Colors.red,
+                                                value: select,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    select = value!;
+                                                  });
+                                                },
+                                              ),
+                                              const SizedBox(
+                                                width: 15,
+                                              ),
+                                              const Text(
+                                                "Melvin Jhon",
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w800,
+                                                ),
+                                              ),
+                                              const Spacer(
+                                                flex: 2,
+                                              ),
+                                              const Text(
+                                                "Chemistry Class Inquiry-----",
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                              ),
+                                              const Text(
+                                                  'Melvin asked for 6 classes of chemistry subject....'),
+                                              const Spacer(
+                                                flex: 2,
+                                              ),
+                                              Text(DateFormat('MMMM dd, yyyy')
+                                                  .format(DateTime.now())),
+                                              const Spacer(
+                                                flex: 1,
+                                              ),
+                                              const Text(
+                                                '(Responded)',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                      const Spacer(
-                                        flex: 2,
+                                      const Divider(
+                                        height: 1,
+                                        thickness: 1,
                                       ),
-                                      const Text(
-                                        "Chemistry Class Inquiry-----",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w700),
-                                      ),
-                                      const Text(
-                                          'Melvin asked for 6 classes of chemistry subject....'),
-                                      const Spacer(
-                                        flex: 2,
-                                      ),
-                                      Text(DateFormat('MMMM dd, yyyy').format(DateTime.now())),
-                                      const Spacer(
-                                        flex: 1,
-                                      ),
-                                      const Text('(Responded)', style: TextStyle(fontWeight: FontWeight.bold),),
                                     ],
-                                  ),
-                                ),
+                                  );
+                                },
                               ),
-                              const Divider(
-                                height: 1,
-                                thickness: 1,
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ) : const ViewInquiry(),
+                            ),
+                          ),
+                        ],
+                      )
+                    : const ViewInquiry(),
               ),
             ),
           ],
