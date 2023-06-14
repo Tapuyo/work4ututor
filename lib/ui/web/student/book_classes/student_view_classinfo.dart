@@ -2,19 +2,20 @@
 
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../utils/themes.dart';
-import '../tutor_profile/view_file.dart';
+import '../../tutor/tutor_profile/view_file.dart';
 
-class ViewClassInfo extends StatefulWidget {
-  const ViewClassInfo({super.key});
+class StudentViewClassInfo extends StatefulWidget {
+  const StudentViewClassInfo({super.key});
 
   @override
-  State<ViewClassInfo> createState() => _ViewClassInfoState();
+  State<StudentViewClassInfo> createState() => _StudentViewClassInfoState();
 }
 
-class _ViewClassInfoState extends State<ViewClassInfo> {
+class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
   final List<ClassesData> _tiles = [
     // ClassesData(title: 'Class 1', fields: ['Field 1', 'Field 2', 'Field 3']),
     // ClassesData(title: 'Class 2', fields: ['Field A', 'Field B', 'Field C']),
@@ -23,6 +24,8 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
 
   bool _expanded = false;
   bool viewClassState = false;
+  var formatter = DateFormat('MMMM, dd yyyy HH:mm:');
+  DateTime datenow = DateTime.now();
   @override
   Widget build(BuildContext context) {
     bool selection5 = false;
@@ -39,6 +42,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
     const double fillStop = (100 - fillPercent) / 100;
     const List<double> stops = [0.0, fillStop, fillStop, 1.0];
     Size size = MediaQuery.of(context).size;
+    bool showcancelresched = false;
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10),
       child: Container(
@@ -111,7 +115,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                               color: Colors.transparent,
                                               image: const DecorationImage(
                                                   image: AssetImage(
-                                                      'assets/images/sample.jpg'),
+                                                      'assets/images/Teacher (3).png'),
                                                   fit: BoxFit.cover)),
                                         )),
                                   ),
@@ -147,7 +151,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                       height: 5,
                                     ),
                                     const Text(
-                                      'Mj Selma, 15',
+                                      'Michele Fox, 28',
                                       style: TextStyle(
                                           fontSize: 30,
                                           color: Colors.white,
@@ -325,7 +329,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                             height: 5,
                                           ),
                                           const Text(
-                                            "Student enrolled in your Chemistry Class for 3 sessions. 1 hour per session.\nSchedule:",
+                                            "Student enrolled in your Chemistry Class for 3 sessions. 50 minutes per class.\nSchedule:",
                                             style: TextStyle(
                                               fontSize: 18,
                                               fontStyle: FontStyle.normal,
@@ -335,18 +339,63 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                           const SizedBox(
                                             height: 5,
                                           ),
-                                          ListView.builder(
-                                              itemCount: 3,
-                                              itemBuilder: (context, index) {
-                                                return  Text(
-                                                  "$index session  February 20, 2023 8:00 AM (Status)",
-                                                  style: const TextStyle(
-                                                    fontSize: 18,
-                                                    fontStyle: FontStyle.normal,
-                                                  ),
-                                                  textAlign: TextAlign.justify,
-                                                );
-                                              }),
+                                          Container(
+                                            width: 600,
+                                            // height: 30 * 3,
+                                            child: ListView.builder(
+                                              physics:const NeverScrollableScrollPhysics(),
+                                              shrinkWrap: true,
+                                                itemCount: 3,
+                                                itemBuilder: (context, index) {
+                                                  return Visibility(
+                                                    visible: true,
+                                                    child: Row(
+                                                      children: [
+                                                        Text(
+                                                          "${(index + 1)} session  ${formatter.format(datenow.add( Duration(days: index)))} (Upcoming)",
+                                                          style: const TextStyle(
+                                                            fontSize: 18,
+                                                            fontStyle:
+                                                                FontStyle.normal,
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.justify,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 5,
+                                                        ),
+                                                        TextButton(
+                                                          child: const Text(
+                                                            "Cancel",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                                fontSize: 18,
+                                                                fontStyle:
+                                                                FontStyle.normal,),
+                                                          ),
+                                                          onPressed: ()  {
+                                                          },
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 5,
+                                                        ),
+                                                        TextButton(
+                                                          child: const Text(
+                                                            "Reschedule",
+                                                            style: TextStyle(
+                                                              color: Colors.blue,
+                                                                fontSize: 18,
+                                                                fontStyle:
+                                                                FontStyle.normal,),
+                                                          ),
+                                                          onPressed: ()  {
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }),
+                                          ),
                                           const SizedBox(
                                             height: 10,
                                           ),
@@ -373,7 +422,6 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                           const Align(
                                             alignment: Alignment.centerLeft,
                                             child: SizedBox(
-                                              width: 600,
                                               height: 50,
                                               child: TextField(
                                                 textAlignVertical:
@@ -885,7 +933,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                           ),
                                         ),
                                         title: const Text(
-                                          "MJ Selma",
+                                          "Michelle Fox",
                                           style: TextStyle(
                                               color: Colors.black,
                                               fontWeight: FontWeight.bold),

@@ -15,6 +15,7 @@ class StudentsMenu extends HookWidget {
   final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
+    final int menuIndex = context.select((InitProvider p) => p.menuIndex);
     Size size = MediaQuery.of(context).size;
     return Container(
       height: size.height - 75,
@@ -75,7 +76,54 @@ class StudentsMenu extends HookWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: kColorSecondary,
+                backgroundColor: menuIndex != 0 ? kColorSecondary : kColorPrimary,
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(
+                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(24.0),
+                ),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              onPressed: () {
+                final provider = context.read<InitProvider>();
+                provider.setMenuIndex(0);
+              },
+              icon: const Icon(
+                Icons.home_outlined,
+                size: 30,
+              ),
+              label: const Text(
+                'DASHBOARD',
+                style: TextStyle(fontSize: 15),
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Container(
+            height: 50,
+            width: 240,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: kColorSecondary,
+              borderRadius: BorderRadius.all(Radius.circular(25)),
+            ),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.only(left: 50),
+                alignment: Alignment.centerLeft,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: Colors.white,
+                backgroundColor: menuIndex != 1 ? kColorSecondary : kColorPrimary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -122,54 +170,7 @@ class StudentsMenu extends HookWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: kColorSecondary,
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(
-                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                    width: 1,
-                  ),
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
-                // ignore: prefer_const_constructors
-                textStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                  fontStyle: FontStyle.normal,
-                  decoration: TextDecoration.none,
-                ),
-              ),
-              onPressed: () {
-                final provider = context.read<InitProvider>();
-                provider.setMenuIndex(2);
-              },
-              icon: const Icon(
-                Icons.wechat,
-                size: 30,
-              ),
-              label: const Text(
-                'MESSAGES',
-                style: TextStyle(fontSize: 15),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
-            height: 50,
-            width: 240,
-            decoration: const BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(25)),
-            ),
-            child: TextButton.icon(
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.only(left: 50),
-                alignment: Alignment.centerLeft,
-                foregroundColor: Colors.white,
-                disabledBackgroundColor: Colors.white,
-                backgroundColor: kColorSecondary,
+                backgroundColor: menuIndex != 3 ? kColorSecondary : kColorPrimary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -194,7 +195,7 @@ class StudentsMenu extends HookWidget {
                 size: 30,
               ),
               label: const Text(
-                'BOOK CLASS',
+                'CLASSES BOOK',
                 style: TextStyle(fontSize: 15),
               ),
             ),
@@ -216,7 +217,7 @@ class StudentsMenu extends HookWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: kColorSecondary,
+                backgroundColor: menuIndex != 4 ? kColorSecondary : kColorPrimary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -263,7 +264,7 @@ class StudentsMenu extends HookWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: kColorSecondary,
+                backgroundColor:menuIndex != 6 ? kColorSecondary : kColorPrimary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -310,7 +311,7 @@ class StudentsMenu extends HookWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: kColorSecondary,
+                backgroundColor: menuIndex != 7 ? kColorSecondary : kColorPrimary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -388,7 +389,7 @@ class StudentsMenu extends HookWidget {
             ),
           ),
           const SizedBox(
-            height: 15,
+            height: 80,
           ),
           Container(
             alignment: Alignment.center,

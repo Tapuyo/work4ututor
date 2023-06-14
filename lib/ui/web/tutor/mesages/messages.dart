@@ -1,11 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:wokr4ututor/ui/web/tutor/mesages/CameraPage.dart';
-import 'package:wokr4ututor/ui/web/tutor/mesages/message_main.dart';
-
-import '../../../../utils/themes.dart';
-import '../calendar/tutor_schedule.dart';
-import 'CameraView.dart';
 import 'userlist.dart';
 
 class MessagePage extends StatefulWidget {
@@ -37,31 +30,6 @@ class _MessagePageState extends State<MessagePage> {
         width: size.width - 320,
         child: Column(
           children: <Widget>[
-            // Container(
-            //   height: 50,
-            //   width: size.width - 310,
-            //   padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            //   alignment: Alignment.center,
-            //   decoration: BoxDecoration(
-            //     shape: BoxShape.rectangle,
-            //     color: kColorPrimary,
-            //     borderRadius: BorderRadius.circular(5.0),
-            //   ),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.start,
-            //     children: [
-            //       Text(
-            //         "MESSAGES",
-            //         style: GoogleFonts.roboto(
-            //           color: Colors.white,
-            //           fontSize: 25,
-            //           fontWeight: FontWeight.normal,
-            //         ),
-            //       ),
-            //       const Spacer(),
-            //     ],
-            //   ),
-            // ),
             Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

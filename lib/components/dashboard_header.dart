@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/themes.dart';
 
@@ -36,7 +35,7 @@ class DashboardHeader extends StatelessWidget {
               children: [
                 Text(
                 name.isNotEmpty ? name.toString(): "Username Here",
-                style: GoogleFonts.roboto(
+                style:const TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                   fontWeight: FontWeight.normal,

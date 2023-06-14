@@ -4,7 +4,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/ui/web/login/forgotpassword.dart';
 import 'package:wokr4ututor/ui/web/terms/termpage.dart';
 
@@ -118,11 +117,11 @@ class _SigniNState extends State<SigniN> {
               alignment: Alignment.center,
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: Column(
-                children: [
+                children: const [
                   Text(
                     " Welcome Back!",
-                    style: GoogleFonts.roboto(
-                      textStyle: Theme.of(context).textTheme.headlineMedium,
+                    style: TextStyle(
+                      // textStyle: Theme.of(context).textTheme.headlineMedium,
                       color: Color.fromRGBO(1, 118, 132, 1),
                       fontWeight: FontWeight.w600,
                     ),
@@ -130,8 +129,8 @@ class _SigniNState extends State<SigniN> {
                   ),
                   Text(
                     " Have a great day ahead.",
-                    style: GoogleFonts.roboto(
-                      textStyle: Theme.of(context).textTheme.headlineSmall,
+                    style: TextStyle(
+                      // textStyle: Theme.of(context).textTheme.headlineMedium,
                       color: Colors.black87,
                       fontSize: 18,
                       fontWeight: FontWeight.normal,
@@ -210,7 +209,7 @@ class _SigniNState extends State<SigniN> {
                         passwordResetDialog(context);
                       },
                       child: Text(
-                        style: GoogleFonts.roboto(
+                        style: TextStyle(
                           color: const Color.fromRGBO(1, 118, 132, 1),
                           fontSize: 16,
                           fontWeight: FontWeight.w500,

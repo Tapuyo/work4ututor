@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 @override
 passwordResetDialog(BuildContext context) {
@@ -33,11 +32,11 @@ passwordResetDialog(BuildContext context) {
                   const SizedBox(
                     height: 10,
                   ),
-                  Text(
+                  const Text(
                     "You are trying to update\nyour password!",
-                    style: GoogleFonts.roboto(
-                      textStyle: Theme.of(context).textTheme.headlineMedium,
-                      color: const Color.fromRGBO(1, 118, 132, 1),
+                    style: TextStyle(
+                      // textStyle: Theme.of(context).textTheme.headlineMedium,
+                      color:  Color.fromRGBO(1, 118, 132, 1),
                       fontSize: 28,
                       fontWeight: FontWeight.w600,
                     ),
@@ -46,10 +45,10 @@ passwordResetDialog(BuildContext context) {
                   const SizedBox(
                     height: 10,
                   ),
-                  Text(
+                  const Text(
                     "An password reset link will be sent to your email,\nopen the link and reset your password!",
-                    style: GoogleFonts.roboto(
-                      textStyle: Theme.of(context).textTheme.headlineSmall,
+                    style: TextStyle(
+                      // textStyle: Theme.of(context).textTheme.headlineMedium,
                       color: Colors.black87,
                       fontSize: 18,
                       fontWeight: FontWeight.normal,
@@ -59,11 +58,11 @@ passwordResetDialog(BuildContext context) {
                   const SizedBox(
                     height: 10,
                   ),
-                  Text(
+                  const Text(
                     "Input your email here!",
-                    style: GoogleFonts.roboto(
-                      textStyle: Theme.of(context).textTheme.headlineMedium,
-                      color: const Color.fromRGBO(1, 118, 132, 1),
+                    style:TextStyle(
+                      // textStyle: Theme.of(context).textTheme.headlineMedium,
+                      color:  Color.fromRGBO(1, 118, 132, 1),
                       fontSize: 25,
                       fontWeight: FontWeight.w600,
                     ),
@@ -84,7 +83,8 @@ passwordResetDialog(BuildContext context) {
                             const TextStyle(color: Colors.black, fontSize: 25),
                         hintText: 'Email',
                       ),
-                      validator: (val) => val!.isEmpty ? 'Enter an email' : null,
+                      validator: (val) =>
+                          val!.isEmpty ? 'Enter an email' : null,
                       onChanged: (val) {
                         //add reset email here
                       },
@@ -103,8 +103,8 @@ passwordResetDialog(BuildContext context) {
                         backgroundColor: const Color.fromRGBO(103, 195, 208, 1),
                         shape: RoundedRectangleBorder(
                           side: const BorderSide(
-                            color:
-                                Color.fromRGBO(1, 118, 132, 1), // your color here
+                            color: Color.fromRGBO(
+                                1, 118, 132, 1), // your color here
                             width: 1,
                           ),
                           borderRadius: BorderRadius.circular(30.0),

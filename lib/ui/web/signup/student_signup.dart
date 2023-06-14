@@ -2,7 +2,6 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:wokr4ututor/ui/web/signup/student_information_signup.dart';
 
@@ -100,8 +99,8 @@ class _StudentSignUpState extends State<StudentSignUp> {
             padding: const EdgeInsets.fromLTRB(10, 20, 10, 25),
             child: Text(
               " Ready to learn from\nour expert tutor's and enjoy\nfriendly classes.",
-              style: GoogleFonts.roboto(
-                      textStyle: Theme.of(context).textTheme.headlineMedium,
+              style: TextStyle(
+                      // textStyle: Theme.of(context).textTheme.headlineMedium,
                       color: Color.fromRGBO(1, 118, 132, 1),
                       fontSize: 30,
                       fontWeight: FontWeight.w600,

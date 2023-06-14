@@ -9,15 +9,15 @@ import 'package:wokr4ututor/ui/web/search_tutor/find_tutors.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 import 'dart:html' as html;
 
-import '../../../data_class/tutor_info_class.dart';
-import '../../../routes/routes.dart';
+import '../../../../data_class/tutor_info_class.dart';
+import '../../../../routes/routes.dart';
 
-class TutorList extends StatefulWidget {
+class TutorListLogin extends StatefulWidget {
   final List<TutorInformation> tutorslist;
   final String keyword;
   final int displayRange;
   final bool isLoading;
-  const TutorList(
+  const TutorListLogin(
       {super.key,
       required this.tutorslist,
       required this.keyword,
@@ -26,10 +26,10 @@ class TutorList extends StatefulWidget {
       });
 
   @override
-  State<TutorList> createState() => _TutorListState();
+  State<TutorListLogin> createState() => _TutorListLoginState();
 }
 
-class _TutorListState extends State<TutorList> {
+class _TutorListLoginState extends State<TutorListLogin> {
   int displayCount = 0;
   List<TutorInformation> _foundUsers = [];
   Reference firebaseStorage = FirebaseStorage.instance.ref();
@@ -93,7 +93,7 @@ class _TutorListState extends State<TutorList> {
                           //   MaterialPageRoute(
                           //       builder: (context) => const TutorProfile()),
                           // );
-                          html.window.open('/tutorsinfo',"");
+                          html.window.open(Routes.tutorInfo,"");
                         },
                         child: Container(
                           width: (size.width - 400) / 3 - 20,

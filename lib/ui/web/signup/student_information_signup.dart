@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:country_pickers/country.dart';
 import 'package:flutter/material.dart';
 import 'package:country_pickers/country_pickers.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'dart:js' as js;
 
@@ -178,11 +177,11 @@ class _InputInfoState extends State<InputInfo> {
                   Container(
                     alignment: Alignment.center,
                     height: 130,
-                    child: Text(
+                    child: const  Text(
                       "Subcribe with your information",
-                      style: GoogleFonts.roboto(
-                        textStyle: Theme.of(context).textTheme.headlineMedium,
-                        color: const Color.fromRGBO(1, 118, 132, 1),
+                      style: TextStyle(
+                      // textStyle: Theme.of(context).textTheme.headlineMedium,
+                        color:  Color.fromRGBO(1, 118, 132, 1),
                         fontSize: 60,
                         fontWeight: FontWeight.w900,
                       ),
@@ -201,7 +200,6 @@ class _InputInfoState extends State<InputInfo> {
                               "Student Identification Number",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
@@ -211,7 +209,6 @@ class _InputInfoState extends State<InputInfo> {
                               "(Auto Generated once Country is selected!)*",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.normal,
                                 fontSize: 15,
                                 fontStyle: FontStyle.italic,
@@ -254,7 +251,6 @@ class _InputInfoState extends State<InputInfo> {
                               "Student Information.",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
@@ -264,7 +260,6 @@ class _InputInfoState extends State<InputInfo> {
                               "Required*",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.normal,
                                 fontSize: 15,
                                 fontStyle: FontStyle.italic,
@@ -577,7 +572,6 @@ class _InputInfoState extends State<InputInfo> {
                               "Upload Students documents.",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
@@ -700,7 +694,6 @@ class _InputInfoState extends State<InputInfo> {
                                     "Guardians Information.",
                                     style: TextStyle(
                                       color: Color.fromRGBO(0, 0, 0, 1),
-                                      fontFamily: 'RobotoMono',
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
                                     ),
@@ -710,7 +703,6 @@ class _InputInfoState extends State<InputInfo> {
                                     "Required.*",
                                     style: TextStyle(
                                       color: Color.fromRGBO(0, 0, 0, 1),
-                                      fontFamily: 'RobotoMono',
                                       fontWeight: FontWeight.normal,
                                       fontSize: 15,
                                       fontStyle: FontStyle.italic,
@@ -844,7 +836,6 @@ class _InputInfoState extends State<InputInfo> {
                                     "Upload Guardian documents.",
                                     style: TextStyle(
                                       color: Color.fromRGBO(0, 0, 0, 1),
-                                      fontFamily: 'RobotoMono',
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
                                     ),

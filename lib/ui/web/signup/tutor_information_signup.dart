@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:country_pickers/country.dart';
 import 'package:flutter/material.dart';
 import 'package:country_pickers/country_pickers.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'dart:js' as js;
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
@@ -203,11 +202,11 @@ class _InputInfoState extends State<InputInfo> {
                   Container(
                     alignment: Alignment.center,
                     height: 130,
-                    child: Text(
+                    child: const Text(
                       "Subcribe with your information",
-                      style: GoogleFonts.roboto(
-                        textStyle: Theme.of(context).textTheme.headlineMedium,
-                        color: const Color.fromRGBO(1, 118, 132, 1),
+                      style: TextStyle(
+                      // textStyle: Theme.of(context).textTheme.headlineMedium,
+                        color: Color.fromRGBO(1, 118, 132, 1),
                         fontSize: 60,
                         fontWeight: FontWeight.w900,
                       ),
@@ -229,7 +228,6 @@ class _InputInfoState extends State<InputInfo> {
                               "Tutor Identification Number",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
@@ -239,7 +237,6 @@ class _InputInfoState extends State<InputInfo> {
                               "(Auto Generated once Country is selected!)*",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.normal,
                                 fontSize: 15,
                                 fontStyle: FontStyle.italic,
@@ -282,7 +279,6 @@ class _InputInfoState extends State<InputInfo> {
                               "Personal Information.",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
@@ -292,7 +288,6 @@ class _InputInfoState extends State<InputInfo> {
                               "Required*",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.normal,
                                 fontSize: 15,
                                 fontStyle: FontStyle.italic,
@@ -615,7 +610,6 @@ class _InputInfoState extends State<InputInfo> {
                               "Subjects you teach and pricing.",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
@@ -625,7 +619,6 @@ class _InputInfoState extends State<InputInfo> {
                               "Required*",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.normal,
                                 fontSize: 15,
                                 fontStyle: FontStyle.italic,
@@ -931,7 +924,6 @@ class _InputInfoState extends State<InputInfo> {
                               "What services are you able to provide?",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
@@ -941,7 +933,6 @@ class _InputInfoState extends State<InputInfo> {
                               "Required, you can select morethan one.*",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.normal,
                                 fontSize: 15,
                                 fontStyle: FontStyle.italic,
@@ -1154,7 +1145,6 @@ class _InputInfoState extends State<InputInfo> {
                               "Type of classes you can offer.",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
@@ -1164,7 +1154,6 @@ class _InputInfoState extends State<InputInfo> {
                               "Required, you can select morethan one.*",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.normal,
                                 fontSize: 15,
                                 fontStyle: FontStyle.italic,
@@ -1257,7 +1246,6 @@ class _InputInfoState extends State<InputInfo> {
                               "Upload your documents.",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
@@ -1270,7 +1258,6 @@ class _InputInfoState extends State<InputInfo> {
                               "ID and Picture required, CV, certification\nand presentation recommended*",
                               style: TextStyle(
                                 color: Color.fromRGBO(0, 0, 0, 1),
-                                fontFamily: 'RobotoMono',
                                 fontWeight: FontWeight.normal,
                                 fontSize: 12,
                                 fontStyle: FontStyle.italic,
@@ -1537,7 +1524,6 @@ class _InputInfoState extends State<InputInfo> {
                                   'Describe your skills, your approach, your teaching method, and tell us',
                                   style: TextStyle(
                                     color: Color.fromRGBO(0, 0, 0, 1),
-                                    fontFamily: 'RobotoMono',
                                     fontWeight: FontWeight.bold,
                                     fontSize: 18,
                                   ),
@@ -1551,7 +1537,6 @@ class _InputInfoState extends State<InputInfo> {
                                   'why a student should choose you! (max 5000 characters)',
                                   style: TextStyle(
                                     color: Color.fromRGBO(0, 0, 0, 1),
-                                    fontFamily: 'RobotoMono',
                                     fontWeight: FontWeight.bold,
                                     fontSize: 18,
                                   ),
@@ -1561,7 +1546,6 @@ class _InputInfoState extends State<InputInfo> {
                                   "Required.*",
                                   style: TextStyle(
                                     color: Color.fromRGBO(0, 0, 0, 1),
-                                    fontFamily: 'RobotoMono',
                                     fontWeight: FontWeight.normal,
                                     fontSize: 15,
                                     fontStyle: FontStyle.italic,

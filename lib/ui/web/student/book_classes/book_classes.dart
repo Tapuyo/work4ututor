@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
 class BookClassesPage extends StatefulWidget {
@@ -44,16 +43,16 @@ class _BookClassesPageState extends State<BookClassesPage> {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: [
+                children: const [
                   Text(
                     "SETTINGS",
-                    style: GoogleFonts.roboto(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 25,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                  const Spacer(),
+                   Spacer(),
                 ],
               ),
             )

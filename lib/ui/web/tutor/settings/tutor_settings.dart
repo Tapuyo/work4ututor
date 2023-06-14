@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/data_class/tutor_info_class.dart';
 import 'package:wokr4ututor/ui/web/tutor/settings/classes_pricing.dart';
 import 'package:wokr4ututor/ui/web/tutor/settings/payments_withdrawals.dart';

@@ -2,7 +2,6 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:wokr4ututor/components/tutordialog.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
@@ -110,8 +109,8 @@ class _SignUpState extends State<SignUp> {
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: Text(
                 " Make yourself\navailable to students\nall over the world",
-                style: GoogleFonts.roboto(
-                  textStyle: Theme.of(context).textTheme.headlineMedium,
+                style: TextStyle(
+                      // textStyle: Theme.of(context).textTheme.headlineMedium,
                   color: Color.fromRGBO(1, 118, 132, 1),
                   fontSize: 30,
                   fontWeight: FontWeight.w600,

@@ -7,6 +7,7 @@ import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
 import '../../data_class/user_class.dart';
 import '../../provider/user_id_provider.dart';
 import 'tutor/tutor_dashboard/tutor_dashboard.dart';
+import 'student/main_dashboard/student_dashboard.dart';
 
 class WebMainPage extends StatefulWidget {
   const WebMainPage({Key? key}) : super(key: key);
@@ -44,7 +45,7 @@ class _MainPageState extends State<WebMainPage> {
 //  final user = Provider.of<Users?>(context);
     final index = _items.length;
     if (index == 0) {
-      return const LoginPage();
+      return const StudentDashboardPage();
     } else {
       print(index);
       return DashboardPage();

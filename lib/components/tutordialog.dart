@@ -1,7 +1,4 @@
-// ignore_for_file: unused_local_variable, non_constant_identifier_names, prefer_typing_uninitialized_variables
-
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
 
@@ -182,11 +179,11 @@ addsubject(BuildContext context) {
                     const SizedBox(
                       height: 10,
                     ),
-                    Text(
+                    const Text(
                       " Work4uTutor Notification",
-                      style: GoogleFonts.roboto(
+                      style: TextStyle(
                         // textStyle: Theme.of(context).textTheme.headlineMedium,
-                        color: const Color.fromRGBO(1, 118, 132, 1),
+                        color:  Color.fromRGBO(1, 118, 132, 1),
                         fontSize: 30,
                         fontWeight: FontWeight.w600,
                       ),
@@ -379,11 +376,11 @@ chooseLanguage(BuildContext context) {
                       const SizedBox(
                         height: 10,
                       ),
-                      Text(
+                     const Text(
                         " Work4uTutor Notification",
-                        style: GoogleFonts.roboto(
+                        style: TextStyle(
                           // textStyle: Theme.of(context).textTheme.headlineMedium,
-                          color: const Color.fromRGBO(1, 118, 132, 1),
+                          color:  Color.fromRGBO(1, 118, 132, 1),
                           fontSize: 30,
                           fontWeight: FontWeight.w600,
                         ),

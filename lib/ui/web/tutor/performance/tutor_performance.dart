@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../utils/themes.dart';
@@ -97,16 +96,16 @@ class _PerformancePageState extends State<PerformancePage> {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
+                children: const [
+                   Text(
                     "PERFORMANCE",
-                    style: GoogleFonts.roboto(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 25,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                  const Spacer(),
+                   Spacer(),
                 ],
               ),
             ),
@@ -136,9 +135,9 @@ class _PerformancePageState extends State<PerformancePage> {
                 const SizedBox(
                   width: 5,
                 ),
-                Text(
+               const Text(
                   "(15)",
-                  style: GoogleFonts.roboto(
+                  style: TextStyle(
                     color: Colors.black,
                     fontSize: 20,
                     fontWeight: FontWeight.normal,
@@ -172,9 +171,9 @@ class _PerformancePageState extends State<PerformancePage> {
                 const SizedBox(
                   width: 5,
                 ),
-                Text(
+               const Text(
                   "(16)",
-                  style: GoogleFonts.roboto(
+                  style: TextStyle(
                     color: Colors.black,
                     fontSize: 20,
                     fontWeight: FontWeight.normal,
@@ -208,9 +207,9 @@ class _PerformancePageState extends State<PerformancePage> {
                 const SizedBox(
                   width: 5,
                 ),
-                Text(
+                const Text(
                   "(17)",
-                  style: GoogleFonts.roboto(
+                  style: TextStyle(
                     color: Colors.black,
                     fontSize: 20,
                     fontWeight: FontWeight.normal,
@@ -244,9 +243,9 @@ class _PerformancePageState extends State<PerformancePage> {
                 const SizedBox(
                   width: 5,
                 ),
-                Text(
+                const Text(
                   "(2)",
-                  style: GoogleFonts.roboto(
+                  style: TextStyle(
                     color: Colors.black,
                     fontSize: 20,
                     fontWeight: FontWeight.normal,
@@ -280,9 +279,9 @@ class _PerformancePageState extends State<PerformancePage> {
                 const SizedBox(
                   width: 5,
                 ),
-                Text(
+               const Text(
                   "(0)",
-                  style: GoogleFonts.roboto(
+                  style: TextStyle(
                     color: Colors.black,
                     fontSize: 20,
                     fontWeight: FontWeight.normal,
@@ -291,10 +290,10 @@ class _PerformancePageState extends State<PerformancePage> {
               ],
             ),
             Row(
-              children: [
+              children:const [
                 Text(
                   "Rating:",
-                  style: GoogleFonts.roboto(
+                  style: TextStyle(
                     color: Colors.black,
                     fontSize: 20,
                     fontWeight: FontWeight.normal,
@@ -302,7 +301,7 @@ class _PerformancePageState extends State<PerformancePage> {
                 ),
                 Text(
                   "4.5",
-                  style: GoogleFonts.roboto(
+                  style: TextStyle(
                     color: Colors.black,
                     fontSize: 20,
                     fontWeight: FontWeight.normal,

@@ -12,6 +12,15 @@ const kCalendarColorFB =  Color.fromRGBO(213,231,255,1);
 final kCalendarColorAB =  const Color.fromRGBO(21, 228, 28, 1).withOpacity(.48);
 const kCalendarColorB = Color.fromRGBO(232, 154, 154, 1);
 
+const kBorderRadius = 10.0;
+const kSpacing = 20.0;
+
+const kFontColorPallets = [
+  Color.fromRGBO(26, 31, 56, 1),
+  Color.fromRGBO(72, 76, 99, 1),
+  Color.fromRGBO(149, 149, 163, 1),
+];
+
 const kInputTextStyle = TextStyle(
     fontSize: 14,
     color: Color(0xffbcbcbc),

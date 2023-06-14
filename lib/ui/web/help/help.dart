@@ -1,9 +1,14 @@
 // ignore_for_file: sized_box_for_whitespace
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+import 'package:wokr4ututor/data_class/helpclass.dart';
 
 import '../../../utils/themes.dart';
+
+import 'package:http/http.dart' as http;
 
 class HelpPage extends StatefulWidget {
   const HelpPage({super.key});
@@ -13,8 +18,73 @@ class HelpPage extends StatefulWidget {
 }
 
 class _HelpPageState extends State<HelpPage> {
+  HelpCategory? dropdownvalue;
+  String? _selectedValue;
+  String? _selectedValue1;
+  bool showdrop = false;
+  List<HelpCategory> helpcategory = [];
+  List<String> subjectlist = [];
+  List<HelpCategory> datacategorylist = [];
+  _runFilter(String? enteredKeyword) {
+    print(enteredKeyword);
+    print(helpcategory.length);
+    List<HelpCategory> categorylist = [];
+    categorylist = helpcategory
+        .where((user) => user.categoryName.contains(enteredKeyword.toString()))
+        .toList();
+    print(categorylist);
+    return categorylist;
+  }
+
+  List<String> _dropdownValues = [
+    'Option 1',
+    'Option 2',
+    'Option 3',
+    'Option 4',
+  ];
+
+  Future<List<String>> getSubjects(String category) async {
+    List<String> subjects = [];
+    await FirebaseFirestore.instance
+        .collection('helpcategory')
+        .get()
+        .then((QuerySnapshot querySnapshot) => {
+              querySnapshot.docs.forEach((doc) {
+                // debugPrint(doc.id);
+                // debugPrint('This is i choose: $category');
+                // debugPrint(doc['categoryName']);
+                if (doc['categoryName'] == category) {
+                  subjects = (doc['categoryList'] as List)
+                      .map((item) => item as String)
+                      .toList();
+                  print('This is the subject: $subjects');
+                }
+              })
+            });
+    return subjects;
+  }
+
+  updateDropdownData(String data) {
+    List<String> slist = [];
+    setState(() {
+      // Simulating data change
+
+      // slist = getSubjects(data.toString());
+      _selectedValue = null; // Reset selected value\
+    });
+    return slist;
+  }
+
+  //Textcontroller
+  final messageController = TextEditingController();
+  String messageinfo = '';
+
+  //send email
+
   @override
   Widget build(BuildContext context) {
+    final helpcategorylist = Provider.of<List<HelpCategory>>(context);
+    helpcategory = helpcategorylist;
     Size size = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10),
@@ -47,16 +117,16 @@ class _HelpPageState extends State<HelpPage> {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: [
+                children: const [
                   Text(
                     "HELP",
-                    style: GoogleFonts.roboto(
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 25,
+                      fontSize: 20,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                  const Spacer(),
+                  Spacer(),
                 ],
               ),
             ),
@@ -78,20 +148,59 @@ class _HelpPageState extends State<HelpPage> {
                   const SizedBox(
                     height: 10,
                   ),
-                  const TextField(
-                    decoration: InputDecoration(
+                  DropdownButtonFormField(
+                    decoration: const InputDecoration(
+                      // enabledBorder: InputBorder.none,
                       border: OutlineInputBorder(),
-                      hintText: 'To:',
                     ),
+                    value: dropdownvalue,
+                    hint: const Text("Category"),
+                    isExpanded: true,
+                    icon: const Icon(Icons.arrow_drop_down),
+                    items: helpcategory.map((HelpCategory items) {
+                      return DropdownMenuItem<HelpCategory>(
+                        value: items,
+                        child: Text(items.categoryName),
+                      );
+                    }).toList(),
+                    onChanged: (HelpCategory? value) async {
+                      List<String> tempdata = [];
+                      String? tempvalue;
+                      String? choosenCategory = value?.categoryName.toString();
+                      tempdata = await getSubjects(choosenCategory.toString());
+                      setState(() {
+                        _selectedValue = tempvalue;
+                        dropdownvalue = value;
+                        subjectlist = tempdata;
+                      });
+                      print('This is the subjectlist: $subjectlist');
+                      print('This is the dropdownvalue: $choosenCategory');
+                    },
                   ),
                   const SizedBox(
                     height: 10,
                   ),
-                  const TextField(
-                    decoration: InputDecoration(
+                  DropdownButtonFormField(
+                    value: _selectedValue,
+                    hint: const Text("Subjects"),
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      // enabledBorder: InputBorder.none,
                       border: OutlineInputBorder(),
-                      hintText: 'Subject:',
                     ),
+                    onChanged: (String? value) {
+                      setState(() {
+                        _selectedValue = value;
+                        print('This is the _selectedValue: $_selectedValue');
+                      });
+                    },
+                    items: subjectlist.map((String value) {
+                      print(value);
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
                   ),
                   const SizedBox(
                     height: 10,
@@ -99,17 +208,24 @@ class _HelpPageState extends State<HelpPage> {
                   Container(
                     width: 600,
                     height: 350,
-                    child: const TextField(
+                    child: TextField(
+                      controller: messageController,
                       textAlignVertical: TextAlignVertical.top,
                       maxLines: null,
                       expands: true,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         hintText: 'Enter your message....',
                       ),
+                      onChanged: (value) {
+                        setState(() {
+                          messageinfo = messageController.text;
+                        });
+                        debugPrint(messageController.text);
+                      },
                     ),
                   ),
-                   const SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Row(
@@ -151,7 +267,15 @@ class _HelpPageState extends State<HelpPage> {
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(5))),
                           ),
-                          onPressed: () {},
+                          onPressed: (dropdownvalue?.categoryName == null ||
+                                  _selectedValue == null ||
+                                  messageinfo == '')
+                              ? null
+                              : () {
+                                  setState(() {
+                                    print('sending inquiry');
+                                  });
+                                },
                           child: const Text('Send'),
                         ),
                       ),

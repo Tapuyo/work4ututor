@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/ui/web/tutor/subscription/subscription_type.dart';
@@ -155,16 +154,16 @@ class ClassesMain extends HookWidget {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: [
+                children: const [
                   Text(
                     "DASHBOARD",
-                    style: GoogleFonts.roboto(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 25,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                  const Spacer(),
+                   Spacer(),
                 ],
               ),
             ),
@@ -650,16 +649,16 @@ class ClassesMain extends HookWidget {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: [
+                children: const [
                   Text(
                     "DASHBOARD",
-                    style: GoogleFonts.roboto(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 25,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                  const Spacer(),
+                   Spacer(),
                 ],
               ),
             ),
@@ -1142,16 +1141,16 @@ class ClassesMain extends HookWidget {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: [
+                children:const [
                   Text(
                     "DASHBOARD",
-                    style: GoogleFonts.roboto(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 25,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                  const Spacer(),
+                   Spacer(),
                 ],
               ),
             ),
