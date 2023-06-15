@@ -3,8 +3,10 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarDialog extends StatefulWidget {
+  const CalendarDialog({super.key});
+
   @override
-  _CalendarDialogState createState() => _CalendarDialogState();
+  State<CalendarDialog> createState() => _CalendarDialogState();
 }
 
 class _CalendarDialogState extends State<CalendarDialog> {
@@ -18,8 +20,8 @@ class _CalendarDialogState extends State<CalendarDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
-      title: Text('Select a date'),
-      content: Container(
+      title: const Text('Select a date'),
+      content:  Container(
         height: 400,
         width: 650,
         child: Row(
@@ -123,7 +125,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
           onPressed: () {
             Navigator.of(context).pop(_selectedDate);
           },
-          child: Text('OK'),
+          child: const Text('OK'),
         ),
       ],
     );

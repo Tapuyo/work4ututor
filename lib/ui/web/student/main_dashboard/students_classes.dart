@@ -467,10 +467,14 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                                             fontWeight: FontWeight.w800),
                                       ),
                                     ),
-                                    const SizedBox(width: kSpacing / 2),
+                                    const Spacer(),
                                     SizedBox(
-                                      width: 200,
-                                      child: Text(DateTime.now().toString()),
+                                      child: Text(
+                                        DateFormat.yMMMMd()
+                                            .format(DateTime.now()),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w700),
+                                      ),
                                     ),
                                   ],
                                 ),

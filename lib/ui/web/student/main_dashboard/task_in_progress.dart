@@ -36,54 +36,7 @@ List<Voucherclass> _getVouchers(QuerySnapshot snapshot) {
   }).toList();
 }
 class _TaskInProgressState extends State<TaskInProgress> {
-  // final List<CardTaskData> data;
-  final CollectionReference<Map<String, dynamic>> _mainCollection =
-      FirebaseFirestore.instance.collection('vouchers');
-
   @override
-  // Widget build(BuildContext context) {
-  //   return StreamBuilder<List<Voucherclass>>(
-  //       stream: voucherlist,
-  //       builder: (context, snapshot) {
-  //       //    if (snapshot.connectionState == ConnectionState.waiting) {
-  //       //   return Text('Loading...');
-  //       // }
-  //       if (snapshot.hasError) {
-  //         return Text('Error: ${snapshot.error}');
-  //       }
-  //       final vouchers = snapshot.data ?? [];
-  //         if (snapshot.hasData) {
-  //           return ClipRRect(
-  //             borderRadius: BorderRadius.circular(kBorderRadius * 2),
-  //             child: SizedBox(
-  //               height: 250,
-  //               child: ListView.builder(
-  //                   shrinkWrap: true,
-  //                   scrollDirection: Axis.horizontal,
-  //                   physics: const NeverScrollableScrollPhysics(),
-  //                   itemCount: vouchers.length,
-  //                   itemBuilder: (context, index) {
-  //                     final mainDocument = vouchers[index];
-  //                     debugPrint(mainDocument.toString());
-  //                     return Padding(
-  //                       padding: const EdgeInsets.symmetric(
-  //                           horizontal: kSpacing / 2),
-  //                       child: Text(mainDocument.voucherName),
-  //                     );
-  //                   }),
-  //             ),
-  //           );
-  //         } else {
-  //           return const Center(
-  //             child: Text(
-  //               'No available voucher.',
-  //               style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
-  //             ),
-  //           );
-  //         }
-  //       });
-  //   //  : const  Center(child:  Text('No available voucher.', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),),);
-  // }
   Widget build(BuildContext context) {
     final data = Provider.of<List<Voucherclass>>(context);
     if (data.isNotEmpty) {
@@ -92,9 +45,10 @@ class _TaskInProgressState extends State<TaskInProgress> {
         child: SizedBox(
             height: 250,
             child: ListView.builder(
+              
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
-                physics: const NeverScrollableScrollPhysics(),
+                physics: const BouncingScrollPhysics(),
                 itemCount: data.length,
                 itemBuilder: (context, index) {
                   final document = data[index];

@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:provider/provider.dart';
-import 'package:wokr4ututor/ui/web/login/login.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
-
-import '../../data_class/user_class.dart';
-import '../../provider/user_id_provider.dart';
 import 'tutor/tutor_dashboard/tutor_dashboard.dart';
 import 'student/main_dashboard/student_dashboard.dart';
 
@@ -30,7 +24,7 @@ class _MainPageState extends State<WebMainPage> {
     }).toList();
     setState(() {
       _items = data.toList();
-      print(_items.length);
+      debugPrint(_items.length.toString());
     });
   }
 
@@ -47,7 +41,7 @@ class _MainPageState extends State<WebMainPage> {
     if (index == 0) {
       return const StudentDashboardPage();
     } else {
-      print(index);
+      debugPrint(index.toString());
       return DashboardPage();
     }
   }

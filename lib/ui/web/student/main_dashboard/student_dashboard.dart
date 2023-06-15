@@ -102,48 +102,34 @@ class MainPageBody extends StatefulWidget {
 
 class _MainPageBodyPageState extends State<MainPageBody> {
   Uint8List? imageBytes;
+  String? downloadURL;
+  String? downloadURL1;
+  ImageProvider? imageProvider;
   gotoList() {
     return const MyClasses();
   }
 
-  void loadImage(String path) async {
-    Uint8List bytes = await fetchImage(path);
+  void _updateResponse() async {
+    String result = await getData();
     setState(() {
-      imageBytes = bytes;
+      downloadURL1 = result;
+      print('This is the result: $result');
     });
   }
 
-  Future<Uint8List> fetchImage(String imagePath) async {
-    firebase_storage.FirebaseStorage storage =
-        firebase_storage.FirebaseStorage.instance;
-    firebase_storage.Reference ref = storage.ref().child(imagePath);
-
-    // Fetch the download URL for the image
-    String downloadURL = await ref.getDownloadURL();
-
-    // Fetch the image data as a byte stream
-    http.Response response = await http.get(Uri.parse(downloadURL));
-
-    // Convert the byte stream to Uint8List
-    Uint8List imageBytes = response.bodyBytes;
-
-    return imageBytes;
+  Future getData() async {
+    try {
+      await downloadURLExample(profileurl);
+      return downloadURL;
+    } catch (e) {
+      debugPrint("Error - $e");
+      return null;
+    }
   }
 
-  void fetchFileUrl(String path, Function(String) onSuccess) {
-    Reference storageReference = FirebaseStorage.instance.ref(path);
-    storageReference.getDownloadURL().then((url) {
-      onSuccess(url);
-    }).catchError((error) {
-      // Handle error
-      print('Error fetching file URL: $error');
-    });
-  }
-
-  void handleSuccess(String url) {
-    profileurl = url;
-    debugPrint(profileurl);
-    // Perform any other necessary operations with the file URL
+  Future<void> downloadURLExample(String path) async {
+    downloadURL = await FirebaseStorage.instance.ref(path).getDownloadURL();
+    debugPrint(downloadURL.toString());
   }
 
   @override
@@ -151,22 +137,32 @@ class _MainPageBodyPageState extends State<MainPageBody> {
     final int menuIndex = context.select((InitProvider p) => p.menuIndex);
     final studentinfodata = Provider.of<List<StudentInfoClass>>(context);
     Size size = MediaQuery.of(context).size;
-
-    if (studentinfodata.isNotEmpty) {
-      setState(() {
-        final studentdata = studentinfodata.first;
-        firstname = studentdata.studentFirstname;
-        middlename = studentdata.studentMiddlename;
-        lastname = studentdata.studentLastname;
-        fullName = middlename == 'N/A'
-            ? '$firstname $lastname'
-            : '$firstname $middlename $lastname';
-        studentID = studentdata.studentID;
-        String profileurl1 = studentdata.profilelink;
-        // profileurl = await fetchFileUrl(profileurl1);
-        fetchFileUrl(profileurl1, handleSuccess);
-      });
+    if (downloadURL1 == null) {
+      if (studentinfodata.isNotEmpty) {
+        setState(() {
+          final studentdata = studentinfodata.first;
+          firstname = studentdata.studentFirstname;
+          middlename = studentdata.studentMiddlename;
+          lastname = studentdata.studentLastname;
+          fullName = middlename == 'N/A'
+              ? '$firstname $lastname'
+              : '$firstname $middlename $lastname';
+          studentID = studentdata.studentID;
+          profileurl = studentdata.profilelink;
+          _updateResponse();
+        });
+      }
     }
+    // return
+    //  FutureBuilder(
+    //     future: getData(),
+    //     builder: (context, snapshot) {
+    //       if (snapshot.hasError) {
+    //         return const Text(
+    //           "Something went wrong",
+    //         );
+    //       }
+    //       if (snapshot.connectionState == ConnectionState.done) {
     return Stack(
       children: [
         Scaffold(
@@ -291,12 +287,16 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                   ],
                 ),
               ),
-               Padding(
-                padding:const EdgeInsets.fromLTRB(0, 5, 10, 5),
-                child: CircleAvatar(
-                  backgroundImage: NetworkImage(profileurl),
-                  radius: 25,
-                ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 5, 10, 5),
+                child: downloadURL1 == null
+                    ? const Center(child: CircularProgressIndicator())
+                    : CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          downloadURL1.toString(),
+                        ),
+                        radius: 25,
+                      ),
               ),
             ],
           ),
@@ -481,6 +481,9 @@ class _MainPageBodyPageState extends State<MainPageBody> {
       ],
     );
   }
+  //         return const Center(child: CircularProgressIndicator());
+  //       });
+  // }
 
   Widget _buildSidebar(BuildContext context) {
     return Column(

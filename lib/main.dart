@@ -14,7 +14,6 @@ import 'package:wokr4ututor/provider/inquirydisplay_provider.dart';
 import 'package:wokr4ututor/provider/search_provider.dart';
 import 'package:wokr4ututor/provider/user_id_provider.dart';
 import 'package:wokr4ututor/routes/routes.dart';
-// ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:wokr4ututor/services/gethelpcategory.dart';
 import 'package:wokr4ututor/services/services.dart';
@@ -102,12 +101,6 @@ class MyApp extends StatelessWidget {
       value: AuthService().user,
       initialData: null,
       child: MaterialApp(
-        // builder: (context, child) {
-        //   return kIsWeb ? const DashboardPage():ScrollConfiguration(
-        //     behavior: MyBehavior(),
-        //     child: child!,
-        //   );
-        // },
         title: 'Work4uTutor',
         initialRoute: Routes.splash,
         // onGenerateRoute: RouteGenerator.generateRoute,
