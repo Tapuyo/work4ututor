@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/data_class/helpclass.dart';
+import 'package:wokr4ututor/services/send_email.dart';
 
 import '../../../utils/themes.dart';
 
@@ -19,6 +20,7 @@ class HelpPage extends StatefulWidget {
 
 class _HelpPageState extends State<HelpPage> {
   HelpCategory? dropdownvalue;
+  String? choosenCategory;
   String? _selectedValue;
   String? _selectedValue1;
   bool showdrop = false;
@@ -80,6 +82,7 @@ class _HelpPageState extends State<HelpPage> {
   String messageinfo = '';
 
   //send email
+
 
   @override
   Widget build(BuildContext context) {
@@ -267,15 +270,17 @@ class _HelpPageState extends State<HelpPage> {
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(5))),
                           ),
-                          onPressed: (dropdownvalue?.categoryName == null ||
-                                  _selectedValue == null ||
-                                  messageinfo == '')
-                              ? null
-                              : () {
-                                  setState(() {
-                                    print('sending inquiry');
-                                  });
-                                },
+                          onPressed:() {
+                          SendEmailService.sendMail(email:'melvinselma4@gmail.com', message: messageController.text, name: 'MJ Amles', subject: 'Temporary Email');},
+                          // (dropdownvalue?.categoryName == null ||
+                          //         _selectedValue == null ||
+                          //         messageinfo == '')
+                          //     ? null
+                          //     : () {
+                          //         setState(() {
+                          //           print('sending inquiry');
+                          //         });
+                          //       },
                           child: const Text('Send'),
                         ),
                       ),
