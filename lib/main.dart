@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:wokr4ututor/constant/constant.dart';
 import 'package:wokr4ututor/data_class/helpclass.dart';
 import 'package:wokr4ututor/data_class/studentsEnrolledclass.dart';
+import 'package:wokr4ututor/data_class/subject_class.dart';
 import 'package:wokr4ututor/provider/chatmessagedisplay.dart';
 import 'package:wokr4ututor/provider/classinfo_provider.dart';
 import 'package:wokr4ututor/provider/classes_inquirey_provider.dart';
@@ -17,6 +18,7 @@ import 'package:wokr4ututor/routes/routes.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:wokr4ututor/services/gethelpcategory.dart';
 import 'package:wokr4ututor/services/services.dart';
+import 'package:wokr4ututor/services/subject_services.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
 import 'package:wokr4ututor/ui/web/student/search_tutor_login/find_tutors_login.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_profile/tutor_profile.dart';
@@ -81,6 +83,10 @@ void main() async {
             DatabaseService(uid: 'YnLdZm2n7bPZSTbXS0VvHgG0Jor2').enrolleelist,
         initialData: const [],
       ),
+      StreamProvider<List<Subjects>>.value(
+        value: SubjectServices().subjectList,
+        initialData: const [],
+      ),
       ChangeNotifierProvider(create: (_) => SearchTutorProvider()),
       ChangeNotifierProvider(create: (_) => UserIDProvider()),
       ChangeNotifierProvider(create: (_) => InquiryDisplayProvider()),
@@ -110,9 +116,14 @@ class MyApp extends StatelessWidget {
           canvasColor: Colors.white,
           primarySwatch: Colors.indigo,
         ),
-        home: const WebMainPage(),
+        home: const TutorProfile(
+          namex: '',
+        ),
+        // home: const WebMainPage(),
         routes: {
-          "/tutorsinfo": (context) => const TutorProfile(),
+          "/tutorsinfo": (context) => const TutorProfile(
+                namex: '',
+              ),
           "/tutorslist": (context) => const FindTutorLogin()
           //add more pages here
         },

@@ -185,6 +185,7 @@ class _FindTutorState extends State<FindTutor> {
                                             final provider = context
                                                 .read<SearchTutorProvider>();
                                             provider.setSearch(tName);
+
                                             TutorList(
                                               tutorslist: tutorsinfo,
                                               keyword: setSearch,
@@ -397,7 +398,7 @@ class _FindTutorState extends State<FindTutor> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                             Text(
+                                            Text(
                                               'Pricing: $_pricevalue',
                                               style: const TextStyle(
                                                 color: Colors.white,
@@ -483,7 +484,7 @@ class _FindTutorState extends State<FindTutor> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                           Text(
+                                          Text(
                                             'Rating: $_rating',
                                             style: const TextStyle(
                                               color: Colors.white,
@@ -496,7 +497,8 @@ class _FindTutorState extends State<FindTutor> {
                                             children: [
                                               IconButton(
                                                 padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
+                                                constraints:
+                                                    const BoxConstraints(),
                                                 icon: Icon(
                                                   _rating >= 1
                                                       ? Icons.star
@@ -511,7 +513,7 @@ class _FindTutorState extends State<FindTutor> {
                                                     if (_rating > 1 ||
                                                         _rating == 0) {
                                                       _rating = 1;
-                                                    }else{
+                                                    } else {
                                                       _rating = 0;
                                                     }
                                                   });
@@ -519,7 +521,8 @@ class _FindTutorState extends State<FindTutor> {
                                               ),
                                               IconButton(
                                                 padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
+                                                constraints:
+                                                    const BoxConstraints(),
                                                 icon: Icon(
                                                   _rating >= 2
                                                       ? Icons.star
@@ -537,7 +540,8 @@ class _FindTutorState extends State<FindTutor> {
                                               ),
                                               IconButton(
                                                 padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
+                                                constraints:
+                                                    const BoxConstraints(),
                                                 icon: Icon(
                                                   _rating >= 3
                                                       ? Icons.star
@@ -555,7 +559,8 @@ class _FindTutorState extends State<FindTutor> {
                                               ),
                                               IconButton(
                                                 padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
+                                                constraints:
+                                                    const BoxConstraints(),
                                                 icon: Icon(
                                                   _rating >= 4
                                                       ? Icons.star
@@ -573,7 +578,8 @@ class _FindTutorState extends State<FindTutor> {
                                               ),
                                               IconButton(
                                                 padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
+                                                constraints:
+                                                    const BoxConstraints(),
                                                 icon: Icon(
                                                   _rating >= 5
                                                       ? Icons.star
