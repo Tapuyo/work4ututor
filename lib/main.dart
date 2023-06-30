@@ -18,7 +18,7 @@ import 'package:wokr4ututor/routes/routes.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:wokr4ututor/services/gethelpcategory.dart';
 import 'package:wokr4ututor/services/services.dart';
-import 'package:wokr4ututor/services/subject_services.dart';
+import 'package:wokr4ututor/services/subjectServices.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
 import 'package:wokr4ututor/ui/web/student/search_tutor_login/find_tutors_login.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_profile/tutor_profile.dart';
@@ -74,6 +74,10 @@ void main() async {
         value: DatabaseService(uid: '').tutorlist,
         initialData: const [],
       ),
+      StreamProvider<List<Subjects>>.value(
+        value: SubjectServices().subjectList,
+        initialData: const [],
+      ),
       StreamProvider<List<HelpCategory>>.value(
         value: HelpService().helplist,
         initialData: const [],
@@ -81,10 +85,6 @@ void main() async {
       StreamProvider<List<StudentsList>>.value(
         value:
             DatabaseService(uid: 'YnLdZm2n7bPZSTbXS0VvHgG0Jor2').enrolleelist,
-        initialData: const [],
-      ),
-      StreamProvider<List<Subjects>>.value(
-        value: SubjectServices().subjectList,
         initialData: const [],
       ),
       ChangeNotifierProvider(create: (_) => SearchTutorProvider()),
@@ -103,6 +103,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final helpcategorylistx = Provider.of<List<HelpCategory>>(context);
+    // print(helpcategorylistx.length);
+    // final subjectInfo = Provider.of<List<Subjects>>(context);
+    // print(subjectInfo.length);
     return StreamProvider<Users?>.value(
       value: AuthService().user,
       initialData: null,

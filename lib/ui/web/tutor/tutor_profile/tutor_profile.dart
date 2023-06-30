@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
+import 'package:wokr4ututor/data_class/helpclass.dart';
 import 'package:wokr4ututor/data_class/subject_class.dart';
 import 'package:wokr4ututor/data_class/tutor_info_class.dart';
 import 'package:wokr4ututor/provider/search_provider.dart';
+import 'package:wokr4ututor/services/subjectServices.dart';
 import 'package:wokr4ututor/ui/web/search_tutor/find_tutors.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_profile/viewschedule.dart';
 
@@ -28,46 +30,35 @@ class TutorProfile extends StatefulWidget {
 }
 
 class _TutorProfileState extends State<TutorProfile> {
-  // List<TutorInformation> tutorsinfox = [];
+  List<Subjects> subjectInfox = [];
 
   @override
   Widget build(BuildContext context) {
+    // final helpcategorylistx = Provider.of<List<HelpCategory>>(context);
+    // debugPrint(helpcategorylistx.length.toString());
     // var tutorname = context.select((SearchTutorProvider p) => p.tName);
+    // final subjectInfo = Provider.of<List<Subjects>>(context);
+    // subjectInfox = subjectInfo;
+    // debugPrint('${subjectInfo.length}11111111111111111111111111111111111');
+
     dynamic langx = List<String>;
     var tutorsinfo = Provider.of<List<TutorInformation>>(context);
-    final subjectInfo = Provider.of<List<Subjects>>(context);
-    print(subjectInfo.length);
 
-    var url;
-    setState(() {
-      // final tutorsinfo = context.read<TutorInformation>();
-      // listtutorsinfox.addAll(tutorsinfo);
-      try {
-        tutorsinfo.retainWhere((tutorId) {
-          return tutorId.firstName
-              .toLowerCase()
-              .contains(widget.namex.toLowerCase() ?? '');
-        });
-      } catch (a) {
-        tutorsinfo = [];
-      }
-      print(tutorsinfo);
+    try {
+      tutorsinfo.retainWhere((tutorId) {
+        return tutorId.firstName
+            .toLowerCase()
+            .contains(widget.namex.toLowerCase() ?? '');
+      });
+    } catch (a) {
+      tutorsinfo = [];
+    }
+    print(tutorsinfo);
+    final CollectionReference subjectCollection =
+        FirebaseFirestore.instance.collection('subjects');
 
-      langx = tutorsinfo[0].language;
-      final ref = FirebaseStorage.instance.ref().child(tutorsinfo[0].imageID);
-      // final subjet =
-      //     FirebaseFirestore.instance.collection(tutorsinfo[0].tutorID);
-      // print(ref);
-      // url = ref.getDownloadURL();
-      // print(url);
-      // tutorsinfo.retainWhere((user) {
-      //   return user.firstName.toLowerCase().contains(''.toLowerCase());
-      // });
-
-      // tutorsinfox.addAll(tutorsinfo);
-    });
-
-    // print(tutorsinfox);
+    langx = tutorsinfo[0].language;
+    final ref = FirebaseStorage.instance.ref().child(tutorsinfo[0].imageID);
 
     const Color background = Color.fromRGBO(55, 116, 135, 1);
     const Color fill = Colors.white;
@@ -984,29 +975,58 @@ class _TutorProfileState extends State<TutorProfile> {
                                         height: 30,
                                         width:
                                             MediaQuery.of(context).size.width,
-                                        child: ListView.builder(
-                                            itemCount: subjectInfo.length,
-                                            scrollDirection: Axis.horizontal,
-                                            itemBuilder: (contex, index) {
-                                              final item = langx[index];
-                                              return Row(
-                                                children: [
-                                                  Text(
-                                                    item['subjectName'] == ''
-                                                        ? ''
-                                                        : item + ',',
-                                                    style: TextStyle(
-                                                        fontSize: 25,
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontStyle:
-                                                            FontStyle.italic),
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 15,
-                                                  ),
-                                                ],
+                                        child: StreamBuilder(
+                                            stream:
+                                                subjectCollection.snapshots(),
+                                            builder: (context,
+                                                AsyncSnapshot<QuerySnapshot>
+                                                    streamSnapshot) {
+                                              if (streamSnapshot.hasData) {
+                                                return ListView.builder(
+                                                    scrollDirection:
+                                                        Axis.horizontal,
+                                                    itemCount: streamSnapshot
+                                                        .data!.docs.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      final DocumentSnapshot
+                                                          documentSnapshot =
+                                                          streamSnapshot.data!
+                                                              .docs[index];
+                                                      return Row(
+                                                        children: [
+                                                          // Text(
+                                                          //   documentSnapshot[
+                                                          //       'tutorId'],
+                                                          //   style: TextStyle(
+                                                          //       fontSize: 12,
+                                                          //       color:
+                                                          //           Colors.red),
+                                                          // ),
+                                                          Text(
+                                                            documentSnapshot[
+                                                                'subjectName'],
+                                                            style: const TextStyle(
+                                                                fontSize: 25,
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 15,
+                                                          ),
+                                                        ],
+                                                      );
+                                                    });
+                                              }
+                                              return const Center(
+                                                child:
+                                                    CircularProgressIndicator(),
                                               );
                                             }),
                                       ),

@@ -1,10 +1,10 @@
 class Subjects {
-  final DateTime dateTime;
-  final String image;
   final String subjectDescription;
   final String subjectId;
   final String subjectName;
   final String tutorId;
+  final String dateTime;
+  final String image;
   Subjects({
     required this.subjectDescription,
     required this.subjectId,
