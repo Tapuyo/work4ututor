@@ -1,5 +1,18 @@
+import 'dart:js_interop';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:provider/provider.dart';
+import 'package:wokr4ututor/data_class/helpclass.dart';
+import 'package:wokr4ututor/data_class/subject_class.dart';
+import 'package:wokr4ututor/data_class/tutor_info_class.dart';
+import 'package:wokr4ututor/provider/search_provider.dart';
+import 'package:wokr4ututor/services/subjectServices.dart';
+import 'package:wokr4ututor/ui/web/search_tutor/find_tutors.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_profile/viewschedule.dart';
 
 import '../../../../components/nav_bar.dart';
@@ -9,15 +22,44 @@ import 'contact_teacher.dart';
 import 'view_file.dart';
 
 class TutorProfile extends StatefulWidget {
-  const TutorProfile({super.key});
+  final String namex;
+  const TutorProfile({super.key, required this.namex});
 
   @override
   State<TutorProfile> createState() => _TutorProfileState();
 }
 
 class _TutorProfileState extends State<TutorProfile> {
+  List<Subjects> subjectInfox = [];
+
   @override
   Widget build(BuildContext context) {
+    // final helpcategorylistx = Provider.of<List<HelpCategory>>(context);
+    // debugPrint(helpcategorylistx.length.toString());
+    // var tutorname = context.select((SearchTutorProvider p) => p.tName);
+    // final subjectInfo = Provider.of<List<Subjects>>(context);
+    // subjectInfox = subjectInfo;
+    // debugPrint('${subjectInfo.length}11111111111111111111111111111111111');
+
+    dynamic langx = List<String>;
+    var tutorsinfo = Provider.of<List<TutorInformation>>(context);
+
+    try {
+      tutorsinfo.retainWhere((tutorId) {
+        return tutorId.firstName
+            .toLowerCase()
+            .contains(widget.namex.toLowerCase() ?? '');
+      });
+    } catch (a) {
+      tutorsinfo = [];
+    }
+    print(tutorsinfo);
+    final CollectionReference subjectCollection =
+        FirebaseFirestore.instance.collection('subjects');
+
+    langx = tutorsinfo[0].language;
+    final ref = FirebaseStorage.instance.ref().child(tutorsinfo[0].imageID);
+
     const Color background = Color.fromRGBO(55, 116, 135, 1);
     const Color fill = Colors.white;
     final List<Color> gradient = [
@@ -49,7 +91,7 @@ class _TutorProfileState extends State<TutorProfile> {
               children: [
                 Container(
                   alignment: Alignment.topCenter,
-                  height: MediaQuery.of(context).size.height,
+                  height: MediaQuery.of(context).size.height + 50,
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -100,7 +142,7 @@ class _TutorProfileState extends State<TutorProfile> {
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                                 color: Colors.transparent,
-                                                image: const DecorationImage(
+                                                image: DecorationImage(
                                                     image: AssetImage(
                                                         'assets/images/sample.jpg'),
                                                     fit: BoxFit.cover)),
@@ -123,16 +165,16 @@ class _TutorProfileState extends State<TutorProfile> {
                                               child: InkWell(
                                                 onTap: () {
                                                   showDialog<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return const ViewFile();
-                                                  },
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
-                                                  }
-                                                });
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return const ViewFile();
+                                                    },
+                                                  ).then((selectedDate) {
+                                                    if (selectedDate != null) {
+                                                      // Do something with the selected date
+                                                    }
+                                                  });
                                                 },
                                                 child: const Icon(
                                                   Icons.arrow_left,
@@ -150,16 +192,17 @@ class _TutorProfileState extends State<TutorProfile> {
                                               child: InkWell(
                                                   onTap: () {
                                                     showDialog<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return const ViewFile();
-                                                  },
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
-                                                  }
-                                                });
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return const ViewFile();
+                                                      },
+                                                    ).then((selectedDate) {
+                                                      if (selectedDate !=
+                                                          null) {
+                                                        // Do something with the selected date
+                                                      }
+                                                    });
                                                   },
                                                   child: Container(
                                                     height: 60,
@@ -186,16 +229,17 @@ class _TutorProfileState extends State<TutorProfile> {
                                               child: InkWell(
                                                   onTap: () {
                                                     showDialog<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return const ViewFile();
-                                                  },
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
-                                                  }
-                                                });
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return const ViewFile();
+                                                      },
+                                                    ).then((selectedDate) {
+                                                      if (selectedDate !=
+                                                          null) {
+                                                        // Do something with the selected date
+                                                      }
+                                                    });
                                                   },
                                                   child: Container(
                                                     height: 60,
@@ -586,7 +630,7 @@ class _TutorProfileState extends State<TutorProfile> {
                                   const Padding(
                                     padding: EdgeInsets.all(10.0),
                                     child: Text(
-                                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+                                      '111111Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit',
                                       textAlign: TextAlign.justify,
                                       style: TextStyle(
                                         fontSize: 15,
@@ -866,9 +910,10 @@ class _TutorProfileState extends State<TutorProfile> {
                                       const SizedBox(
                                         height: 5,
                                       ),
-                                      const Text(
-                                        'Marian, 28',
-                                        style: TextStyle(
+                                      Text(
+                                        '${tutorsinfo[0].lastname}, ${tutorsinfo[0].firstName} ${tutorsinfo[0].middleName == 'N/A' ? '' : tutorsinfo[0].middleName}',
+                                        // 'Marian, 28',
+                                        style: const TextStyle(
                                             fontSize: 35,
                                             color: Colors.white,
                                             fontWeight: FontWeight.w900),
@@ -876,9 +921,10 @@ class _TutorProfileState extends State<TutorProfile> {
                                       const SizedBox(
                                         height: 5,
                                       ),
-                                      const Text(
-                                        'USA, Manchester',
-                                        style: TextStyle(
+                                      Text(
+                                        tutorsinfo[0].birthPlace ?? '',
+                                        // 'USA, Manchester',
+                                        style: const TextStyle(
                                             fontSize: 25,
                                             color: Colors.white,
                                             fontWeight: FontWeight.w500),
@@ -886,29 +932,118 @@ class _TutorProfileState extends State<TutorProfile> {
                                       const SizedBox(
                                         height: 5,
                                       ),
-                                      const Text(
-                                        'English, Filipino, Russian, European',
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w400),
+                                      Container(
+                                        height: 30,
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        child: ListView.builder(
+                                            itemCount: langx.length,
+                                            scrollDirection: Axis.horizontal,
+                                            itemBuilder: (contex, index) {
+                                              final item = langx[index];
+                                              return Row(
+                                                children: [
+                                                  Text(
+                                                    item == ''
+                                                        ? ''
+                                                        : item + ',',
+                                                    style: const TextStyle(
+                                                        fontSize: 20,
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.w400),
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 15,
+                                                  ),
+                                                ],
+                                              );
+                                            }),
                                       ),
+
+                                      // Text(
+                                      //   'English, Filipino, Russian, European',
+                                      //   style: TextStyle(
+                                      //       fontSize: 20,
+                                      //       color: Colors.white,
+                                      //       fontWeight: FontWeight.w400),
+                                      // ),
                                       const SizedBox(
                                         height: 5,
                                       ),
-                                      const Text(
-                                        'Chemistry, Science, Math, Language(Filipino, English)',
-                                        style: TextStyle(
-                                            fontSize: 25,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
-                                            fontStyle: FontStyle.italic),
+                                      Container(
+                                        height: 30,
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        child: StreamBuilder(
+                                            stream:
+                                                subjectCollection.snapshots(),
+                                            builder: (context,
+                                                AsyncSnapshot<QuerySnapshot>
+                                                    streamSnapshot) {
+                                              if (streamSnapshot.hasData) {
+                                                return ListView.builder(
+                                                    scrollDirection:
+                                                        Axis.horizontal,
+                                                    itemCount: streamSnapshot
+                                                        .data!.docs.length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      final DocumentSnapshot
+                                                          documentSnapshot =
+                                                          streamSnapshot.data!
+                                                              .docs[index];
+                                                      return Row(
+                                                        children: [
+                                                          // Text(
+                                                          //   documentSnapshot[
+                                                          //       'tutorId'],
+                                                          //   style: TextStyle(
+                                                          //       fontSize: 12,
+                                                          //       color:
+                                                          //           Colors.red),
+                                                          // ),
+                                                          Text(
+                                                            documentSnapshot[
+                                                                'subjectName'],
+                                                            style: const TextStyle(
+                                                                fontSize: 25,
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 15,
+                                                          ),
+                                                        ],
+                                                      );
+                                                    });
+                                              }
+                                              return const Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                            }),
                                       ),
+                                      // const Text(
+                                      //   'Chemistry, Science, Math, Language(Filipino, English)',
+                                      //   style: TextStyle(
+                                      //       fontSize: 25,
+                                      //       color: Colors.white,
+                                      //       fontWeight: FontWeight.w500,
+                                      //       fontStyle: FontStyle.italic),
+                                      // ),
                                       const SizedBox(
                                         height: 20,
                                       ),
-                                      const Text(
-                                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat vLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat ',
+                                      Text(
+                                        tutorsinfo[0].promotionalMessage ?? '',
+                                        // 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat vLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat ',
                                         textAlign: TextAlign.justify,
                                         style: TextStyle(
                                           fontSize: 15,

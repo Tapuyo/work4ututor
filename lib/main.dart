@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:wokr4ututor/constant/constant.dart';
 import 'package:wokr4ututor/data_class/helpclass.dart';
 import 'package:wokr4ututor/data_class/studentsEnrolledclass.dart';
+import 'package:wokr4ututor/data_class/subject_class.dart';
 import 'package:wokr4ututor/provider/chatmessagedisplay.dart';
 import 'package:wokr4ututor/provider/classinfo_provider.dart';
 import 'package:wokr4ututor/provider/classes_inquirey_provider.dart';
@@ -17,6 +18,7 @@ import 'package:wokr4ututor/routes/routes.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:wokr4ututor/services/gethelpcategory.dart';
 import 'package:wokr4ututor/services/services.dart';
+import 'package:wokr4ututor/services/subjectServices.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
 import 'package:wokr4ututor/ui/web/student/search_tutor_login/find_tutors_login.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_profile/tutor_profile.dart';
@@ -72,6 +74,10 @@ void main() async {
         value: DatabaseService(uid: '').tutorlist,
         initialData: const [],
       ),
+      StreamProvider<List<Subjects>>.value(
+        value: SubjectServices().subjectList,
+        initialData: const [],
+      ),
       StreamProvider<List<HelpCategory>>.value(
         value: HelpService().helplist,
         initialData: const [],
@@ -97,6 +103,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final helpcategorylistx = Provider.of<List<HelpCategory>>(context);
+    // print(helpcategorylistx.length);
+    // final subjectInfo = Provider.of<List<Subjects>>(context);
+    // print(subjectInfo.length);
     return StreamProvider<Users?>.value(
       value: AuthService().user,
       initialData: null,
@@ -110,9 +120,14 @@ class MyApp extends StatelessWidget {
           canvasColor: Colors.white,
           primarySwatch: Colors.indigo,
         ),
-        home: const WebMainPage(),
+        home: const TutorProfile(
+          namex: '',
+        ),
+        // home: const WebMainPage(),
         routes: {
-          "/tutorsinfo": (context) => const TutorProfile(),
+          "/tutorsinfo": (context) => const TutorProfile(
+                namex: '',
+              ),
           "/tutorslist": (context) => const FindTutorLogin()
           //add more pages here
         },
