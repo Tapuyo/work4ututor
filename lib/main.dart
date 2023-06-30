@@ -120,10 +120,10 @@ class MyApp extends StatelessWidget {
           canvasColor: Colors.white,
           primarySwatch: Colors.indigo,
         ),
-        home: const TutorProfile(
-          namex: '',
-        ),
-        // home: const WebMainPage(),
+        // home: const TutorProfile(
+        //   namex: '',
+        // ),
+        home: const WebMainPage(),
         routes: {
           "/tutorsinfo": (context) => const TutorProfile(
                 namex: '',
