@@ -27,7 +27,10 @@ class RouteGenerator {
         return CupertinoPageRoute(builder: (_) => const TutorSignup());
 
       case Routes.tutorInfo:
-        return CupertinoPageRoute(builder: (_) => const TutorProfile());
+        return CupertinoPageRoute(
+            builder: (_) => const TutorProfile(
+                  namex: '',
+                ));
 
       case Routes.tutorList:
         return CupertinoPageRoute(builder: (_) => const FindTutor());
