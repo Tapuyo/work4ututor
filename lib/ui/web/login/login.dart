@@ -11,6 +11,7 @@ import '../../../data_class/user_class.dart';
 import '../../../shared_components/alphacode3.dart';
 import '../../../utils/themes.dart';
 
+
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -253,7 +254,7 @@ class _SigniNState extends State<SigniN> {
                       // provider.setUserID(result.uid);
                      _auth.adduserInfo({
                         "userID": result.uid,
-                        "userStatus": 'tutor'
+                        "userStatus": 'student'
                       });
                     });
                   }

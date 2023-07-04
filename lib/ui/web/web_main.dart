@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:wokr4ututor/ui/web/login/login.dart';
 import 'tutor/tutor_dashboard/tutor_dashboard.dart';
 import 'student/main_dashboard/student_dashboard.dart';
 
@@ -13,7 +14,7 @@ class WebMainPage extends StatefulWidget {
 class _MainPageState extends State<WebMainPage> {
   final _userinfo = Hive.box('userID');
   List<Map<String, dynamic>> _items = [];
-   _refreshItems() {
+  _refreshItems() {
     final data = _userinfo.keys.map((key) {
       final item = _userinfo.get(key);
       return {
@@ -39,10 +40,10 @@ class _MainPageState extends State<WebMainPage> {
 //  final user = Provider.of<Users?>(context);
     final index = _items.length;
     if (index == 0) {
-      return const StudentDashboardPage();
+      return const LoginPage();
     } else {
       debugPrint(index.toString());
-      return DashboardPage();
+      return StudentDashboardPage(uID: _items[0]['userID'].toString());
     }
   }
 }

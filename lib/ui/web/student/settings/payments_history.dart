@@ -6,7 +6,8 @@ import '../../../../data_class/atmclass.dart';
 import '../../../../utils/themes.dart';
 
 class PaymentsHistory extends StatefulWidget {
-  const PaymentsHistory({super.key});
+  final String uID;
+  const PaymentsHistory({super.key, required this.uID});
 
   @override
   State<PaymentsHistory> createState() => _PaymentsHistorysState();

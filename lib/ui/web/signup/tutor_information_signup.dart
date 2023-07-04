@@ -1625,10 +1625,10 @@ class _InputInfoState extends State<InputInfo> {
                               ),
                             ),
                             onPressed: () => {
-                              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) =>  DashboardPage()),
-                ),
+                //               Navigator.pushReplacement(
+                //   context,
+                //   MaterialPageRoute(builder: (context) =>  DashboardPage()),
+                // ),
                             },
                             child: const Text(
                               'Proceed Now',

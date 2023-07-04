@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wokr4ututor/data_class/tutor_info_class.dart';
 import 'package:wokr4ututor/ui/web/student/settings/guardian_information.dart';
 import 'package:wokr4ututor/ui/web/student/settings/payments_history.dart';
+import 'package:wokr4ututor/ui/web/student/settings/student_account.dart';
 import 'package:wokr4ututor/ui/web/student/settings/student_information.dart';
 import 'package:wokr4ututor/ui/web/tutor/settings/classes_pricing.dart';
 import 'package:wokr4ututor/ui/web/tutor/settings/payments_withdrawals.dart';
@@ -10,14 +11,15 @@ import 'package:wokr4ututor/ui/web/tutor/settings/tutor_information.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
 class StudentSettingsPage extends StatefulWidget {
-  const StudentSettingsPage({super.key});
+  final String uID;
+  const StudentSettingsPage({super.key, required this.uID});
 
   @override
   State<StudentSettingsPage> createState() => _StudentSettingsPageState();
 }
 
 class _StudentSettingsPageState extends State<StudentSettingsPage> {
-  String settingsView = '/guardianinfo';
+  String settingsView = '/studentinfo';
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -58,6 +60,31 @@ class _StudentSettingsPageState extends State<StudentSettingsPage> {
                     height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
+                        backgroundColor: settingsView == "/studentinfo"
+                            ? kColorPrimary
+                            : Colors.white,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          settingsView = "/studentinfo";
+                        });
+                      },
+                      child: Text(
+                        'Student Information',
+                        style: TextStyle(
+                            color: settingsView == "/studentinfo"
+                                ? Colors.white
+                                : Colors.black),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 200,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
                         backgroundColor: settingsView == "/guardianinfo"
                             ? kColorPrimary
                             : Colors.white,
@@ -85,21 +112,23 @@ class _StudentSettingsPageState extends State<StudentSettingsPage> {
                     height: 50,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: settingsView == "/studentinfo"
+                        backgroundColor: settingsView == "/accounts"
                             ? kColorPrimary
                             : Colors.white,
+                        disabledForegroundColor: Colors.blueGrey,
+                        disabledBackgroundColor: Colors.blueGrey,
                         shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(Radius.circular(5))),
                       ),
                       onPressed: () {
                         setState(() {
-                          settingsView = "/studentinfo";
+                          settingsView = "/accounts";
                         });
                       },
                       child: Text(
-                        'Student Information',
+                        'Account Information',
                         style: TextStyle(
-                            color: settingsView == "/studentinfo"
+                            color: settingsView == "/accounts"
                                 ? Colors.white
                                 : Colors.black),
                       ),
@@ -138,11 +167,13 @@ class _StudentSettingsPageState extends State<StudentSettingsPage> {
               child: Divider(color: Colors.grey),
             ),
             if (settingsView == "/guardianinfo") ...{
-              const GuardianInfoSettings(),
-            }else if(settingsView == "/studentinfo") ...{
-              const StudentInformation(),
-            }else if(settingsView == "/history") ...{
-              const PaymentsHistory(),
+              GuardianInfoSettings(uID: widget.uID),
+            } else if (settingsView == "/studentinfo") ...{
+              StudentInformation(uID: widget.uID),
+            } else if (settingsView == "/history") ...{
+              PaymentsHistory(uID: widget.uID),
+            } else if (settingsView == "/accounts") ...{
+              StudentAccounts(uID: widget.uID),
             }
           ],
         ),

@@ -21,6 +21,8 @@ import '../../../../shared_components/responsive_builder.dart';
 import '../../help/help.dart';
 
 class DashboardPage extends StatefulWidget {
+  final String uID;
+  const DashboardPage({super.key, required this.uID});
   @override
   _DashboardPageState createState() => _DashboardPageState();
 }

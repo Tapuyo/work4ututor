@@ -50,7 +50,7 @@ addStudentInfo(String tEmail, tPassword, uType) {
       .add({'email': tEmail, 'password': tPassword, 'role': uType});
   FirebaseFirestore.instance
       .collection('students')
-      .add({'firstName': tEmail, 'lastName': tPassword, 'userID': 'Tutor'});
+      .add({'firstName': tEmail, 'lastName': tPassword, 'userID': 'Student'});
 }
 
 class DatabaseService {
@@ -67,21 +67,21 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('studentsEnrolled');
 
   List<TutorInformation> _getTutorInformation(QuerySnapshot snapshot) {
-    
     return snapshot.docs.map((tutordata) {
       return TutorInformation(
         birthPlace: tutordata['birthPlace'] ?? '',
         country: tutordata['country'] ?? '',
-        certificates: tutordata['certificates'] ?? '',
+        certificates:
+            (tutordata['certificates'] as List<dynamic>).cast<String>(),
         resume: tutordata['resume'] ?? '',
         promotionalMessage: tutordata['promotionalMessage'] ?? '',
         withdrawal: tutordata['withdrawal'] ?? '',
         status: tutordata['status'] ?? '',
         extensionName: tutordata['extensionName'] ?? '',
-        dateSign: DateTime.now().toString(),
+        dateSign: tutordata['dateSign']?.toDate() ?? '',
         firstName: tutordata['firstName'] ?? '',
         imageID: tutordata['imageID'] ?? '',
-        language: tutordata['language'] ?? '',
+        language: (tutordata['language'] as List<dynamic>).cast<String>(),
         lastname: tutordata['lastName'] ?? '',
         middleName: tutordata['middleName'] ?? '',
         presentation: tutordata['presentation'] ?? '',

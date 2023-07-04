@@ -148,7 +148,7 @@ class StudentsMenu extends HookWidget {
                 size: 30,
               ),
               label: const Text(
-                'CLASSES',
+                'CALENDAR',
                 style: TextStyle(fontSize: 15),
               ),
             ),
@@ -195,7 +195,7 @@ class StudentsMenu extends HookWidget {
                 size: 30,
               ),
               label: const Text(
-                'CLASSES BOOK',
+                'CLASSES',
                 style: TextStyle(fontSize: 15),
               ),
             ),
@@ -242,7 +242,7 @@ class StudentsMenu extends HookWidget {
                 size: 30,
               ),
               label: const Text(
-                'MY INQUIRIES',
+                'INQUIRIES',
                 style: TextStyle(fontSize: 15),
               ),
             ),

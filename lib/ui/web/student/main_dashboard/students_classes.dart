@@ -15,13 +15,14 @@ import 'package:wokr4ututor/ui/web/student/main_dashboard/app_helpers.dart';
 import 'package:wokr4ututor/ui/web/student/main_dashboard/task_progress.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
-import '../../../../data_class/studentinofclass.dart';
+import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/voucherclass.dart';
 import '../../../../services/getvouchers.dart';
 import 'coupon.dart';
 import 'task_in_progress.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz;
+import 'dart:html' as html;
 
 class StudentMainDashboard extends StatefulWidget {
   const StudentMainDashboard({super.key});
@@ -302,7 +303,7 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
       totalcompletedclasses = completedclasses.length.toString();
     } else {
       totalcompletedclasses = '0';
-    }
+    }   
     Size size = MediaQuery.of(context).size;
     return StreamProvider<List<Voucherclass>>.value(
         value: GetVouchers(uid: 'UHvVwHVxYZARastsdiA0').voucherlist,
@@ -406,9 +407,10 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                                                     Radius.circular(25))),
                                           ),
                                           onPressed: () {
-                                            setState(() {
-                                              fetchSubcollection();
-                                            });
+                                            html.window.open('/tutorslist', "");
+                                            // setState(() {
+                                            //   fetchSubcollection();
+                                            // });
                                           },
                                           child: const Text(
                                             'Book Now',

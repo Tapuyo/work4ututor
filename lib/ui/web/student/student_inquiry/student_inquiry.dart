@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/provider/classes_inquirey_provider.dart';
@@ -15,7 +16,8 @@ import '../../../../utils/themes.dart';
 import 'dart:html' as html;
 
 class StudentInquiry extends HookWidget {
-  StudentInquiry({super.key});
+ final String uID;
+  StudentInquiry(this.uID, {super.key});
 
   DateTime? _fromselectedDate;
   DateTime? _toselectedDate;
@@ -68,6 +70,7 @@ class StudentInquiry extends HookWidget {
 
   String dropdownValue = 'English';
   Color buttonColor = kCalendarColorAB;
+  
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +88,7 @@ class StudentInquiry extends HookWidget {
 
     useEffect(() {
       Future.microtask(() async {
-        provider.getClassInquiry(context, userId);
+        provider.getClassInquiry(context, uID);
       });
       return;
     }, [isRefresh]);
@@ -126,7 +129,7 @@ class StudentInquiry extends HookWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: const [
                   Text(
-                    "MY INQUIRY",
+                    "INQUIRIES",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -326,8 +329,7 @@ class StudentInquiry extends HookWidget {
                                   backgroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(
                                     side: const BorderSide(
-                                      color:
-                                          kColorPrimary, // your color here
+                                      color: kColorPrimary, // your color here
                                       width: 1,
                                     ),
                                     borderRadius: BorderRadius.circular(24.0),

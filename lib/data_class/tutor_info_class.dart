@@ -1,12 +1,12 @@
 class TutorInformation {
-  dynamic language = List<String>;
+  List<String> language;
   final String birthPlace;
-  dynamic certificates = List<String>;
+  List<String> certificates;
   final String country;
-  final String dateSign;
+  final DateTime dateSign;
   final String extensionName;
   final String firstName;
-  dynamic imageID = List<String>;
+  final String imageID;
   final String lastname;
   final String middleName;
   final String presentation;

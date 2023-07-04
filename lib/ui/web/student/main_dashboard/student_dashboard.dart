@@ -7,8 +7,11 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/components/students_navbar.dart';
+import 'package:wokr4ututor/data_class/classesdataclass.dart';
+import 'package:wokr4ututor/data_class/user_class.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/ui/web/student/book_classes/my_classes.dart';
 import 'package:wokr4ututor/ui/web/student/calendar/student_calendar.dart';
@@ -20,10 +23,12 @@ import 'package:wokr4ututor/ui/web/tutor/mesages/messages.dart';
 import 'package:wokr4ututor/ui/web/tutor/performance/tutor_performance.dart';
 
 import '../../../../data_class/studentanalyticsclass.dart';
-import '../../../../data_class/studentinofclass.dart';
+import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/studentsEnrolledclass.dart';
+import '../../../../services/getenrolledclasses.dart';
 import '../../../../services/getstudentclassesanalytics.dart';
 import '../../../../services/getstudentinfo.dart';
+import '../../../../services/getuser.dart';
 import '../../../../services/services.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
@@ -32,11 +37,14 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:http/http.dart' as http;
 
 class StudentDashboardPage extends StatefulWidget {
-  const StudentDashboardPage({super.key});
+  final String uID;
+  const StudentDashboardPage({super.key, required this.uID});
   @override
   State<StudentDashboardPage> createState() => _StudentDashboardPageState();
 }
 
+final _userinfo = Hive.box('userID');
+List<Map<String, dynamic>> _items = [];
 String firstname = '';
 String middlename = '';
 String lastname = '';
@@ -52,22 +60,43 @@ int newnotificationcount = 0;
 class _StudentDashboardPageState extends State<StudentDashboardPage> {
   @override
   Widget build(BuildContext context) {
-    final int menuIndex = context.select((InitProvider p) => p.menuIndex);
     Size size = MediaQuery.of(context).size;
     return MultiProvider(
       providers: [
         StreamProvider<List<StudentsList>>.value(
           value: DatabaseService(uid: '').enrolleelist,
           catchError: (context, error) {
-            // Handle the error here
             print('Error occurred: $error');
-            // Return a default value or an alternative stream
             return [];
           },
           initialData: const [],
         ),
         StreamProvider<List<StudentInfoClass>>.value(
           value: StudentInfoData(uid: 'XuQyf7S8gCOJBu6gTIb0').getstudentinfo,
+          catchError: (context, error) {
+            print('Error occurred: $error');
+            return [];
+          },
+          initialData: const [],
+        ),
+        StreamProvider<List<StudentGuardianClass>>.value(
+          value: StudentGuardianData(uid: 'XuQyf7S8gCOJBu6gTIb0').guardianinfo,
+          catchError: (context, error) {
+            print('Error occurred: $error');
+            return [];
+          },
+          initialData: const [],
+        ),
+        StreamProvider<List<UserData>>.value(
+          value: GetUsersData(uid: 'UhcbNwFHdQbclzdU2eC9NeIeziF2').getUserinfo,
+          catchError: (context, error) {
+            print('Error occurred: $error');
+            return [];
+          },
+          initialData: const [],
+        ),
+        StreamProvider<List<ClassesData>>.value(
+          value: EnrolledClass(uid: 'XuQyf7S8gCOJBu6gTIb0', role: 'student').getenrolled,
           catchError: (context, error) {
             // Handle the error here
             print('Error occurred: $error');
@@ -87,15 +116,16 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
           initialData: const [],
         )
       ],
-      child: const MainPageBody(),
+      child: MainPageBody(
+        uID: widget.uID,
+      ),
     );
   }
-
-  void onPressed() {}
 }
 
 class MainPageBody extends StatefulWidget {
-  const MainPageBody({super.key});
+  final String uID;
+  const MainPageBody({super.key, required this.uID});
   @override
   State<MainPageBody> createState() => _MainPageBodyPageState();
 }
@@ -317,11 +347,10 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                       ] else if (menuIndex == 3) ...[
                         gotoList()
                       ] else if (menuIndex == 4) ...[
-                        StudentInquiry()
+                        StudentInquiry(widget.uID)
                       ] else if (menuIndex == 5) ...[
                         const PerformancePage()
                       ] else if (menuIndex == 6) ...[
-                        const StudentSettingsPage()
                       ] else if (menuIndex == 7) ...[
                         const HelpPage()
                       ] else ...[
@@ -343,11 +372,11 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                     ] else if (menuIndex == 3) ...[
                       gotoList()
                     ] else if (menuIndex == 4) ...[
-                      StudentInquiry()
+                      StudentInquiry(widget.uID)
                     ] else if (menuIndex == 5) ...[
                       const PerformancePage()
                     ] else if (menuIndex == 6) ...[
-                      const StudentSettingsPage()
+                       StudentSettingsPage(uID: widget.uID,)
                     ] else if (menuIndex == 7) ...[
                       const HelpPage()
                     ] else ...[
@@ -389,11 +418,11 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                             ] else if (menuIndex == 3) ...[
                               gotoList()
                             ] else if (menuIndex == 4) ...[
-                              StudentInquiry()
+                              StudentInquiry(widget.uID)
                             ] else if (menuIndex == 5) ...[
                               const PerformancePage()
                             ] else if (menuIndex == 6) ...[
-                              const StudentSettingsPage()
+                              StudentSettingsPage(uID: widget.uID,)
                             ] else if (menuIndex == 7) ...[
                               const HelpPage()
                             ] else ...[

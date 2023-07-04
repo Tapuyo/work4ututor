@@ -1,13 +1,17 @@
 // ignore_for_file: unused_element, unused_local_variable, sized_box_for_whitespace
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:wokr4ututor/data_class/classesdataclass.dart';
 import 'package:wokr4ututor/data_class/studentsEnrolledclass.dart';
 import 'package:wokr4ututor/ui/web/student/book_classes/student_view_classinfo.dart';
 import 'package:wokr4ututor/ui/web/tutor/classes/view_classinfo.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
+import '../../../../data_class/studentinfoclass.dart';
+import '../../../../data_class/tutor_info_class.dart';
 import '../../../../provider/classinfo_provider.dart';
 
 import 'dart:html' as html;
@@ -26,6 +30,28 @@ class _MyClassesState extends State<MyClasses> {
   Color buttonColor = kCalendarColorAB;
   DateTime? _fromselectedDate;
   DateTime? _toselectedDate;
+  ClassesData selectedclass = ClassesData(
+      classid: '',
+      subjectID: '',
+      tutorID: '',
+      studentID: '',
+      materials: [],
+      schedule: [],
+      score: [],
+      status: '',
+      totalClasses: '',
+      completedClasses: '',
+      pendingClasses: '',
+      dateEnrolled: DateTime.now(),
+      studentinfo: [],
+      tutorinfo: [],
+      subjectinfo: []);
+
+  String? downloadURL;
+  List<String> imagelinks = [];
+  ImageProvider? imageProvider;
+  String profileurl = '';
+
   void _pickDateDialog() {
     showDatePicker(
             context: context,
@@ -71,11 +97,23 @@ class _MyClassesState extends State<MyClasses> {
   }
 
   bool select = false;
+
+  Future getData(String path) async {
+    try {
+      return await FirebaseStorage.instance.ref(path).getDownloadURL();
+    } catch (e) {
+      debugPrint("Error - $e");
+      return null;
+    }
+  }
+
+  
   @override
   Widget build(BuildContext context) {
     final bool open =
         context.select((ViewClassDisplayProvider p) => p.openClassInfo);
-    final enrolleelist = Provider.of<List<StudentsList>>(context);
+    final enrolledlist = Provider.of<List<ClassesData>>(context);
+
     Size size = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10),
@@ -109,7 +147,7 @@ class _MyClassesState extends State<MyClasses> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const Text(
-                    "CLASSES BOOK",
+                    "CLASSES",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -412,7 +450,9 @@ class _MyClassesState extends State<MyClasses> {
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(5))),
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  print(enrolledlist.length);
+                                },
                                 child: const Text('Search'),
                               ),
                             ),
@@ -533,238 +573,295 @@ class _MyClassesState extends State<MyClasses> {
                               thickness: 2,
                             ),
                           ),
-                          Container(
-                            width: size.width - 320,
-                            height: size.height - 175,
-                            child: ListView.builder(
-                              itemCount: 1,
-                              itemBuilder: (context, index) {
-                                return Column(
-                                  children: [
-                                    Container(
-                                      color: (index % 2 == 0)
-                                          ? Colors.white
-                                          : Colors.grey[200],
-                                      child: InkWell(
-                                        highlightColor: kCalendarColorFB,
-                                        splashColor: kColorPrimary,
-                                        focusColor:
-                                            Colors.green.withOpacity(0.0),
-                                        hoverColor: kColorLight,
-                                        onTap: () {
-                                          final provider = context
-                                              .read<ViewClassDisplayProvider>();
-                                          provider.setViewClassinfo(true);
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            top: 5.0,
-                                            left: 10,
-                                            right: 10,
-                                            bottom: 5.0,
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Checkbox(
-                                                checkColor: Colors.black,
-                                                activeColor: Colors.red,
-                                                value: select,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    select = value!;
-                                                  });
-                                                },
-                                              ),
-                                              SizedBox(
-                                                width: 300,
-                                                child: ListTile(
-                                                  leading: CircleAvatar(
-                                                    radius: 20.0,
-                                                    backgroundColor:
-                                                        Colors.transparent,
-                                                    child: Image.asset(
-                                                      'assets/images/login.png',
-                                                      width: 300.0,
-                                                      height: 100.0,
-                                                      fit: BoxFit.contain,
-                                                    ),
-                                                  ),
-                                                  title: const Text(
-                                                    'Michelle Fox',
-                                                    style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                    ),
-                                                  ),
-                                                  subtitle: const Text(
-                                                    "Philippines",
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.normal,
-                                                    ),
-                                                  ),
+                          enrolledlist.isNotEmpty
+                              ? Container(
+                                  width: size.width - 320,
+                                  height: size.height - 175,
+                                  child: ListView.builder(
+                                    itemCount: enrolledlist.length,
+                                    itemBuilder: (context, index) {
+                                      final enrolledClass = enrolledlist[index];
+                                      List<SubjectClass> subjectinfo =
+                                          enrolledClass.subjectinfo;
+                                      List<TutorInformation> tutorinfo =
+                                          enrolledClass.tutorinfo;
+                                      List<StudentInfoClass> studentinfo =
+                                          enrolledClass.studentinfo;
+                                      bool dataLoaded = false;
+                                      String tempimage = '';
+                                      if (!dataLoaded) {
+                                        getData(tutorinfo.first.imageID)
+                                            .then((downloadURL) {
+                                          if (downloadURL != null) {
+                                            setState(() {
+                                              tempimage = downloadURL;
+                                              dataLoaded =
+                                                  true; // Mark the data as loaded
+                                            });
+                                          } else {
+                                            print(
+                                                'Failed to retrieve download URL.');
+                                          }
+                                        });
+                                      }
+
+                                      return Column(
+                                        children: [
+                                          Container(
+                                            color: (index % 2 == 0)
+                                                ? Colors.white
+                                                : Colors.grey[200],
+                                            child: InkWell(
+                                              highlightColor: kCalendarColorFB,
+                                              splashColor: kColorPrimary,
+                                              focusColor:
+                                                  Colors.green.withOpacity(0.0),
+                                              hoverColor: kColorLight,
+                                              onTap: () {
+                                                setState(() {
+                                                  selectedclass = enrolledClass;
+                                                });
+                                                final provider = context.read<
+                                                    ViewClassDisplayProvider>();
+                                                provider.setViewClassinfo(true);
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                  top: 5.0,
+                                                  left: 10,
+                                                  right: 10,
+                                                  bottom: 5.0,
                                                 ),
-                                              ),
-                                              const SizedBox(
-                                                width: 5,
-                                              ),
-                                              SizedBox(
-                                                width: 200,
-                                                child: Text(
-                                                  DateFormat('MMMM dd, yyyy')
-                                                      .format(DateTime.now())
-                                                      .toString(),
-                                                  style: const TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w700),
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              const SizedBox(
-                                                width: 140,
-                                                child: Text(
-                                                  "Chemistry ",
-                                                  style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w700),
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              SizedBox(
-                                                  width: 140,
-                                                  child: Container(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8),
-                                                        color: (index
-                                                                .isNegative)
-                                                            ? Colors.white
-                                                            : kCalendarColorFB,
-                                                      ),
-                                                      child: const Align(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          child: Text(
-                                                              'Ongoing')))),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              SizedBox(
-                                                  width: 180,
-                                                  child: Column(
-                                                    children: const [
-                                                      ListTile(
-                                                        title:
-                                                            Text('3 Classes'),
-                                                        subtitle: Text(
-                                                            'Completed: 1 Class/Upcoming: 2 Classes'),
-                                                      )
-                                                    ],
-                                                  )),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              SizedBox(
-                                                width: 140,
-                                                child: Container(
-                                                  width: 90,
-                                                  height: 40,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20),
-                                                    color: buttonColor,
-                                                  ),
-                                                  child: TextButton.icon(
-                                                    style: TextButton
-                                                        .styleFrom(
-                                                      padding:
-                                                          const EdgeInsets
-                                                              .all(10),
-                                                      alignment:
-                                                          Alignment.center,
-                                                      foregroundColor:
-                                                          const Color
-                                                                  .fromRGBO(
-                                                              1,
-                                                              118,
-                                                              132,
-                                                              1),
-                                                      disabledBackgroundColor:
-                                                          Colors.white,
-                                                      backgroundColor:
-                                                          Colors.white,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        side:
-                                                            const BorderSide(
-                                                          color: kColorPrimary, // your color here
-                                                          width: 1,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Checkbox(
+                                                      checkColor: Colors.black,
+                                                      activeColor: Colors.red,
+                                                      value: select,
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          select = value!;
+                                                        });
+                                                      },
+                                                    ),
+                                                    SizedBox(
+                                                      width: 300,
+                                                      child: ListTile(
+                                                        leading: CircleAvatar(
+                                                          backgroundImage:
+                                                              NetworkImage(
+                                                            tempimage
+                                                                .toString(),
+                                                          ),
+                                                          radius: 25,
                                                         ),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                                    24.0),
+                                                        title: Text(
+                                                          '${(tutorinfo.first.firstName)}${(tutorinfo.first.middleName == 'N/A' ? '' : ' ${(tutorinfo.first.firstName)}')} ${(tutorinfo.first.lastname)}',
+                                                          // 'Name',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                          ),
+                                                        ),
+                                                        subtitle: Text(
+                                                          tutorinfo
+                                                              .first.country,
+                                                          // 'Country',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 15,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal,
+                                                          ),
+                                                        ),
                                                       ),
-                                                      // ignore: prefer_const_constructors
-                                                      textStyle: TextStyle(
-                                                        color: Colors
-                                                            .deepPurple,
-                                                        fontSize: 12,
-                                                        fontStyle: FontStyle
-                                                            .normal,
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 5,
+                                                    ),
+                                                    SizedBox(
+                                                      width: 200,
+                                                      child: Text(
+                                                        DateFormat(
+                                                                'MMMM dd, yyyy')
+                                                            .format(enrolledlist[
+                                                                    index]
+                                                                .dateEnrolled)
+                                                            .toString(),
+                                                        style: const TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w700),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    SizedBox(
+                                                      width: 140,
+                                                      child: Text(
+                                                        subjectinfo
+                                                            .first.subjectName,
+                                                        // 'Subject Name',
+                                                        style: const TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w700),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    SizedBox(
+                                                        width: 140,
+                                                        child: Container(
+                                                            alignment: Alignment
+                                                                .center,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8),
+                                                              color: (index
+                                                                      .isNegative)
+                                                                  ? Colors.white
+                                                                  : kCalendarColorFB,
+                                                            ),
+                                                            child: Align(
+                                                                alignment:
+                                                                    Alignment
+                                                                        .center,
+                                                                child: Text(
+                                                                    enrolledlist[
+                                                                            index]
+                                                                        .status)))),
+                                                    const SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    SizedBox(
+                                                        width: 180,
+                                                        child: Column(
+                                                          children: [
+                                                            ListTile(
+                                                              title: Text(
+                                                                  '${(enrolledClass.totalClasses)} Classes'),
+                                                              subtitle: Text(
+                                                                  'Completed: ${(enrolledClass.completedClasses)} Class/Upcoming: ${(enrolledClass.pendingClasses)} Classes'),
+                                                            )
+                                                          ],
+                                                        )),
+                                                    const SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    SizedBox(
+                                                      width: 140,
+                                                      child: Container(
+                                                        width: 90,
+                                                        height: 40,
                                                         decoration:
-                                                            TextDecoration
-                                                                .none,
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                          color: buttonColor,
+                                                        ),
+                                                        child: TextButton.icon(
+                                                          style: TextButton
+                                                              .styleFrom(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(10),
+                                                            alignment: Alignment
+                                                                .center,
+                                                            foregroundColor:
+                                                                const Color
+                                                                        .fromRGBO(
+                                                                    1,
+                                                                    118,
+                                                                    132,
+                                                                    1),
+                                                            disabledBackgroundColor:
+                                                                Colors.white,
+                                                            backgroundColor:
+                                                                Colors.white,
+                                                            shape:
+                                                                RoundedRectangleBorder(
+                                                              side:
+                                                                  const BorderSide(
+                                                                color:
+                                                                    kColorPrimary, // your color here
+                                                                width: 1,
+                                                              ),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          24.0),
+                                                            ),
+                                                            // ignore: prefer_const_constructors
+                                                            textStyle:
+                                                                const TextStyle(
+                                                              color: Colors
+                                                                  .deepPurple,
+                                                              fontSize: 12,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .normal,
+                                                              decoration:
+                                                                  TextDecoration
+                                                                      .none,
+                                                            ),
+                                                          ),
+                                                          onPressed: () {},
+                                                          icon: const Icon(
+                                                            Icons
+                                                                .open_in_browser,
+                                                            size: 15,
+                                                            color: Colors.black,
+                                                          ),
+                                                          label: const Text(
+                                                            'View Class',
+                                                            style: TextStyle(
+                                                                fontSize: 15),
+                                                          ),
+                                                        ),
                                                       ),
                                                     ),
-                                                    onPressed: () {
-                                                    },
-                                                    icon: const Icon(
-                                                      Icons.open_in_browser,
-                                                      size: 15,
-                                                      color: Colors.black,
-                                                    ),
-                                                    label: const Text(
-                                                      'View Class',
-                                                      style: TextStyle(
-                                                          fontSize: 15),
-                                                    ),
-                                                  ),
+                                                  ],
                                                 ),
                                               ),
-                                            ],
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                    ),
-                                    const Divider(
-                                      height: 1,
-                                      thickness: 1,
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
+                                          const Divider(
+                                            height: 1,
+                                            thickness: 1,
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                )
+                              : Container(
+                                  width: size.width - 320,
+                                  height: size.height - 175,
+                                  child: const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                ),
                         ],
                       )
-                    : const StudentViewClassInfo(),
+                    : StudentViewClassInfo(
+                        enrolledClass: selectedclass,
+                      ),
               ),
             ),
           ],

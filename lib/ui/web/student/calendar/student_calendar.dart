@@ -1,4 +1,3 @@
-
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
@@ -6,23 +5,66 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../../../../data_class/classesdataclass.dart';
 import '../../../../provider/init_provider.dart';
+import '../../../../services/getenrolledclasses.dart';
 import '../../../../utils/themes.dart';
 import '../../tutor/calendar/setup_calendar.dart';
 
 class StudentCalendar extends StatefulWidget {
-   const StudentCalendar({Key? key}) : super(key: key);
+  const StudentCalendar({Key? key}) : super(key: key);
 
   @override
   State<StudentCalendar> createState() => _StudentCalendarState();
 }
 
 class _StudentCalendarState extends State<StudentCalendar> {
+//  TableCalendarController _calendarController;
+  List<DateTime> highlightedDatesList = [
+    DateTime(2023, 6, 10),
+    DateTime(2023, 6, 15),
+    DateTime(2023, 6, 20),
+  ];
+
   CalendarFormat _calendarFormat = CalendarFormat.month;
 
   DateTime _focusedDay = DateTime.now();
 
-  DateTime? _selectedDay;
+  DateTime _selectedDay = DateTime.now();
+
+  String selectedDate = DateFormat('MMMM dd,').format(DateTime.now());
+
+  int count = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return StreamProvider<List<ClassesData>>.value(
+      value: EnrolledClass(uid: 'XuQyf7S8gCOJBu6gTIb0', role: 'student')
+          .getenrolled,
+      catchError: (context, error) {
+        print('Error occurred: $error');
+        return [];
+      },
+      initialData: const [],
+      child: const StudentCalendarBody(),
+    );
+  }
+}
+
+class StudentCalendarBody extends StatefulWidget {
+  const StudentCalendarBody({Key? key}) : super(key: key);
+
+  @override
+  State<StudentCalendarBody> createState() => _StudentCalendarBodyState();
+}
+
+class _StudentCalendarBodyState extends State<StudentCalendarBody> {
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+
+  DateTime _focusedDay = DateTime.now();
+
+  DateTime _selectedDay = DateTime.now();
 
   String selectedDate = DateFormat('MMMM dd,').format(DateTime.now());
 
@@ -32,6 +74,48 @@ class _StudentCalendarState extends State<StudentCalendar> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     final int listIndex = context.select((InitProvider s) => s.listIndex);
+    List<ClassesData> enrolledClasses = Provider.of<List<ClassesData>>(context);
+
+    List<ScheduleData> getCombinedSchedule(List<ClassesData> enrolledClasses) {
+      List<ScheduleData> schedule = [];
+
+      for (var classesData in enrolledClasses) {
+        List<Schedule> scheduleDataList = classesData.schedule;
+        for (var scheduleItem in scheduleDataList) {
+          String studentID = classesData.studentID;
+          String tutorID = classesData.tutorID;
+          String classID = classesData.classid;
+          String scheduleID = scheduleItem.scheduleID;
+          String session = scheduleItem.session;
+          DateTime scheduleDateTime = scheduleItem.schedule;
+          ScheduleData tempsched = ScheduleData(
+              studentID: studentID,
+              tutorID: tutorID,
+              classID: classID,
+              scheduleID: scheduleID,
+              tutorinfo: classesData.tutorinfo.first,
+              studentinfo: classesData.studentinfo.first,
+              subjectinfo: classesData.subjectinfo.first,
+              session: session,
+              schedule: scheduleDateTime);
+          schedule.add(tempsched);
+        }
+      }
+      print('Schedule length ${(schedule.length)}');
+      return schedule;
+    }
+
+    List<ScheduleData> scheduleList = getCombinedSchedule(enrolledClasses);
+
+    List<ScheduleData> filteredSchedules = scheduleList.where((schedule) {
+      DateTime now = DateTime.now();
+      DateTime scheduleDate = schedule.schedule;
+
+      // Compare the date field of the schedule with the current date and time
+      return DateFormat('yyyy-MM-dd').format(scheduleDate) ==
+          DateFormat('yyyy-MM-dd').format(_selectedDay);
+    }).toList();
+
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10),
       child: Column(
@@ -55,7 +139,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: const [
                       Text(
-                        "CLASSES",
+                        "CALENDAR",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -116,255 +200,209 @@ class _StudentCalendarState extends State<StudentCalendar> {
                     ],
                   ),
                 ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Flexible(
-                      flex: 12,
-                      child: SizedBox(
-                        width: size.width - 320,
-                        height: 500,
-                        child: Card(
-                          margin: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-                          elevation: 0.0,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(5),
-                            ),
-                            side: BorderSide(color: kColorPrimary, width: 4),
-                          ),
-                          child: MouseRegion(
-                            onHover: (event) {},
-                            cursor: SystemMouseCursors.click,
-                            child: TableCalendar(
-                              shouldFillViewport: false,
-                              firstDay: DateTime(1950, 8),
-                              lastDay: DateTime(5000),
-                              focusedDay: _focusedDay,
-                              calendarFormat: _calendarFormat,
-                              daysOfWeekHeight: 60,
-                              rowHeight: 60,
-                              headerStyle: const HeaderStyle(
-                                titleTextStyle: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.w400),
-                                decoration: BoxDecoration(
-                                  color: kColorPrimary,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5)),
-                                ),
-                                formatButtonVisible: false,
-                                leftChevronIcon: Icon(
-                                  Icons.arrow_left_outlined,
-                                  color: Colors.white,
-                                  size: 25,
-                                ),
-                                rightChevronIcon: Icon(
-                                  Icons.arrow_right_outlined,
-                                  color: Colors.white,
-                                  size: 25,
-                                ),
-                              ),
-                              // Calendar Dates styling
-                              daysOfWeekStyle: const DaysOfWeekStyle(
-                                // Weekend days color (Sat,Sun)
-                                weekendStyle: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                                weekdayStyle: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                              ),
-                              calendarStyle: CalendarStyle(
-                                // Weekend dates color (Sat & Sun Column)
-                                weekendTextStyle: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold),
-                                outsideDaysVisible: true,
-                                cellMargin: const EdgeInsets.fromLTRB(5,5,5,0),
-                                rowDecoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
-                                defaultDecoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: const Color(0xFF616161),
-                                    width: .5
+                enrolledClasses.isEmpty
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            flex: 12,
+                            child: SizedBox(
+                              width: size.width - 320,
+                              height: 500,
+                              child: Card(
+                                margin: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                                elevation: 0.0,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(5),
                                   ),
+                                  side: BorderSide(
+                                      color: kColorPrimary, width: 4),
                                 ),
-                                weekendDecoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: const Color(0xFF616161),
-                                     width: .5
-                                  ),
-                                ),
-                                defaultTextStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                // highlighted color for today
-                                todayDecoration: BoxDecoration(
-                                  color: kColorLight,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: const Color(0xFF616161),
-                                  ),
-                                ),
-                                // highlighted color for selected day
-                                selectedDecoration: BoxDecoration(
-                                  color:kColorLight,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: const Color(0xFF616161),
-                                  ),
-                                ),
-                              ),
-                              selectedDayPredicate: (day) {
-                                // Use `selectedDayPredicate` to determine which day is currently selected.
-                                // If this returns true, then `day` will be marked as selected.
+                                child: MouseRegion(
+                                  onHover: (event) {},
+                                  cursor: SystemMouseCursors.click,
+                                  child: TableCalendar(
+                                    shouldFillViewport: false,
+                                    firstDay: DateTime(1950, 8),
+                                    lastDay: DateTime(5000),
+                                    focusedDay: _focusedDay,
+                                    calendarFormat: _calendarFormat,
+                                    daysOfWeekHeight: 60,
+                                    rowHeight: 60,
+                                    headerStyle: const HeaderStyle(
+                                      titleTextStyle: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20.0,
+                                          fontWeight: FontWeight.w400),
+                                      decoration: BoxDecoration(
+                                        color: kColorPrimary,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5)),
+                                      ),
+                                      formatButtonVisible: false,
+                                      leftChevronIcon: Icon(
+                                        Icons.arrow_left_outlined,
+                                        color: Colors.white,
+                                        size: 25,
+                                      ),
+                                      rightChevronIcon: Icon(
+                                        Icons.arrow_right_outlined,
+                                        color: Colors.white,
+                                        size: 25,
+                                      ),
+                                    ),
+                                    daysOfWeekStyle: const DaysOfWeekStyle(
+                                      weekendStyle: TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                      weekdayStyle: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),
+                                    calendarStyle: CalendarStyle(
+                                      weekendTextStyle: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      outsideDaysVisible: true,
+                                      cellMargin:
+                                          const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                                      rowDecoration: const BoxDecoration(
+                                        color: Colors.white,
+                                      ),
+                                      defaultDecoration: BoxDecoration(
+                                        color: Colors.transparent,
+                                        shape: BoxShape.rectangle,
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          color: const Color(0xFF616161),
+                                          width: 0.5,
+                                        ),
+                                      ),
+                                      weekendDecoration: BoxDecoration(
+                                        color: Colors.transparent,
+                                        shape: BoxShape.rectangle,
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          color: const Color(0xFF616161),
+                                          width: 0.5,
+                                        ),
+                                      ),
+                                      defaultTextStyle: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      todayDecoration: BoxDecoration(
+                                        color: Colors.transparent,
+                                        shape: BoxShape.rectangle,
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          color: const Color(0xFF616161),
+                                          width: 0.5,
+                                        ),
+                                      ),
+                                      selectedDecoration: BoxDecoration(
+                                        color: kColorPrimary,
+                                        shape: BoxShape.rectangle,
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          color: kColorPrimary,
+                                          width: 0.2,
+                                        ),
+                                      ),
+                                    ),
+                                    selectedDayPredicate: (day) {
+                                      return isSameDay(_selectedDay, day);
+                                    },
+                                    onDaySelected: (selectedDay, focusedDay) {
+                                      if (!isSameDay(
+                                          _selectedDay, selectedDay)) {
+                                        setState(() {
+                                          _selectedDay = selectedDay;
+                                          _focusedDay = focusedDay;
+                                        });
+                                      }
+                                    },
+                                    calendarBuilders: CalendarBuilders(
+                                      markerBuilder: (context, date, _) {
+                                        int count = 0;
+                                        for (var highlightedDate
+                                            in scheduleList) {
+                                          if (isSameDay(
+                                              date, highlightedDate.schedule)) {
+                                            count++;
+                                          }
+                                        }
 
-                                // Using `isSameDay` is recommended to disregard
-                                // the time-part of compared DateTime objects.
-                                return isSameDay(_selectedDay, day);
-                              },
-                              onDaySelected: (selectedDay, focusedDay) {
-                                if (!isSameDay(_selectedDay, selectedDay)) {
-                                  // Call `setState()` when updating the selected day
-                                  setState(() {
-                                    _selectedDay = selectedDay;
-                                    _focusedDay = focusedDay;
-                                  });
-                                }
-                              },
-                              
-                              calendarBuilders: CalendarBuilders(
-                                markerBuilder: (context, day, events) =>
-                                    events.isNotEmpty
-                                        ?  Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                          children: [
-                                            // Container(
-                                            //     width: 30,
-                                            //     height: 18,
-                                            //     alignment: Alignment.center,
-                                            //     decoration:  BoxDecoration(
-                                            //       color: kCalendarColorAB,
-                                            //     ),
-                                            //     child: Text(
-                                            //       '${events.length}',
-                                            //       style: const TextStyle(
-                                            //           color: Colors.white),
-                                            //     ),
-                                            //   ),
-                                              // Container(
-                                              //   width: 30,
-                                              //   height: 18,
-                                              //   alignment: Alignment.center,
-                                              //   decoration:  const BoxDecoration(
-                                              //     color: kCalendarColorFB,
-                                              //   ),
-                                              //   child: Text(
-                                              //     '${events.length}',
-                                              //     style: const TextStyle(
-                                              //         color: Colors.white),
-                                              //   ),
-                                              // ),
-                                              // Container(
-                                              //   width: 30,
-                                              //   height: 18,
-                                              //   alignment: Alignment.center,
-                                              //   decoration: const BoxDecoration(
-                                              //     color: kCalendarColorB,
-                                              //   ),
-                                              //   child: Text(
-                                              //     '${events.length}',
-                                              //     style: const TextStyle(
-                                              //         color: Colors.white),
-                                              //   ),
-                                              // ),
-                                          ],
-                                        )
-                                        : Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                          children: [
-                                            // Container(
-                                            //     width: 30,
-                                            //     height: 18,
-                                            //     alignment: Alignment.center,
-                                            //     decoration:  BoxDecoration(
-                                            //       color: kCalendarColorAB,
-                                            //     ),
-                                            //     child: Text(
-                                            //       '${events.length}',
-                                            //       style: const TextStyle(
-                                            //           color: Colors.white),
-                                            //     ),
-                                            //   ),
-                                              Visibility(
-                                                visible: events.isNotEmpty ? true : false,
-                                                child: Container(
-                                                  width: 40,
-                                                  height: 18,
-                                                  alignment: Alignment.center,
-                                                  decoration:  const BoxDecoration(
-                                                    color: kCalendarColorFB,
-                                                  ),
-                                                  child: Text(
-                                                    '${events.length}',
-                                                    style: const TextStyle(
-                                                        color: Colors.black),
-                                                  ),
+                                        if (count > 0) {
+                                          return Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: [
+                                              Container(
+                                                width: 40,
+                                                height: 18,
+                                                alignment: Alignment.center,
+                                                decoration: const BoxDecoration(
+                                                  color: kCalendarColorFB,
+                                                ),
+                                                child: Text(
+                                                  '$count',
+                                                  style: const TextStyle(
+                                                      color: Colors.black),
                                                 ),
                                               ),
-                                              // Container(
-                                              //   width: 30,
-                                              //   height: 18,
-                                              //   alignment: Alignment.center,
-                                              //   decoration: const BoxDecoration(
-                                              //     color: kCalendarColorB,
-                                              //   ),
-                                              //   child: Text(
-                                              //     '${events.length}',
-                                              //     style: const TextStyle(
-                                              //         color: Colors.white),
-                                              //   ),
-                                              // ),
-                                          ],
-                                        ),
+                                            ],
+                                          );
+                                        }
+
+                                        return null;
+                                      },
+                                      todayBuilder: (context, date, _) {
+                                        return Container(
+                                          margin: const EdgeInsets.all(5),
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            color: Colors.transparent,
+                                            shape: BoxShape.rectangle,
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                            border: Border.all(
+                                              color: const Color(0xFF616161),
+                                              width: 0.5,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            '${date.day}',
+                                            style: const TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    onPageChanged: (focusedDay) {
+                                      _focusedDay = focusedDay;
+                                    },
+                                  ),
+                                ),
                               ),
-                              onFormatChanged: (format) {
-                                if (_calendarFormat != format) {
-                                  // Call `setState()` when updating calendar format
-                                  setState(() {
-                                    _calendarFormat = format;
-                                  });
-                                }
-                              },
-                              onPageChanged: (focusedDay) {
-                                // No need to call `setState()` here
-                                _focusedDay = focusedDay;
-                              },
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
@@ -388,7 +426,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              selectedDate,
+                              DateFormat('MMMM, dd').format(_selectedDay),
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
@@ -397,9 +435,9 @@ class _StudentCalendarState extends State<StudentCalendar> {
                             const SizedBox(
                               width: 5,
                             ),
-                            const Text(
-                              "(0 Classes today)",
-                              style: TextStyle(
+                            Text(
+                              "(${(filteredSchedules.length)} Classes today)",
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.normal,
                               ),
@@ -412,9 +450,9 @@ class _StudentCalendarState extends State<StudentCalendar> {
                         SizedBox(
                           width: 600,
                           height: 500,
-                          child: count != 0
+                          child: filteredSchedules.isNotEmpty
                               ? ListView.builder(
-                                  itemCount: count,
+                                  itemCount: filteredSchedules.length,
                                   itemBuilder: (context, index) {
                                     return InkWell(
                                       onTap: () {},
@@ -441,60 +479,90 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                             const SizedBox(
                                               width: 15,
                                             ),
-                                            Card(
-                                              color: index % 2 == 0
-                                                  ? kCalendarColorFB
-                                                  : kCalendarColorAB,
-                                              margin: const EdgeInsets.fromLTRB(
-                                                  20.0, 6.0, 20.0, 0.0),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Row(
-                                                  children: [
-                                                    CircleAvatar(
-                                                      radius: 25.0,
-                                                      backgroundColor:
-                                                          Colors.transparent,
-                                                      child: Image.asset(
-                                                        'assets/images/login.png',
-                                                        width: 300.0,
-                                                        height: 100.0,
-                                                        fit: BoxFit.contain,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: const [
-                                                        Text(
-                                                          "Melvin Jhon Selma",
-                                                          style: TextStyle(
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400),
+                                            SizedBox(
+                                              width: 500,
+                                              child: Card(
+                                                color: index % 2 == 0
+                                                    ? kCalendarColorFB
+                                                    : kCalendarColorAB,
+                                                margin:
+                                                    const EdgeInsets.fromLTRB(
+                                                        20.0, 6.0, 20.0, 0.0),
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Row(
+                                                    children: [
+                                                      CircleAvatar(
+                                                        radius: 25.0,
+                                                        backgroundColor:
+                                                            Colors.transparent,
+                                                        child: Image.asset(
+                                                          'assets/images/login.png',
+                                                          width: 300.0,
+                                                          height: 100.0,
+                                                          fit: BoxFit.contain,
                                                         ),
-                                                        Text('Chemistry'),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 30,
-                                                    ),
-                                                    const Padding(
-                                                      padding: EdgeInsets.only(
-                                                          bottom: 12.0),
-                                                      child:
-                                                          Text('First Class'),
-                                                    ),
-                                                  ],
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            '${(filteredSchedules[index].tutorinfo.firstName)} ${(filteredSchedules[index].tutorinfo.middleName == 'N/A' ? '' : (filteredSchedules[index].tutorinfo.middleName))} ${(filteredSchedules[index].tutorinfo.lastname)}',
+                                                            style: const TextStyle(
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400),
+                                                          ),
+                                                          Text(
+                                                            filteredSchedules[
+                                                                    index]
+                                                                .subjectinfo
+                                                                .subjectName,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const Spacer(),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                bottom: 12.0),
+                                                        child: Text((() {
+                                                          if (filteredSchedules[
+                                                                      index]
+                                                                  .session
+                                                                  .toString() ==
+                                                              '1') {
+                                                            return "${(filteredSchedules[index].session.toString())}st Session";
+                                                          } else if (filteredSchedules[
+                                                                      index]
+                                                                  .session
+                                                                  .toString() ==
+                                                              '2') {
+                                                            return "${(filteredSchedules[index].session.toString())}nd Session";
+                                                          } else if (filteredSchedules[
+                                                                      index]
+                                                                  .session
+                                                                  .toString() ==
+                                                              '3') {
+                                                            return "${(filteredSchedules[index].session.toString())}rd Session";
+                                                          } else {
+                                                            return "${(filteredSchedules[index].session.toString())}th Session";
+                                                          }
+                                                        })()),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -565,46 +633,112 @@ class _StudentCalendarState extends State<StudentCalendar> {
   }
 }
 
-CalendarBuilders calendarBuilder() {
-  return CalendarBuilders(
-    todayBuilder: (
-      context,
-      day,
-      focusedDay,
-    ) {
-      return buildCalendarDay(
-          day: DateTime.now().day.toString(),
-          text: '3',
-          backColor: Colors.green);
-    },
-  );
-}
+// todayBuilder: (context, date, _) {
+//   int count = 0;
+//   for (var highlightedDate
+//       in scheduleList) {
+//     if (isSameDay(
+//         date, highlightedDate.schedule)) {
+//       count++;
+//     }
+//   }
 
-Container buildCalendarDay({
-  required String day,
-  required Color backColor,
-  required String text,
-}) {
-  return Container(
-    color: backColor,
-    width: 100,
-    height: 55,
-    padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-    child: Center(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          const Icon(
-            Icons.circle,
-            size: 20,
-            color: Colors.red,
-          ),
-          Text(day, style: const TextStyle(fontSize: 14, color: Colors.white)),
-        ],
-      ),
-    ),
-  );
-}
+//   if (count > 0) {
+//     bool isTodayHighlighted = scheduleList
+//         .any((highlightedDate) =>
+//             isSameDay(
+//                 date,
+//                 highlightedDate
+//                     .schedule));
+
+//     if (isTodayHighlighted) {
+//       return Container(
+//         decoration: BoxDecoration(
+//           color: Colors.blue,
+//           shape: BoxShape.rectangle,
+//           borderRadius:
+//               BorderRadius.circular(5),
+//           border: Border.all(
+//             color: kColorPrimary,
+//             width: 0.2,
+//           ),
+//         ),
+//         child: Center(
+//           child: Text(
+//             '${date.day}',
+//             style: const TextStyle(
+//               color: Colors.white,
+//               fontWeight: FontWeight.bold,
+//             ),
+//           ),
+//         ),
+//       );
+//     }
+//   }
+
+//   return Container(
+//     decoration: BoxDecoration(
+//       color: Colors.blue,
+//       shape: BoxShape.rectangle,
+//       borderRadius:
+//           BorderRadius.circular(5),
+//       border: Border.all(
+//         color: kColorPrimary,
+//         width: 0.2,
+//       ),
+//     ),
+//     child: Center(
+//       child: Text(
+//         '${date.day}',
+//         style: const TextStyle(
+//           color: Colors.white,
+//           fontWeight: FontWeight.bold,
+//         ),
+//       ),
+//     ),
+//   );
+// },
+
+// CalendarBuilders calendarBuilder() {
+//   return CalendarBuilders(
+//     todayBuilder: (
+//       context,
+//       day,
+//       focusedDay,
+//     ) {
+//       return buildCalendarDay(
+//           day: DateTime.now().day.toString(),
+//           text: '3',
+//           backColor: Colors.green);
+//     },
+//   );
+// }
+
+// Container buildCalendarDay({
+//   required String day,
+//   required Color backColor,
+//   required String text,
+// }) {
+//   return Container(
+//     color: backColor,
+//     width: 100,
+//     height: 55,
+//     padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+//     child: Center(
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.end,
+//         children: [
+//           const Icon(
+//             Icons.circle,
+//             size: 20,
+//             color: Colors.red,
+//           ),
+//           Text(day, style: const TextStyle(fontSize: 14, color: Colors.white)),
+//         ],
+//       ),
+//     ),
+//   );
+// }
 
 AnimatedContainer buildCalendarDayMarker({
   required String text,

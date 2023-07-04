@@ -10,6 +10,6 @@ class UserData{
   final String email;
   final String password;
   final String role;
-UserData({required this.uid, required this.email,required this.password,required this.role});
+UserData({required this.uid, required this.email,required this.password,required this.role, });
 
 }

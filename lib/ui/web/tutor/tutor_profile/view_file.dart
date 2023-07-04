@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ViewFile extends StatefulWidget {
-  const ViewFile({super.key});
+  final String? imageURL;
+  const ViewFile({super.key, required this.imageURL});
 
   @override
   State<ViewFile> createState() => _ViewFileState();
@@ -21,7 +22,8 @@ class _ViewFileState extends State<ViewFile> {
           children: [
             Padding(
               padding: const EdgeInsets.only(
-                left: 10.0, right: 10,
+                left: 10.0,
+                right: 10,
               ),
               child: Align(
                 alignment: Alignment.topRight,
@@ -33,8 +35,10 @@ class _ViewFileState extends State<ViewFile> {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           color: Colors.transparent,
-                          image: const DecorationImage(
-                              image: AssetImage('assets/images/5815489.jpg'),
+                          image: DecorationImage(
+                              image: NetworkImage(
+                                widget.imageURL.toString(),
+                              ),
                               fit: BoxFit.cover)),
                     )),
               ),

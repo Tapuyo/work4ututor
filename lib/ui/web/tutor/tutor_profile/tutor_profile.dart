@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:wokr4ututor/ui/web/student/main_dashboard/student_dashboard.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_profile/viewschedule.dart';
 
 import '../../../../components/nav_bar.dart';
@@ -85,7 +86,9 @@ class _TutorProfileState extends State<TutorProfile> {
                                             showDialog<DateTime>(
                                               context: context,
                                               builder: (BuildContext context) {
-                                                return const ViewFile();
+                                                return ViewFile(
+                                                  imageURL: profileurl,
+                                                );
                                               },
                                             ).then((selectedDate) {
                                               if (selectedDate != null) {
@@ -123,16 +126,16 @@ class _TutorProfileState extends State<TutorProfile> {
                                               child: InkWell(
                                                 onTap: () {
                                                   showDialog<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return const ViewFile();
-                                                  },
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
-                                                  }
-                                                });
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return const ViewFile(imageURL: '',);
+                                                    },
+                                                  ).then((selectedDate) {
+                                                    if (selectedDate != null) {
+                                                      // Do something with the selected date
+                                                    }
+                                                  });
                                                 },
                                                 child: const Icon(
                                                   Icons.arrow_left,
@@ -150,16 +153,17 @@ class _TutorProfileState extends State<TutorProfile> {
                                               child: InkWell(
                                                   onTap: () {
                                                     showDialog<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return const ViewFile();
-                                                  },
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
-                                                  }
-                                                });
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return const ViewFile(imageURL: '',);
+                                                      },
+                                                    ).then((selectedDate) {
+                                                      if (selectedDate !=
+                                                          null) {
+                                                        // Do something with the selected date
+                                                      }
+                                                    });
                                                   },
                                                   child: Container(
                                                     height: 60,
@@ -186,16 +190,17 @@ class _TutorProfileState extends State<TutorProfile> {
                                               child: InkWell(
                                                   onTap: () {
                                                     showDialog<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return const ViewFile();
-                                                  },
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
-                                                  }
-                                                });
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return const ViewFile(imageURL: '',);
+                                                      },
+                                                    ).then((selectedDate) {
+                                                      if (selectedDate !=
+                                                          null) {
+                                                        // Do something with the selected date
+                                                      }
+                                                    });
                                                   },
                                                   child: Container(
                                                     height: 60,

@@ -94,7 +94,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                           showDialog<DateTime>(
                                             context: context,
                                             builder: (BuildContext context) {
-                                              return const ViewFile();
+                                              return const ViewFile(imageURL: '',);
                                             },
                                           ).then((selectedDate) {
                                             if (selectedDate != null) {

@@ -1,49 +1,49 @@
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:provider/provider.dart';
+import 'package:wokr4ututor/data_class/user_class.dart';
 import 'package:wokr4ututor/services/getstudentinfo.dart';
+import 'package:wokr4ututor/ui/web/student/settings/accountcancellation.dart';
 
 import '../../../../data_class/studentinfoclass.dart';
+import '../../../../data_class/voucherclass.dart';
+import '../../../../services/getuser.dart';
 import '../../../../utils/themes.dart';
 
-class GuardianInfoSettings extends StatefulWidget {
+class StudentAccounts extends StatefulWidget {
   final String uID;
-  const GuardianInfoSettings({super.key, required this.uID});
+  const StudentAccounts({super.key, required this.uID});
 
   @override
-  State<GuardianInfoSettings> createState() => _GuardianInfoSettingsState();
+  State<StudentAccounts> createState() => _StudentAccountsState();
 }
 
-//controllers
-TextEditingController confirstname = TextEditingController();
-TextEditingController conmiddlename = TextEditingController();
-TextEditingController conlastname = TextEditingController();
-TextEditingController conaddress = TextEditingController();
-TextEditingController concountry = TextEditingController();
-TextEditingController concontact = TextEditingController();
-TextEditingController conemailadd = TextEditingController();
+class _StudentAccountsState extends State<StudentAccounts> {
+  //controllers
+  TextEditingController conpassword = TextEditingController();
+  TextEditingController conconfirmpassword = TextEditingController();
+  TextEditingController connewpassword = TextEditingController();
+  TextEditingController conemailadd = TextEditingController();
+  List<String> languages = [];
 
-String uID = "Upload your ID";
-bool selection1 = false;
-bool selection2 = false;
-bool selection3 = false;
-bool selection4 = false;
-bool selection5 = false;
-TextEditingController _aboutmecontroller = TextEditingController();
+  //obscuretext
+  bool obscurrent = true;
+  bool obsnewpass = true;
+  bool obsconfirm = true;
 
-class _GuardianInfoSettingsState extends State<GuardianInfoSettings> {
   @override
   Widget build(BuildContext context) {
-    final guardianinfo = Provider.of<List<StudentGuardianClass>>(context);
+    final userinfodata = Provider.of<List<UserData>>(context);
     Size size = MediaQuery.of(context).size;
-    if (guardianinfo.isNotEmpty) {
-      final guardiandata = guardianinfo.first;
-      confirstname.text = guardiandata.guardianFirstname;
-      conmiddlename.text = guardiandata.guardianMiddlename;
-      conlastname.text = guardiandata.guardianLastname;
-      concountry.text = guardiandata.country;
-      conaddress.text = guardiandata.address;
-      conemailadd.text = guardiandata.email;
-      concontact.text = guardiandata.contact;
+
+    if (userinfodata.isNotEmpty) {
+      final userdata = userinfodata.first;
+      conemailadd.text = userdata.email;
+      conpassword.text = userdata.password;
+
       return Padding(
         padding: const EdgeInsets.only(left: 10, top: 5, right: 10),
         child: Container(
@@ -58,7 +58,49 @@ class _GuardianInfoSettingsState extends State<GuardianInfoSettings> {
               child: Column(
                 children: [
                   const SizedBox(
-                    height: 50,
+                    height: 40,
+                  ),
+                  Container(
+                    width: size.width - 320,
+                    padding: const EdgeInsets.only(left: 200, right: 200),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "Account Information",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 25,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const Spacer(),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: SizedBox(
+                            width: 200,
+                            height: 40,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5))),
+                              ),
+                              onPressed: () {
+                              accountCancelationDialog(context);
+                              },
+                              child: const Text(
+                                'Cancel Account',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 30,
                   ),
                   Container(
                     alignment: Alignment.center,
@@ -71,86 +113,6 @@ class _GuardianInfoSettingsState extends State<GuardianInfoSettings> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              height: 40,
-                              width: 380,
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                              decoration:
-                                  const BoxDecoration(color: kColorPrimary),
-                              child: const Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  'Guardian Name',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.normal,
-                                      color: Colors.white),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: SizedBox(
-                                width: 380,
-                                height: 50,
-                                child: TextField(
-                                  controller: confirstname,
-                                  textAlignVertical: TextAlignVertical.top,
-                                  maxLines: null,
-                                  expands: true,
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    hintText: 'First Name',
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Container(
-                              height: 40,
-                              width: 380,
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                              decoration:
-                                  const BoxDecoration(color: kColorPrimary),
-                              child: const Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  'Country of Residence',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.normal,
-                                      color: Colors.white),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: SizedBox(
-                                width: 380,
-                                height: 50,
-                                child: TextField(
-                                  controller: concountry,
-                                  textAlignVertical: TextAlignVertical.top,
-                                  maxLines: null,
-                                  expands: true,
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    hintText: 'Country',
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
                             Container(
                               height: 40,
                               width: 380,
@@ -188,6 +150,56 @@ class _GuardianInfoSettingsState extends State<GuardianInfoSettings> {
                                 ),
                               ),
                             ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              height: 40,
+                              width: 380,
+                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              decoration:
+                                  const BoxDecoration(color: kColorPrimary),
+                              child: const Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'New Password',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.white),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: SizedBox(
+                                width: 380,
+                                height: 50,
+                                child: TextField(
+                                  controller: connewpassword,
+                                  obscureText: obsnewpass,
+                                  textAlignVertical: TextAlignVertical.top,
+                                  decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      hintText: '**********',
+                                      suffixIcon: IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            obsnewpass = !obsnewpass;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          obsnewpass
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                        ),
+                                      )),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(
@@ -206,7 +218,7 @@ class _GuardianInfoSettingsState extends State<GuardianInfoSettings> {
                               child: const Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  'Guardian Last Name',
+                                  'Current Password',
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.normal,
@@ -223,14 +235,24 @@ class _GuardianInfoSettingsState extends State<GuardianInfoSettings> {
                                 width: 380,
                                 height: 50,
                                 child: TextField(
-                                  controller: conlastname,
+                                  controller: conpassword,
+                                  obscureText: obscurrent,
                                   textAlignVertical: TextAlignVertical.top,
-                                  maxLines: null,
-                                  expands: true,
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    hintText: 'Last Name',
-                                  ),
+                                  decoration: InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      hintText: '**********',
+                                      suffixIcon: IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            obscurrent = !obscurrent;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          obscurrent
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                        ),
+                                      )),
                                 ),
                               ),
                             ),
@@ -246,7 +268,7 @@ class _GuardianInfoSettingsState extends State<GuardianInfoSettings> {
                               child: const Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  'City/State',
+                                  'Confirm New Password',
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.normal,
@@ -263,54 +285,24 @@ class _GuardianInfoSettingsState extends State<GuardianInfoSettings> {
                                 width: 380,
                                 height: 50,
                                 child: TextField(
-                                  controller: conaddress,
+                                  controller: conconfirmpassword,
+                                  obscureText: obsconfirm,
                                   textAlignVertical: TextAlignVertical.top,
-                                  maxLines: null,
-                                  expands: true,
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    hintText: 'City/State',
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            Container(
-                              height: 40,
-                              width: 380,
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                              decoration:
-                                  const BoxDecoration(color: kColorPrimary),
-                              child: const Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  'Contact',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.normal,
-                                      color: Colors.white),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: SizedBox(
-                                width: 380,
-                                height: 50,
-                                child: TextField(
-                                  controller: concontact,
-                                  textAlignVertical: TextAlignVertical.top,
-                                  maxLines: null,
-                                  expands: true,
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    hintText: 'Contact',
-                                  ),
+                                  decoration: InputDecoration(
+                                      border: const OutlineInputBorder(),
+                                      hintText: '********',
+                                      suffixIcon: IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            obsconfirm = !obsconfirm;
+                                          });
+                                        },
+                                        icon: Icon(
+                                          obsconfirm
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                        ),
+                                      )),
                                 ),
                               ),
                             ),
@@ -341,28 +333,8 @@ class _GuardianInfoSettingsState extends State<GuardianInfoSettings> {
                                         BorderRadius.all(Radius.circular(20))),
                               ),
                               onPressed: () {
-                                setState(() {
-                                  if (conaddress.text.isNotEmpty ||
-                                      concontact.text.isNotEmpty ||
-                                      concountry.text.isNotEmpty ||
-                                      conemailadd.text.isNotEmpty ||
-                                      confirstname.text.isNotEmpty ||
-                                      conlastname.text.isNotEmpty ||
-                                      conmiddlename.text.isNotEmpty) {
-                                    updateGuardianInfo(
-                                        'XuQyf7S8gCOJBu6gTIb0',
-                                        guardiandata.docID,
-                                        confirstname.text,
-                                        conmiddlename.text,
-                                        conlastname.text,
-                                        concontact.text,
-                                        conemailadd.text,
-                                        conaddress.text,
-                                        concountry.text);
-                                  } else {
-                                    return;
-                                  }
-                                });
+                                updateEmailAndPassword(
+                                    conemailadd.text, connewpassword.text);
                               },
                               child: const Text('Update'),
                             ),

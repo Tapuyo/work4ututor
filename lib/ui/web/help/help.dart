@@ -169,7 +169,7 @@ class _HelpPageState extends State<HelpPage> {
                     onChanged: (HelpCategory? value) async {
                       List<String> tempdata = [];
                       String? tempvalue;
-                      String? choosenCategory = value?.categoryName.toString();
+                      choosenCategory = value?.categoryName.toString();
                       tempdata = await getSubjects(choosenCategory.toString());
                       setState(() {
                         _selectedValue = tempvalue;
@@ -271,7 +271,7 @@ class _HelpPageState extends State<HelpPage> {
                                     BorderRadius.all(Radius.circular(5))),
                           ),
                           onPressed:() {
-                          SendEmailService.sendMail(email:'melvinselma4@gmail.com', message: messageController.text, name: 'MJ Amles', subject: 'Temporary Email');},
+                          SendEmailService.sendMail(email:'melvinselma4@gmail.com', message: messageController.text, name: 'MJ Amles', subject: '$choosenCategory($_selectedValue)');},
                           // (dropdownvalue?.categoryName == null ||
                           //         _selectedValue == null ||
                           //         messageinfo == '')
