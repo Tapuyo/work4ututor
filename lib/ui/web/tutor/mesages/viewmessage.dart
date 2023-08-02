@@ -5,35 +5,83 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/provider/chatmessagedisplay.dart';
 
+import '../../../../data_class/chatmessageclass.dart';
 import '../../../../data_class/inquirydetailclass.dart';
 import '../../../../provider/inquirydisplay_provider.dart';
+import '../../../../services/getmessages.dart';
 import '../../../../utils/themes.dart';
 
 class ViewMessage extends StatefulWidget {
-  const ViewMessage({super.key});
+  final String uID;
+  final String chatID;
+  const ViewMessage({Key? key, required this.uID, required this.chatID})
+      : super(key: key);
 
   @override
   State<ViewMessage> createState() => _ViewMessageState();
 }
 
 class _ViewMessageState extends State<ViewMessage> {
-  List<ChatMessage> messages = [
-    ChatMessage(messageContent: "Hello, Will", messageType: "receiver"),
-    ChatMessage(messageContent: "How have you been?", messageType: "receiver"),
-    ChatMessage(
-        messageContent:
-            "Hey Kriss, I am doing fine dude. wbu? Hey Kriss, I am doing fine dude. wbu? Hey Kriss, I am doing fine dude. wbu? Hey Kriss, I am doing fine dude. wbu? Hey Kriss, I am doing fine dude. wbu?",
-        messageType: "sender"),
-    ChatMessage(messageContent: "ehhhh, doing OK.", messageType: "receiver"),
-    ChatMessage(
-        messageContent: "Is there any thing wrong?", messageType: "sender"),
-  ];
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return StreamProvider<List<MessageContent>>.value(
+      value: GetMessageConversation(chatID: widget.chatID, userID: widget.uID)
+          .getmessage,
+      catchError: (context, error) {
+        print('Error occurred: $error');
+        return [];
+      },
+      initialData: const [],
+      child: ViewMessageBody(
+        userID: widget.uID,
+        chatID: widget.chatID,
+      ),
+    );
+  }
+}
+
+class ViewMessageBody extends StatefulWidget {
+  final String userID;
+  final String chatID;
+  const ViewMessageBody(
+      {super.key, required this.userID, required this.chatID});
+
+  @override
+  State<ViewMessageBody> createState() => _ViewMessageBodyState();
+}
+
+ScrollController _scrollController = ScrollController();
+
+class _ViewMessageBodyState extends State<ViewMessageBody> {
+  TextEditingController messageContent = TextEditingController();
+
   bool select = false;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     final bool openChat =
         context.select((ChatDisplayProvider p) => p.openMessage);
+    final messagedata = Provider.of<List<MessageContent>>(context);
+    if (messagedata.isNotEmpty) {
+      setState(() {
+        messagedata.sort((a, b) => a.dateSent.compareTo(b.dateSent));
+      });
+    }
     return Column(
       children: [
         SafeArea(
@@ -43,9 +91,8 @@ class _ViewMessageState extends State<ViewMessage> {
               children: <Widget>[
                 IconButton(
                   onPressed: () {
-                    final provider =
-                                      context.read<ChatDisplayProvider>();
-                                  provider.setOpenMessage(false);
+                    final provider = context.read<ChatDisplayProvider>();
+                    provider.setOpenMessage(false);
                   },
                   icon: const Icon(
                     Icons.arrow_back,
@@ -100,25 +147,23 @@ class _ViewMessageState extends State<ViewMessage> {
             thickness: 2,
           ),
         ),
-        Container(
-          width: size.width - 320,
-          height: size.height - 175,
+        Expanded(
           child: Stack(
             children: <Widget>[
               ListView.builder(
-                itemCount: messages.length,
+                controller: _scrollController,
+                itemCount: messagedata.length,
                 shrinkWrap: true,
-                padding: const EdgeInsets.only(top: 10, bottom: 10),
-                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(top: 10, bottom: 70),
                 itemBuilder: (context, index) {
                   return Container(
                     padding: const EdgeInsets.only(
                         left: 14, right: 14, top: 10, bottom: 10),
                     child: Align(
-                        alignment: (messages[index].messageType == "receiver"
-                            ? Alignment.topLeft
-                            : Alignment.topRight),
-                        child: messages[index].messageType == "receiver"
+                        alignment: (messagedata[index].userID == widget.userID
+                            ? Alignment.topRight
+                            : Alignment.topLeft),
+                        child: messagedata[index].userID != widget.userID
                             ? Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,14 +191,14 @@ class _ViewMessageState extends State<ViewMessage> {
                                           topRight: Radius.circular(20),
                                           bottomLeft: Radius.circular(20),
                                           bottomRight: Radius.circular(20)),
-                                      color: (messages[index].messageType ==
-                                              "receiver"
-                                          ? Colors.grey.shade200
-                                          : kColorLight),
+                                      color: (messagedata[index].userID ==
+                                              widget.userID
+                                          ? kColorLight
+                                          : Colors.grey.shade200),
                                     ),
                                     padding: const EdgeInsets.all(16),
                                     child: Text(
-                                      messages[index].messageContent,
+                                      messagedata[index].messageContent,
                                       style: const TextStyle(fontSize: 15),
                                     ),
                                   ),
@@ -173,14 +218,14 @@ class _ViewMessageState extends State<ViewMessage> {
                                             topLeft: Radius.circular(20),
                                             bottomLeft: Radius.circular(20),
                                             bottomRight: Radius.circular(20)),
-                                        color: (messages[index].messageType ==
-                                                "receiver"
-                                            ? Colors.grey.shade200
-                                            : kColorLight),
+                                        color: (messagedata[index].userID ==
+                                                widget.userID
+                                            ? kColorLight
+                                            : Colors.grey.shade200),
                                       ),
                                       padding: const EdgeInsets.all(16),
                                       child: Text(
-                                        messages[index].messageContent,
+                                        messagedata[index].messageContent,
                                         style: const TextStyle(fontSize: 15),
                                       ),
                                     ),
@@ -234,12 +279,19 @@ class _ViewMessageState extends State<ViewMessage> {
                       const SizedBox(
                         width: 15,
                       ),
-                      const Expanded(
+                      Expanded(
                         child: TextField(
-                          decoration: InputDecoration(
+                          controller: messageContent,
+                          decoration: const InputDecoration(
                               hintText: "Write message...",
                               hintStyle: TextStyle(color: Colors.black54),
                               border: InputBorder.none),
+                          onSubmitted: (value) {
+                            sendmessage(messageContent.text, widget.chatID,
+                                widget.userID);
+                            _scrollController.jumpTo(
+                                _scrollController.position.maxScrollExtent);
+                          },
                         ),
                       ),
                       const SizedBox(

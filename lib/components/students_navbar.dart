@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
+import 'package:wokr4ututor/ui/web/tutor/tutor_dashboard/tutor_dashboard.dart';
+import 'package:wokr4ututor/ui/web/web_main.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
 import '../ui/auth/auth.dart';
@@ -76,7 +78,8 @@ class StudentsMenu extends HookWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: menuIndex != 0 ? kColorSecondary : kColorPrimary,
+                backgroundColor:
+                    menuIndex != 0 ? kColorSecondary : kColorPrimary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -123,7 +126,8 @@ class StudentsMenu extends HookWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: menuIndex != 1 ? kColorSecondary : kColorPrimary,
+                backgroundColor:
+                    menuIndex != 1 ? kColorSecondary : kColorPrimary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -170,7 +174,8 @@ class StudentsMenu extends HookWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: menuIndex != 3 ? kColorSecondary : kColorPrimary,
+                backgroundColor:
+                    menuIndex != 3 ? kColorSecondary : kColorPrimary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -217,7 +222,8 @@ class StudentsMenu extends HookWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: menuIndex != 4 ? kColorSecondary : kColorPrimary,
+                backgroundColor:
+                    menuIndex != 4 ? kColorSecondary : kColorPrimary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -264,7 +270,8 @@ class StudentsMenu extends HookWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor:menuIndex != 6 ? kColorSecondary : kColorPrimary,
+                backgroundColor:
+                    menuIndex != 6 ? kColorSecondary : kColorPrimary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -311,7 +318,8 @@ class StudentsMenu extends HookWidget {
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.white,
-                backgroundColor: menuIndex != 7 ? kColorSecondary : kColorPrimary,
+                backgroundColor:
+                    menuIndex != 7 ? kColorSecondary : kColorPrimary,
                 shape: RoundedRectangleBorder(
                   side: const BorderSide(
                     color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -377,6 +385,12 @@ class StudentsMenu extends HookWidget {
               onPressed: () async {
                 dynamic result = await _auth.signOutAnon();
                 print(result.toString());
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            WebMainPage()),
+                  );
               },
               icon: const Icon(
                 Icons.logout_outlined,

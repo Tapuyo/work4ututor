@@ -35,21 +35,30 @@ List<Map<String, dynamic>> withdrawals = [
     'id': 1,
     'date': '2022-04-29',
     'amount': 100.0,
-    'status': 'processed',
+    'status': 'Processed',
   },
   {
     'id': 2,
     'date': '2022-05-01',
     'amount': 50.0,
-    'status': 'pending',
+    'status': 'Pending',
   },
   {
     'id': 3,
     'date': '2022-05-02',
     'amount': 75.0,
-    'status': 'processed',
+    'status': 'Processed',
   },
 ];
+Color _getColorForStatus(String status) {
+  if (status == 'Processed') {
+    return Colors.green;
+  } else if (status == 'Pending') {
+    return Colors.orange;
+  } else {
+    return Colors.red;
+  }
+}
 
 class _PaymentsWithdrwalsState extends State<PaymentsWithdrwals> {
   @override
@@ -68,35 +77,119 @@ class _PaymentsWithdrwalsState extends State<PaymentsWithdrwals> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  height: 50,
-                  width: 400,
-                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  decoration: const BoxDecoration(
-                      color: kColorPrimary,
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Row(
-                      children: const [
-                        Text(
-                          'Total Earnigs',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.white),
+                Row(
+                  children: [
+                    Container(
+                      height: 50,
+                      width: 300,
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      decoration: const BoxDecoration(
+                          color: kColorPrimary,
+                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: const [
+                            Text.rich(TextSpan(children: [
+                              TextSpan(
+                                text: 'Earnigs On Hold',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                              TextSpan(
+                                text: '\nWORK4UTUTOR FEES ALREADY APPLIED',
+                                style: TextStyle(
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                            ])),
+                            Spacer(),
+                            Text(
+                              '\$ 523.00',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ],
                         ),
-                        Spacer(),
-                        Text(
-                          '\$ 1023.00',
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                    const Spacer(),
+                    Container(
+                      height: 50,
+                      width: 300,
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      decoration: const BoxDecoration(
+                          color: kColorPrimary,
+                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: const [
+                            Text.rich(TextSpan(children: [
+                              TextSpan(
+                                text: 'Earnigs Recieved',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                              TextSpan(
+                                text: '\nWORK4UTUTOR FEES ALREADY APPLIED',
+                                style: TextStyle(
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                            ])),
+                            Spacer(),
+                            Text(
+                              '\$ 500.00',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Container(
+                      height: 50,
+                      width: 300,
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      decoration: const BoxDecoration(
+                          color: kColorPrimary,
+                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: const [
+                            Text(
+                              'Total Earnigs',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.white),
+                            ),
+                            Spacer(),
+                            Text(
+                              '\$ 1023.00',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(
                   height: 10,
@@ -213,8 +306,18 @@ class _PaymentsWithdrwalsState extends State<PaymentsWithdrwals> {
                       final withdrawal = withdrawals[index];
                       return ListTile(
                         title: Text('Withdrawal #${withdrawal['id']}'),
-                        subtitle: Text(
-                            'Date: ${withdrawal['date']} | Amount: \$${withdrawal['amount']} | Status: ${withdrawal['status']}'),
+                        subtitle: Text.rich(TextSpan(children: [
+                          TextSpan(
+                            text:
+                                'Date: ${withdrawal['date']} | Amount: \$${withdrawal['amount']} ',
+                          ),
+                          TextSpan(
+                            text: '| STATUS: ${withdrawal['status']}',
+                            style: TextStyle(
+                                color:
+                                    _getColorForStatus(withdrawal['status'])),
+                          ),
+                        ])),
                       );
                     },
                   ),

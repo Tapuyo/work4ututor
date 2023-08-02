@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
 
+import '../data_class/studentinfoclass.dart';
 import '../data_class/studentsEnrolledclass.dart';
 import '../data_class/tutor_info_class.dart';
 
@@ -110,19 +111,6 @@ class DatabaseService {
     }).toList();
   }
 
-  //
-//   Stream<List<TutorInformation>> getListUserCampaigns() async* {
-// final collection = FirebaseFirestore.instance.collection('student');
-// final List list_of_users = await collection.get().then((value) => value.docs);
-// for (int i = 0; i < list_of_users.length; i++) {
-//   FirebaseFirestore.instance.collection("UserData")
-//       .doc(list_of_users[i].id.toString())
-//       .collection("studentsEnrolled")
-//       .snapshots()
-//       .listen(CreateListofAllUserCampaigns);
-// }
-// yield UserCampaignList;
-//   }
 
   Stream<List<StudentsList>> get enrolleelist {
     return enrolleeCollection
@@ -278,5 +266,44 @@ class DatabaseService {
       'from': DateFormat('HH:MM').format(DateTime.now()),
       'to': DateFormat('HH:MM').format(DateTime.now())
     });
+  }
+}
+
+class TutorInfoData {
+  final String uid;
+  TutorInfoData({required this.uid});
+
+  List<TutorInformation> _getTutorInfo(
+      DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    return [
+      TutorInformation(
+        birthPlace: snapshot.get('birthPlace') ?? '',
+        country: snapshot.get('country') ?? '',
+        certificates:
+            (snapshot.get('certificates') as List<dynamic>).cast<String>(),
+        resume: snapshot.get('resume') ?? '',
+        promotionalMessage: snapshot.get('promotionalMessage') ?? '',
+        withdrawal: snapshot.get('withdrawal') ?? '',
+        status: snapshot.get('status') ?? '',
+        extensionName: snapshot.get('extensionName') ?? '',
+        dateSign: snapshot.get('dateSign')?.toDate() ?? '',
+        firstName: snapshot.get('firstName') ?? '',
+        imageID: snapshot.get('imageID') ?? '',
+        language: (snapshot.get('language') as List<dynamic>).cast<String>(),
+        lastname: snapshot.get('lastName') ?? '',
+        middleName: snapshot.get('middleName') ?? '',
+        presentation: snapshot.get('presentation') ?? '',
+        tutorID: snapshot.get('tutorID') ?? '',
+        userId: snapshot.get('userID') ?? '',
+      )
+    ];
+  }
+
+  Stream<List<TutorInformation>> get gettutorinfo {
+    return FirebaseFirestore.instance
+        .collection('tutor')
+        .doc(uid)
+        .snapshots()
+        .map(_getTutorInfo);
   }
 }

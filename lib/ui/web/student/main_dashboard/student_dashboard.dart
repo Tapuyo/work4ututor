@@ -10,9 +10,11 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/components/students_navbar.dart';
+import 'package:wokr4ututor/data_class/chatmessageclass.dart';
 import 'package:wokr4ututor/data_class/classesdataclass.dart';
 import 'package:wokr4ututor/data_class/user_class.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
+import 'package:wokr4ututor/services/getmessages.dart';
 import 'package:wokr4ututor/ui/web/student/book_classes/my_classes.dart';
 import 'package:wokr4ututor/ui/web/student/calendar/student_calendar.dart';
 import 'package:wokr4ututor/ui/web/student/main_dashboard/students_classes.dart';
@@ -63,8 +65,16 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
     Size size = MediaQuery.of(context).size;
     return MultiProvider(
       providers: [
-        StreamProvider<List<StudentsList>>.value(
-          value: DatabaseService(uid: '').enrolleelist,
+        // StreamProvider<List<StudentsList>>.value(
+        //   value: DatabaseService(uid: '').enrolleelist,
+        //   catchError: (context, error) {
+        //     print('Error occurred: $error');
+        //     return [];
+        //   },
+        //   initialData: const [],
+        // ),
+         StreamProvider<List<ChatMessage>>.value(
+          value: GetMessageList(uid: widget.uID, role: 'student').getmessageinfo,
           catchError: (context, error) {
             print('Error occurred: $error');
             return [];
@@ -96,7 +106,8 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
           initialData: const [],
         ),
         StreamProvider<List<ClassesData>>.value(
-          value: EnrolledClass(uid: 'XuQyf7S8gCOJBu6gTIb0', role: 'student').getenrolled,
+          value: EnrolledClass(uid: 'XuQyf7S8gCOJBu6gTIb0', role: 'student')
+              .getenrolled,
           catchError: (context, error) {
             // Handle the error here
             print('Error occurred: $error');
@@ -183,16 +194,6 @@ class _MainPageBodyPageState extends State<MainPageBody> {
         });
       }
     }
-    // return
-    //  FutureBuilder(
-    //     future: getData(),
-    //     builder: (context, snapshot) {
-    //       if (snapshot.hasError) {
-    //         return const Text(
-    //           "Something went wrong",
-    //         );
-    //       }
-    //       if (snapshot.connectionState == ConnectionState.done) {
     return Stack(
       children: [
         Scaffold(
@@ -349,9 +350,12 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                       ] else if (menuIndex == 4) ...[
                         StudentInquiry(widget.uID)
                       ] else if (menuIndex == 5) ...[
-                        const PerformancePage()
-                      ] else if (menuIndex == 6) ...[
-                      ] else if (menuIndex == 7) ...[
+                        PerformancePage(
+                          uID: widget.uID,
+                        )
+                      ] else if (menuIndex == 6)
+                        ...[]
+                      else if (menuIndex == 7) ...[
                         const HelpPage()
                       ] else ...[
                         const ClassesMain()
@@ -374,9 +378,13 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                     ] else if (menuIndex == 4) ...[
                       StudentInquiry(widget.uID)
                     ] else if (menuIndex == 5) ...[
-                      const PerformancePage()
+                      PerformancePage(
+                        uID: widget.uID,
+                      )
                     ] else if (menuIndex == 6) ...[
-                       StudentSettingsPage(uID: widget.uID,)
+                      StudentSettingsPage(
+                        uID: widget.uID,
+                      )
                     ] else if (menuIndex == 7) ...[
                       const HelpPage()
                     ] else ...[
@@ -420,9 +428,13 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                             ] else if (menuIndex == 4) ...[
                               StudentInquiry(widget.uID)
                             ] else if (menuIndex == 5) ...[
-                              const PerformancePage()
+                              PerformancePage(
+                                uID: widget.uID,
+                              )
                             ] else if (menuIndex == 6) ...[
-                              StudentSettingsPage(uID: widget.uID,)
+                              StudentSettingsPage(
+                                uID: widget.uID,
+                              )
                             ] else if (menuIndex == 7) ...[
                               const HelpPage()
                             ] else ...[

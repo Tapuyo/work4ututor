@@ -259,7 +259,7 @@ class EnrolledClass {
 
     await FirebaseFirestore.instance
         .collection('students')
-        .doc(uid)
+        .doc(data['studentID'])
         .get()
         .then((DocumentSnapshot<Map<String, dynamic>> querySnapshot) {
       var data = querySnapshot.data() as Map<String, dynamic>;

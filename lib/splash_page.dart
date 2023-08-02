@@ -14,23 +14,27 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
-    Timer(const Duration(seconds: 3), () => {
-     });
-    if (kIsWeb) {
-      Navigator.of(context).pushReplacementNamed(Routes.webMain);
-    } else {
-      Navigator.of(context).pushReplacementNamed(Routes.mobMain);
-    }
+    Timer(
+        const Duration(seconds: 3),
+        () => {
+              if (kIsWeb)
+                {
+                  Navigator.of(context).pushReplacementNamed(Routes.webMain),
+                }
+              else
+                {
+                  Navigator.of(context).pushReplacementNamed(Routes.mobMain),
+                }
+            });
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height,
-      width: MediaQuery.of(context).size.width,
-      child: const Center(
-        child: CircularProgressIndicator(color: Colors.teal),
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }

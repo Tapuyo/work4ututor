@@ -13,13 +13,18 @@ import 'package:wokr4ututor/provider/classes_inquirey_provider.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/provider/inquirydisplay_provider.dart';
 import 'package:wokr4ututor/provider/search_provider.dart';
+import 'package:wokr4ututor/provider/tutor_reviews_provider.dart';
 import 'package:wokr4ututor/provider/user_id_provider.dart';
+import 'package:wokr4ututor/routes/route_generator.dart';
 import 'package:wokr4ututor/routes/routes.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:wokr4ututor/services/classes_inquiry_service.dart';
 import 'package:wokr4ututor/services/gethelpcategory.dart';
 import 'package:wokr4ututor/services/services.dart';
 import 'package:wokr4ututor/services/subjectServices.dart';
+import 'package:wokr4ututor/splash_page.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
+import 'package:wokr4ututor/ui/web/student/main_dashboard/student_dashboard.dart';
 import 'package:wokr4ututor/ui/web/student/search_tutor_login/find_tutors_login.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_profile/tutor_profile.dart';
 import 'package:wokr4ututor/ui/web/web_main.dart';
@@ -46,6 +51,7 @@ Future<void> setupFlutterNotifications() async {
   isFlutterLocalNotificationsInitialized = true;
 }
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
@@ -67,6 +73,7 @@ void main() async {
   await Hive.openBox('userID');
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => InitProvider()),
@@ -93,6 +100,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => ChatDisplayProvider()),
       ChangeNotifierProvider(create: (_) => ViewClassDisplayProvider()),
       ChangeNotifierProvider(create: (_) => ClassesInquiryProvider()),
+       ChangeNotifierProvider(create: (_) => IndividualReviewProvider()),
     ],
     child: const MyApp(),
   ));
@@ -103,42 +111,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final helpcategorylistx = Provider.of<List<HelpCategory>>(context);
-    // print(helpcategorylistx.length);
-    // final subjectInfo = Provider.of<List<Subjects>>(context);
-    // print(subjectInfo.length);
-    return StreamProvider<Users?>.value(
-      value: AuthService().user,
-      initialData: null,
-      child: MaterialApp(
-        title: 'Work4uTutor',
-        initialRoute: Routes.splash,
-        // onGenerateRoute: RouteGenerator.generateRoute,
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          fontFamily: "Nunito",
-          canvasColor: Colors.white,
-          primarySwatch: Colors.indigo,
-        ),
-        // home: const TutorProfile(
-        //   namex: '',
-        // ),
-        home: const WebMainPage(),
-        routes: {
-          "/tutorsinfo": (context) => const TutorProfile(
-                namex: '',
-              ),
-          "/tutorslist": (context) => const FindTutorLogin()
-          //add more pages here
-        },
+    return MaterialApp(
+      title: 'Work4uTutor',
+      // initialRoute: Routes.splash,
+      onGenerateRoute: RouteGenerator.generateRoute,
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: "Nunito",
+        canvasColor: Colors.white,
+        primarySwatch: Colors.indigo,
       ),
+      home: const SplashPage(),
+      
+      routes: {
+        "/tutorsinfo": (context) => const TutorProfile(
+              namex: '',
+            ),
+        "/tutorslist": (context) => const FindTutorLogin(),
+        "/studentdashboard": (context) => const StudentDashboardPage(
+              uID: '',
+            )
+      },
     );
-  }
-}
-
-class MyBehavior extends ScrollBehavior {
-  Widget buildViewportChrome(
-      BuildContext context, Widget child, AxisDirection axisDirection) {
-    return child;
   }
 }

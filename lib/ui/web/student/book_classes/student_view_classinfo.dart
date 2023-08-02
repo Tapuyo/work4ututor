@@ -10,6 +10,7 @@ import 'package:wokr4ututor/ui/web/student/main_dashboard/app_helpers.dart';
 
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../utils/themes.dart';
+import '../../communication.dart/videocall.dart';
 import '../../tutor/tutor_profile/view_file.dart';
 import 'package:universal_html/html.dart' as html;
 
@@ -893,8 +894,16 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
                                                                           BorderRadius.all(
                                                                               Radius.circular(20))),
                                                                 ),
-                                                                onPressed:
-                                                                    () {},
+                                                                onPressed: () {
+                                                                  Navigator
+                                                                      .push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) =>
+                                                                                 const VideoCall(chatID: '', uID: '',)),
+                                                                  );
+                                                                },
                                                                 child: const Text(
                                                                     'Join Class Link'),
                                                               ),

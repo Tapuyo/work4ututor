@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
+import 'package:wokr4ututor/data_class/chatmessageclass.dart';
 import 'package:wokr4ututor/provider/chatmessagedisplay.dart';
+import 'package:wokr4ututor/services/getmessages.dart';
 import 'package:wokr4ututor/ui/web/tutor/mesages/viewmessage.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
@@ -69,10 +72,43 @@ class _UserListState extends State<UserList> {
     });
   }
 
+  final _userinfo = Hive.box('userID');
+  List<Map<String, dynamic>> _items = [];
+  _refreshItems() {
+    final data = _userinfo.keys.map((key) {
+      final item = _userinfo.get(key);
+      return {
+        "key": key,
+        "userID": item["userID"],
+        "role": item["role"],
+        "userStatus": item["userStatus"]
+      };
+    }).toList();
+    setState(() {
+      _items = data.toList();
+      debugPrint(_items.length.toString());
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshItems();
+  }
+
+  String chatID = '';
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    final bool openChat = context.select((ChatDisplayProvider p) => p.openMessage);
+    final bool openChat =
+        context.select((ChatDisplayProvider p) => p.openMessage);
+    final messagelist = Provider.of<List<ChatMessage>>(context);
+    if (messagelist.isNotEmpty) {
+      setState(() {
+        messagelist.sort((a, b) => b.messageDate.compareTo(a.messageDate));
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
@@ -125,7 +161,7 @@ class _UserListState extends State<UserList> {
           Flexible(
             flex: size.width > 1350 ? 4 : 5,
             child: SizedBox(
-              height: size.height,
+              height: size.height - 130,
               child: Card(
                 margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                 elevation: 2,
@@ -138,11 +174,12 @@ class _UserListState extends State<UserList> {
                   onHover: (event) {},
                   cursor: SystemMouseCursors.click,
                   child: ListView.builder(
-                    itemCount: users.length,
+                    shrinkWrap: true,
+                    itemCount: messagelist.length,
                     itemBuilder: (BuildContext context, int index) {
                       return Container(
-                        decoration:
-                           const BoxDecoration(border: Border(bottom: BorderSide(width: .05))),
+                        decoration: const BoxDecoration(
+                            border: Border(bottom: BorderSide(width: .05))),
                         child: ListTile(
                           leading: const CircleAvatar(
                             backgroundColor: Colors.black12,
@@ -152,13 +189,20 @@ class _UserListState extends State<UserList> {
                             ),
                           ),
                           title: Text(
-                            users[index]['name']!,
+                            messagelist[index].tutorID,
                             style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold),
                           ),
-                          subtitle: Text(users[index]['description']!,
-                              style: const TextStyle(color: Colors.black)),
+                          subtitle: Text(messagelist[index].lastmessage,
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: messagelist[index]
+                                              .messageStatus
+                                              .toString() ==
+                                          'unread'
+                                      ? FontWeight.bold
+                                      : FontWeight.normal)),
                           trailing: Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
@@ -169,13 +213,18 @@ class _UserListState extends State<UserList> {
                                   IconButton(
                                     iconSize: 15,
                                     icon: Icon(
-                                      users[index]['isFavorite'] == 'true'
+                                      messagelist[index]
+                                                  .studentFav
+                                                  .toString() ==
+                                              'yes'
                                           ? Icons.star
                                           : Icons.star_border,
-                                      color:
-                                          users[index]['isFavorite'] == 'true'
-                                              ? Colors.orange
-                                              : null,
+                                      color: messagelist[index]
+                                                  .studentFav
+                                                  .toString() ==
+                                              'yes'
+                                          ? Colors.orange
+                                          : null,
                                     ),
                                     splashColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
@@ -210,9 +259,15 @@ class _UserListState extends State<UserList> {
                             // Navigate to user profile page
                             // Navigator.pushNamed(context, '/profile',
                             //     arguments: {'username': users[index]['name']});
-                             final provider =
-                                      context.read<ChatDisplayProvider>();
-                                  provider.setOpenMessage(true);
+
+                            final provider =
+                                context.read<ChatDisplayProvider>();
+                            provider.setOpenMessage(true);
+                            setState(() {
+                              updatemessagestatusInfo(
+                                  messagelist[index].chatID);
+                              chatID = messagelist[index].chatID;
+                            });
                           },
                         ),
                       );
@@ -229,45 +284,47 @@ class _UserListState extends State<UserList> {
           ),
           Flexible(
               flex: 10,
-              child: SingleChildScrollView(
-                  controller: ScrollController(),
-                  child: Center(
-                    child: SizedBox(
-                      height: size.height - 128,
-                      child:  openChat != true ? Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.wechat_rounded,
-                            color: Colors.blue,
-                            size: 75,
-                          ),
-                          const Text(
-                            'Select a conversation to display messages',
-                            style: TextStyle(
-                              fontSize: 18,
+              child: SizedBox(
+                child: openChat != true
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.wechat_rounded,
+                              color: Colors.blue,
+                              size: 75,
                             ),
-                          ),
-                          const Text(
-                            'or',
-                            style: TextStyle(
-                              fontSize: 18,
+                            const Text(
+                              'Select a conversation to display messages',
+                              style: TextStyle(
+                                fontSize: 18,
+                              ),
                             ),
-                          ),
-                          InkWell(
-                              onTap: () {
-                                print('New message');
-                              },
-                              child: const Text(
-                                'Start a new conversation',
-                                style:
-                                    TextStyle(fontSize: 18, color: Colors.blue),
-                              ))
-                        ],
-                      ) : const ViewMessage(),
-                    ),
-                  ))),
+                            const Text(
+                              'or',
+                              style: TextStyle(
+                                fontSize: 18,
+                              ),
+                            ),
+                            InkWell(
+                                onTap: () {
+                                  print('New message');
+                                },
+                                child: const Text(
+                                  'Start a new conversation',
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.blue),
+                                ))
+                          ],
+                        ),
+                      )
+                    : ViewMessage(
+                        uID: _items.first['userID'].toString(),
+                        chatID: chatID,
+                      ),
+              )),
         ],
       ),
     );

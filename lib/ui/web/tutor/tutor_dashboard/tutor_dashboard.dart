@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -15,7 +18,16 @@ import 'package:wokr4ututor/utils/themes.dart';
 
 import '../../../../components/nav_bar.dart';
 import '../../../../constant/constant.dart';
+import '../../../../data_class/classesdataclass.dart';
+import '../../../../data_class/studentanalyticsclass.dart';
+import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/studentsEnrolledclass.dart';
+import '../../../../data_class/tutor_info_class.dart';
+import '../../../../data_class/user_class.dart';
+import '../../../../services/getenrolledclasses.dart';
+import '../../../../services/getstudentclassesanalytics.dart';
+import '../../../../services/getstudentinfo.dart';
+import '../../../../services/getuser.dart';
 import '../../../../services/services.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import '../../help/help.dart';
@@ -24,17 +36,149 @@ class DashboardPage extends StatefulWidget {
   final String uID;
   const DashboardPage({super.key, required this.uID});
   @override
-  _DashboardPageState createState() => _DashboardPageState();
+  State<DashboardPage> createState() => _DashboardPageState();
 }
 
+List<Map<String, dynamic>> _items = [];
+String firstname = '';
+String middlename = '';
+String lastname = '';
+String fullName = '';
+String tutroID = '';
+String profileurl = '';
+
+bool _showModal = false;
+GlobalKey _buttonKey = GlobalKey();
+int newmessagecount = 0;
+int newnotificationcount = 0;
+
 class _DashboardPageState extends State<DashboardPage> {
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return MultiProvider(
+      providers: [
+        StreamProvider<List<TutorInformation>>.value(
+          value: TutorInfoData(uid: widget.uID).gettutorinfo,
+          catchError: (context, error) {
+            print('Error occurred: $error');
+            return [];
+          },
+          initialData: const [],
+        ),
+        StreamProvider<List<StudentsList>>.value(
+          value: DatabaseService(uid: '').enrolleelist,
+          catchError: (context, error) {
+            print('Error occurred: $error');
+            return [];
+          },
+          initialData: const [],
+        ),
+        StreamProvider<List<StudentGuardianClass>>.value(
+          value: StudentGuardianData(uid: 'XuQyf7S8gCOJBu6gTIb0').guardianinfo,
+          catchError: (context, error) {
+            print('Error occurred: $error');
+            return [];
+          },
+          initialData: const [],
+        ),
+        StreamProvider<List<UserData>>.value(
+          value: GetUsersData(uid: 'UhcbNwFHdQbclzdU2eC9NeIeziF2').getUserinfo,
+          catchError: (context, error) {
+            print('Error occurred: $error');
+            return [];
+          },
+          initialData: const [],
+        ),
+        StreamProvider<List<ClassesData>>.value(
+          value: EnrolledClass(uid: widget.uID, role: 'tutor').getenrolled,
+          catchError: (context, error) {
+            // Handle the error here
+            print('Error occurred: $error');
+            // Return a default value or an alternative stream
+            return [];
+          },
+          initialData: const [],
+        ),
+        StreamProvider<List<STUanalyticsClass>>.value(
+          value: StudentAnalytics(uid: 'XuQyf7S8gCOJBu6gTIb0').studentanalytics,
+          catchError: (context, error) {
+            // Handle the error here
+            print('Error occurred: $error');
+            // Return a default value or an alternative stream
+            return [];
+          },
+          initialData: const [],
+        )
+      ],
+      child: DashboardPageBody(
+        uID: widget.uID,
+      ),
+    );
+  }
+}
+
+class DashboardPageBody extends StatefulWidget {
+  final String uID;
+  const DashboardPageBody({super.key, required this.uID});
+  @override
+  State<DashboardPageBody> createState() => _DashboardPageBodyState();
+}
+
+class _DashboardPageBodyState extends State<DashboardPageBody> {
+  Uint8List? imageBytes;
+  String? downloadURL;
+  String? downloadURL1;
+  ImageProvider? imageProvider;
   bool _showModal = false;
   GlobalKey _buttonKey = GlobalKey();
-  int newmessagecount = 1;
-  int newnotificationcount = 1;
+  int newmessagecount = 0;
+  int newnotificationcount = 0;
+   bool tutorstatus = true;
+  void _updateResponse() async {
+    String result = await getData();
+    setState(() {
+      downloadURL1 = result;
+      print('This is the result: $result');
+    });
+  }
+
+  Future getData() async {
+    try {
+      await downloadURLExample(profileurl);
+      return downloadURL;
+    } catch (e) {
+      debugPrint("Error - $e");
+      return null;
+    }
+  }
+
+  Future<void> downloadURLExample(String path) async {
+    downloadURL = await FirebaseStorage.instance.ref(path).getDownloadURL();
+    debugPrint(downloadURL.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
     final int menuIndex = context.select((InitProvider p) => p.menuIndex);
+    final tutorinfodata = Provider.of<List<TutorInformation>>(context);
+    if (downloadURL1 == null) {
+      if (tutorinfodata.isNotEmpty) {
+        setState(() {
+          final tutordata = tutorinfodata.first;
+          firstname = tutordata.firstName;
+          middlename = tutordata.middleName;
+          lastname = tutordata.lastname;
+          fullName = middlename == 'N/A'
+              ? '$firstname $lastname'
+              : '$firstname $middlename $lastname';
+          tutroID = tutordata.userId;
+          profileurl = tutordata.imageID;
+           tutorstatus = tutordata.status == 'unsubscribe' ? true : false;
+          _updateResponse();
+        });
+      }
+    }
     Size size = MediaQuery.of(context).size;
     return StreamProvider<List<StudentsList>>.value(
       value: DatabaseService(uid: '').enrolleelist,
@@ -47,7 +191,8 @@ class _DashboardPageState extends State<DashboardPage> {
                 ? null
                 : Drawer(
                     child: SafeArea(
-                      child: SingleChildScrollView(child: _buildSidebar(context)),
+                      child:
+                          SingleChildScrollView(child: _buildSidebar(context)),
                     ),
                   ),
             appBar: AppBar(
@@ -118,12 +263,12 @@ class _DashboardPageState extends State<DashboardPage> {
                 Padding(
                   padding: const EdgeInsets.all(2.0),
                   child: Column(
-                    mainAxisAlignment:MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                    const  Text(
-                        "MJ Selma",
-                        style: TextStyle(
+                      Text(
+                        fullName,
+                        style: const TextStyle(
                           fontWeight: FontWeight.normal,
                           color: Colors.white,
                           fontSize: 16,
@@ -131,9 +276,9 @@ class _DashboardPageState extends State<DashboardPage> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                       const  Text(
-                        "TTRPHL202301",
-                        style: TextStyle(
+                      Text(
+                        tutroID,
+                        style: const TextStyle(
                           fontWeight: FontWeight.normal,
                           color: Colors.white,
                           fontSize: 12,
@@ -148,7 +293,8 @@ class _DashboardPageState extends State<DashboardPage> {
                           itemCount: 5,
                           itemSize: 16,
                           ratingWidget: RatingWidget(
-                              full: const Icon(Icons.star, color: Colors.orange),
+                              full:
+                                  const Icon(Icons.star, color: Colors.orange),
                               half: const Icon(
                                 Icons.star_half,
                                 color: Colors.orange,
@@ -163,14 +309,16 @@ class _DashboardPageState extends State<DashboardPage> {
                     ],
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(0, 5, 10, 5),
-                  child: CircleAvatar(
-                    backgroundImage: AssetImage(
-                      'assets/images/sample.jpg',
-                    ),
-                    radius: 25,
-                  ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 5, 10, 5),
+                  child: downloadURL1 == null
+                      ? const Center(child: CircularProgressIndicator())
+                      : CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            downloadURL1.toString(),
+                          ),
+                          radius: 25,
+                        ),
                 ),
               ],
             ),
@@ -196,15 +344,19 @@ class _DashboardPageState extends State<DashboardPage> {
                       if (menuIndex == 0) ...[
                         const ClassesMain()
                       ] else if (menuIndex == 1) ...[
-                        const TableBasicsExample1()
+                        TableBasicsExample1(
+                          uID: widget.uID,
+                        )
                       ] else if (menuIndex == 2) ...[
                         const MessagePage()
                       ] else if (menuIndex == 3) ...[
-                         ClassInquiry()
+                        ClassInquiry(widget.uID)
                       ] else if (menuIndex == 4) ...[
                         const StudentsEnrolled()
                       ] else if (menuIndex == 5) ...[
-                        const PerformancePage()
+                        PerformancePage(
+                          uID: widget.uID,
+                        )
                       ] else if (menuIndex == 6) ...[
                         const SettingsPage()
                       ] else if (menuIndex == 7) ...[
@@ -241,15 +393,19 @@ class _DashboardPageState extends State<DashboardPage> {
                               if (menuIndex == 0) ...[
                                 const ClassesMain()
                               ] else if (menuIndex == 1) ...[
-                                const TableBasicsExample1()
+                                TableBasicsExample1(
+                                  uID: widget.uID,
+                                )
                               ] else if (menuIndex == 2) ...[
                                 const MessagePage()
                               ] else if (menuIndex == 3) ...[
-                                ClassInquiry()
+                                ClassInquiry(widget.uID)
                               ] else if (menuIndex == 4) ...[
                                 const StudentsEnrolled()
                               ] else if (menuIndex == 5) ...[
-                                const PerformancePage()
+                                PerformancePage(
+                                  uID: widget.uID,
+                                )
                               ] else if (menuIndex == 6) ...[
                                 const SettingsPage()
                               ] else if (menuIndex == 7) ...[

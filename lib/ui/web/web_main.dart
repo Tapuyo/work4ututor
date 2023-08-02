@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:wokr4ututor/ui/web/communication.dart/videocall.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
+import 'admin/adminlogin.dart';
 import 'tutor/tutor_dashboard/tutor_dashboard.dart';
 import 'student/main_dashboard/student_dashboard.dart';
 
@@ -20,6 +22,7 @@ class _MainPageState extends State<WebMainPage> {
       return {
         "key": key,
         "userID": item["userID"],
+        "role": item["role"],
         "userStatus": item["userStatus"]
       };
     }).toList();
@@ -40,10 +43,19 @@ class _MainPageState extends State<WebMainPage> {
 //  final user = Provider.of<Users?>(context);
     final index = _items.length;
     if (index == 0) {
+      // return const VideoCall(chatID: '', uID: '',);
       return const LoginPage();
     } else {
       debugPrint(index.toString());
-      return StudentDashboardPage(uID: _items[0]['userID'].toString());
+      if (_items[0]['role'].toString() == 'student') {
+        return StudentDashboardPage(uID: _items[0]['userID'].toString());
+        // return const VideoCall(chatID: '', uID: '',);
+        // return const AdminLoginPage();
+      } else if (_items[0]['role'].toString() == 'tutor') {
+        return DashboardPage(uID: _items[0]['userID'].toString());
+      } else {
+        return const LoginPage();
+      }
     }
   }
 }

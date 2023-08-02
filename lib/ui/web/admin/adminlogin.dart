@@ -13,11 +13,11 @@ import '../../../shared_components/alphacode3.dart';
 import '../../../utils/themes.dart';
 import '../student/main_dashboard/student_dashboard.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class AdminLoginPage extends StatefulWidget {
+  const AdminLoginPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<AdminLoginPage> createState() => _AdminLoginPageState();
 }
 
 final AuthService _auth = AuthService();
@@ -29,7 +29,7 @@ String userEmail = '';
 String error = '';
 bool obscure = true;
 
-class _LoginPageState extends State<LoginPage> {
+class _AdminLoginPageState extends State<AdminLoginPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -61,15 +61,10 @@ class LogScreen extends StatelessWidget {
     return Container(
       height: size.height,
       width: size.width,
-      decoration: const BoxDecoration(
-          image: DecorationImage(
-        image: AssetImage("assets/images/Student (12).png"),
-        fit: BoxFit.cover,
-      )),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: const <Widget>[
-          CustomAppBar(),
           SigniN(),
           // It will cover 1/3 of free spaces
         ],
@@ -136,24 +131,25 @@ class _SigniNState extends State<SigniN> {
               child: Column(
                 children: const [
                   Text(
-                    " Welcome Back!",
+                    "ADMINISTRATIVE LOGIN",
                     style: TextStyle(
                       // textStyle: Theme.of(context).textTheme.headlineMedium,
                       color: Color.fromRGBO(1, 118, 132, 1),
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  Text(
-                    " Have a great day ahead.",
-                    style: TextStyle(
-                      // textStyle: Theme.of(context).textTheme.headlineMedium,
-                      color: Colors.black87,
-                      fontSize: 18,
                       fontWeight: FontWeight.normal,
+                      fontSize: 18,
                     ),
                     textAlign: TextAlign.center,
                   ),
+                  // Text(
+                  //   " Have a great day ahead.",
+                  //   style: TextStyle(
+                  //     // textStyle: Theme.of(context).textTheme.headlineMedium,
+                  //     color: Colors.black87,
+                  //     fontSize: 18,
+                  //     fontWeight: FontWeight.normal,
+                  //   ),
+                  //   textAlign: TextAlign.center,
+                  // ),
                 ],
               ),
             ),
@@ -216,25 +212,6 @@ class _SigniNState extends State<SigniN> {
                       },
                     ),
                   ),
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        textStyle: const TextStyle(color: Colors.black),
-                      ),
-                      onPressed: () {
-                        passwordResetDialog(context);
-                      },
-                      child: Text(
-                        style: TextStyle(
-                          color: const Color.fromRGBO(1, 118, 132, 1),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        'Forgot your password?',
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -249,9 +226,9 @@ class _SigniNState extends State<SigniN> {
                   shape: RoundedRectangleBorder(
                     side: const BorderSide(
                       color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                      width: 1,
+                      width: .2,
                     ),
-                    borderRadius: BorderRadius.circular(30.0),
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
                 onPressed: () async {
@@ -305,7 +282,7 @@ class _SigniNState extends State<SigniN> {
                           color: Colors.white,
                           fontSize: 18,
                         ),
-                        'Confirm Submission',
+                        'Continue Log In',
                       ),
               ),
             ),

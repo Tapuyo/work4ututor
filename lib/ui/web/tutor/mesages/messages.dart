@@ -36,7 +36,7 @@ class _MessagePageState extends State<MessagePage> {
                     Flexible(
                       flex: size.width > 1350 ? 4 : 5,
                       child: SizedBox(
-                        height: size.height,
+                        height: size.height - 75,
                         child: Card(
                           margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                           elevation: 0,

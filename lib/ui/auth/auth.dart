@@ -2,6 +2,7 @@
 
 // ignore_for_file: avoid_print
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
 import 'package:wokr4ututor/services/services.dart';
@@ -11,16 +12,35 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   //create user obj based on firebaseuser
-  Users? _userFromFirebaseUser(User? user) {
+   Future<Users?> _userFromFirebaseUser(User? user) async {
     if (user != null) {
-      return Users(uid: user.uid);
+      DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
+          .collection('user')
+          .doc(user.uid)
+          .get();
+
+      if (snapshot.exists) {
+        UserData userData = _getUser(snapshot);
+        return Users(uid: user.uid, role: userData.role);
+      }
     }
     return null;
   }
 
+ UserData _getUser(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+    return UserData(
+      email: data['email'] ?? '',
+      password: data['password'] ?? '',
+      role: data['role'] ?? '',
+      uid: snapshot.id,
+    );
+  }
+
   //auth change user stream
   Stream<Users?> get user {
-    return _auth.authStateChanges().map(_userFromFirebaseUser);
+    return _auth.authStateChanges().asyncMap(_userFromFirebaseUser);
   }
 
   // sign w/ anon
@@ -76,10 +96,10 @@ class AuthService {
       return null;
     }
   }
-  
-final _userinfo = Hive.box('userID');
-Future<void> adduserInfo(Map<String, dynamic> newData) async {
-  await _userinfo.add(newData);
-  print('Saving Successful');
-}
+
+  final _userinfo = Hive.box('userID');
+  Future<void> adduserInfo(Map<String, dynamic> newData) async {
+    await _userinfo.add(newData);
+    print('Saving Successful');
+  }
 }

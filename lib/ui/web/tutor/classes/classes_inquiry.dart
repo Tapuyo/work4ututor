@@ -13,7 +13,8 @@ import '../../../../data_class/classes_inquiry_model.dart';
 import '../../../../utils/themes.dart';
 
 class ClassInquiry extends HookWidget {
-  ClassInquiry({super.key});
+  final String uID;
+  ClassInquiry(this.uID, {super.key});
 
   DateTime? _fromselectedDate;
   DateTime? _toselectedDate;
@@ -79,12 +80,10 @@ class ClassInquiry extends HookWidget {
 
     final bool isRefresh =
         context.select((ClassesInquiryProvider p) => p.isrefresh);
-    final String userId = context.select((UserIDProvider p) => p.userID);
-
 
     useEffect(() {
       Future.microtask(() async {
-        provider.getClassInquiry(context,userId);
+        provider.getClassInquiry(context, uID);
       });
       return;
     }, [isRefresh]);
@@ -382,15 +381,19 @@ class ClassInquiry extends HookWidget {
                           SizedBox(
                             width: size.width - 320,
                             height: size.height - 175,
-                            child: isLoading ? const Center(child: CircularProgressIndicator(),): ListView.builder(
-                              itemCount: classesInquiry.length,
-                              itemBuilder: (context, index) {
-                                return classInquiryItems(
-                                  select: select,
-                                  classInquiry: classesInquiry[index],
-                                );
-                              },
-                            ),
+                            child: isLoading
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : ListView.builder(
+                                    itemCount: classesInquiry.length,
+                                    itemBuilder: (context, index) {
+                                      return classInquiryItems(
+                                        select: select,
+                                        classInquiry: classesInquiry[index],
+                                      );
+                                    },
+                                  ),
                           ),
                         ],
                       )

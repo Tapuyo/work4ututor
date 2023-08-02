@@ -1,15 +1,19 @@
+class Users {
+  final String? uid;
+  final String role;
 
-class Users{
-  final String uid;
-  
-  Users({ required this.uid });
+  Users({required this.uid, required this.role});
 }
-class UserData{
 
+class UserData {
   final String uid;
   final String email;
   final String password;
   final String role;
-UserData({required this.uid, required this.email,required this.password,required this.role, });
-
+  UserData({
+    required this.uid,
+    required this.email,
+    required this.password,
+    required this.role,
+  });
 }

@@ -32,36 +32,6 @@ class StudentMainDashboard extends StatefulWidget {
 }
 
 class _StudentMainDashboardState extends State<StudentMainDashboard> {
-  final taskInProgress = [
-    Voucherclass(
-      voucherName: "Introductory Voucher",
-      amount: '50.00',
-      startDate: DateTime.now().add(const Duration(minutes: 50)),
-      expiryDate: DateTime.now().add(const Duration(minutes: 50)),
-      vstatus: 'Available',
-    ),
-    // CardTaskData(
-    //   label: "Refund Voucher",
-    //   jobDesk: "\$100.00",
-    //   dueDate: DateTime.now().add(const Duration(hours: 4)),
-    // ),
-    // CardTaskData(
-    //   label: "Introductory Voucher",
-    //   jobDesk: "\$50.00",
-    //   dueDate: DateTime.now().add(const Duration(days: 2)),
-    // ),
-    // CardTaskData(
-    //   label: "Introductory Voucher",
-    //   jobDesk: "\$50.00",
-    //   dueDate: DateTime.now().add(const Duration(minutes: 50)),
-    // ),
-    // CardTaskData(
-    //   label: "Introductory Voucher",
-    //   jobDesk: "\$50.00",
-    //   dueDate: DateTime.now().add(const Duration(minutes: 50)),
-    // ),
-  ];
-
   getUserBooks() {
     print('im here');
     FirebaseFirestore.instance.collection('vouchers').get().then((value) {
@@ -356,88 +326,84 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                   children: [
                     Column(
                       children: [
-                        Card(
-                          margin: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                          elevation: 4,
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            alignment: Alignment.centerLeft,
-                            width: 905,
-                            height: 310,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(5.0),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.only(left: 35),
-                                  height: 300,
-                                  width: 500,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Hi $fullName,',
-                                        style: const TextStyle(
-                                            fontSize: 25,
-                                            fontWeight: FontWeight.w800),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      const Text(
-                                        'Welcome back, ready to learn new lesson \nclick the button bellow to book new tutor.',
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w300),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      SizedBox(
-                                        width: 320,
-                                        height: 50,
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                Colors.orangeAccent,
-                                            shape: const RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(25))),
-                                          ),
-                                          onPressed: () {
-                                            html.window.open('/tutorslist', "");
-                                            // setState(() {
-                                            //   fetchSubcollection();
-                                            // });
-                                          },
-                                          child: const Text(
-                                            'Book Now',
-                                            style:
-                                                TextStyle(color: Colors.white),
-                                          ),
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          alignment: Alignment.centerLeft,
+                          width: 905,
+                          height: 310,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.only(left: 35),
+                                height: 300,
+                                width: 500,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Hi $fullName,',
+                                      style: const TextStyle(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.w800),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    const Text(
+                                      'Welcome back, ready to learn new lesson \nclick the button bellow to book new tutor.',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w300),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    SizedBox(
+                                      width: 320,
+                                      height: 50,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              Colors.orangeAccent,
+                                          shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(25))),
+                                        ),
+                                        onPressed: () {
+                                          html.window.open('/tutorslist', "");
+                                          // setState(() {
+                                          //   fetchSubcollection();
+                                          // });
+                                        },
+                                        child: const Text(
+                                          'Book Now',
+                                          style:
+                                              TextStyle(color: Colors.white),
                                         ),
                                       ),
-                                    ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Container(
+                                  height: 320,
+                                  width: 320,
+                                  decoration: const BoxDecoration(
+                                    image: DecorationImage(
+                                        image: AssetImage(
+                                            "assets/images/5836.png"),
+                                        fit: BoxFit.cover),
                                   ),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Container(
-                                    height: 320,
-                                    width: 320,
-                                    decoration: const BoxDecoration(
-                                      image: DecorationImage(
-                                          image: AssetImage(
-                                              "assets/images/5836.png"),
-                                          fit: BoxFit.cover),
-                                    ),
-                                    child: null // Foreground widget here
-                                    ),
-                              ],
-                            ),
+                                  child: null // Foreground widget here
+                                  ),
+                            ],
                           ),
                         ),
                         const SizedBox(

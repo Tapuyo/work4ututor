@@ -1,14 +1,19 @@
 // ignore_for_file: unused_field, prefer_final_fields, unused_local_variable, sized_box_for_whitespace
 
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../utils/themes.dart';
+import '../../student/book_classes/cancelclasses.dart';
+import '../../student/book_classes/rescheduleclasses.dart';
 import '../tutor_profile/view_file.dart';
 
 class ViewClassInfo extends StatefulWidget {
-  const ViewClassInfo({super.key});
+  final ClassesData enrolledClass;
+  const ViewClassInfo({super.key, required this.enrolledClass});
 
   @override
   State<ViewClassInfo> createState() => _ViewClassInfoState();
@@ -23,6 +28,47 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
 
   bool _expanded = false;
   bool viewClassState = false;
+  var formatter = DateFormat('MMMM, dd yyyy HH:mm:');
+  DateTime datenow = DateTime.now();
+  String profileurl = '';
+  String? downloadURL;
+  String? downloadURL1;
+  String dueCancelDate(DateTime dateTime) {
+    // DateTime due = DateFormat('d MMMM y').format(dateTime);
+    Duration diff = dateTime.difference(DateTime.now());
+
+    if (diff.inDays > 1) {
+      return "${diff.inDays} Days";
+    } else if (diff.inHours > 1) {
+      return "${diff.inHours} Hours";
+    } else {
+      return "Is Overdue";
+    }
+  }
+
+  void _updateResponse() async {
+    String result = await getData();
+    setState(() {
+      downloadURL1 = result;
+      print('This is the result: $result');
+    });
+  }
+
+  Future getData() async {
+    try {
+      await downloadURLExample(profileurl);
+      return downloadURL;
+    } catch (e) {
+      debugPrint("Error - $e");
+      return null;
+    }
+  }
+
+  Future<void> downloadURLExample(String path) async {
+    downloadURL = await FirebaseStorage.instance.ref(path).getDownloadURL();
+    debugPrint(downloadURL.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
     bool selection5 = false;
@@ -39,6 +85,11 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
     const double fillStop = (100 - fillPercent) / 100;
     const List<double> stops = [0.0, fillStop, fillStop, 1.0];
     Size size = MediaQuery.of(context).size;
+    bool showcancelresched = false;
+    profileurl = widget.enrolledClass.studentinfo.first.profilelink;
+    _updateResponse();
+    List<ClassesMaterials> materials = widget.enrolledClass.materials;
+    materials.sort((a, b) => a.session.compareTo(b.session));
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10),
       child: Container(
@@ -94,7 +145,9 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                           showDialog<DateTime>(
                                             context: context,
                                             builder: (BuildContext context) {
-                                              return const ViewFile(imageURL: '',);
+                                              return ViewFile(
+                                                imageURL: downloadURL1,
+                                              );
                                             },
                                           ).then((selectedDate) {
                                             if (selectedDate != null) {
@@ -108,11 +161,17 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                           decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(10),
-                                              color: Colors.transparent,
-                                              image: const DecorationImage(
-                                                  image: AssetImage(
-                                                      'assets/images/sample.jpg'),
+                                              color: Colors.white,
+                                              image: DecorationImage(
+                                                  image: NetworkImage(
+                                                    downloadURL1.toString(),
+                                                  ),
                                                   fit: BoxFit.cover)),
+                                          //         child: const Icon(
+                                          //   Icons.person,
+                                          //   color: Colors.grey,
+                                          //   size: 100,
+                                          // ),
                                         )),
                                   ),
                                 ),
@@ -146,9 +205,9 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                     const SizedBox(
                                       height: 5,
                                     ),
-                                    const Text(
-                                      'Mj Selma, 15',
-                                      style: TextStyle(
+                                    Text(
+                                      '${(widget.enrolledClass.studentinfo.first.studentFirstname)}${(widget.enrolledClass.studentinfo.first.studentMiddlename == 'N/A' ? '' : ' ${(widget.enrolledClass.studentinfo.first.studentMiddlename)}')} ${(widget.enrolledClass.studentinfo.first.studentLastname)}, 18',
+                                      style: const TextStyle(
                                           fontSize: 30,
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold),
@@ -157,12 +216,13 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                       height: 5,
                                     ),
                                     Row(
-                                      children: const [
+                                      children: [
                                         Flexible(
                                           flex: 5,
                                           child: Text(
-                                            'Manila, Philippines',
-                                            style: TextStyle(
+                                            (widget.enrolledClass.studentinfo
+                                                .first.country),
+                                            style: const TextStyle(
                                                 fontSize: 25,
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.w500),
@@ -184,12 +244,13 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                       height: 5,
                                     ),
                                     Row(
-                                      children: const [
+                                      children: [
                                         Flexible(
                                           flex: 5,
                                           child: Text(
-                                            'Chemistry',
-                                            style: TextStyle(
+                                            (widget.enrolledClass.subjectinfo
+                                                .first.subjectName),
+                                            style: const TextStyle(
                                                 fontSize: 25,
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.w500,
@@ -324,29 +385,154 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                           const SizedBox(
                                             height: 5,
                                           ),
-                                          const Text(
-                                            "Student enrolled in your Chemistry Class for 3 sessions. 1 hour per session.\nSchedule:",
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              fontStyle: FontStyle.normal,
+                                          Text.rich(
+                                            TextSpan(
+                                              children: [
+                                                const TextSpan(
+                                                  text:
+                                                      "You are enrolled in a ",
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontStyle: FontStyle.normal,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      "${widget.enrolledClass.totalClasses} sessions ",
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontStyle: FontStyle.normal,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      "of ${widget.enrolledClass.subjectinfo.first.subjectName}.",
+                                                  style: const TextStyle(
+                                                      fontSize: 18,
+                                                      fontStyle:
+                                                          FontStyle.normal,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                const TextSpan(
+                                                  text:
+                                                      " 50 minutes per class session.\nSchedule:",
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontStyle: FontStyle.normal,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                             textAlign: TextAlign.justify,
                                           ),
                                           const SizedBox(
                                             height: 5,
                                           ),
-                                          ListView.builder(
-                                              itemCount: 3,
-                                              itemBuilder: (context, index) {
-                                                return  Text(
-                                                  "$index session  February 20, 2023 8:00 AM (Status)",
-                                                  style: const TextStyle(
-                                                    fontSize: 18,
-                                                    fontStyle: FontStyle.normal,
-                                                  ),
-                                                  textAlign: TextAlign.justify,
-                                                );
-                                              }),
+                                          Container(
+                                            width: 600,
+                                            // height: 30 * 3,
+                                            child: ListView.builder(
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                shrinkWrap: true,
+                                                itemCount: widget.enrolledClass
+                                                    .schedule.length,
+                                                itemBuilder: (context, index) {
+                                                  final scheduledata = widget
+                                                      .enrolledClass
+                                                      .schedule[index];
+                                                  return Visibility(
+                                                    visible: true,
+                                                    child: Row(
+                                                      children: [
+                                                        Text(
+                                                          (() {
+                                                            if (scheduledata
+                                                                    .session ==
+                                                                '1') {
+                                                              return "${(scheduledata.session)}st session  ${DateFormat('MMMM, dd yyyy').format(scheduledata.schedule)} (Upcoming)";
+                                                            } else if (scheduledata
+                                                                    .session ==
+                                                                '2') {
+                                                              return "${(scheduledata.session)}nd session  ${DateFormat('MMMM, dd yyyy').format(scheduledata.schedule)} (Upcoming)";
+                                                            } else if (scheduledata
+                                                                    .session ==
+                                                                '3') {
+                                                              return "${(scheduledata.session)}rd session  ${DateFormat('MMMM, dd yyyy').format(scheduledata.schedule)} (Upcoming)";
+                                                            } else {
+                                                              return "${(scheduledata.session)}th session  ${DateFormat('MMMM, dd yyyy').format(scheduledata.schedule)} (Upcoming)";
+                                                            }
+                                                          })(),
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 18,
+                                                            fontStyle: FontStyle
+                                                                .normal,
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.justify,
+                                                        ),
+                                                        const Spacer(),
+                                                        TextButton(
+                                                          child: const Text(
+                                                            "Cancel",
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontSize: 18,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .normal,
+                                                            ),
+                                                          ),
+                                                          onPressed: () {
+                                                            String dateresult =
+                                                                dueCancelDate(
+                                                                    scheduledata
+                                                                        .schedule);
+                                                            print(dateresult);
+
+                                                            // if (dateresult != 'Is Overdue') {
+                                                            cancellclass(
+                                                                context,
+                                                                dateresult);
+                                                            // } else {
+                                                            //   html.window.alert(
+                                                            //       'You will be charge to cancel');
+                                                            // }
+                                                          },
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 5,
+                                                        ),
+                                                        TextButton(
+                                                          child: const Text(
+                                                            "Reschedule",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.blue,
+                                                              fontSize: 18,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .normal,
+                                                            ),
+                                                          ),
+                                                          onPressed: () {
+                                                            String dateresult =
+                                                                dueCancelDate(
+                                                                    scheduledata
+                                                                        .schedule);
+                                                            print(dateresult);
+                                                            rescheduleclass(
+                                                                context);
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }),
+                                          ),
                                           const SizedBox(
                                             height: 10,
                                           ),
@@ -359,7 +545,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                             child: const Align(
                                               alignment: Alignment.centerLeft,
                                               child: Text(
-                                                'Add Grade',
+                                                'Class Grade',
                                                 style: TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.bold,
@@ -373,7 +559,6 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                           const Align(
                                             alignment: Alignment.centerLeft,
                                             child: SizedBox(
-                                              width: 600,
                                               height: 50,
                                               child: TextField(
                                                 textAlignVertical:
@@ -420,7 +605,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(),
                                                 hintText:
-                                                    'Enter your message....',
+                                                    'Enter your comment....',
                                               ),
                                             ),
                                           ),
@@ -458,155 +643,135 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                         children: [
                                           Container(
                                             width: 600,
-                                            height: 600,
                                             child: ListView.builder(
-                                              itemCount: _tiles.length,
-                                              itemBuilder:
-                                                  (BuildContext context,
-                                                      int index) {
-                                                return Card(
-                                                  child: ExpansionTile(
-                                                    title: Text(
-                                                        _tiles[index].classid),
-                                                    children: <Widget>[
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(16.0),
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            const Text(
-                                                                'Files:'),
-                                                            const SizedBox(
-                                                              width: 10,
-                                                            ),
-                                                            SizedBox(
-                                                              width: 160,
-                                                              height: 40,
-                                                              child:
-                                                                  ElevatedButton
-                                                                      .icon(
-                                                                style: ElevatedButton
-                                                                    .styleFrom(
-                                                                  backgroundColor:
-                                                                      Colors
-                                                                          .white,
-                                                                  shape: const RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.all(
-                                                                              Radius.circular(15))),
-                                                                ),
-                                                                onPressed:
-                                                                    () {},
-                                                                icon:
-                                                                    const Icon(
-                                                                  Icons
-                                                                      .attach_file_outlined,
-                                                                  color:
-                                                                      kColorPrimary,
-                                                                ),
-                                                                label:
-                                                                    const Text(
-                                                                  'Add Files',
-                                                                  style: TextStyle(
-                                                                      color:
-                                                                          kColorPrimary),
+                                              shrinkWrap: true,
+                                              itemCount: materials.length,
+                                              itemBuilder: (context, index) {
+                                                final selectedmaterials =
+                                                    materials[index];
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          bottom: 10.0),
+                                                  child: Card(
+                                                    child: ExpansionTile(
+                                                      title: Text(
+                                                        (() {
+                                                          if (selectedmaterials
+                                                                  .session ==
+                                                              '1') {
+                                                            return "${(selectedmaterials.session)}st session materials.";
+                                                          } else if (selectedmaterials
+                                                                  .session ==
+                                                              '2') {
+                                                            return "${(selectedmaterials.session)}nd session materials";
+                                                          } else if (selectedmaterials
+                                                                  .session ==
+                                                              '3') {
+                                                            return "${(selectedmaterials.session)}rd session materials";
+                                                          } else {
+                                                            return "${(selectedmaterials.session)}th session materials";
+                                                          }
+                                                        })(),
+                                                      ),
+                                                      children: <Widget>[
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(16.0),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              const Text(
+                                                                  'Files:'),
+                                                              const SizedBox(
+                                                                width: 10,
+                                                              ),
+                                                              SizedBox(
+                                                                width: 160,
+                                                                height: 40,
+                                                                child:
+                                                                    ElevatedButton
+                                                                        .icon(
+                                                                  style: ElevatedButton
+                                                                      .styleFrom(
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .white,
+                                                                    shape: const RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.all(Radius.circular(15))),
+                                                                  ),
+                                                                  onPressed:
+                                                                      () {},
+                                                                  icon:
+                                                                      const Icon(
+                                                                    Icons
+                                                                        .attach_file_outlined,
+                                                                    color:
+                                                                        kColorPrimary,
+                                                                  ),
+                                                                  label:
+                                                                      const Text(
+                                                                    'Add Files',
+                                                                    style: TextStyle(
+                                                                        color:
+                                                                            kColorPrimary),
+                                                                  ),
                                                                 ),
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .fromLTRB(
-                                                                50, 10, 50, 10),
-                                                        child: TextFormField(
-                                                          decoration:
-                                                              const InputDecoration(
-                                                            labelText:
-                                                                'Add notes here',
-                                                            border:
-                                                                OutlineInputBorder(
-                                                              borderSide:
-                                                                  BorderSide(),
-                                                              gapPadding: 0,
-                                                            ),
+                                                            ],
                                                           ),
                                                         ),
-                                                      ),
-                                                      Align(
-                                                        alignment:
-                                                            Alignment.topRight,
-                                                        child: Padding(
+                                                        Padding(
                                                           padding:
                                                               const EdgeInsets
                                                                       .fromLTRB(
                                                                   50,
-                                                                  0,
+                                                                  10,
                                                                   50,
                                                                   10),
-                                                          child: SizedBox(
-                                                            width: 100,
-                                                            height: 40,
-                                                            child:
-                                                                ElevatedButton(
-                                                              style:
-                                                                  ElevatedButton
-                                                                      .styleFrom(
-                                                                minimumSize:
-                                                                    Size.zero,
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .zero,
-                                                                backgroundColor:
-                                                                    kColorPrimary,
-                                                                shape: const RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.all(
-                                                                            Radius.circular(15))),
-                                                              ),
-                                                              onPressed: () {},
-                                                              // icon: const Icon(Icons.attach_file_outlined, color: kColorPrimary,),
-                                                              child: const Text(
-                                                                'Save',
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white),
+                                                          child: TextFormField(
+                                                            decoration:
+                                                                const InputDecoration(
+                                                              labelText:
+                                                                  'Add notes here',
+                                                              border:
+                                                                  OutlineInputBorder(
+                                                                borderSide:
+                                                                    BorderSide(),
+                                                                gapPadding: 0,
                                                               ),
                                                             ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(16.0),
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            const Text(
-                                                                'Class Video Meeting:'),
-                                                            const SizedBox(
-                                                              width: 10,
-                                                            ),
-                                                            SizedBox(
-                                                              width: 180,
+                                                        Align(
+                                                          alignment: Alignment
+                                                              .topRight,
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .fromLTRB(
+                                                                    50,
+                                                                    0,
+                                                                    50,
+                                                                    10),
+                                                            child: SizedBox(
+                                                              width: 100,
                                                               height: 40,
                                                               child:
-                                                                  ElevatedButton
-                                                                      .icon(
+                                                                  ElevatedButton(
                                                                 style: ElevatedButton
                                                                     .styleFrom(
+                                                                  minimumSize:
+                                                                      Size.zero,
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .zero,
                                                                   backgroundColor:
-                                                                      Colors
-                                                                          .white,
+                                                                      kColorPrimary,
                                                                   shape: const RoundedRectangleBorder(
                                                                       borderRadius:
                                                                           BorderRadius.all(
@@ -614,101 +779,128 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                 ),
                                                                 onPressed:
                                                                     () {},
-                                                                icon:
-                                                                    const Icon(
-                                                                  Icons
-                                                                      .video_camera_back_outlined,
-                                                                  color:
-                                                                      kColorPrimary,
-                                                                ),
-                                                                label:
+                                                                // icon: const Icon(Icons.attach_file_outlined, color: kColorPrimary,),
+                                                                child:
                                                                     const Text(
-                                                                  'Set up Class Link',
+                                                                  'Save',
                                                                   style: TextStyle(
-                                                                      color:
-                                                                          kColorPrimary),
+                                                                      color: Colors
+                                                                          .white),
                                                                 ),
                                                               ),
                                                             ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .fromLTRB(
-                                                                50, 10, 50, 10),
-                                                        child: TextFormField(
-                                                          decoration:
-                                                              const InputDecoration(
-                                                            labelText:
-                                                                'Meeting link...',
-                                                            border:
-                                                                OutlineInputBorder(
-                                                              borderSide:
-                                                                  BorderSide(),
-                                                              gapPadding: 0,
-                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      const SizedBox(
-                                                        height: 10,
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .fromLTRB(
-                                                                50, 10, 50, 10),
-                                                        child: Align(
-                                                          alignment: Alignment
-                                                              .centerRight,
-                                                          child: SizedBox(
-                                                            width: 150,
-                                                            height: 40,
-                                                            child:
-                                                                ElevatedButton(
-                                                              style:
-                                                                  ElevatedButton
-                                                                      .styleFrom(
-                                                                backgroundColor:
-                                                                    kColorPrimary,
-                                                                shape: const RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.all(
-                                                                            Radius.circular(20))),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(16.0),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              const Text(
+                                                                  'Class Video Meeting:'),
+                                                              const SizedBox(
+                                                                width: 10,
                                                               ),
-                                                              onPressed: () {},
-                                                              child: const Text(
-                                                                  'Join Class Link'),
+                                                              SizedBox(
+                                                                width: 180,
+                                                                height: 40,
+                                                                child:
+                                                                    ElevatedButton
+                                                                        .icon(
+                                                                  style: ElevatedButton
+                                                                      .styleFrom(
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .white,
+                                                                    shape: const RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.all(Radius.circular(15))),
+                                                                  ),
+                                                                  onPressed:
+                                                                      () {},
+                                                                  icon:
+                                                                      const Icon(
+                                                                    Icons
+                                                                        .video_camera_back_outlined,
+                                                                    color:
+                                                                        kColorPrimary,
+                                                                  ),
+                                                                  label:
+                                                                      const Text(
+                                                                    'Set up Class Link',
+                                                                    style: TextStyle(
+                                                                        color:
+                                                                            kColorPrimary),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .fromLTRB(
+                                                                  50,
+                                                                  10,
+                                                                  50,
+                                                                  10),
+                                                          child: TextFormField(
+                                                            decoration:
+                                                                const InputDecoration(
+                                                              labelText:
+                                                                  'Meeting link...',
+                                                              border:
+                                                                  OutlineInputBorder(
+                                                                borderSide:
+                                                                    BorderSide(),
+                                                                gapPadding: 0,
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      // Padding(
-                                                      //   padding:
-                                                      //       const EdgeInsets.all(
-                                                      //           16.0),
-                                                      //   child: Column(
-                                                      //     crossAxisAlignment:
-                                                      //         CrossAxisAlignment
-                                                      //             .start,
-                                                      //     children: _tiles[index]
-                                                      //         .fields
-                                                      //         .map((field) =>
-                                                      //             TextFormField(
-                                                      //               decoration:
-                                                      //                   InputDecoration(
-                                                      //                 labelText:
-                                                      //                     field,
-                                                      //                 border:
-                                                      //                     OutlineInputBorder(),
-                                                      //               ),
-                                                      //             ))
-                                                      //         .toList(),
-                                                      //   ),
-                                                      // ),
-                                                    ],
+                                                        const SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .fromLTRB(
+                                                                  50,
+                                                                  10,
+                                                                  50,
+                                                                  10),
+                                                          child: Align(
+                                                            alignment: Alignment
+                                                                .centerRight,
+                                                            child: SizedBox(
+                                                              width: 150,
+                                                              height: 40,
+                                                              child:
+                                                                  ElevatedButton(
+                                                                style: ElevatedButton
+                                                                    .styleFrom(
+                                                                  backgroundColor:
+                                                                      kColorPrimary,
+                                                                  shape: const RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.all(
+                                                                              Radius.circular(20))),
+                                                                ),
+                                                                onPressed:
+                                                                    () {},
+                                                                child: const Text(
+                                                                    'Join Class Link'),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 );
                                               },
@@ -758,18 +950,19 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                             )),
                                       ),
                                       Container(
-                                        width: 350,
-                                        height: 180,
+                                        width: 380,
                                         alignment: Alignment.center,
                                         padding: const EdgeInsets.fromLTRB(
                                             30, 10, 30, 10),
                                         decoration: BoxDecoration(
                                             color: Colors.grey.shade200),
                                         child: ListView.builder(
-                                          itemCount: 3,
-                                          itemBuilder: (BuildContext context,
-                                              int index) {
-                                            int classCount = index + 1;
+                                          shrinkWrap: true,
+                                          itemCount: widget
+                                              .enrolledClass.schedule.length,
+                                          itemBuilder: (context, index) {
+                                            final classCount = widget
+                                                .enrolledClass.schedule[index];
                                             return Container(
                                               alignment: Alignment.center,
                                               padding:
@@ -777,12 +970,26 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                               child: Row(
                                                 children: [
                                                   Text(
-                                                      '$classCount Class Session'),
-                                                  const SizedBox(
-                                                    width: 10,
+                                                    (() {
+                                                      if (classCount.session ==
+                                                          '1') {
+                                                        return "${(classCount.session)}st Class Session";
+                                                      } else if (classCount
+                                                              .session ==
+                                                          '2') {
+                                                        return "${(classCount.session)}nd Class Session";
+                                                      } else if (classCount
+                                                              .session ==
+                                                          '3') {
+                                                        return "${(classCount.session)}rd Class Session";
+                                                      } else {
+                                                        return "${(classCount.session)}th Class Session";
+                                                      }
+                                                    })(),
                                                   ),
+                                                  const Spacer(),
                                                   SizedBox(
-                                                    width: 160,
+                                                    width: 170,
                                                     height: 40,
                                                     child: ElevatedButton(
                                                       style: ElevatedButton
@@ -812,31 +1019,43 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                         ),
                                       ),
                                       const Spacer(),
-                                      Container(
-                                        width: 380,
-                                        height: 65,
-                                        alignment: Alignment.center,
-                                        // padding:
-                                        // const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                                        decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            border: Border.all(
-                                              color: Colors.grey,
-                                              width: .1,
+                                      Card(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              10.0), //<-- SEE HERE
+                                        ),
+                                        elevation: 1,
+                                        child: Container(
+                                          width: 380,
+                                          height: 65,
+                                          alignment: Alignment.center,
+                                          // padding:
+                                          // const EdgeInsets.fromLTRB(30, 10, 30, 10),
+                                          decoration: const BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.only(
+                                                  bottomLeft:
+                                                      Radius.circular(10),
+                                                  bottomRight:
+                                                      Radius.circular(10))),
+                                          child: Center(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: const [
+                                                Icon(EvaIcons.clockOutline),
+                                                SizedBox(
+                                                  width: 5,
+                                                ),
+                                                Text(
+                                                  '50 minutes per class session',
+                                                  textAlign: TextAlign.justify,
+                                                )
+                                              ],
                                             ),
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                                    bottomLeft:
-                                                        Radius.circular(10),
-                                                    bottomRight:
-                                                        Radius.circular(10))),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: const [
-                                            Icon(EvaIcons.clockOutline),
-                                            Text('50 minutes per class session')
-                                          ],
+                                          ),
                                         ),
                                       )
                                     ],
@@ -846,71 +1065,80 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                               const SizedBox(
                                 height: 10,
                               ),
-                              Container(
-                                width: 380,
-                                height: 100,
-                                alignment: Alignment.center,
-                                // padding:
-                                // const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(
-                                      color: Colors.grey,
-                                      width: .1,
-                                    ),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(10))),
-                                child: Column(
-                                  children: [
-                                    const Padding(
-                                      padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                                      child: Align(
-                                          alignment: Alignment.topLeft,
-                                          child: Text(
-                                            'A class by',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                            ),
-                                          )),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          50, 5, 50, 5),
-                                      child: ListTile(
-                                        leading: const CircleAvatar(
-                                          backgroundColor: Colors.black12,
-                                          child: Icon(
-                                            Icons.person,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                        title: const Text(
-                                          "MJ Selma",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        subtitle: const Text("Chemistry",
-                                            style:
-                                                TextStyle(color: Colors.black)),
-                                        onTap: () {
-                                          // Navigate to user profile page
-                                          // Navigator.pushNamed(context, '/profile',
-                                          //     arguments: {'username': users[index]['name']});
-                                          //  final provider =
-                                          //           context.read<ChatDisplayProvider>();
-                                          //       provider.setOpenMessage(true);
-                                        },
+                              Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      10.0), //<-- SEE HERE
+                                ),
+                                child: Container(
+                                  width: 380,
+                                  height: 100,
+                                  alignment: Alignment.center,
+                                  // padding:
+                                  // const EdgeInsets.fromLTRB(30, 10, 30, 10),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(
+                                        color: Colors.grey,
+                                        width: .1,
                                       ),
-                                    ),
-                                    // Row(
-                                    //   mainAxisAlignment: MainAxisAlignment.center,
-                                    //   children: const [
-                                    //     Icon(EvaIcons.clockOutline),
-                                    //     Text('50 minutes per class session')
-                                    //   ],
-                                    // ),
-                                  ],
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(10))),
+                                  child: Column(
+                                    children: [
+                                      const Padding(
+                                        padding:
+                                            EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                        child: Align(
+                                            alignment: Alignment.topLeft,
+                                            child: Text(
+                                              'A class by',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                              ),
+                                            )),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            50, 5, 50, 5),
+                                        child: ListTile(
+                                          leading: const CircleAvatar(
+                                            backgroundColor: Colors.black12,
+                                            child: Icon(
+                                              Icons.person,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          title: Text(
+                                            '${(widget.enrolledClass.tutorinfo.first.firstName)}${(widget.enrolledClass.tutorinfo.first.middleName == 'N/A' ? '' : ' ${(widget.enrolledClass.tutorinfo.first.middleName)}')} ${(widget.enrolledClass.tutorinfo.first.lastname)}, 28',
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          subtitle: Text(
+                                              (widget.enrolledClass.subjectinfo
+                                                  .first.subjectName),
+                                              style: const TextStyle(
+                                                  color: Colors.black)),
+                                          onTap: () {
+                                            // Navigate to user profile page
+                                            // Navigator.pushNamed(context, '/profile',
+                                            //     arguments: {'username': users[index]['name']});
+                                            //  final provider =
+                                            //           context.read<ChatDisplayProvider>();
+                                            //       provider.setOpenMessage(true);
+                                          },
+                                        ),
+                                      ),
+                                      // Row(
+                                      //   mainAxisAlignment: MainAxisAlignment.center,
+                                      //   children: const [
+                                      //     Icon(EvaIcons.clockOutline),
+                                      //     Text('50 minutes per class session')
+                                      //   ],
+                                      // ),
+                                    ],
+                                  ),
                                 ),
                               )
                             ],

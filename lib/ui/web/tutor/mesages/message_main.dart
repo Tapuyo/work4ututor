@@ -3,17 +3,64 @@
 // ignore_for_file: library_private_types_in_public_api, prefer_final_fields
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:wokr4ututor/services/getmessages.dart';
+
+import '../../../../data_class/chatmessageclass.dart';
+import '../../../../data_class/classesdataclass.dart';
 
 class IndividualPage extends StatefulWidget {
-   const IndividualPage({super.key});
+  final String uID;
+  const IndividualPage({Key? key, required this.uID}) : super(key: key);
+
+  @override
+  State<IndividualPage> createState() => _IndividualPageState();
+}
+
+class _IndividualPageState extends State<IndividualPage> {
+//  TableCalendarController _calendarController;
+  List<DateTime> highlightedDatesList = [
+    DateTime(2023, 6, 10),
+    DateTime(2023, 6, 15),
+    DateTime(2023, 6, 20),
+  ];
+
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+
+  DateTime _focusedDay = DateTime.now();
+
+  DateTime _selectedDay = DateTime.now();
+
+  String selectedDate = DateFormat('MMMM dd,').format(DateTime.now());
+
+  int count = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return StreamProvider<List<MessageContent>>.value(
+      value: GetMessageConversation(chatID: widget.uID, userID: 'tutor').getmessage,
+      catchError: (context, error) {
+        print('Error occurred: $error');
+        return [];
+      },
+      initialData: const [],
+      child: const IndividualPageBody(),
+    );
+  }
+}
+class IndividualPageBody extends StatefulWidget {
+  const IndividualPageBody({super.key});
   // final ChatModel chatModel;
   // final ChatModel sourchat;
 
   @override
-  _IndividualPageState createState() => _IndividualPageState();
+  _IndividualPageBodyState createState() => _IndividualPageBodyState();
 }
 
-class _IndividualPageState extends State<IndividualPage> {
+class _IndividualPageBodyState extends State<IndividualPageBody> {
   bool show = false;
   FocusNode focusNode = FocusNode();
   bool sendButton = false;
@@ -76,6 +123,7 @@ class _IndividualPageState extends State<IndividualPage> {
 
   @override
   Widget build(BuildContext context) {
+    final messagedata = Provider.of<List<MessageContent>>(context);
     return Stack(
       children: [
         Image.asset(
@@ -87,7 +135,7 @@ class _IndividualPageState extends State<IndividualPage> {
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: PreferredSize(
-            preferredSize: Size.fromHeight(60),
+            preferredSize: const Size.fromHeight(60),
             child: AppBar(
               leadingWidth: 70,
               titleSpacing: 0,
@@ -98,18 +146,18 @@ class _IndividualPageState extends State<IndividualPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.arrow_back,
                       size: 24,
                     ),
                     CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.blueGrey,
                       child: Image.asset(
                         "assets/images/worklogo.png",
                         alignment: Alignment.topCenter,
                         fit: BoxFit.fitWidth,
                       ),
-                      radius: 20,
-                      backgroundColor: Colors.blueGrey,
                     ),
                   ],
                 ),
@@ -117,11 +165,11 @@ class _IndividualPageState extends State<IndividualPage> {
               title: InkWell(
                 onTap: () {},
                 child: Container(
-                  margin: EdgeInsets.all(6),
+                  margin: const EdgeInsets.all(6),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: const [
                       Text(
                         'Melvin',
                         style: TextStyle(
@@ -140,36 +188,36 @@ class _IndividualPageState extends State<IndividualPage> {
                 ),
               ),
               actions: [
-                IconButton(icon: Icon(Icons.videocam), onPressed: () {}),
-                IconButton(icon: Icon(Icons.call), onPressed: () {}),
+                IconButton(icon: const Icon(Icons.videocam), onPressed: () {}),
+                IconButton(icon: const Icon(Icons.call), onPressed: () {}),
                 PopupMenuButton<String>(
-                  padding: EdgeInsets.all(0),
+                  padding: const EdgeInsets.all(0),
                   onSelected: (value) {
                     print(value);
                   },
                   itemBuilder: (BuildContext contesxt) {
                     return [
-                      PopupMenuItem(
+                      const PopupMenuItem(
                         child: Text("View Contact"),
                         value: "View Contact",
                       ),
-                      PopupMenuItem(
+                      const PopupMenuItem(
                         child: Text("Media, links, and docs"),
                         value: "Media, links, and docs",
                       ),
-                      PopupMenuItem(
+                      const PopupMenuItem(
                         child: Text("Whatsapp Web"),
                         value: "Whatsapp Web",
                       ),
-                      PopupMenuItem(
+                      const PopupMenuItem(
                         child: Text("Search"),
                         value: "Search",
                       ),
-                      PopupMenuItem(
+                      const PopupMenuItem(
                         child: Text("Mute Notification"),
                         value: "Mute Notification",
                       ),
-                      PopupMenuItem(
+                      const PopupMenuItem(
                         child: Text("Wallpaper"),
                         value: "Wallpaper",
                       ),
@@ -223,7 +271,7 @@ class _IndividualPageState extends State<IndividualPage> {
                               Container(
                                 width: MediaQuery.of(context).size.width - 60,
                                 child: Card(
-                                  margin: EdgeInsets.only(
+                                  margin: const EdgeInsets.only(
                                       left: 2, right: 2, bottom: 8),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(25),
@@ -249,7 +297,7 @@ class _IndividualPageState extends State<IndividualPage> {
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       hintText: "Type a message",
-                                      hintStyle: TextStyle(color: Colors.grey),
+                                      hintStyle: const TextStyle(color: Colors.grey),
                                       prefixIcon: IconButton(
                                         icon: Icon(
                                           show
@@ -270,7 +318,7 @@ class _IndividualPageState extends State<IndividualPage> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
-                                            icon: Icon(Icons.attach_file),
+                                            icon: const Icon(Icons.attach_file),
                                             onPressed: () {
                                               showModalBottomSheet(
                                                   backgroundColor:
@@ -281,7 +329,7 @@ class _IndividualPageState extends State<IndividualPage> {
                                             },
                                           ),
                                           IconButton(
-                                            icon: Icon(Icons.camera_alt),
+                                            icon: const Icon(Icons.camera_alt),
                                             onPressed: () {
                                               // Navigator.push(
                                               //     context,
@@ -292,7 +340,7 @@ class _IndividualPageState extends State<IndividualPage> {
                                           ),
                                         ],
                                       ),
-                                      contentPadding: EdgeInsets.all(5),
+                                      contentPadding: const EdgeInsets.all(5),
                                     ),
                                   ),
                                 ),
@@ -305,7 +353,7 @@ class _IndividualPageState extends State<IndividualPage> {
                                 ),
                                 child: CircleAvatar(
                                   radius: 25,
-                                  backgroundColor: Color(0xFF128C7E),
+                                  backgroundColor: const Color(0xFF128C7E),
                                   child: IconButton(
                                     icon: Icon(
                                       sendButton ? Icons.send : Icons.mic,
@@ -317,12 +365,9 @@ class _IndividualPageState extends State<IndividualPage> {
                                             _scrollController
                                                 .position.maxScrollExtent,
                                             duration:
-                                                Duration(milliseconds: 300),
+                                                const Duration(milliseconds: 300),
                                             curve: Curves.easeOut);
-                                        sendMessage(
-                                            _controller.text,
-                                            '1',
-                                           '1');
+                                        sendMessage(_controller.text, '1', '1');
                                         _controller.clear();
                                         setState(() {
                                           sendButton = false;
@@ -374,28 +419,28 @@ class _IndividualPageState extends State<IndividualPage> {
                 children: [
                   iconCreation(
                       Icons.insert_drive_file, Colors.indigo, "Document"),
-                  SizedBox(
+                  const SizedBox(
                     width: 40,
                   ),
                   iconCreation(Icons.camera_alt, Colors.pink, "Camera"),
-                  SizedBox(
+                  const SizedBox(
                     width: 40,
                   ),
                   iconCreation(Icons.insert_photo, Colors.purple, "Gallery"),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   iconCreation(Icons.headset, Colors.orange, "Audio"),
-                  SizedBox(
+                  const SizedBox(
                     width: 40,
                   ),
                   iconCreation(Icons.location_pin, Colors.teal, "Location"),
-                  SizedBox(
+                  const SizedBox(
                     width: 40,
                   ),
                   iconCreation(Icons.person, Colors.blue, "Contact"),
@@ -423,12 +468,12 @@ class _IndividualPageState extends State<IndividualPage> {
               color: Colors.white,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           Text(
             text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
               // fontWeight: FontWeight.w100,
             ),
@@ -439,15 +484,14 @@ class _IndividualPageState extends State<IndividualPage> {
   }
 
   Widget emojiSelect() {
-  return Image.asset(
-              "assets/images/worklogo.png",
-              alignment: Alignment.topCenter,
-              fit: BoxFit.fitWidth,
-            );
+    return Image.asset(
+      "assets/images/worklogo.png",
+      alignment: Alignment.topCenter,
+      fit: BoxFit.fitWidth,
+    );
   }
-  
+
   void sendMessage(String text, id, id2) {}
 }
 
-class MessageModel {
-}
+class MessageModel {}
