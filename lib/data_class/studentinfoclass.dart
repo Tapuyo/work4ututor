@@ -46,3 +46,36 @@ class StudentGuardianClass {
     required this.contact,
   });
 }
+class RecentUser {
+  final String? icon, name, date, posts, role, email;
+
+  RecentUser(
+      {this.icon, this.name, this.date, this.posts, this.role, this.email});
+}
+
+List recentUsers = [
+  RecentUser(
+    icon: "assets/icons/xd_file.svg",
+    name: "Melvin Jhon Selma",
+    role: "Philippines",
+    email: "de***ak@huawei.com",
+    date: "01-03-2021",
+    posts: "Registered",
+  ),
+  RecentUser(
+    icon: "assets/icons/Figma_file.svg",
+    name: "Sarrah Avelino",
+    role: "Philippines",
+    email: "se****k1@google.com",
+    date: "27-02-2021",
+    posts: "Registered",
+  ),
+  RecentUser(
+    icon: "assets/icons/doc_file.svg",
+    name: "James Lebron",
+    role: "Philippines",
+    email: "ne****tr@google.com",
+    date: "23-02-2021",
+    posts: "Registered",
+  ),
+];

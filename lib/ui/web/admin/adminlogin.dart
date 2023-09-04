@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
 import 'package:wokr4ututor/ui/auth/auth.dart';
+import 'package:wokr4ututor/ui/web/admin/executive_dashboard.dart';
 import 'package:wokr4ututor/ui/web/login/forgotpassword.dart';
 import 'package:wokr4ututor/ui/web/terms/termpage.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_dashboard/tutor_dashboard.dart';
@@ -102,7 +103,7 @@ class _SigniNState extends State<SigniN> {
       width: 400,
       padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
       alignment: Alignment.center,
-      margin: const EdgeInsets.fromLTRB(200, 30, 200, 0),
+      margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(.9),
         borderRadius: BorderRadius.circular(20),
@@ -232,48 +233,53 @@ class _SigniNState extends State<SigniN> {
                   ),
                 ),
                 onPressed: () async {
-                  isLoading ? null : _handleButtonPress;
-                  Users? result = await _auth.signinwEmailandPassword(
-                      userEmail, userPassword);
-                  // 'mjselma@gmail.com',
-                  // '123456');
-                  if (result == null) {
-                    setState(() {
-                      error = 'Could not sign in w/ those credential';
-                      print(error);
-                    });
-                  } else {
-                    setState(() {
-                      print(result.uid);
-                      print(result.role);
-                      _auth.adduserInfo({
-                        "userID": result.uid,
-                        "role": result.role,
-                        "userStatus": ''
-                      });
-                    });
-                    if (result.role == 'tutor') {
-                      setState(() {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  DashboardPage(uID: result.uid.toString())),
-                        );
-                      });
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ExecutiveDashboard()),
+                  );
+                  // isLoading ? null : _handleButtonPress;
+                  // Users? result = await _auth.signinwEmailandPassword(
+                  //     userEmail, userPassword);
+                  // // 'mjselma@gmail.com',
+                  // // '123456');
+                  // if (result == null) {
+                  //   setState(() {
+                  //     error = 'Could not sign in w/ those credential';
+                  //     print(error);
+                  //   });
+                  // } else {
+                  //   setState(() {
+                  //     print(result.uid);
+                  //     print(result.role);
+                  //     _auth.adduserInfo({
+                  //       "userID": result.uid,
+                  //       "role": result.role,
+                  //       "userStatus": ''
+                  //     });
+                  //   });
+                  //   if (result.role == 'tutor') {
+                  //     setState(() {
+                  //       Navigator.pushReplacement(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //             builder: (context) =>
+                  //                 DashboardPage(uID: result.uid.toString())),
+                  //       );
+                  //     });
 
-                      StudentDashboardPage(uID: result.uid.toString());
-                    } else if (result.role == 'student') {
-                      setState(() {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => StudentDashboardPage(
-                                  uID: result.uid.toString())),
-                        );
-                      });
-                    }
-                  }
+                  //     StudentDashboardPage(uID: result.uid.toString());
+                  //   } else if (result.role == 'student') {
+                  //     setState(() {
+                  //       Navigator.pushReplacement(
+                  //         context,
+                  //         MaterialPageRoute(
+                  //             builder: (context) => StudentDashboardPage(
+                  //                 uID: result.uid.toString())),
+                  //       );
+                  //     });
+                  //   }
+                  // }
                 },
                 child: isLoading
                     ? CircularProgressIndicator() // Display progress indicator

@@ -452,7 +452,7 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: TaskInProgress(),
+                                      child: VoucherData(),
                                     ),
                                   ],
                                 ),

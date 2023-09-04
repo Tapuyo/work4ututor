@@ -7,20 +7,13 @@ class SubjectServices {
 
   List<Subjects> _subject(QuerySnapshot snapshot) {
     return snapshot.docs.map((subjectData) {
-      String subjectDescriptionx,
-          subjectIdx,
-          subjectNamex,
-          tutorIdx,
-          dateTimex,
-          imagex;
-      subjectDescriptionx = subjectData['subjectDescription'] ?? '';
+      String subjectIdx, subjectNamex, tutorIdx, dateTimex, imagex;
       subjectIdx = subjectData['subjectid'] ?? '';
       subjectNamex = subjectData['subjectName'] ?? '';
       tutorIdx = subjectData['tutorId'] ?? '';
       dateTimex = subjectData['datetime'].toString();
       imagex = subjectData['image'] ?? '';
       return Subjects(
-        subjectDescription: subjectDescriptionx,
         subjectId: subjectIdx,
         subjectName: subjectNamex,
         tutorId: tutorIdx,

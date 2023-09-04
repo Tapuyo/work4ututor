@@ -2,18 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../constant/constant.dart';
 import '../../../../data_class/voucherclass.dart';
 import '../../../../services/getvouchers.dart';
 import '../../../../utils/themes.dart';
 import 'coupon.dart';
 
-class TaskInProgress extends StatefulWidget {
-  TaskInProgress({
+class VoucherData extends StatefulWidget {
+  VoucherData({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<TaskInProgress> createState() => _TaskInProgressState();
+  State<VoucherData> createState() => _VoucherDataState();
 }
 Stream<List<Voucherclass>> get voucherlist {
   return FirebaseFirestore.instance
@@ -35,7 +36,7 @@ List<Voucherclass> _getVouchers(QuerySnapshot snapshot) {
     );
   }).toList();
 }
-class _TaskInProgressState extends State<TaskInProgress> {
+class _VoucherDataState extends State<VoucherData> {
   @override
   Widget build(BuildContext context) {
     final data = Provider.of<List<Voucherclass>>(context);

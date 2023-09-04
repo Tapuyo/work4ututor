@@ -10,7 +10,7 @@ import 'package:wokr4ututor/utils/themes.dart';
 import 'dart:html' as html;
 
 import '../../../../data_class/tutor_info_class.dart';
-import '../../../../routes/routes.dart';
+// import '../../../../routes/routes.dart';
 
 class TutorListLogin extends StatefulWidget {
   final List<TutorInformation> tutorslist;
@@ -93,7 +93,7 @@ class _TutorListLoginState extends State<TutorListLogin> {
                           //   MaterialPageRoute(
                           //       builder: (context) => const TutorProfile()),
                           // );
-                          html.window.open(Routes.tutorInfo,"");
+                          // html.window.open(Routes.tutorInfo,"");
                         },
                         child: Container(
                           width: (size.width - 400) / 3 - 20,

@@ -59,7 +59,7 @@ dependencies:
   syncfusion_flutter_pdfviewer: ^20.3.47
   flutter_spinkit: ^5.1.0
   eva_icons_flutter: ^3.1.0
-  get: ^4.6.5
+  get: ^4.3.8
   badges: ^3.0.2
   flutter_typeahead: ^4.3.7
   hive: ^2.2.3
@@ -73,7 +73,10 @@ dependencies:
   http: ^0.13.6
   whiteboard_sdk_flutter: ^0.5.4
   flutter_colorpicker: ^1.0.3
-
+  timeago: ^3.3.0
+  dotted_border: ^2.0.0+1
+  fl_chart: ^0.62.0
+  url_launcher: ^6.1.11
 
   
 

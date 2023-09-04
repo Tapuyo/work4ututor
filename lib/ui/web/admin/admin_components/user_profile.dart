@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-import '../constant/constant.dart';
+import 'package:flutter/material.dart';
+
+import '../../../../constant/constant.dart';
 
 class UserProfileData {
   final ImageProvider image;
@@ -44,7 +44,7 @@ class UserProfile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildName(),
-                    _buildRating(),
+                    _buildJobdesk(),
                   ],
                 ),
               )
@@ -74,25 +74,15 @@ class UserProfile extends StatelessWidget {
     );
   }
 
-  Widget _buildRating() {
-    return  RatingBar(
-                    initialRating: 4,
-                    direction: Axis.horizontal,
-                    allowHalfRating: true,
-                    itemCount: 5,
-                    itemSize: 20,
-                    ratingWidget: RatingWidget(
-                        full: const Icon(Icons.star, color: Colors.orange),
-                        half: const Icon(
-                          Icons.star_half,
-                          color: Colors.orange,
-                        ),
-                        empty: const Icon(
-                          Icons.star_outline,
-                          color: Colors.orange,
-                        )),
-                    onRatingUpdate: (value) {
-                      // _ratingValue = value;
-                    });
+  Widget _buildJobdesk() {
+    return Text(
+      data.jobDesk,
+      style: TextStyle(
+        fontWeight: FontWeight.w300,
+        color: kFontColorPallets[1],
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
   }
 }

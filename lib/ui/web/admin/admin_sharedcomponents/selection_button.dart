@@ -1,8 +1,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+import 'package:wokr4ututor/utils/themes.dart';
 
-import '../constant/constant.dart';
+import '../../../../constant/constant.dart';
+import '../../../../provider/init_provider.dart';
 
 class SelectionButtonData {
   final IconData activeIcon;
@@ -58,6 +61,8 @@ class _SelectionButtonState extends State<SelectionButton> {
               widget.onSelected(index, data);
               setState(() {
                 selected = index;
+                final provider = context.read<InitProvider>();
+                        provider.setMenuIndex(index);
               });
             },
             data: data,
@@ -114,7 +119,7 @@ class _Button extends StatelessWidget {
       size: 20,
       color: (!selected)
           ? kFontColorPallets[1]
-          : Theme.of(Get.context!).primaryColor,
+          : kColorLight,
     );
   }
 
@@ -124,7 +129,7 @@ class _Button extends StatelessWidget {
       style: TextStyle(
         color: (!selected)
             ? kFontColorPallets[1]
-            : Theme.of(Get.context!).primaryColor,
+            : kColorLight,
         fontWeight: FontWeight.bold,
         letterSpacing: .8,
         fontSize: 14,

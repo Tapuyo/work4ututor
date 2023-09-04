@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:wokr4ututor/ui/web/admin/executive_dashboard.dart';
 import 'package:wokr4ututor/ui/web/communication.dart/videocall.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
 import 'admin/adminlogin.dart';
@@ -44,7 +45,7 @@ class _MainPageState extends State<WebMainPage> {
     final index = _items.length;
     if (index == 0) {
       // return const VideoCall(chatID: '', uID: '',);
-      return const LoginPage();
+      return const AdminPage(uID: '',);
     } else {
       debugPrint(index.toString());
       if (_items[0]['role'].toString() == 'student') {
@@ -54,7 +55,7 @@ class _MainPageState extends State<WebMainPage> {
       } else if (_items[0]['role'].toString() == 'tutor') {
         return DashboardPage(uID: _items[0]['userID'].toString());
       } else {
-        return const LoginPage();
+        return  const AdminPage(uID: '',);
       }
     }
   }
