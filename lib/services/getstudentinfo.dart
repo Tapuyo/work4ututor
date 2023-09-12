@@ -76,6 +76,7 @@ class StudentInfoData {
         contact: snapshot.get('contact') ?? '',
         emailadd: snapshot.get('emailadd') ?? '',
         profilelink: snapshot.get('profileurl') ?? '',
+        dateregistered: snapshot.get('dateregistered').toDate() ?? '',
       )
     ];
   }

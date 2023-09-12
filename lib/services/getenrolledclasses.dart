@@ -276,6 +276,7 @@ class EnrolledClass {
         contact: data['contact'] ?? '',
         emailadd: data['emailadd'] ?? '',
         profilelink: data['profileurl'] ?? '',
+        dateregistered: data['dateregistered'].toDate() ?? '',
       );
       studentinfo.add(tempinfo);
       debugPrint('Student Fetching ${(studentinfo.length)}');
@@ -330,9 +331,6 @@ class EnrolledClass {
           docID: documentSnapshot.id,
           subjectID: data['subjectId'] ?? '',
           subjectName: data['subjectName'] ?? '',
-          subjectimage: data['image'] ?? '',
-          description: data['subjectDescription'] ?? '',
-          tutorID: data['tutorId'] ?? '',
           datecreated: data['datetime'].toDate() ?? '',
         );
         subjectinfo.add(tempsubjectinfo);

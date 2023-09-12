@@ -17,28 +17,31 @@ class RouteGenerator {
 
     switch (settings.name) {
       case Routes.splash:
-        return CupertinoPageRoute(builder: (_) => const SplashPage());
+        return MaterialPageRoute(builder: (_) => const SplashPage());
 
       case Routes.login:
-        return CupertinoPageRoute(builder: (_) => const LoginPage());
+        return MaterialPageRoute(builder: (_) => const LoginPage());
 
       case Routes.mobMain:
-        return CupertinoPageRoute(builder: (_) => const MobMainPage());
+        return MaterialPageRoute(builder: (_) => const MobMainPage());
 
       case Routes.webMain:
-        return CupertinoPageRoute(builder: (_) => const WebMainPage());
+        return MaterialPageRoute(builder: (_) => const WebMainPage());
 
       case Routes.tutorSignup:
-        return CupertinoPageRoute(builder: (_) => const TutorSignup());
+        return MaterialPageRoute(builder: (_) => const TutorSignup());
 
       case Routes.studentSignup:
-        return CupertinoPageRoute(builder: (_) => const StudentSignup());
+        return MaterialPageRoute(builder: (_) => const StudentSignup());
 
       case Routes.adminLogin:
-        return CupertinoPageRoute(builder: (_) => const AdminLoginPage());
+        return MaterialPageRoute(builder: (_) => const AdminLoginPage());
 
       case Routes.tutorList:
-        return CupertinoPageRoute(builder: (_) => const FindTutor());
+        return MaterialPageRoute(builder: (_) => const FindTutor());
+
+      case Routes.deleteAccount:
+        return MaterialPageRoute(builder: (_) => const FindTutor());
 
       default:
         return _errorRoute();
@@ -46,7 +49,7 @@ class RouteGenerator {
   }
 
   static Route<dynamic> _errorRoute() {
-    return CupertinoPageRoute(builder: (_) {
+    return MaterialPageRoute(builder: (_) {
       return Scaffold(
         appBar: AppBar(
           title: const Text('Error'),

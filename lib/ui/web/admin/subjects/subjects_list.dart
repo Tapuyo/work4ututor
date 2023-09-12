@@ -2,56 +2,40 @@ part of dashboard;
 
 class _Subjects extends StatelessWidget {
   const _Subjects({
-    required this.data,
     Key? key,
   }) : super(key: key);
 
-  final List<SubjectData> data;
-
   @override
   Widget build(BuildContext context) {
-    final DashboardController controller = Get.put(DashboardController());
-    final filteredData =
-        controller.subjectList.value.where((item) => item.subjectStatus == "Active").toList();
+    return Obx(() {
+      final DashboardController controller = Get.put(DashboardController());
+      final filteredData = controller.subjectList.value
+          .where((item) => item.subjectStatus == "Active")
+          .toList();
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(kBorderRadius * 2),
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3, // Number of columns
-          crossAxisSpacing: kSpacing / 2,
-          mainAxisSpacing: kSpacing, // Horizontal spacing between columns
-        ),
-        shrinkWrap: true,
-        physics: const BouncingScrollPhysics(),
-        itemCount: filteredData.length,
-        itemBuilder: (context, index) {
-          return SubjectList(
-            data: filteredData[index],
-            primary: _getSequenceColor(index),
-            onPrimary: Colors.white,
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildNewSubject() {
-    return ListView.builder(
-      itemCount: data.length,
-      itemBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.all(kSpacing / 2), // Adjust padding as needed
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(kBorderRadius * 2),
-          child: SubjectList(
-            data: data[index],
-            primary: _getSequenceColor(index),
-            onPrimary: Colors.white,
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(kBorderRadius * 2),
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3, // Number of columns
+            crossAxisSpacing: kSpacing / 2,
+            mainAxisSpacing: kSpacing, // Horizontal spacing between columns
           ),
+          shrinkWrap: true,
+          physics: const BouncingScrollPhysics(),
+          itemCount: filteredData.length,
+          itemBuilder: (context, index) {
+            return SubjectList(
+              data: filteredData[index],
+              primary: _getSequenceColor(index),
+              onPrimary: Colors.white,
+            );
+          },
         ),
-      ),
-    );
+      );
+    });
   }
+
 
   Color _getSequenceColor(int index) {
     int val = index % 4;
@@ -65,6 +49,7 @@ class _Subjects extends StatelessWidget {
       return Colors.lightBlue;
     }
   }
+
   void showAddsubjects(BuildContext context, Map<String, dynamic> tutorsinfo) {
     showDialog(
         context: context,

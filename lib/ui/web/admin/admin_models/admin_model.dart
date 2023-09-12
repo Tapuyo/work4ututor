@@ -1,4 +1,5 @@
 class AdminsInformation {
+  final String docid;
   final String address;
   final DateTime dateRegister;
   final String firstname;
@@ -7,9 +8,13 @@ class AdminsInformation {
   final String email;
   final String position;
   final String adminID;
+  final String adminpassword;
+  final String adminstatus;
   final String contactnumber;
+  final DateTime dateofbirth;
 
   AdminsInformation({
+    required this.docid,
     required this.address,
     required this.dateRegister,
     required this.firstname,
@@ -18,6 +23,9 @@ class AdminsInformation {
     required this.email,
     required this.position,
     required this.adminID,
+    required this.adminpassword,
+    required this.adminstatus,
     required this.contactnumber,
+    required this.dateofbirth,
   });
 }

@@ -5,6 +5,8 @@ class DashboardController extends GetxController {
   late Rx<List<AdminsInformation>> adminsList;
   late Rx<List<ListTaskAssignedData>> taskList;
   late Rx<List<SubjectData>> subjectList;
+  late Rx<List<AdminPositions>> adminpositionlist;
+  late Rx<List<StudentInfoClass>> studentlist;
 
   @override
   void onInit() {
@@ -15,6 +17,11 @@ class DashboardController extends GetxController {
     listenForTaskChanges();
     subjectList = Rx<List<SubjectData>>([]);
     listenForSubjectChanges();
+    adminpositionlist = Rx<List<AdminPositions>>([]);
+    listenForPositionChanges();
+     studentlist = Rx<List<StudentInfoClass>>([]);
+    listenForStudentChanges();
+    
   }
 
   void listenForAdminsChanges() {
@@ -38,6 +45,10 @@ class DashboardController extends GetxController {
           position: data['adminposition'],
           adminID: data['adminID'],
           contactnumber: data['contactnumber'],
+          adminpassword: data['adminpassword'],
+          adminstatus: data['adminstatus'],
+          dateofbirth: (data['dateofbirth'] as Timestamp).toDate(),
+          docid: documentSnapshot.id,
         );
 
         newAdminsList.add(admin);
@@ -64,6 +75,7 @@ class DashboardController extends GetxController {
           subjectName: data['subjectName'],
           subjectStatus: data['subjectStatus'],
           dataID: documentSnapshot.id,
+          totaltutors: data['totaltutors'],
         );
 
         newSubjectList.add(subject);
@@ -101,7 +113,65 @@ class DashboardController extends GetxController {
     });
   }
 
+  void listenForPositionChanges() {
+    final CollectionReference adminspositionCollection =
+        FirebaseFirestore.instance.collection('adminpositions');
+
+    adminspositionCollection.snapshots().listen((querySnapshot) {
+      List<AdminPositions> positionslist = [];
+
+      for (var documentSnapshot in querySnapshot.docs) {
+        Map<String, dynamic> data =
+            documentSnapshot.data() as Map<String, dynamic>;
+
+        AdminPositions positions = AdminPositions(
+          positionID: documentSnapshot.id,
+          nameofposition: data['adminposition'],
+        );
+
+        positionslist.add(positions);
+      }
+
+      adminpositionlist.value = positionslist;
+    });
+  }
+
+  void listenForStudentChanges() {
+    final CollectionReference adminspositionCollection =
+        FirebaseFirestore.instance.collection('students');
+
+    adminspositionCollection.snapshots().listen((querySnapshot) {
+      List<StudentInfoClass> studentdatalist = [];
+
+      for (var documentSnapshot in querySnapshot.docs) {
+        Map<String, dynamic> data =
+            documentSnapshot.data() as Map<String, dynamic>;
+
+        StudentInfoClass students = StudentInfoClass(
+          languages: (data['language'] as List<dynamic>).cast<String>(),
+          address: data['address'] ?? '',
+          country: data['country'] ?? '',
+          studentFirstname: data['studentFirstName'] ?? '',
+          studentMiddlename: data['studentMiddleName'] ?? '',
+          studentLastname: data['studentLastName'] ?? '',
+          studentID: data['studentID'] ?? '',
+          userID: data['userID'] ?? '',
+          contact: data['contact'] ?? '',
+          emailadd: data['emailadd'] ?? '',
+          profilelink: data['profileurl'] ?? '',
+          dateregistered: data['dateregistered'].toDate() ?? '',
+        );
+
+        studentdatalist.add(students);
+      }
+
+      studentlist.value = studentdatalist;
+    });
+  }
+
   RxBool openNew = false.obs;
+
+  RxBool openArchieveAdmin = true.obs;
 
   final dataProfil = const UserProfileData(
     image: AssetImage('assets/images/man.png'),
@@ -112,33 +182,6 @@ class DashboardController extends GetxController {
   final member = ["Sarah Avelino", "Melvin Jhon Amles", "Michelle Fox"];
 
   final dataTask = const TaskProgressData(totalTask: 5, totalCompleted: 1);
-
-  final subjectdata = [
-    SubjectData(
-        dateAccepted: DateTime.now(),
-        subjectId: '00001',
-        subjectName: 'Math',
-        subjectStatus: 'New',
-        dataID: ''),
-    SubjectData(
-        dateAccepted: DateTime.now(),
-        subjectId: '00002',
-        subjectName: 'Science',
-        subjectStatus: 'Accepted',
-        dataID: ''),
-    SubjectData(
-        dateAccepted: DateTime.now(),
-        subjectId: '00003',
-        subjectName: 'English',
-        subjectStatus: 'Accepted',
-        dataID: ''),
-    SubjectData(
-        dateAccepted: DateTime.now(),
-        subjectId: '00004',
-        subjectName: 'Korean Language',
-        subjectStatus: 'Accepted',
-        dataID: ''),
-  ];
 
   final taskInProgress = [
     CardTaskData(
