@@ -10,6 +10,7 @@ class StudentInfoClass {
   final String emailadd;
   final List<String> languages;
   final String profilelink;
+  final DateTime dateregistered;
 
   StudentInfoClass({
     required this.contact,
@@ -23,6 +24,7 @@ class StudentInfoClass {
     required this.studentID,
     required this.userID,
     required this.profilelink,
+    required this.dateregistered,
   });
 }
 
@@ -46,6 +48,7 @@ class StudentGuardianClass {
     required this.contact,
   });
 }
+
 class RecentUser {
   final String? icon, name, date, posts, role, email;
 

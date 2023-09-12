@@ -128,7 +128,9 @@ class NewSubjectList extends StatelessWidget {
           flex: 1,
         ),
         ElevatedButton.icon(
-          onPressed: () {},
+          onPressed: () {
+            updateAdminPosition(data.dataID, 'Reject');
+          },
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.red,
             backgroundColor: onPrimary,

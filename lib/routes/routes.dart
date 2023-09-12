@@ -7,4 +7,5 @@ class Routes {
   static const String adminLogin = '/adminLogin';
   static const String tutorList = '/tutorList';
   static const String studentSignup = '/studentSignup';
+  static const String deleteAccount = '/deleteAccount';
 }

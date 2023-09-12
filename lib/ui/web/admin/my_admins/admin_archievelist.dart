@@ -9,53 +9,16 @@ import 'package:wokr4ututor/ui/web/admin/executive_dashboard.dart';
 import 'package:wokr4ututor/ui/web/admin/my_admins/add_admin.dart';
 import 'package:wokr4ututor/ui/web/admin/my_admins/confirmation_dialog.dart';
 
-class AdminData {
-  final String admindocid;
-  final String adminname;
-  final String adminaddress;
-  final String adminID;
-  final String adminEmail;
-  final DateTime dateregisterd;
-  final String adminposition;
-  final String adminpassword;
-  final String adminstatus;
-  final String contactnumber;
-  final DateTime dateofbirth;
-
-  const AdminData({
-    required this.admindocid,
-    required this.adminname,
-    required this.adminaddress,
-    required this.adminID,
-    required this.adminEmail,
-    required this.dateregisterd,
-    required this.adminposition,
-    required this.adminpassword,
-    required this.adminstatus,
-    required this.contactnumber,
-    required this.dateofbirth,
-  });
-}
-
-class AdminPositions {
-  final String positionID;
-  final String nameofposition;
-
-  const AdminPositions({
-    required this.positionID,
-    required this.nameofposition,
-  });
-}
-
-class AdminList extends StatelessWidget {
-  AdminList({super.key});
+class ArchieveAdminList extends StatelessWidget {
+  const ArchieveAdminList({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
       final DashboardController controller = Get.put(DashboardController());
       final filteredData = controller.adminsList.value
-          .where((item) => item.adminstatus == "Active")
+          .where((item) =>
+              item.adminstatus == "Cancel" || item.adminstatus == "Block")
           .toList();
       return GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -230,19 +193,18 @@ class AdminList extends StatelessWidget {
   }
 
   Widget _acceptButton(BuildContext context, AdminsInformation data) {
-    return Row(
-      children: [
-        ElevatedButton.icon(
-          onPressed: () async {
+    if (data.adminstatus == 'Block') {
+      return ElevatedButton.icon(
+        onPressed: ()async {
             final currentContext = context;
             try {
-              await AdminService.updateAdminData(adminId: data.docid, adminstatus: 'Block');
+              await AdminService.updateAdminData(adminId: data.docid, adminstatus: 'Active');
               print('Admin data saved successfully');
               // ignore: use_build_context_synchronously
               QuickAlert.show(
                 context: currentContext,
                 type: QuickAlertType.success,
-                text: 'Admin Blocked Successfully!',
+                text: 'Admin Unblocked Successfuly!',
                 autoCloseDuration: const Duration(seconds: 2),
                 showConfirmBtn: false,
               );
@@ -258,27 +220,27 @@ class AdminList extends StatelessWidget {
                 textColor: Colors.white,
               );
             }
-          },
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.red,
-            backgroundColor: Colors.white,
-          ),
-          icon: const Center(child: Icon(EvaIcons.closeCircleOutline)),
-          label: const Text("Block"),
+        },
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.green,
         ),
-        const Spacer(),
-        ElevatedButton.icon(
-          onPressed: () async {
-             final currentContext = context;
+        icon: const Center(child: Icon(EvaIcons.unlockOutline)),
+        label: const Text("Unblock"),
+      );
+    } else if (data.adminstatus == 'Cancel') {
+      return ElevatedButton.icon(
+        onPressed: () async {
+            final currentContext = context;
             try {
-              await AdminService.updateAdminData(adminId: data.docid, adminstatus: 'Cancel');
+              await AdminService.updateAdminData(adminId: data.docid, adminstatus: 'Active');
               print('Admin data saved successfully');
               // ignore: use_build_context_synchronously
               QuickAlert.show(
                 context: currentContext,
                 type: QuickAlertType.success,
-                text: 'Admin Cancel Successfully!',
-                autoCloseDuration: const Duration(seconds: 3),
+                text: 'Admin is now Active!',
+                autoCloseDuration: const Duration(seconds: 2),
                 showConfirmBtn: false,
               );
             } catch (error) {
@@ -293,16 +255,17 @@ class AdminList extends StatelessWidget {
                 textColor: Colors.white,
               );
             }
-          },
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.red,
-            backgroundColor: Colors.white,
-          ),
-          icon: const Center(child: Icon(EvaIcons.closeCircleOutline)),
-          label: const Text("Cancel"),
+        },
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.blue,
         ),
-      ],
-    );
+        icon: const Center(child: Icon(EvaIcons.checkmarkCircle2)),
+        label: const Text("Activate"),
+      );
+    } else {
+      return Container();
+    }
   }
 }
 

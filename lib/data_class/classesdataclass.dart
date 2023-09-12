@@ -77,18 +77,12 @@ class SubjectClass {
   final String docID;
   final String subjectID;
   final String subjectName;
-  final String tutorID;
-  final String description;
-  final String subjectimage;
   final DateTime datecreated;
 
   SubjectClass({
     required this.docID,
     required this.subjectID,
     required this.subjectName,
-    required this.tutorID,
-    required this.description,
-    required this.subjectimage,
     required this.datecreated,
   });
 }

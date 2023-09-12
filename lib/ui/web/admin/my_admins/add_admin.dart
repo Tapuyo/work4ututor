@@ -1,17 +1,23 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print
+
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:country_pickers/country.dart';
 import 'package:country_pickers/country_picker_dropdown.dart';
+import 'package:country_pickers/country_pickers.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:wokr4ututor/constant/constant.dart';
 import 'package:wokr4ututor/services/send_email.dart';
 import 'package:wokr4ututor/shared_components/alphacode3.dart';
 import 'package:wokr4ututor/ui/web/admin/admin_sharedcomponents/header_text.dart';
 import 'package:wokr4ututor/ui/web/admin/executive_dashboard.dart';
+import 'package:wokr4ututor/ui/web/admin/my_admins/admin_list.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 import '../../../../utils/themes.dart';
 
@@ -33,15 +39,59 @@ class _NewadminState extends State<Newadmin> {
   String personalemail = '';
   String adminID = '';
   String password = '';
-  String adminposition = '';
+  String adminposition = 'Executive Admin';
+
+  DateTime selectedDate = DateTime.now();
+  TextEditingController dateController = TextEditingController();
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(1950),
+      lastDate: DateTime(2099),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+        dateController.text = DateFormat('MMMM d, yyyy').format(selectedDate);
+      });
+    }
+  }
+
+  InputDecoration getInputDecoration() {
+    // ignore: unnecessary_null_comparison
+    if (selectedDate != null) {
+      return const InputDecoration(
+        border: InputBorder.none,
+        icon: Icon(Icons.calendar_today),
+        labelText: null, // Set labelText to null when selectedDate is not empty
+      );
+    } else {
+      return const InputDecoration(
+        border: InputBorder.none,
+        icon: Icon(Icons.calendar_today),
+        labelText: "Enter Date",
+      );
+    }
+  }
+
+  PhoneNumber phoneNumber = PhoneNumber(isoCode: 'PH');
+  TextEditingController phoneNumberController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final DashboardController controller = Get.put(DashboardController());
+    List<AdminPositions> positionsList = controller.adminpositionlist.value;
+    List<String> datalist = positionsList
+        .where((item) => item.nameofposition != null)
+        .map((item) => item.nameofposition)
+        .toList();
     return Form(
       key: adminformkey,
       child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: kColorPrimary,
           title: const HeaderText('Add New Admin'),
         ),
@@ -55,74 +105,15 @@ class _NewadminState extends State<Newadmin> {
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const HeaderText('Complete Name'),
-                  const SizedBox(
-                    height: 10,
+                  const Text(
+                    'Firstname',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 150,
-                        height: 45,
-                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: const Color.fromARGB(255, 159, 159,
-                                159), // Set your desired border color here
-                            width: .5, // Set the border width
-                          ),
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            hintStyle: TextStyle(color: Colors.black),
-                            hintText: 'Firstname',
-                            border: InputBorder.none,
-                          ),
-                          validator: (val) =>
-                              val!.isEmpty ? 'Enter firstname' : null,
-                          onChanged: (val) {
-                            adminname = val;
-                          },
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 2,
-                      ),
-                      Container(
-                        width: 148,
-                        height: 45,
-                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: const Color.fromARGB(255, 159, 159,
-                                159), // Set your desired border color here
-                            width: .5, // Set the border width
-                          ),
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            hintStyle: TextStyle(color: Colors.black),
-                            hintText: 'Lastname',
-                            border: InputBorder.none,
-                          ),
-                          validator: (val) =>
-                              val!.isEmpty ? 'Enter lastname' : null,
-                          onChanged: (val) {
-                            adminlastname = val;
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  const HeaderText('Address'),
                   const SizedBox(
                     height: 10,
                   ),
@@ -139,33 +130,117 @@ class _NewadminState extends State<Newadmin> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    child: CountryPickerDropdown(
-                      onValuePicked: (Country country) {
-                        final alpha3Code = getAlpha3Code(country.name);
-                        Random random = Random();
-                        int randomNumber = random.nextInt(1000000) + 1;
-                        String currentyear =
-                            DateFormat('yyyy').format(DateTime.now());
-                        //todo please replace the random number with legnth of students enrolled
-                        setState(() {
-                          // tutorIDNumber =
-                          //     'TTR$alpha3Code$currentyear$randomNumber';
-                          address = country.name;
-                        });
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        hintStyle: TextStyle(color: Colors.black),
+                        hintText: 'Firstname',
+                        border: InputBorder.none,
+                      ),
+                      validator: (val) =>
+                          val!.isEmpty ? 'Enter firstname' : null,
+                      onChanged: (val) {
+                        adminname = val;
                       },
-                      itemBuilder: (Country country) {
-                        return Row(
-                          children: <Widget>[
-                            Expanded(child: Text(country.name)),
-                          ],
-                        );
-                      },
-                      itemHeight: 50,
-                      isExpanded: true,
-                      icon: const Icon(Icons.arrow_drop_down),
                     ),
-                    // country.name
                   ),
+                  const SizedBox(
+                    width: 2,
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  const HeaderText('Lastname'),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    width: 300,
+                    height: 45,
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color.fromARGB(255, 159, 159,
+                            159), // Set your desired border color here
+                        width: .5, // Set the border width
+                      ),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        hintStyle: TextStyle(color: Colors.black),
+                        hintText: 'Lastname',
+                        border: InputBorder.none,
+                      ),
+                      validator: (val) =>
+                          val!.isEmpty ? 'Enter lastname' : null,
+                      onChanged: (val) {
+                        adminlastname = val;
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  const HeaderText('Date of Birth'),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    width: 300,
+                    height: 45,
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color.fromARGB(255, 159, 159,
+                            159), // Set your desired border color here
+                        width: .5, // Set the border width
+                      ),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: TextField(
+                        controller:
+                            dateController, //editing controller of this TextField
+                        decoration: getInputDecoration(),
+                        readOnly: true, // when true user cannot edit text
+                        onTap: () async {
+                          _selectDate(context);
+                        }),
+                  ),
+                  const HeaderText('Country'),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                      width: 300,
+                      height: 45,
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: const Color.fromARGB(255, 159, 159,
+                              159), // Set your desired border color here
+                          width: .5, // Set the border width
+                        ),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: CountryPickerDropdown(
+                        initialValue: 'PH',
+                        itemBuilder: _buildDropdownItem,
+                        sortComparator: (Country a, Country b) =>
+                            a.isoCode.compareTo(b.isoCode),
+                        onValuePicked: (Country country) {
+                          print(country.name);
+                          setState(() {
+                            address = country.name;
+                            phoneNumber = PhoneNumber(isoCode: country.isoCode);
+                          });
+                        },
+                        isExpanded: true,
+                      )
+                      // country.name
+                      ),
                   const SizedBox(
                     height: 10,
                   ),
@@ -186,18 +261,21 @@ class _NewadminState extends State<Newadmin> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    child: TextFormField(
-                      decoration: const InputDecoration(
-                        hintStyle: TextStyle(
-                          color: Colors.black,
-                        ),
-                        hintText: 'Select position',
-                        border: InputBorder.none,
-                      ),
-                      validator: (val) =>
-                          val!.isEmpty ? 'Select position' : null,
-                      onChanged: (val) {
-                        adminposition = val;
+                    child: DropdownButton<String>(
+                      value: adminposition, // Use the selectedValue variable
+                      items: datalist.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      underline: Container(),
+                      isExpanded: true,
+                      onChanged: (newValue) {
+                        // Update the selected value when it changes
+                        setState(() {
+                          adminposition = newValue!;
+                        });
                       },
                     ),
                   ),
@@ -221,19 +299,23 @@ class _NewadminState extends State<Newadmin> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    child: TextFormField(
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(
-                          color: Colors.black,
-                        ),
-                        hintText: '+000000000',
-                      ),
-                      validator: (val) =>
-                          val!.isEmpty ? 'Enter contact number' : null,
-                      onChanged: (val) {
-                        contact = val;
+                    child: InternationalPhoneNumberInput(
+                      onInputChanged: (PhoneNumber number) {
+                        setState(() {
+                          phoneNumber = number;
+                          print(phoneNumber.phoneNumber);
+                        });
                       },
+                      selectorConfig: const SelectorConfig(
+                        selectorType: PhoneInputSelectorType.DIALOG,
+                      ),
+                      ignoreBlank: false,
+                      // autoValidateMode: AutovalidateMode.onUserInteraction,
+                      inputDecoration: const InputDecoration(
+                        border: InputBorder.none,
+                      ),
+                      initialValue: phoneNumber,
+                      textFieldController: phoneNumberController,
                     ),
                   ),
                   const SizedBox(
@@ -292,19 +374,21 @@ class _NewadminState extends State<Newadmin> {
                       ),
                       onPressed: () async {
                         int length = controller.adminsList.value.length + 1;
+                        final currentContext = context;
                         adminID = 'WORK4U$length';
                         password = 'work4u2023';
                         if (adminformkey.currentState!.validate()) {
                           try {
                             await AdminService.saveAdminData(
                               adminname: adminname,
-                              contact: contact,
+                              contact: phoneNumber.phoneNumber!,
                               address: address,
                               personalemail: personalemail,
                               adminID: adminID,
                               password: password,
                               adminposition: adminposition,
                               adminlastname: adminlastname,
+                              dateofbirth: selectedDate,
                             );
                             SendEmailtoadmin.sendMail(
                               email: personalemail,
@@ -312,10 +396,27 @@ class _NewadminState extends State<Newadmin> {
                                   'Your UserID: $adminID and Password: $password',
                               name: 'MJ Amles',
                             );
-
                             print('Admin data saved successfully');
+                            QuickAlert.show(
+                              context: currentContext,
+                              type: QuickAlertType.success,
+                              text: 'Admin Added Successfully!',
+                              autoCloseDuration: const Duration(seconds: 3),
+                              showConfirmBtn: false,
+                            ).then((_) {
+                              Navigator.of(context).pop();
+                            });
                           } catch (error) {
                             print('Error saving admin data: $error');
+                            QuickAlert.show(
+                              context: context,
+                              type: QuickAlertType.error,
+                              title: 'Oops...',
+                              text: 'Sorry, something went wrong',
+                              backgroundColor: Colors.black,
+                              titleColor: Colors.white,
+                              textColor: Colors.white,
+                            );
                           }
                         }
                       },
@@ -336,6 +437,16 @@ class _NewadminState extends State<Newadmin> {
       ),
     );
   }
+
+  Widget _buildDropdownItem(Country country) => Row(
+        children: <Widget>[
+          CountryPickerUtils.getDefaultFlagImage(country),
+          const SizedBox(
+            width: 8.0,
+          ),
+          Text(country.name),
+        ],
+      );
 }
 
 class AdminService {
@@ -348,6 +459,7 @@ class AdminService {
     required String adminID,
     required String password,
     required String adminposition,
+    required DateTime dateofbirth,
   }) async {
     CollectionReference adminsCollection =
         FirebaseFirestore.instance.collection('admin');
@@ -359,10 +471,26 @@ class AdminService {
       'contactnumber': contact,
       'address': address,
       'adminemail': personalemail,
+      'dateofbirth': dateofbirth,
       'adminID': adminID,
-      'password': password,
+      'adminpassword': password,
       'adminposition': adminposition,
       'dateRegisterd': DateTime.now(),
+      'adminstatus': 'Active',
     });
+  }
+   static Future<void> updateAdminData({
+    required String adminId, 
+   required String adminstatus,
+  }) async {
+    CollectionReference adminsCollection =
+        FirebaseFirestore.instance.collection('admin');
+
+    DocumentReference adminRef = adminsCollection.doc(adminId);
+
+    Map<String, dynamic> dataToUpdate = {};
+    if (adminstatus != null) dataToUpdate['adminstatus'] = adminstatus;
+
+    await adminRef.update(dataToUpdate);
   }
 }

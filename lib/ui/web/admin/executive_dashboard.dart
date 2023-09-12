@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 library dashboard;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/quickalert.dart';
+import 'package:wokr4ututor/components/shared_popups/cancel_personal_account.dart';
 import 'package:wokr4ututor/data_class/chatmessageclass.dart';
 import 'package:wokr4ututor/data_class/classesdataclass.dart';
 import 'package:wokr4ututor/data_class/studentanalyticsclass.dart';
@@ -26,10 +30,12 @@ import 'package:wokr4ututor/ui/web/admin/admin_sharedcomponents/card_task.dart';
 import 'package:wokr4ututor/ui/web/admin/admin_sharedcomponents/rejected.dart';
 import 'package:wokr4ututor/ui/web/admin/admin_sharedcomponents/selection_button.dart';
 import 'package:wokr4ututor/ui/web/admin/admin_sharedcomponents/view_tutorinfo.dart';
+import 'package:wokr4ututor/ui/web/admin/admin_views/admin_view_students.dart';
 import 'package:wokr4ututor/ui/web/admin/helpers/app_helpers.dart';
 import 'package:wokr4ututor/ui/web/admin/internal_data/internal_confirmation.dart';
 import 'package:wokr4ututor/ui/web/admin/messages/admin_messages.dart';
 import 'package:wokr4ututor/ui/web/admin/my_admins/add_admin.dart';
+import 'package:wokr4ututor/ui/web/admin/my_admins/admin_archievelist.dart';
 import 'package:wokr4ututor/ui/web/admin/my_admins/admin_list.dart';
 import 'package:wokr4ututor/ui/web/admin/reports/mini_info_reports.dart';
 import 'package:wokr4ututor/ui/web/admin/reports/report_charts.dart';
@@ -405,7 +411,7 @@ class ExecutiveDashboard extends GetView<DashboardController> {
         // const SizedBox(height: kSpacing),
         Padding(
           padding: const EdgeInsets.all(kSpacing),
-          child: Text(
+          child: SelectableText (
             "2023 Work4uTutor License",
             style: Theme.of(context).textTheme.bodySmall,
           ),
@@ -598,6 +604,25 @@ class ExecutiveDashboard extends GetView<DashboardController> {
           Row(
             children: [
               const Expanded(child: HeaderText("Administration")),
+              ElevatedButton(
+                onPressed: () {
+                  controller.openArchieveAdmin.value =
+                      !controller.openArchieveAdmin.value;
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.grey[850],
+                  backgroundColor: Colors.grey[100],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  elevation: 0,
+                ),
+                child: Obx(() {
+                  return Text(controller.openArchieveAdmin.value
+                      ? "Show Archived"
+                      : 'Show Active');
+                }),
+              ),
               IconButton(
                 onPressed: () {
                   showAddadmin(context);
@@ -613,7 +638,11 @@ class ExecutiveDashboard extends GetView<DashboardController> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
-                child: AdminList(),
+                child: Obx(() {
+                  return controller.openArchieveAdmin.value
+                      ? AdminList()
+                      : const ArchieveAdminList();
+                }),
               ),
             ],
           ),
@@ -791,6 +820,44 @@ class ExecutiveDashboard extends GetView<DashboardController> {
                   const SizedBox(
                     width: 10,
                   ),
+                  const Padding(
+                    padding: EdgeInsets.all(5.0),
+                    child: Text(
+                      "TIN Number:",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 5, right: 5),
+                    width: 300,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.black45,
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.white,
+                    ),
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        hintStyle:
+                            TextStyle(color: Colors.black38, fontSize: 16),
+                        hintText: 'Example: TTR*********',
+                        border: InputBorder.none,
+                      ),
+                      validator: (val) =>
+                          val!.isEmpty ? 'Enter firstname' : null,
+                      onChanged: (val) {
+                        // adminname = val;
+                      },
+                    ),
+                  ),
                   SizedBox(
                     width: 100,
                     child: ElevatedButton(
@@ -814,79 +881,54 @@ class ExecutiveDashboard extends GetView<DashboardController> {
               right: 10,
               bottom: 8.0,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Checkbox(
-                  checkColor: Colors.black,
-                  activeColor: Colors.green,
-                  value: select,
-                  onChanged: (value) {
-                    select = value!;
-                  },
-                ),
-                const SizedBox(
-                  width: 15,
-                ),
-                const Text(
-                  "Name",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+            child: DataTable(
+              horizontalMargin: 0,
+              columnSpacing: kSpacing / 2,
+              dividerThickness: 1.0, // Adjust the thickness of column lines
+              dataRowHeight: 50.0,
+              columns: const [
+                DataColumn(
+                  label: Text(
+                    "Tutor Name",
+                    style: TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ),
-                const Spacer(
-                  flex: 2,
-                ),
-                const SizedBox(
-                  width: 35,
-                ),
-                const Text(
-                  "Date Sign",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                DataColumn(
+                  label: Text(
+                    "Date Sign",
+                    style: TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ),
-                const Spacer(
-                    // flex: 2,
-                    ),
-                const Text(
-                  "Subjects",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                DataColumn(
+                  label: Text(
+                    "Status",
+                    style: TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ),
-                const Spacer(
-                    // flex: 1,
-                    ),
-                const Text(
-                  "Status",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                DataColumn(
+                  label: Text(
+                    "TIN Number",
+                    style: TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ),
-                const Spacer(
-                    // flex: 1,
-                    ),
-                const Text(
-                  "Classes",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                DataColumn(
+                  label: Text(
+                    "Classes",
+                    style: TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ),
-                const Spacer(
-                    // flex: 3,
-                    ),
-                const Text(
-                  "Action",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                DataColumn(
+                  label: Text(
+                    "Actions",
+                    style: TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ),
-                const Spacer(
-                    // flex: 3,
-                    ),
               ],
+              rows: List.generate(
+                0,
+                (index) => recentUserDataRow(
+                    controller.studentlist.value[index], context, index),
+              ),
             ),
           ),
           const SizedBox(
@@ -951,14 +993,6 @@ class ExecutiveDashboard extends GetView<DashboardController> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
                                         children: [
-                                          Checkbox(
-                                            checkColor: Colors.black,
-                                            activeColor: Colors.red,
-                                            value: select,
-                                            onChanged: (value) {
-                                              select = value!;
-                                            },
-                                          ),
                                           SizedBox(
                                             width: 300,
                                             child: ListTile(
@@ -1002,38 +1036,38 @@ class ExecutiveDashboard extends GetView<DashboardController> {
                                           const SizedBox(
                                             width: 10,
                                           ),
-                                          SizedBox(
-                                            width: 150,
-                                            height: 40,
-                                            child: ElevatedButton.icon(
-                                              icon: const Icon(
-                                                EvaIcons.externalLinkOutline,
-                                                color: Colors.white,
-                                                size: 16,
-                                              ),
-                                              onPressed: () {
-                                                // showAddschedule(context, data);
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                foregroundColor:
-                                                    Colors.grey[850],
-                                                backgroundColor: Colors.blue,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                ),
-                                                elevation: 0,
-                                              ),
-                                              label: const Text(
-                                                "Open Subjects",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
+                                          // SizedBox(
+                                          //   width: 150,
+                                          //   height: 40,
+                                          //   child: ElevatedButton.icon(
+                                          //     icon: const Icon(
+                                          //       EvaIcons.externalLinkOutline,
+                                          //       color: Colors.white,
+                                          //       size: 16,
+                                          //     ),
+                                          //     onPressed: () {
+                                          //       // showAddschedule(context, data);
+                                          //     },
+                                          //     style: ElevatedButton.styleFrom(
+                                          //       foregroundColor:
+                                          //           Colors.grey[850],
+                                          //       backgroundColor: Colors.blue,
+                                          //       shape: RoundedRectangleBorder(
+                                          //         borderRadius:
+                                          //             BorderRadius.circular(20),
+                                          //       ),
+                                          //       elevation: 0,
+                                          //     ),
+                                          //     label: const Text(
+                                          //       "Open Subjects",
+                                          //       style: TextStyle(
+                                          //           color: Colors.white),
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          // const SizedBox(
+                                          //   width: 10,
+                                          // ),
                                           SizedBox(
                                             width: 150,
                                             child: Text(
@@ -1077,6 +1111,28 @@ class ExecutiveDashboard extends GetView<DashboardController> {
                                           ),
                                           const SizedBox(
                                             width: 10,
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              // Navigator.push(
+                                              //   context,
+                                              //   MaterialPageRoute(
+                                              //       builder: (context) => const TutorProfile(
+                                              //             namex: '',
+                                              //           )),
+                                              // );
+                                              showTutor(context);
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              foregroundColor: Colors.grey[850],
+                                              backgroundColor: Colors.grey[100],
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                              elevation: 0,
+                                            ),
+                                            child: const Text("View"),
                                           ),
                                           SizedBox(
                                             width: 150,
@@ -1341,154 +1397,144 @@ class ExecutiveDashboard extends GetView<DashboardController> {
           const SizedBox(height: kSpacing),
           Card(
             elevation: 4.0,
-            child: Row(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(5.0),
-                  child: Text(
-                    "Date Sign:",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(5),
-                  width: 130,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: 1,
-                    ),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 95,
-                        child: Text(
-                          _fromselectedDate == null
-                              ? 'From'
-                              : DateFormat.yMMMMd().format(_fromselectedDate!),
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
+            child: Padding(
+              padding: const EdgeInsets.all(kSpacing / 2),
+              child: Row(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(5.0),
+                    child: Text(
+                      "Date Sign:",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
                       ),
-                      InkWell(
-                        onTap: () {
-                          // _pickDateDialog();
-                        },
-                        child: const Icon(
-                          Icons.calendar_month,
-                          size: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Container(
-                  padding: const EdgeInsets.all(5),
-                  width: 130,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: 1,
-                    ),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 95,
-                        child: Text(
-                          _toselectedDate == null
-                              ? 'To'
-                              : DateFormat.yMMMMd().format(_toselectedDate!),
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          // _pickDateDialog();
-                        },
-                        child: const Icon(
-                          Icons.calendar_month,
-                          size: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  width: 30,
-                ),
-                const Padding(
-                  padding: EdgeInsets.all(5.0),
-                  child: Text(
-                    "Status:",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.only(left: 5, right: 5),
-                  width: 150,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: 1,
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    width: 130,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                        color: Colors.black45,
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(5),
                     ),
-                    borderRadius: BorderRadius.circular(5),
-                    color: Colors.white,
-                  ),
-                  child: DropdownButton<String>(
-                    elevation: 10,
-                    value: statusValue,
-                    onChanged: (statValue) {
-                      statusValue = statValue!;
-                    },
-                    underline: Container(),
-                    items: <String>[
-                      'All',
-                      'Subscribed',
-                      'Unsubscribed',
-                      'Cancelled',
-                    ].map<DropdownMenuItem<String>>((String value1) {
-                      return DropdownMenuItem<String>(
-                        value: value1,
-                        child: Container(
-                          width: 110,
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 95,
                           child: Text(
-                            value1,
-                            style: const TextStyle(
-                              fontSize: 16,
-                            ),
+                            _fromselectedDate == null
+                                ? 'From'
+                                : DateFormat.yMMMMd()
+                                    .format(_fromselectedDate!),
+                            style: const TextStyle(fontWeight: FontWeight.w500),
                           ),
                         ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                SizedBox(
-                  width: 100,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: kColorPrimary,
-                      shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(5))),
+                        InkWell(
+                          onTap: () {
+                            // _pickDateDialog();
+                          },
+                          child: const Icon(
+                            Icons.calendar_month,
+                            size: 20,
+                          ),
+                        ),
+                      ],
                     ),
-                    onPressed: () {},
-                    child: const Text('Search'),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 10),
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    width: 130,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                        color: Colors.black45,
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 95,
+                          child: Text(
+                            _toselectedDate == null
+                                ? 'To'
+                                : DateFormat.yMMMMd().format(_toselectedDate!),
+                            style: const TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            // _pickDateDialog();
+                          },
+                          child: const Icon(
+                            Icons.calendar_month,
+                            size: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 30,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.all(5.0),
+                    child: Text(
+                      "SIN Number:",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 5, right: 5),
+                    width: 300,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.black45,
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.white,
+                    ),
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        hintStyle:
+                            TextStyle(color: Colors.black38, fontSize: 16),
+                        hintText: 'Example: STU*********',
+                        border: InputBorder.none,
+                      ),
+                      validator: (val) =>
+                          val!.isEmpty ? 'Enter firstname' : null,
+                      onChanged: (val) {
+                        // adminname = val;
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  SizedBox(
+                    width: 100,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: kColorPrimary,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                      ),
+                      onPressed: () {},
+                      child: const Text('Search'),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           SizedBox(
@@ -1500,34 +1546,63 @@ class ExecutiveDashboard extends GetView<DashboardController> {
                 right: 10,
                 bottom: 8.0,
               ),
-              child: DataTable(
-                horizontalMargin: 0,
-                columnSpacing: kSpacing,
-                columns: const [
-                  DataColumn(
-                    label: Text("Student Name"),
+              child: Obx(() {
+                return DataTable(
+                  horizontalMargin: 0,
+                  columnSpacing: kSpacing / 2,
+                  dividerThickness: 1.0, // Adjust the thickness of column lines
+                  dataRowHeight: 50.0,
+                  columns: const [
+                    DataColumn(
+                      label: Text(
+                        "Student Name",
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        "Country",
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        "E-mail",
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        "SIN Number",
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        "Contact",
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        "Date Registered",
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    DataColumn(
+                      label: Text(
+                        "Option",
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ],
+                  rows: List.generate(
+                    controller.studentlist.value.length,
+                    (index) => recentUserDataRow(
+                        controller.studentlist.value[index], context, index),
                   ),
-                  DataColumn(
-                    label: Text("Address"),
-                  ),
-                  DataColumn(
-                    label: Text("E-mail"),
-                  ),
-                  DataColumn(
-                    label: Text("Registration Date"),
-                  ),
-                  DataColumn(
-                    label: Text("Status"),
-                  ),
-                  DataColumn(
-                    label: Text("Option"),
-                  ),
-                ],
-                rows: List.generate(
-                  recentUsers.length,
-                  (index) => recentUserDataRow(recentUsers[index], context),
-                ),
-              ),
+                );
+              }),
             ),
           ),
         ],
@@ -1784,7 +1859,7 @@ class ExecutiveDashboard extends GetView<DashboardController> {
             ),
           ),
           const SizedBox(height: kSpacing),
-          _Subjects(data: controller.subjectdata),
+          const _Subjects(),
         ],
       ),
     );
@@ -1824,7 +1899,7 @@ class ExecutiveDashboard extends GetView<DashboardController> {
             ],
           ),
           const SizedBox(height: kSpacing),
-          _NewSubjects(newdata: controller.subjectdata),
+          const _NewSubjects(),
         ],
       ),
     );
@@ -2307,111 +2382,205 @@ class ExecutiveDashboard extends GetView<DashboardController> {
     );
   }
 
-  DataRow recentUserDataRow(RecentUser userInfo, BuildContext context) {
+  DataRow recentUserDataRow(
+      StudentInfoClass userInfo, BuildContext context, int index) {
     return DataRow(
+      color: index.isEven
+          ? MaterialStateColor.resolveWith(
+              (states) => const Color.fromARGB(255, 172, 221, 244))
+          : null, // Set the background color
+
       cells: [
         DataCell(
           Row(
             children: [
-              // TextAvatar(
-              //   size: 35,
-              //   backgroundColor: Colors.white,
-              //   textColor: Colors.white,
-              //   fontSize: 14,
-              //   upperCase: true,
-              //   numberLetters: 1,
-              //   shape: .Rectangle,
-              //   text: userInfo.name!,
-              // ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: kSpacing),
-                child: Text(
-                  userInfo.name!,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                padding: const EdgeInsets.only(left: kSpacing / 2),
+                child: CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors.orange.withOpacity(.5),
+                  child: Text(
+                    userInfo.studentFirstname.getInitialName(1).toUpperCase() +
+                        userInfo.studentLastname
+                            .getInitialName(1)
+                            .toUpperCase(),
+                    style: const TextStyle(
+                      color: Color.fromARGB(255, 147, 89, 2),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
+              ),
+              const SizedBox(
+                width: 1,
+              ),
+              Text(
+                '${userInfo.studentFirstname} ${userInfo.studentMiddlename == 'N/A' ? '' : userInfo.studentMiddlename} ${userInfo.studentLastname}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
         ),
-        DataCell(Text(userInfo.role!)),
-        DataCell(Text(userInfo.email!)),
-        DataCell(Text(userInfo.date!)),
-        DataCell(Text(userInfo.posts!)),
+        DataCell(Text(userInfo.country)),
+        DataCell(Text(userInfo.emailadd)),
+        DataCell(Text(userInfo.studentID)),
+        DataCell(Text(userInfo.contact)),
+        DataCell(Text(
+          DateFormat('MMMM d, yyyy').format(userInfo.dateregistered),
+        )),
         DataCell(
           Row(
             children: [
-              TextButton(
-                child:
-                    const Text('View', style: TextStyle(color: Colors.green)),
-                onPressed: () {},
+              ElevatedButton.icon(
+                icon: const Icon(
+                  EvaIcons.personOutline,
+                  color: Colors.white,
+                  size: 16,
+                ),
+                onPressed: () {
+                  showStudentInfo(context, userInfo);
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.grey[850],
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  elevation: 0,
+                ),
+                label: const Text(
+                  "View Info",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
               const SizedBox(
-                width: 6,
+                width: 3,
               ),
-              TextButton(
-                child: const Text("Delete",
-                    style: TextStyle(color: Colors.redAccent)),
+              ElevatedButton.icon(
+                icon: const Icon(
+                  EvaIcons.personRemoveOutline,
+                  color: Colors.white,
+                  size: 16,
+                ),
                 onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (_) {
-                        return AlertDialog(
-                            title: Center(
-                              child: Column(
-                                children: const [
-                                  Icon(Icons.warning_outlined,
-                                      size: 36, color: Colors.red),
-                                  SizedBox(height: 20),
-                                  Text("Confirm Deletion"),
-                                ],
-                              ),
-                            ),
-                            content: Container(
-                              color: Colors.grey,
-                              height: 70,
-                              child: Column(
-                                children: [
-                                  Text(
-                                      "Are you sure want to delete '${userInfo.name}'?"),
-                                  const SizedBox(
-                                    height: 16,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      ElevatedButton.icon(
-                                          icon: const Icon(
-                                            Icons.close,
-                                            size: 14,
-                                          ),
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.grey),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          label: const Text("Blocked")),
-                                      const SizedBox(
-                                        width: 20,
-                                      ),
-                                      ElevatedButton.icon(
-                                          icon: const Icon(
-                                            Icons.delete,
-                                            size: 14,
-                                          ),
-                                          style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.red),
-                                          onPressed: () {},
-                                          label: const Text("Delete"))
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ));
-                      });
+                  // QuickAlert.show(
+                  //   context: context,
+                  //   type: QuickAlertType.custom,
+                  //   barrierDismissible: true,
+                  //   confirmBtnText: 'Yes',
+                  //   cancelBtnText: 'No',
+                  //   confirmBtnColor: Colors.green,
+                  //   showCancelBtn: true,
+                  //   customAsset: 'assets/images/warning.gif',
+                  //   widget: const Center(
+                  //     child: Text(
+                  //         'Are you sure you sure you want to close your Student Profile with Work4uTutor?'),
+                  //   ),
+                  //   onConfirmBtnTap: () async {
+                  //     // if (message.length < 5) {
+                  //     //   await
+                  //     QuickAlert.show(
+                  //       context: context,
+                  //       type: QuickAlertType.error,
+                  //       text: 'Please input something',
+                  //     );
+                  //     // return;
+                  //     // }
+                  //     Navigator.pop(context);
+                  //     await Future.delayed(const Duration(milliseconds: 1000));
+                  //     await QuickAlert.show(
+                  //       context: context,
+                  //       type: QuickAlertType.success,
+                  //       text: "Phone number has been saved!.",
+                  //     );
+                  //   },
+                  //   onCancelBtnTap: () {
+                  //     QuickAlert.show(
+                  //       context: context,
+                  //       type: QuickAlertType.error,
+                  //       text: 'Please input something',
+                  //     );
+                  //   },
+                  // );
+                  showCancelAccount(context, 'Are you sure you sure you want to close this Student Profile with Work4uTutor?');
                 },
-                // Delete
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.grey[850],
+                  backgroundColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  elevation: 0,
+                ),
+                label: const Text(
+                  "Cancel",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
+              // TextButton(
+              //   child: const Text("Delete",
+              //       style: TextStyle(color: Colors.redAccent)),
+              //   onPressed: () {
+              //     showDialog(
+              //         context: context,
+              //         builder: (_) {
+              //           return AlertDialog(
+              //               title: Center(
+              //                 child: Column(
+              //                   children: const [
+              //                     Icon(Icons.warning_outlined,
+              //                         size: 36, color: Colors.red),
+              //                     SizedBox(height: 20),
+              //                     Text("Confirm Deletion"),
+              //                   ],
+              //                 ),
+              //               ),
+              //               content: Container(
+              //                 color: Colors.grey,
+              //                 height: 70,
+              //                 child: Column(
+              //                   children: [
+              //                     Text(
+              //                         "Are you sure want to delete ${userInfo.studentFirstname} ${userInfo.studentMiddlename == 'N/A' ? '' : userInfo.studentMiddlename} ${userInfo.studentLastname} ?"),
+              //                     const SizedBox(
+              //                       height: 16,
+              //                     ),
+              //                     Row(
+              //                       mainAxisAlignment: MainAxisAlignment.center,
+              //                       children: [
+              //                         ElevatedButton.icon(
+              //                             icon: const Icon(
+              //                               Icons.close,
+              //                               size: 14,
+              //                             ),
+              //                             style: ElevatedButton.styleFrom(
+              //                                 backgroundColor: Colors.grey),
+              //                             onPressed: () {
+              //                               Navigator.of(context).pop();
+              //                             },
+              //                             label: const Text("Blocked")),
+              //                         const SizedBox(
+              //                           width: 20,
+              //                         ),
+              //                         ElevatedButton.icon(
+              //                             icon: const Icon(
+              //                               Icons.delete,
+              //                               size: 14,
+              //                             ),
+              //                             style: ElevatedButton.styleFrom(
+              //                                 backgroundColor: Colors.red),
+              //                             onPressed: () {},
+              //                             label: const Text("Delete"))
+              //                       ],
+              //                     )
+              //                   ],
+              //                 ),
+              //               ));
+              //         });
+              //   },
+              //   // Delete
+              // ),
             ],
           ),
         ),
@@ -2473,7 +2642,7 @@ class ExecutiveDashboard extends GetView<DashboardController> {
     );
   }
 
-  void showAddadmin(BuildContext context) {
+  void showStudentInfo(BuildContext context, StudentInfoClass data) {
     showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -2486,13 +2655,62 @@ class ExecutiveDashboard extends GetView<DashboardController> {
                   var width = MediaQuery.of(context).size.width;
 
                   return SizedBox(
-                    height: height - 200,
-                    width: 500,
-                    child: const Newadmin(),
+                    height: height - 100,
+                    width: 800,
+                    child: ViewStudentPersonalInfo(
+                      data: data,
+                    ),
                   );
                 },
               ),
             ));
   }
-   
+
+  void showAddadmin(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        var height = MediaQuery.of(context).size.height;
+        var width = MediaQuery.of(context).size.width;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius:
+                BorderRadius.circular(15.0), // Adjust the radius as needed
+          ),
+          contentPadding: EdgeInsets.zero,
+          content: ClipRRect(
+            borderRadius: BorderRadius.circular(15.0), // Same radius as above
+            child: Container(
+              color: Colors
+                  .white, // Set the background color of the circular content
+
+              child: Stack(
+                children: <Widget>[
+                  SizedBox(
+                    height: height - 200,
+                    width: 500,
+                    child: const Newadmin(),
+                  ),
+                  Positioned(
+                    top: 10.0,
+                    right: 10.0,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.red,
+                        size: 15,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

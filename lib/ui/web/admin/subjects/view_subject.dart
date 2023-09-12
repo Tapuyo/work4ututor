@@ -5,11 +5,12 @@ import 'package:wokr4ututor/constant/constant.dart';
 import 'package:wokr4ututor/ui/web/admin/helpers/app_helpers.dart';
 
 class SubjectData {
-   final String dataID;
+  final String dataID;
   final String subjectName;
   final DateTime dateAccepted;
   final String subjectId;
   final String subjectStatus;
+  final String totaltutors;
 
   const SubjectData({
     required this.dataID,
@@ -17,6 +18,7 @@ class SubjectData {
     required this.dateAccepted,
     required this.subjectId,
     required this.subjectStatus,
+    required this.totaltutors,
   });
 }
 
@@ -66,8 +68,6 @@ class SubjectList extends StatelessWidget {
                 _buildJobdesk(),
                 const Spacer(flex: 1),
                 _buildDate(),
-                const Spacer(flex: 1),
-                _acceptButton(),
               ],
             ),
           ),
@@ -98,7 +98,7 @@ class SubjectList extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Text(
-        "Total Tutors: ${"0"}",
+        "Total Tutors: ${data.totaltutors}",
         style: TextStyle(
           color: onPrimary,
           fontSize: 12,
@@ -114,7 +114,7 @@ class SubjectList extends StatelessWidget {
     return _IconLabel(
       color: onPrimary,
       iconData: EvaIcons.calendarOutline,
-      label: data.dateAccepted.toString(),
+      label: DateFormat('MMMM d, yyyy').format(data.dateAccepted),
     );
   }
 
