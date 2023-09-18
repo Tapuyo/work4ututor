@@ -207,6 +207,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:language_picker/languages.dart';
 
 import '../data_class/classesdataclass.dart';
 import '../data_class/studentinfoclass.dart';
@@ -277,6 +278,9 @@ class EnrolledClass {
         emailadd: data['emailadd'] ?? '',
         profilelink: data['profileurl'] ?? '',
         dateregistered: data['dateregistered'].toDate() ?? '',
+        age: data['age'] ?? '',
+        dateofbirth: data['dateofbirth'] ?? '',
+        timezone: data['timezone'] ?? '',
       );
       studentinfo.add(tempinfo);
       debugPrint('Student Fetching ${(studentinfo.length)}');

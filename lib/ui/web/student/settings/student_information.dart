@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:language_picker/languages.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/services/getstudentinfo.dart';
 import 'package:wokr4ututor/ui/web/tutor/settings/tutor_information.dart';
@@ -493,10 +494,10 @@ class _StudentInformationState extends State<StudentInformation> {
                               shrinkWrap: true,
                               itemCount: languages.length,
                               itemBuilder: (context, index) {
-                                final item = languages[index];
+                                String item = languages[index];
 
                                 return Dismissible(
-                                  key: Key(item),
+                                  key: Key(item.toString()),
                                   onDismissed: (direction) {
                                     setState(() {
                                       deleteLanguage(item);
@@ -577,16 +578,16 @@ class _StudentInformationState extends State<StudentInformation> {
                             ),
                             onPressed: () {
                               setState(() {
-                                updateStudentInfo(
-                                    'XuQyf7S8gCOJBu6gTIb0',
-                                    confirstname.text,
-                                    conmiddlename.text,
-                                    conlastname.text,
-                                    languages,
-                                    concontact.text,
-                                    conemailadd.text,
-                                    conaddress.text,
-                                    concountry.text);
+                                // updateStudentInfo(
+                                //     'XuQyf7S8gCOJBu6gTIb0',
+                                //     confirstname.text,
+                                //     conmiddlename.text,
+                                //     conlastname.text,
+                                //     languages,
+                                //     concontact.text,
+                                //     conemailadd.text,
+                                //     conaddress.text,
+                                //     concountry.text);
                               });
                             },
                             child: const Text('Update'),

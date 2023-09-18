@@ -3,8 +3,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
+import 'package:wokr4ututor/ui/web/login/login.dart';
 import 'package:wokr4ututor/ui/web/tutor/tutor_dashboard/tutor_dashboard.dart';
 import 'package:wokr4ututor/ui/web/web_main.dart';
 import 'package:wokr4ututor/utils/themes.dart';
@@ -384,13 +386,12 @@ class StudentsMenu extends HookWidget {
               ),
               onPressed: () async {
                 dynamic result = await _auth.signOutAnon();
-                print(result.toString());
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            WebMainPage()),
-                  );
+                deleteAllData();
+                // ignore: use_build_context_synchronously
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
               },
               icon: const Icon(
                 Icons.logout_outlined,
@@ -456,5 +457,10 @@ class StudentsMenu extends HookWidget {
         ],
       ),
     );
+  }
+
+  void deleteAllData() async {
+    final box = await Hive.openBox('userID');
+    await box.clear();
   }
 }

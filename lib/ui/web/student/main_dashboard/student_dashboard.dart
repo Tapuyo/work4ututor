@@ -82,7 +82,7 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
           initialData: const [],
         ),
         StreamProvider<List<StudentInfoClass>>.value(
-          value: StudentInfoData(uid: 'XuQyf7S8gCOJBu6gTIb0').getstudentinfo,
+          value: StudentInfoData(uid: widget.uID).getstudentinfo,
           catchError: (context, error) {
             print('Error occurred: $error');
             return [];
@@ -90,7 +90,7 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
           initialData: const [],
         ),
         StreamProvider<List<StudentGuardianClass>>.value(
-          value: StudentGuardianData(uid: 'XuQyf7S8gCOJBu6gTIb0').guardianinfo,
+          value: StudentGuardianData(uid: widget.uID).guardianinfo,
           catchError: (context, error) {
             print('Error occurred: $error');
             return [];
@@ -98,7 +98,7 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
           initialData: const [],
         ),
         StreamProvider<List<UserData>>.value(
-          value: GetUsersData(uid: 'UhcbNwFHdQbclzdU2eC9NeIeziF2').getUserinfo,
+          value: GetUsersData(uid: widget.uID).getUserinfo,
           catchError: (context, error) {
             print('Error occurred: $error');
             return [];
@@ -106,7 +106,7 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
           initialData: const [],
         ),
         StreamProvider<List<ClassesData>>.value(
-          value: EnrolledClass(uid: 'XuQyf7S8gCOJBu6gTIb0', role: 'student')
+          value: EnrolledClass(uid: widget.uID, role: 'student')
               .getenrolled,
           catchError: (context, error) {
             // Handle the error here
@@ -117,7 +117,7 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
           initialData: const [],
         ),
         StreamProvider<List<STUanalyticsClass>>.value(
-          value: StudentAnalytics(uid: 'XuQyf7S8gCOJBu6gTIb0').studentanalytics,
+          value: StudentAnalytics(uid: widget.uID).studentanalytics,
           catchError: (context, error) {
             // Handle the error here
             print('Error occurred: $error');

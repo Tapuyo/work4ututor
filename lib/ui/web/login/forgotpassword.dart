@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 
 @override
-passwordResetDialog(BuildContext context) {
+passwordResetDialog(BuildContext newcontext) {
   showDialog(
     barrierDismissible: false,
-    context: context,
+    context: newcontext,
     builder: (_) => WillPopScope(
       onWillPop: () => Future.value(false),
-      child: Dialog(
+      child: AlertDialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius:
+              BorderRadius.circular(15.0), // Adjust the radius as needed
         ),
-        elevation: 0,
-        child: Container(
+        contentPadding: EdgeInsets.zero,
+        content: Container(
           alignment: Alignment.center,
           width: 400,
           height: 470,
@@ -36,7 +37,7 @@ passwordResetDialog(BuildContext context) {
                     "You are trying to update\nyour password!",
                     style: TextStyle(
                       // textStyle: Theme.of(context).textTheme.headlineMedium,
-                      color:  Color.fromRGBO(1, 118, 132, 1),
+                      color: Color.fromRGBO(1, 118, 132, 1),
                       fontSize: 28,
                       fontWeight: FontWeight.w600,
                     ),
@@ -60,9 +61,9 @@ passwordResetDialog(BuildContext context) {
                   ),
                   const Text(
                     "Input your email here!",
-                    style:TextStyle(
+                    style: TextStyle(
                       // textStyle: Theme.of(context).textTheme.headlineMedium,
-                      color:  Color.fromRGBO(1, 118, 132, 1),
+                      color: Color.fromRGBO(1, 118, 132, 1),
                       fontSize: 25,
                       fontWeight: FontWeight.w600,
                     ),
@@ -137,14 +138,14 @@ passwordResetDialog(BuildContext context) {
                 right: 0.0,
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(newcontext).pop();
                   },
                   child: const Align(
                     alignment: Alignment.topRight,
-                    child: CircleAvatar(
-                      radius: 12.0,
-                      backgroundColor: Colors.red,
-                      child: Icon(Icons.close, color: Colors.black),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.red,
+                      size: 15,
                     ),
                   ),
                 ),

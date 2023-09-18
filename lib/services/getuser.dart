@@ -13,7 +13,7 @@ class GetUsersData {
     return [
       UserData(
         email: snapshot.get('email') ?? '',
-        password: snapshot.get('password') ?? '',
+        status: snapshot.get('status') ?? '',
         role: snapshot.get('role') ?? '',
         uid: snapshot.id,
       )

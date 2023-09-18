@@ -301,9 +301,9 @@ class _TutorInfoSettingsState extends State<TutorInfoSettings> {
                           ),
                         ),
                         onPressed: () async {
-                          String fileName = await uploadData();
+                          String? fileName = await uploadData('');
                           setState(() {
-                            uID = fileName;
+                            uID = fileName!;
                             print(fileName);
                           });
                         },
@@ -356,9 +356,9 @@ class _TutorInfoSettingsState extends State<TutorInfoSettings> {
                           ),
                         ),
                         onPressed: () async {
-                          String fileName = await uploadData();
+                          String? fileName = await uploadData('');
                           setState(() {
-                            uID = fileName;
+                            uID = fileName!;
                             print(fileName);
                           });
                         },

@@ -68,7 +68,7 @@ class DialogShow extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const TutorInfo()),
+                            builder: (context) => const TutorInfo(uid: '', email: '',)),
                       );
                     }
                   },
@@ -124,7 +124,7 @@ class DialogShow extends StatelessWidget {
                 TextButton(
                   onPressed: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const TutorInfo()),
+                    MaterialPageRoute(builder: (context) => const TutorInfo(uid: '', email: '',)),
                   ),
                   child: const Text('OK'),
                 ),

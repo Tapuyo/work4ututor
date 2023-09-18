@@ -19,9 +19,8 @@ class DashboardController extends GetxController {
     listenForSubjectChanges();
     adminpositionlist = Rx<List<AdminPositions>>([]);
     listenForPositionChanges();
-     studentlist = Rx<List<StudentInfoClass>>([]);
+    studentlist = Rx<List<StudentInfoClass>>([]);
     listenForStudentChanges();
-    
   }
 
   void listenForAdminsChanges() {
@@ -160,6 +159,8 @@ class DashboardController extends GetxController {
           emailadd: data['emailadd'] ?? '',
           profilelink: data['profileurl'] ?? '',
           dateregistered: data['dateregistered'].toDate() ?? '',
+          age: data['age'] ?? '',
+          dateofbirth: data['dateofbirth'] ?? '', timezone: data['timezone'] ?? '',
         );
 
         studentdatalist.add(students);

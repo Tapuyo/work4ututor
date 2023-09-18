@@ -14,6 +14,7 @@ import 'package:wokr4ututor/provider/classes_inquirey_provider.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/provider/inquirydisplay_provider.dart';
 import 'package:wokr4ututor/provider/search_provider.dart';
+import 'package:wokr4ututor/provider/studet_info_provider.dart';
 import 'package:wokr4ututor/provider/tutor_reviews_provider.dart';
 import 'package:wokr4ututor/provider/user_id_provider.dart';
 import 'package:wokr4ututor/routes/route_generator.dart';
@@ -35,6 +36,11 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'data_class/tutor_info_class.dart';
 import 'data_class/user_class.dart';
+import 'package:timezone/browser.dart' as tz;
+
+Future<void> setup() async {
+  await tz.initializeTimeZone();
+}
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await setupFlutterNotifications();
@@ -55,6 +61,7 @@ Future<void> setupFlutterNotifications() async {
 }
 
 void main() async {
+  setup();
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
     usePathUrlStrategy();
@@ -75,7 +82,7 @@ void main() async {
   await Hive.openBox('userID');
 
   Get.lazyPut(() => DashboardController());
-  
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(MultiProvider(
@@ -105,6 +112,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => ViewClassDisplayProvider()),
       ChangeNotifierProvider(create: (_) => ClassesInquiryProvider()),
       ChangeNotifierProvider(create: (_) => IndividualReviewProvider()),
+      ChangeNotifierProvider(create: (_) => StudentInfoProvider()),
     ],
     child: const MyApp(),
   ));
@@ -117,7 +125,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Work4uTutor',
-      initialRoute: Routes.splash,
+      initialRoute: '/',
       onGenerateRoute: RouteGenerator.generateRoute,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -125,6 +133,7 @@ class MyApp extends StatelessWidget {
         canvasColor: Colors.white,
         primarySwatch: Colors.indigo,
       ),
+      home: const WebMainPage(),
     );
   }
 }

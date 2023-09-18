@@ -2,6 +2,7 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:wokr4ututor/provider/init_provider.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
@@ -38,67 +39,7 @@ class CustomAppBar extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-          Container(
-            height: 38,
-            width: 120,
-            decoration: const BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-            ),
-            child: TextButton.icon(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                shape: const BeveledRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
-                // ignore: prefer_const_constructors
-                textStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 12,
-                  fontStyle: FontStyle.normal,
-                  decoration: TextDecoration.none,
-                ),
-              ),
-              onPressed: () {},
-              icon: const Icon(Icons.language_rounded),
-              label: const Text('LANGUAGE'),
-            ),
-          ),
           const Spacer(),
-          Container(
-            height: 38,
-            width: 110,
-            decoration: const BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: Color.fromRGBO(1, 118, 132, 1),
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-            ),
-            child: TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                shape: const BeveledRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
-                // ignore: prefer_const_constructors
-                textStyle: TextStyle(
-                  color: Colors.black,
-                  // fontFamily: 'Avenir',
-                  fontSize: 12,
-                  fontStyle: FontStyle.normal,
-                  decoration: TextDecoration.none,
-                ),
-              ),
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const FindTutor()),
-                );
-              },
-              child: const Text('FIND TUTOR'),
-            ),
-          ),
-          const SizedBox(
-            width: 20,
-          ),
           Container(
             height: 38,
             width: 140,
@@ -401,7 +342,7 @@ Widget navbarmenu(BuildContext context) {
             alignment: Alignment.centerLeft,
             foregroundColor: Colors.white,
             disabledBackgroundColor: Colors.white,
-            backgroundColor:  menuIndex != 3 ? kColorSecondary : kColorPrimary,
+            backgroundColor: menuIndex != 3 ? kColorSecondary : kColorPrimary,
             shape: RoundedRectangleBorder(
               side: const BorderSide(
                 color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -448,7 +389,7 @@ Widget navbarmenu(BuildContext context) {
             alignment: Alignment.centerLeft,
             foregroundColor: Colors.white,
             disabledBackgroundColor: Colors.white,
-            backgroundColor:  menuIndex != 4 ? kColorSecondary : kColorPrimary,
+            backgroundColor: menuIndex != 4 ? kColorSecondary : kColorPrimary,
             shape: RoundedRectangleBorder(
               side: const BorderSide(
                 color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -495,7 +436,7 @@ Widget navbarmenu(BuildContext context) {
             alignment: Alignment.centerLeft,
             foregroundColor: Colors.white,
             disabledBackgroundColor: Colors.white,
-            backgroundColor:  menuIndex != 5 ? kColorSecondary : kColorPrimary,
+            backgroundColor: menuIndex != 5 ? kColorSecondary : kColorPrimary,
             shape: RoundedRectangleBorder(
               side: const BorderSide(
                 color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -542,7 +483,7 @@ Widget navbarmenu(BuildContext context) {
             alignment: Alignment.centerLeft,
             foregroundColor: Colors.white,
             disabledBackgroundColor: Colors.white,
-            backgroundColor:  menuIndex != 6 ? kColorSecondary : kColorPrimary,
+            backgroundColor: menuIndex != 6 ? kColorSecondary : kColorPrimary,
             shape: RoundedRectangleBorder(
               side: const BorderSide(
                 color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -589,7 +530,7 @@ Widget navbarmenu(BuildContext context) {
             alignment: Alignment.centerLeft,
             foregroundColor: Colors.white,
             disabledBackgroundColor: Colors.white,
-            backgroundColor:  menuIndex != 7 ? kColorSecondary : kColorPrimary,
+            backgroundColor: menuIndex != 7 ? kColorSecondary : kColorPrimary,
             shape: RoundedRectangleBorder(
               side: const BorderSide(
                 color: Color.fromRGBO(1, 118, 132, 1), // your color here
@@ -654,7 +595,12 @@ Widget navbarmenu(BuildContext context) {
           ),
           onPressed: () async {
             dynamic result = await _auth.signOutAnon();
-            print(result.toString());
+            deleteAllData();
+            // ignore: use_build_context_synchronously
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginPage()),
+            );
           },
           icon: const Icon(
             Icons.logout_outlined,
@@ -717,6 +663,11 @@ Widget navbarmenu(BuildContext context) {
       ),
     ],
   );
+}
+
+void deleteAllData() async {
+  final box = await Hive.openBox('userID');
+  await box.clear();
 }
 
 class FindTutorNavbar extends StatelessWidget {

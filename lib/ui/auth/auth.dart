@@ -12,34 +12,35 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   //create user obj based on firebaseuser
-   Future<Users?> _userFromFirebaseUser(User? user) async {
+  Future<UserData?> _userFromFirebaseUser(User? user) async {
     if (user != null) {
-      DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore.instance
+      DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+          .instance
           .collection('user')
           .doc(user.uid)
           .get();
 
       if (snapshot.exists) {
         UserData userData = _getUser(snapshot);
-        return Users(uid: user.uid, role: userData.role);
+        return userData;
       }
     }
     return null;
   }
 
- UserData _getUser(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+  UserData _getUser(DocumentSnapshot<Map<String, dynamic>> snapshot) {
     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
 
     return UserData(
       email: data['email'] ?? '',
-      password: data['password'] ?? '',
+      status: data['status'] ?? '',
       role: data['role'] ?? '',
       uid: snapshot.id,
     );
   }
 
   //auth change user stream
-  Stream<Users?> get user {
+  Stream<UserData?> get user {
     return _auth.authStateChanges().asyncMap(_userFromFirebaseUser);
   }
 
@@ -81,19 +82,37 @@ class AuthService {
 
   // register with email and password
   Future registerwEmailandPassword(
-      String email, String password, String role, String name, lastname) async {
+      String email, String password, String role) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       User? user = result.user;
       //create a new document for the user with the uid
-      await DatabaseService(uid: user!.uid)
-          .updateUserData(email, password, role);
-      await DatabaseService(uid: user.uid).updateTutorData(name, lastname);
+      await DatabaseService(uid: user!.uid).updateUserData(email, role);
+      await DatabaseService(uid: user.uid).updateTutorData(email);
       return _userFromFirebaseUser(user);
     } catch (e) {
       print(e.toString());
       return null;
+    }
+  }
+
+  Future registerwEmailandPasswordforStudent(
+    String email,
+    String password,
+    String role,
+  ) async {
+    try {
+      UserCredential result = await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      User? user = result.user;
+      //create a new document for the user with the uid
+      await DatabaseService(uid: user!.uid).updateUserData(email, role);
+      await DatabaseService(uid: user.uid).updateStudentData(email);
+      return _userFromFirebaseUser(user);
+    } catch (e) {
+      print(e.toString());
+      return e;
     }
   }
 

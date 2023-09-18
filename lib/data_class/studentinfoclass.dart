@@ -1,16 +1,21 @@
+import 'package:language_picker/languages.dart';
+
 class StudentInfoClass {
   final String address;
+  final String age;
+  final String contact;
   final String country;
+  final String dateofbirth;
+  final DateTime dateregistered;
   final String studentFirstname;
   final String studentMiddlename;
   final String studentLastname;
   final String studentID;
   final String userID;
-  final String contact;
   final String emailadd;
   final List<String> languages;
   final String profilelink;
-  final DateTime dateregistered;
+  final String timezone;
 
   StudentInfoClass({
     required this.contact,
@@ -25,6 +30,9 @@ class StudentInfoClass {
     required this.userID,
     required this.profilelink,
     required this.dateregistered,
+    required this.age,
+    required this.dateofbirth,
+    required this.timezone,
   });
 }
 

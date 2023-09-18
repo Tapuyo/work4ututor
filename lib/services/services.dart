@@ -6,24 +6,32 @@ import 'package:file_picker/file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
-
-import '../data_class/studentinfoclass.dart';
+import 'package:universal_html/html.dart' as html;
+import 'package:wokr4ututor/data_class/subject_teach_pricing.dart';
+import 'package:wokr4ututor/ui/web/admin/executive_dashboard.dart';
 import '../data_class/studentsEnrolledclass.dart';
 import '../data_class/tutor_info_class.dart';
 
-uploadData() async {
+Future<String?> uploadData(String uid) async {
   FilePickerResult? result = await FilePicker.platform.pickFiles();
 
   if (result != null) {
     Uint8List? file = result.files.first.bytes;
     String filename = result.files.first.name;
 
-    UploadTask task =
-        FirebaseStorage.instance.ref().child("userID/$filename").putData(file!);
-    // print("Uploaded");
-    return filename;
+    UploadTask task = FirebaseStorage.instance
+        .ref()
+        .child("students/$filename")
+        .putData(file!);
+
+    // Wait for the upload task to complete
+    await task;
+
+    // Generate and return the download URL
+    String downloadURL = await task.snapshot.ref.getDownloadURL();
+    return downloadURL;
   } else {
-    // print("Error");
+    return null; // Return null in case of an error
   }
 }
 
@@ -63,7 +71,7 @@ class DatabaseService {
   final CollectionReference tutorCollection =
       FirebaseFirestore.instance.collection('tutor');
   final CollectionReference studentCollection =
-      FirebaseFirestore.instance.collection('student');
+      FirebaseFirestore.instance.collection('students');
   final CollectionReference enrolleeCollection =
       FirebaseFirestore.instance.collection('studentsEnrolled');
 
@@ -111,7 +119,6 @@ class DatabaseService {
     }).toList();
   }
 
-
   Stream<List<StudentsList>> get enrolleelist {
     return enrolleeCollection
         .doc('YnLdZm2n7bPZSTbXS0VvHgG0Jor2')
@@ -120,63 +127,112 @@ class DatabaseService {
         .map(_getStudentsEnrolled);
   }
 
-  Future updateUserData(String email, String password, String role) async {
-    return await dataCollection.doc(uid).set({
-      'email': email,
-      'password': password,
-      'role': role,
-    });
+  Future updateUserData(String email, String role) async {
+    return await dataCollection
+        .doc(uid)
+        .set({'email': email, 'role': role, 'status': 'unfinished'});
+  }
+
+  Future<void> updateUserStatus(
+    String uid,
+    String status,
+  ) async {
+    try {
+      await FirebaseFirestore.instance.collection('user').doc(uid).set({
+        "status": status,
+      }, SetOptions(merge: true));
+      html.window.alert('Upload Successful');
+    } catch (error) {
+      html.window.alert('Upload Failed: $error');
+    }
   }
 
   Future updateTutorData(
-    String name,
-    String lastname,
+    String email,
   ) async {
-    return await tutorCollection.doc(uid).set({
+    final tutorDocumentRef = tutorCollection.doc(uid);
+    await tutorDocumentRef.set({
       "language": [],
       "birthPlace": "",
       "certificates": "",
       "country": "",
       "dateSign": "",
+      "emailadd": email,
       "extensionName": "",
-      "firstName": name,
+      "firstName": '',
       "imageID": "",
-      "lastName": lastname,
+      "lastName": "",
       "middleName": "",
       "presentation": "",
       "promotionalMessage": "",
       "resume": "",
       "status": "unsubscribe",
-      "tutorID": uid,
-      "userID": "",
+      "tutorID": "",
+      "userID": uid,
       "withdrawal": "",
     });
   }
 
-  Future updateStudentData(
-    String name,
-    String lastname,
-  ) async {
-    return await studentCollection.doc(uid).set({
+  Future updateStudentData(String email) async {
+    // Reference to the student document
+    final studentDocumentRef = studentCollection.doc(uid);
+
+    // Set the initial data for the document
+    await studentDocumentRef.set({
+      "userID": uid,
+      "studentMiddleName": '',
+      "studentLastName": "",
+      "studentID": "",
+      "studentFirstName": "",
+      "profileurl": "",
       "language": [],
-      "birthPlace": "",
-      "certificates": "",
+      "emailadd": email,
+      "dateregistered": DateTime.now(),
+      "dateofbirth": '',
       "country": "",
-      "dateSign": "",
-      "extensionName": "",
-      "firstName": name,
-      "imageID": "",
-      "lastName": lastname,
-      "middleName": "",
-      "presentation": "",
-      "promotionalMessage": "",
-      "resume": "",
-      "status": "unsubscribe",
-      "tutorID": uid,
-      "userID": "",
-      "withdrawal": "",
+      "contact": "",
+      "age": "",
+      "address": "",
+      "timezone": "",
+    });
+
+    // Create the "enrolledclasses" collection
+    await studentDocumentRef.collection("enrolledclasses").add({
+      // Add data specific to the "enrolledclasses" collection
+      // Example: {"className": "Math 101", "instructor": "John Doe"}
+    });
+
+    // Create the "guardianname" collection
+    await studentDocumentRef.collection("guardianname").add({
+      // Add data specific to the "guardianname" collection
+      // Example: {"guardianName": "Alice Smith", "relationship": "Parent"}
+    });
+
+    // Create the "myconversation" collection
+    await studentDocumentRef.collection("myconversation").add({
+      // Add data specific to the "myconversation" collection
+      // Example: {"message": "Hello, world!", "timestamp": Timestamp.now()}
     });
   }
+
+  // Future updateStudentData(String email) async {
+  //   return await studentCollection.doc(uid).set({
+  //     "userID": uid,
+  //     "studentMiddleName": '',
+  //     "studentLastName": "",
+  //     "studentID": "",
+  //     "studentFirstName": "",
+  //     "profileurl": "",
+  //     "language": [],
+  //     "emailadd": email,
+  //     "dateregistered": DateTime.now(),
+  //     "dateofbirth": '',
+  //     "country": "",
+  //     "contact": "",
+  //     "age": "",
+  //     "address": "",
+  //   });
+  // }
 
   getTutorInfo() async {
     try {

@@ -42,7 +42,7 @@ class _StudentAccountsState extends State<StudentAccounts> {
     if (userinfodata.isNotEmpty) {
       final userdata = userinfodata.first;
       conemailadd.text = userdata.email;
-      conpassword.text = userdata.password;
+      conpassword.text = '';
 
       return Padding(
         padding: const EdgeInsets.only(left: 10, top: 5, right: 10),

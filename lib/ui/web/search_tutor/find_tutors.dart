@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:wokr4ututor/data_class/tutor_info_class.dart';
 import 'package:wokr4ututor/provider/search_provider.dart';
 import 'package:wokr4ututor/ui/web/search_tutor/tutor_list.dart';
+import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
 import 'package:wokr4ututor/utils/themes.dart';
 
 import '../../../components/nav_bar.dart';

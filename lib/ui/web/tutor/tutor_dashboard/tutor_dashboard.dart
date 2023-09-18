@@ -44,7 +44,7 @@ String firstname = '';
 String middlename = '';
 String lastname = '';
 String fullName = '';
-String tutroID = '';
+String tutorID = '';
 String profileurl = '';
 
 bool _showModal = false;
@@ -134,7 +134,7 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
   GlobalKey _buttonKey = GlobalKey();
   int newmessagecount = 0;
   int newnotificationcount = 0;
-   bool tutorstatus = true;
+  bool tutorstatus = true;
   void _updateResponse() async {
     String result = await getData();
     setState(() {
@@ -172,9 +172,9 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
           fullName = middlename == 'N/A'
               ? '$firstname $lastname'
               : '$firstname $middlename $lastname';
-          tutroID = tutordata.userId;
+          tutorID = tutordata.tutorID;
           profileurl = tutordata.imageID;
-           tutorstatus = tutordata.status == 'unsubscribe' ? true : false;
+          tutorstatus = tutordata.status == 'unsubscribe' ? true : false;
           _updateResponse();
         });
       }
@@ -277,7 +277,7 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        tutroID,
+                        tutorID,
                         style: const TextStyle(
                           fontWeight: FontWeight.normal,
                           color: Colors.white,
@@ -287,7 +287,7 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       RatingBar(
-                          initialRating: 4,
+                          initialRating: 0,
                           direction: Axis.horizontal,
                           allowHalfRating: true,
                           itemCount: 5,

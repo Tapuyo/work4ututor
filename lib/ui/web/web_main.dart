@@ -3,6 +3,8 @@ import 'package:hive/hive.dart';
 import 'package:wokr4ututor/ui/web/admin/executive_dashboard.dart';
 import 'package:wokr4ututor/ui/web/communication.dart/videocall.dart';
 import 'package:wokr4ututor/ui/web/login/login.dart';
+import 'package:wokr4ututor/ui/web/signup/student_information_signup.dart';
+import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
 import 'admin/adminlogin.dart';
 import 'tutor/tutor_dashboard/tutor_dashboard.dart';
 import 'student/main_dashboard/student_dashboard.dart';
@@ -41,21 +43,30 @@ class _MainPageState extends State<WebMainPage> {
 
   @override
   Widget build(BuildContext context) {
-//  final user = Provider.of<Users?>(context);
     final index = _items.length;
     if (index == 0) {
       // return const VideoCall(chatID: '', uID: '',);
-      return const AdminPage(uID: '',);
+      return const LoginPage();
     } else {
       debugPrint(index.toString());
-      if (_items[0]['role'].toString() == 'student') {
+      if (_items[0]['role'].toString() == 'student' &&
+          _items[0]['userStatus'].toString() == 'unfinished') {
+        return StudentInfo(uid: _items[0]['userID'].toString(), email: _items[0]['email'].toString(),);
+        // return const VideoCall(chatID: '', uID: '',);
+        // return const AdminLoginPage();
+      } else if (_items[0]['role'].toString() == 'student' &&
+          _items[0]['userStatus'].toString() == 'completed') {
         return StudentDashboardPage(uID: _items[0]['userID'].toString());
         // return const VideoCall(chatID: '', uID: '',);
         // return const AdminLoginPage();
-      } else if (_items[0]['role'].toString() == 'tutor') {
+      } else if (_items[0]['role'].toString() == 'tutor' &&
+          _items[0]['userStatus'].toString() == 'completed') {
         return DashboardPage(uID: _items[0]['userID'].toString());
+      } else if (_items[0]['role'].toString() == 'tutor' &&
+          _items[0]['userStatus'].toString() == 'unfinished') {
+        return TutorInfo(uid: _items[0]['userID'].toString(), email: _items[0]['email'].toString(),);
       } else {
-        return  const AdminPage(uID: '',);
+        return const LoginPage();
       }
     }
   }

@@ -1,24 +1,35 @@
-// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, unused_local_variable, unused_field, prefer_final_fields, unused_element
+// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, unused_local_variable, unused_field, prefer_final_fields, unused_element, use_build_context_synchronously
 
 import 'dart:math';
 
 import 'package:country_pickers/country.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:country_pickers/country_pickers.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'dart:js' as js;
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:language_picker/language_picker.dart';
+import 'package:language_picker/languages.dart';
+import 'package:timezone/browser.dart' as tz;
+import 'package:timezone/timezone.dart';
 import 'package:wokr4ututor/components/nav_bar.dart';
-import 'package:wokr4ututor/services/services.dart';
+import 'package:wokr4ututor/data_class/subject_teach_pricing.dart';
+import 'package:wokr4ututor/services/getstudentinfo.dart';
+import 'package:wokr4ututor/ui/auth/auth.dart';
+import 'package:wokr4ututor/ui/web/login/login.dart';
 
-import '../../../components/tutordialog.dart';
 import '../../../shared_components/alphacode3.dart';
 import '../terms/termpage.dart';
 import '../tutor/tutor_dashboard/tutor_dashboard.dart';
 
-
 class TutorInfo extends StatefulWidget {
-  const TutorInfo({Key? key}) : super(key: key);
+  final String uid;
+  final String email;
+  const TutorInfo({Key? key, required this.uid, required this.email})
+      : super(key: key);
 
   @override
   State<TutorInfo> createState() => _TutorInfoState();
@@ -27,19 +38,20 @@ class TutorInfo extends StatefulWidget {
 class _TutorInfoState extends State<TutorInfo> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Work4ututor',
-      theme: ThemeData(
-        primaryColor: Colors.white,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: const Scaffold(appBar: null, body: Center(child: InputInfo())),
-    );
+    return Scaffold(
+        appBar: null,
+        body: Center(
+            child: InputInfo(
+          uid: widget.uid,
+          email: widget.email,
+        )));
   }
 }
 
 class InputInfo extends StatefulWidget {
-  const InputInfo({super.key});
+  final String uid;
+  final String email;
+  const InputInfo({super.key, required this.uid, required this.email});
 
   @override
   State<InputInfo> createState() => _InputInfoState();
@@ -47,9 +59,9 @@ class InputInfo extends StatefulWidget {
 
 class _InputInfoState extends State<InputInfo> {
   void main() {
-     super.initState();
+    super.initState();
     _initData();
-}
+  }
 
 // timezone
   var dtf = js.context['Intl'].callMethod('DateTimeFormat');
@@ -61,10 +73,22 @@ class _InputInfoState extends State<InputInfo> {
   bool select = false;
 
 //tutor information
+  Map<String, Location> _timeZones = {};
+  String _selectedTimeZone = 'UTC';
+  TextEditingController firstname = TextEditingController();
+  TextEditingController middlename = TextEditingController();
+  TextEditingController lastname = TextEditingController();
+  TextEditingController price2 = TextEditingController();
+  TextEditingController price3 = TextEditingController();
+  TextEditingController preice5 = TextEditingController();
+  PhoneNumber phoneNumber = PhoneNumber(isoCode: 'PH');
+  TextEditingController phoneNumberController = TextEditingController();
+
+  String selectedCountry = "";
   String tcontactNumber = "";
   String tCountry = "";
-  String tCity = "";
-    List<String> tTimezone = [];
+  TextEditingController tCity = TextEditingController();
+  List<String> tTimezone = [];
   int age = 0;
   String contactNumber = "";
   var ulanguages = [
@@ -92,7 +116,7 @@ class _InputInfoState extends State<InputInfo> {
   String uPicture = "";
   List<String> uCertificates = [];
   List<String> tlanguages = [];
-  List<String> tSubjects = [];
+  List<SubjectTeach> tSubjects = [];
   String uCV = "";
   String uVideo = "";
   String tAbout = "";
@@ -172,22 +196,56 @@ class _InputInfoState extends State<InputInfo> {
       }
     }
   }
-  
+
   String _timezone = 'Unknown';
   List<String> _availableTimezones = <String>[];
 
-   Future<void> _initData() async {
-    
-    try {
-      _availableTimezones = await FlutterNativeTimezone.getAvailableTimezones();
-      _availableTimezones.sort();
-      tTimezone = _availableTimezones;
-      print(tTimezone.toString());
-    } catch (e) {
-      print('Could not get available timezones');
-    }
+  // Future<void> _initData() async {
+  //   try {
+  //     _availableTimezones = await FlutterNativeTimezone.getAvailableTimezones();
+  //     _availableTimezones.sort();
+  //     tTimezone = _availableTimezones;
+  //     print(tTimezone.toString());
+  //   } catch (e) {
+  //     print('Could not get available timezones');
+  //   }
+  // }
+
+  String tutorIDNumber = 'TTR*********';
+  String applicantsID = '';
+  final tutorformKey = GlobalKey<FormState>();
+  @override
+  void initState() {
+    super.initState();
+    // Get a list of all time zones.
+    _initData();
+    _timeZones = tz.timeZoneDatabase.locations;
   }
- String tutorIDNumber = 'STU*********';
+
+  Future<void> _initData() async {
+    try {
+      _selectedTimeZone = await FlutterNativeTimezone
+          .getLocalTimezone(); // Set local timezone here
+    } catch (e) {
+      print('Could not get the local timezone');
+    }
+    // try {
+    //   _timezone = await FlutterNativeTimezone.getLocalTimezone();
+    // } catch (e) {
+    //   print('Could not get the local timezone');
+    // }
+    // try {
+    //   _availableTimezones = await FlutterNativeTimezone.get();
+    //   _availableTimezones.sort();
+    // } catch (e) {
+    //   print('Could not get available timezones');
+    // }
+    // if (mounted) {
+    //   setState(() {});
+    // }
+  }
+
+  final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -195,1454 +253,1642 @@ class _InputInfoState extends State<InputInfo> {
       body: Column(
         children: [
           const CustomAppBarLog(),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    alignment: Alignment.center,
-                    height: 130,
-                    child: const Text(
-                      "Subcribe with your information",
-                      style: TextStyle(
-                      // textStyle: Theme.of(context).textTheme.headlineMedium,
-                        color: Color.fromRGBO(1, 118, 132, 1),
-                        fontSize: 60,
-                        fontWeight: FontWeight.w900,
+          Form(
+            key: tutorformKey,
+            child: Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      alignment: Alignment.center,
+                      height: 130,
+                      child: const Text(
+                        "Subscribe with your information",
+                        style: TextStyle(
+                          // textStyle: Theme.of(context).textTheme.headlineMedium,
+                          color: Color.fromRGBO(1, 118, 132, 1),
+                          fontSize: 60,
+                          fontWeight: FontWeight.w900,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(5, 0, 15, 5),
-                    alignment: Alignment.centerLeft,
-                    width: 600,
-                    child: Column(
-                      children: <Widget>[
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: const [
-                            Text(
-                              "Tutor Identification Number",
-                              style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                             Text(
-                              "(Auto Generated once Country is selected!)*",
-                              style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
-                                fontWeight: FontWeight.normal,
-                                fontSize: 15,
-                                fontStyle: FontStyle.italic,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              width: 200,
-                              height: 45,
-                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                              decoration: BoxDecoration(
-                                color:  const Color.fromRGBO(242, 242, 242, 1),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    tutorIDNumber.toString(),
-                                    style: const TextStyle(
-                                        fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: const [
-                            Text(
-                              "Personal Information.",
-                              style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                            Text(
-                              "Required*",
-                              style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
-                                fontWeight: FontWeight.normal,
-                                fontSize: 15,
-                                fontStyle: FontStyle.italic,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Container(
-                          width: 600,
-                          height: 45,
-                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                          decoration: BoxDecoration(
-                            color: const Color.fromRGBO(242, 242, 242, 1),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              fillColor: Colors.grey,
-                              hintText: 'Contact Number',
-                              hintStyle: TextStyle(color: Colors.black),
-                            ),
-                            validator: (val) =>
-                                val!.isEmpty ? 'Enter an Contact Number' : null,
-                            onChanged: (val) {
-                              tcontactNumber = val;
-                            },
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 14,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              width: 400,
-                              height: 45,
-                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                              decoration: BoxDecoration(
-                                color: const Color.fromRGBO(242, 242, 242, 1),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    bdate.toString(),
-                                    style: const TextStyle(
-                                        fontSize: 16, color: Colors.black),
-                                  ),
-                                  const Spacer(),
-                                  IconButton(
-                                    tooltip: "Date of Birth",
-                                    hoverColor: Colors.transparent,
-                                    icon: const Icon(
-                                      Icons.calendar_month_outlined,
-                                      color: Colors.blue,
-                                      size: 33,
-                                    ),
-                                    onPressed: () {
-                                      _selectDate();
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(5, 0, 15, 5),
+                      alignment: Alignment.centerLeft,
+                      width: 600,
+                      child: Row(
+                        children: [
+                          Stack(
+                            alignment: Alignment.centerLeft,
+                            children: <Widget>[
+                              Container(
+                                width: 350,
+                                height: 350,
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(20)),
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: Colors.grey.shade300, width: 1)),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: FadeInImage(
+                                    fadeInDuration:
+                                        const Duration(milliseconds: 500),
+                                    placeholder: const AssetImage(
+                                        "assets/images/login.png"), // Use AssetImage here
+                                    image: NetworkImage(profileurl),
+                                    imageErrorBuilder:
+                                        (context, error, stackTrace) {
+                                      return Image.asset(
+                                          "assets/images/login.png");
                                     },
+                                    fit: BoxFit.cover,
+                                    height: 70,
+                                    width: 70,
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                            const Spacer(),
-                            Container(
-                              width: 150,
-                              height: 45,
-                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                              decoration: BoxDecoration(
-                                color: const Color.fromRGBO(242, 242, 242, 1),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    myage.toString(),
-                                    style: const TextStyle(
-                                        fontSize: 16, color: Colors.black),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        CheckboxListTile(
-                          title: const Text(
-                            'Share my personal information to any user.',
-                            style: TextStyle(fontSize: 15),
+                              Positioned(
+                                  bottom: 12,
+                                  right: 12,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[200],
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(20)),
+                                    ),
+                                    child: IconButton(
+                                      onPressed: () async {
+                                        String? downloadURL =
+                                            await uploadTutorProfile(widget.uid);
+
+                                        if (downloadURL != null) {
+                                          // The upload was successful, and downloadURL contains the URL.
+                                          print(
+                                              "File uploaded successfully. URL: $downloadURL");
+                                          setState(() {
+                                            profileurl = downloadURL;
+                                            updateTutorProfile(
+                                                widget.uid, profileurl);
+                                          });
+                                        } else {
+                                          // There was an error during file selection or upload.
+                                          print("Error uploading file.");
+                                        }
+                                      },
+                                      icon: const Icon(
+                                        Icons.add_a_photo,
+                                        size: 25.0,
+                                        color: Color.fromARGB(255, 0, 0, 0),
+                                      ),
+                                    ),
+                                  ))
+                            ],
                           ),
-                          // subtitle: const Text(
-                          //     'A computer science portal for geeks.'),
-                          // secondary: const Icon(Icons.code),
-                          autofocus: false,
-                          activeColor: Colors.green,
-                          checkColor: Colors.white,
-                          selected: selection5,
-                          value: selection5,
-                          controlAffinity: ListTileControlAffinity.leading,
-                          onChanged: (value) {
-                            setState(() {
-                              selection5 = value!;
-                            });
-                          },
-                        ),
-                        Row(
-                          children: [
+                          Column(
+                            children: [Container()],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(5, 0, 15, 5),
+                      alignment: Alignment.centerLeft,
+                      width: 600,
+                      child: Column(
+                        children: <Widget>[
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: const [
+                              Text(
+                                "Tutor Identification Number",
+                                style: TextStyle(
+                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                              Text(
+                                "(Auto Generated once Country is selected!)*",
+                                style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                width: 300,
+                                height: 45,
+                                padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(5)),
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: Colors.grey.shade300, width: 1)),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      tutorIDNumber.toString(),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: const [
+                              Text(
+                                "Personal Information.",
+                                style: TextStyle(
+                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                              Text(
+                                "Required*",
+                                style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                width: 190,
+                                height: 45,
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(5)),
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: Colors.grey.shade300, width: 1)),
+                                child: TextFormField(
+                                  controller: firstname,
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    fillColor: Colors.grey,
+                                    hintText: 'Firstname',
+                                    hintStyle: TextStyle(color: Colors.black),
+                                  ),
+                                  validator: (val) => val!.isEmpty
+                                      ? 'Enter an firstname'
+                                      : null,
+                                  // onChanged: (val) {
+                                  //   setState(() {
+                                  //     firstname.text = val;
+                                  //   });
+                                  // },
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Container(
+                                width: 190,
+                                height: 45,
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(5)),
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: Colors.grey.shade300, width: 1)),
+                                child: TextFormField(
+                                  controller: middlename,
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    fillColor: Colors.grey,
+                                    hintText: 'Middlename',
+                                    hintStyle: TextStyle(color: Colors.black),
+                                  ),
+                                  validator: (val) => val!.isEmpty
+                                      ? 'Enter an middlename'
+                                      : null,
+                                  // onChanged: (val) {
+                                  //   setState(() {
+                                  //     middlename.text = val;
+                                  //   });
+                                  // },
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Container(
+                                width: 190,
+                                height: 45,
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(5)),
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: Colors.grey.shade300, width: 1)),
+                                child: TextFormField(
+                                  controller: lastname,
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    fillColor: Colors.grey,
+                                    hintText: 'Lastname',
+                                    hintStyle: TextStyle(color: Colors.black),
+                                  ),
+                                  validator: (val) =>
+                                      val!.isEmpty ? 'Enter an lastname' : null,
+                                  // onChanged: (val) {
+                                  //   setState(() {
+                                  //     lastname.text = val;
+                                  //   });
+                                  // },
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                width: 400,
+                                height: 45,
+                                padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(5)),
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: Colors.grey.shade300, width: 1)),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      bdate.toString(),
+                                      style: const TextStyle(
+                                          fontSize: 16, color: Colors.black),
+                                    ),
+                                    const Spacer(),
+                                    IconButton(
+                                      tooltip: "Date of Birth",
+                                      hoverColor: Colors.transparent,
+                                      icon: const Icon(
+                                        EvaIcons.calendarOutline,
+                                        color: Colors.blue,
+                                        size: 25,
+                                      ),
+                                      onPressed: () {
+                                        _selectDate();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Spacer(),
+                              Container(
+                                width: 150,
+                                height: 45,
+                                padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(5)),
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: Colors.grey.shade300, width: 1)),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      myage.toString(),
+                                      style: const TextStyle(
+                                          fontSize: 16, color: Colors.black),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                  width: 300,
+                                  height: 45,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(5)),
+                                      color: Colors.white,
+                                      border: Border.all(
+                                          color: Colors.grey.shade300,
+                                          width: 1)),
+                                  child: CountryPickerDropdown(
+                                    initialValue: 'PH',
+                                    itemBuilder: _buildDropdownItem,
+                                    sortComparator: (Country a, Country b) =>
+                                        a.isoCode.compareTo(b.isoCode),
+                                    onValuePicked: (Country country) {
+                                      final alpha3Code =
+                                          getAlpha3Code(country.name);
+                                      Random random = Random();
+
+                                      DateTime datenow = DateTime.now();
+                                      String currenttime =
+                                          DateFormat('HHmmss').format(datenow);
+                                      String randomNumber =
+                                          random.nextInt(1000000).toString() +
+                                              currenttime.toString();
+                                      String currentyear =
+                                          DateFormat('yyyyMMdd')
+                                              .format(datenow);
+                                      //todo please replace the random number with legnth of students enrolled
+                                      setState(() {
+                                        selectedCountry = country.name;
+                                        tutorIDNumber =
+                                            'TTR$alpha3Code$currentyear$currenttime';
+                                        applicantsID =
+                                            'Work$currentyear$currenttime';
+                                      });
+                                    },
+                                    isExpanded: true,
+                                  )
+                                  // country.name
+                                  ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Container(
+                                width: 266,
+                                height: 45,
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(5)),
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: Colors.grey.shade300, width: 1)),
+                                child: TextFormField(
+                                  controller: tCity,
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    fillColor: Colors.grey,
+                                    hintText: 'City',
+                                    hintStyle: TextStyle(color: Colors.black),
+                                  ),
+                                  validator: (val) =>
+                                      val!.isEmpty ? 'Enter your City' : null,
+                                  // onChanged: (val) {
+                                  //   tCity = val;
+                                  // },
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(children: [
                             Container(
-                              width: 300,
+                                width: 250,
+                                height: 45,
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(5)),
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: Colors.grey.shade300, width: 1)),
+                                child: DropdownButton<String>(
+                                  value: _selectedTimeZone,
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      _selectedTimeZone = newValue!;
+                                    });
+                                  },
+                                  items: _timeZones.keys
+                                      .map((String timeZoneName) {
+                                    return DropdownMenuItem<String>(
+                                      value: timeZoneName,
+                                      child: Text(timeZoneName),
+                                    );
+                                  }).toList(),
+                                  isExpanded: true,
+                                  underline: Container(),
+                                )),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Container(
+                              width: 280,
                               height: 45,
                               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                               decoration: BoxDecoration(
-                                color: const Color.fromRGBO(242, 242, 242, 1),
+                                border: Border.all(
+                                  color: const Color.fromARGB(255, 159, 159,
+                                      159), // Set your desired border color here
+                                  width: .5, // Set the border width
+                                ),
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(5),
                               ),
-                              child:  CountryPickerDropdown(
-                                onValuePicked: (Country country) {
-                                  final alpha3Code =
-                                      getAlpha3Code(country.name);
-                                  Random random = Random();
-                                  int randomNumber =
-                                      random.nextInt(1000000) + 1;
-                                       String currentyear = DateFormat('yyyy').format(DateTime.now());
-                                  //todo please replace the random number with legnth of students enrolled
+                              child: InternationalPhoneNumberInput(
+                                onInputChanged: (PhoneNumber number) {
                                   setState(() {
-                                    tutorIDNumber =
-                                        'TTR$alpha3Code$currentyear$randomNumber';
+                                    phoneNumber = number;
                                   });
                                 },
-                                itemBuilder: (Country country) {
-                                  return Row(
-                                    children: <Widget>[
-                                      Expanded(child: Text(country.name)),
-                                    ],
-                                  );
-                                },
-                                itemHeight: 50,
-                                isExpanded: true,
-                                icon: const Icon(Icons.arrow_drop_down),
+                                selectorConfig: const SelectorConfig(
+                                  selectorType: PhoneInputSelectorType.DIALOG,
+                                ),
+                                ignoreBlank: false,
+                                autoValidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                inputDecoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                ),
+                                initialValue: phoneNumber,
+                                textFieldController: phoneNumberController,
                               ),
-                              // country.name
                             ),
-                            const SizedBox(
-                              width: 14,
-                            ),
-                            Container(
-                              width: 266,
+                          ]),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Visibility(
+                            visible: tlanguages.isNotEmpty ? true : false,
+                            child: Container(
+                              width: 600,
                               height: 45,
                               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                               decoration: BoxDecoration(
-                                color: const Color.fromRGBO(242, 242, 242, 1),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: TextFormField(
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  fillColor: Colors.grey,
-                                  hintText: 'City',
-                                  hintStyle: TextStyle(color: Colors.black),
-                                ),
-                                validator: (val) =>
-                                    val!.isEmpty ? 'Enter your City' : null,
-                                onChanged: (val) {
-                                  tCity = val;
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 14,
-                        ),
-                        Container(
-                                            width: 600,
-                                            height: 45,
-                                            padding: const EdgeInsets.fromLTRB(
-                                                10, 0, 10, 0),
-                                            decoration: BoxDecoration(
-                                              color: const Color.fromRGBO(
-                                                  242, 242, 242, 1),
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                            ),
-                                            child: DropdownButtonFormField(
-                                              decoration: const InputDecoration(
-                                                enabledBorder: InputBorder.none,
-                                              ),
-                                              value: dropdownvalue,
-                                              hint: const Text(
-                                                  "Timezone"),
-                                              isExpanded: true,
-                                              icon: const Icon(
-                                                  Icons.arrow_drop_down),
-                                              items: tTimezone
-                                                  .map((String items) {
-                                                return DropdownMenuItem(
-                                                  value: items,
-                                                  child: Text(items),
-                                                );
-                                              }).toList(),
-                                              onChanged: (val) {
-                                                setState(() {
-                                                  tTimezone.clear();
-                                                  tTimezone.add(val.toString());
-                                                  dropdownvalue = val.toString();
-                                                });
-                                              },
-                                            ),
-                                          ),
-                        const SizedBox(
-                          height: 14,
-                        ),
-                        SizedBox(
-                          width: 600,
-                          height: thieght,
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: ListView.builder(
-                                    primary: false,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: languageCount,
-                                    itemBuilder: (context, index) {
-                                      return Column(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(5)),
+                                  color: Colors.white,
+                                  border: Border.all(
+                                      color: Colors.grey.shade300, width: 1)),
+                              child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: tlanguages.length,
+                                  itemBuilder: (context, index) {
+                                    String language = tlanguages[index];
+                                    return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Container(
-                                            width: 600,
-                                            height: 45,
-                                            padding: const EdgeInsets.fromLTRB(
-                                                10, 0, 10, 0),
-                                            decoration: BoxDecoration(
-                                              color: const Color.fromRGBO(
-                                                  242, 242, 242, 1),
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                            ),
-                                            child: DropdownButtonFormField(
-                                              decoration: const InputDecoration(
-                                                enabledBorder: InputBorder.none,
-                                              ),
-                                              value: dropdownvalue,
-                                              hint: const Text(
-                                                  "Select your language"),
-                                              isExpanded: true,
-                                              icon: const Icon(
-                                                  Icons.arrow_drop_down),
-                                              items: ulanguages
-                                                  .map((String items) {
-                                                return DropdownMenuItem(
-                                                  value: items,
-                                                  child: Text(items),
-                                                );
-                                              }).toList(),
-                                              onChanged: (String? value) {
+                                          Text(language),
+                                          IconButton(
+                                            icon: const Icon(Icons.delete),
+                                            color: Colors.red,
+                                            onPressed: () {
+                                              setState(() {
+                                                tlanguages.removeAt(index);
+                                              });
+                                            },
+                                          ),
+                                        ]);
+                                  }),
+                            ),
+                          ),
+                          Visibility(
+                            visible: tlanguages.isNotEmpty ? true : false,
+                            child: const SizedBox(
+                              height: 5,
+                            ),
+                          ),
+                          Container(
+                              width: 600,
+                              height: 45,
+                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(5)),
+                                  color: Colors.white,
+                                  border: Border.all(
+                                      color: Colors.grey.shade300, width: 1)),
+                              child: LanguagePickerDropdown(
+                                  itemBuilder: languageBuilder,
+                                  onValuePicked: (Language language) {
+                                    setState(() {
+                                      tlanguages.add(language.name);
+                                    });
+                                  })),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            children: const [
+                              Text(
+                                "(You can select more than one language.)",
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w100,
+                                    fontSize: 12,
+                                    fontStyle: FontStyle.italic),
+                                textAlign: TextAlign.left,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 50,
+                          ),
+                          Row(
+                            children: const [
+                              Text(
+                                "Subjects you teach and pricing.",
+                                style: TextStyle(
+                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                              Text(
+                                "Required*",
+                                style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Visibility(
+                            visible: tSubjects.isNotEmpty,
+                            child: SizedBox(
+                              width: 600,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                primary: false,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: tSubjects.length,
+                                itemBuilder: (context, index) {
+                                  SubjectTeach subjectdata = tSubjects[index];
+
+                                  // Create TextEditingController instances for each TextFormField
+                                  TextEditingController price2Controller =
+                                      TextEditingController();
+                                  TextEditingController price3Controller =
+                                      TextEditingController();
+                                  TextEditingController price5Controller =
+                                      TextEditingController();
+
+                                  return Column(
+                                    children: [
+                                      Container(
+                                        width: 600,
+                                        height: 45,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            10, 0, 10, 0),
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(5)),
+                                            color: Colors.white,
+                                            border: Border.all(
+                                                color: Colors.grey.shade300,
+                                                width: 1)),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Text(subjectdata.subjectname),
+                                            const Spacer(),
+                                            IconButton(
+                                              icon: const Icon(Icons.delete),
+                                              color: Colors.red,
+                                              onPressed: () {
                                                 setState(() {
-                                                  print(value);
-                                                  if (tlanguages[index] ==
-                                                      (value.toString())) {
-                                                  } else {
-                                                    tlanguages
-                                                        .add(value.toString());
-                                                  }
-                                                  print(tlanguages);
+                                                  tSubjects.removeAt(index);
                                                 });
                                               },
                                             ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 14,
+                                      ),
+                                      Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Container(
+                                                width: 350,
+                                                height: 45,
+                                                alignment: Alignment.centerLeft,
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        const BorderRadius.all(
+                                                            Radius.circular(5)),
+                                                    color: Colors.white,
+                                                    border: Border.all(
+                                                        color: Colors
+                                                            .grey.shade300,
+                                                        width: 1)),
+                                                child: const Text(
+                                                    "Price for 2 classes"),
+                                              ),
+                                              const Spacer(),
+                                              Container(
+                                                width: 100,
+                                                height: 45,
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        10, 0, 10, 0),
+                                                decoration: BoxDecoration(
+                                                  color: const Color.fromRGBO(
+                                                      242, 242, 242, 1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                ),
+                                                child: TextFormField(
+                                                  controller:
+                                                      price2Controller, // Use the controller
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border: InputBorder.none,
+                                                    fillColor: Colors.grey,
+                                                    hintText: '',
+                                                    hintStyle: TextStyle(
+                                                        color: Colors.black),
+                                                  ),
+                                                  validator: (val) =>
+                                                      val!.isEmpty
+                                                          ? 'Input price'
+                                                          : null,
+                                                  onChanged: (val) {
+                                                    // Update the subjectdata when the value changes
+                                                    subjectdata.price2 = val;
+                                                    print(tSubjects[index]
+                                                        .price2);
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 14,
+                                          ),
+                                          Row(
+                                            children: [
+                                              Container(
+                                                width: 350,
+                                                height: 45,
+                                                alignment: Alignment.centerLeft,
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        const BorderRadius.all(
+                                                            Radius.circular(5)),
+                                                    color: Colors.white,
+                                                    border: Border.all(
+                                                        color: Colors
+                                                            .grey.shade300,
+                                                        width: 1)),
+                                                child: const Text(
+                                                    "Price for 3 classes"),
+                                              ),
+                                              const Spacer(),
+                                              Container(
+                                                width: 100,
+                                                height: 45,
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        10, 0, 10, 0),
+                                                decoration: BoxDecoration(
+                                                  color: const Color.fromRGBO(
+                                                      242, 242, 242, 1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                ),
+                                                child: TextFormField(
+                                                  controller:
+                                                      price3Controller, // Use the controller
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border: InputBorder.none,
+                                                    fillColor: Colors.grey,
+                                                    hintText: '',
+                                                    hintStyle: TextStyle(
+                                                        color: Colors.black),
+                                                  ),
+                                                  validator: (val) =>
+                                                      val!.isEmpty
+                                                          ? 'Input price'
+                                                          : null,
+                                                  onChanged: (val) {
+                                                    // Update the subjectdata when the value changes
+                                                    subjectdata.price3 = val;
+                                                    print(tSubjects[index]
+                                                        .price3);
+                                                  },
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 14,
+                                          ),
+                                          Row(
+                                            children: [
+                                              Container(
+                                                width: 350,
+                                                height: 45,
+                                                alignment: Alignment.centerLeft,
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        const BorderRadius.all(
+                                                            Radius.circular(5)),
+                                                    color: Colors.white,
+                                                    border: Border.all(
+                                                        color: Colors
+                                                            .grey.shade300,
+                                                        width: 1)),
+                                                child: const Text(
+                                                    "Price for 5 classes"),
+                                              ),
+                                              const Spacer(),
+                                              Container(
+                                                width: 100,
+                                                height: 45,
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        10, 0, 10, 0),
+                                                decoration: BoxDecoration(
+                                                  color: const Color.fromRGBO(
+                                                      242, 242, 242, 1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                ),
+                                                child: TextFormField(
+                                                  controller:
+                                                      price5Controller, // Use the controller
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    border: InputBorder.none,
+                                                    fillColor: Colors.grey,
+                                                    hintText: '',
+                                                    hintStyle: TextStyle(
+                                                        color: Colors.black),
+                                                  ),
+                                                  validator: (val) =>
+                                                      val!.isEmpty
+                                                          ? 'Input price'
+                                                          : null,
+                                                  onChanged: (val) {
+                                                    // Update the subjectdata when the value changes
+                                                    subjectdata.price5 = val;
+                                                    print(tSubjects[index]
+                                                        .price5);
+                                                  },
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                           const SizedBox(
                                             height: 14,
                                           ),
                                         ],
-                                      );
-                                    }),
+                                      ),
+                                    ],
+                                  );
+                                },
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                        Row(
-                          children: [
-                            TextButton(
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.red,
-                                disabledBackgroundColor: Colors.red,
-                                shape: const BeveledRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(5))),
-                                // ignore: prefer_const_constructors
-                                textStyle: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontStyle: FontStyle.normal,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  languageCount++;
-                                  thieght = 45;
-                                  thieght = (thieght * languageCount) +
-                                      (14 * languageCount);
-                                  print(languageCount);
-                                });
-                              },
-                              child: const Text('Add more language'),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 50,
-                        ),
-                        Row(
-                          children: const [
-                            Text(
-                              "Subjects you teach and pricing.",
-                              style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                            Text(
-                              "Required*",
-                              style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
-                                fontWeight: FontWeight.normal,
-                                fontSize: 15,
-                                fontStyle: FontStyle.italic,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        SizedBox(
-                          width: 600,
-                          height: subjecthieght,
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: ListView.builder(
-                                  primary: false,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: subjectcount,
-                                  itemBuilder: (context, index) {
-                                    return Column(
-                                      children: [
-                                        Container(
-                                          width: 600,
-                                          height: 45,
-                                          padding: const EdgeInsets.fromLTRB(
-                                              10, 0, 10, 0),
-                                          decoration: BoxDecoration(
-                                            color: const Color.fromRGBO(
-                                                242, 242, 242, 1),
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          child: DropdownButtonFormField(
-                                            decoration: const InputDecoration(
-                                              enabledBorder: InputBorder.none,
-                                            ),
-                                            value: dropdownvaluesubject,
-                                            hint: const Text(
-                                                "Select your subject"),
-                                            isExpanded: true,
-                                            icon: const Icon(
-                                                Icons.arrow_drop_down),
-                                            items:
-                                                uSubjects.map((String items) {
-                                              return DropdownMenuItem(
-                                                value: items,
-                                                child: Text(items),
-                                              );
-                                            }).toList(),
-                                            onChanged: (String? newValue) {
-                                              setState(() {
-                                                if (newValue == "Others") {
-                                                        addsubject(context);
-                                                }else if (newValue == "Language") {
-                                                        chooseLanguage(context);
-                                                }
-                                                if (tSubjects.isEmpty) {
-                                                  subjectcount == 1;
-                                                  tSubjects
-                                                      .add(newValue.toString());
-                                                  print(tSubjects);
-                                                } else {
-                                                  tSubjects
-                                                      .add(newValue.toString());
-                                                  print(tSubjects);
-                                                }
-                                              });
-                                            },
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          height: 14,
-                                        ),
-                                        Column(
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Container(
-                                                    width: 350,
-                                                    height: 45,
-                                                    alignment:
-                                                        Alignment.centerLeft,
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    decoration: BoxDecoration(
-                                                      color:
-                                                          const Color.fromRGBO(
-                                                              242, 242, 242, 1),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
-                                                    ),
-                                                    child: const Text(
-                                                        "Price for 2 classes")),
-                                                const Spacer(),
-                                                Container(
-                                                  width: 100,
-                                                  height: 45,
-                                                  padding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          10, 0, 10, 0),
-                                                  decoration: BoxDecoration(
-                                                    color: const Color.fromRGBO(
-                                                        242, 242, 242, 1),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                  ),
-                                                  child: TextFormField(
-                                                    decoration:
-                                                        const InputDecoration(
-                                                      border: InputBorder.none,
-                                                      fillColor: Colors.grey,
-                                                      hintText: '',
-                                                      hintStyle: TextStyle(
-                                                          color: Colors.black),
-                                                    ),
-                                                    validator: (val) =>
-                                                        val!.isEmpty
-                                                            ? 'Input price'
-                                                            : null,
-                                                    onChanged: (val) {
-                                                      // tTimezone = val;
-                                                    },
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 14,
-                                            ),
-                                            Row(
-                                              children: [
-                                                Container(
-                                                    width: 350,
-                                                    height: 45,
-                                                    alignment:
-                                                        Alignment.centerLeft,
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    decoration: BoxDecoration(
-                                                      color:
-                                                          const Color.fromRGBO(
-                                                              242, 242, 242, 1),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
-                                                    ),
-                                                    child: const Text(
-                                                        "Price for 3 classes")),
-                                                const Spacer(),
-                                                Container(
-                                                  width: 100,
-                                                  height: 45,
-                                                  padding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          10, 0, 10, 0),
-                                                  decoration: BoxDecoration(
-                                                    color: const Color.fromRGBO(
-                                                        242, 242, 242, 1),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                  ),
-                                                  child: TextFormField(
-                                                    decoration:
-                                                        const InputDecoration(
-                                                      border: InputBorder.none,
-                                                      fillColor: Colors.grey,
-                                                      hintText: '',
-                                                      hintStyle: TextStyle(
-                                                          color: Colors.black),
-                                                    ),
-                                                    validator: (val) =>
-                                                        val!.isEmpty
-                                                            ? 'Input price'
-                                                            : null,
-                                                    onChanged: (val) {
-                                                      // tTimezone = val;
-                                                    },
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 14,
-                                            ),
-                                            Row(
-                                              children: [
-                                                Container(
-                                                    width: 350,
-                                                    height: 45,
-                                                    alignment:
-                                                        Alignment.centerLeft,
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    decoration: BoxDecoration(
-                                                      color:
-                                                          const Color.fromRGBO(
-                                                              242, 242, 242, 1),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
-                                                    ),
-                                                    child: const Text(
-                                                        "Price for 5 classes")),
-                                                const Spacer(),
-                                                Container(
-                                                  width: 100,
-                                                  height: 45,
-                                                  padding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          10, 0, 10, 0),
-                                                  decoration: BoxDecoration(
-                                                    color: const Color.fromRGBO(
-                                                        242, 242, 242, 1),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                  ),
-                                                  child: TextFormField(
-                                                    decoration:
-                                                        const InputDecoration(
-                                                      border: InputBorder.none,
-                                                      fillColor: Colors.grey,
-                                                      hintText: '',
-                                                      hintStyle: TextStyle(
-                                                          color: Colors.black),
-                                                    ),
-                                                    validator: (val) =>
-                                                        val!.isEmpty
-                                                            ? 'Input price'
-                                                            : null,
-                                                    onChanged: (val) {
-                                                      // tTimezone = val;
-                                                    },
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 14,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            TextButton(
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.red,
-                                disabledBackgroundColor: Colors.red,
-                                shape: const BeveledRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(5))),
-                                // ignore: prefer_const_constructors
-                                textStyle: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontStyle: FontStyle.normal,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  // if (subjectcount != tSubjects.length) {
-                                  // subjecthieght = 250;
-                                  // subjecthieght =
-                                  //     (subjecthieght * subjectcount);
-                                  // print(tSubjects.length);
-                                  // } else {
-                                  subjectcount++;
-                                  subjecthieght = 250;
-                                  subjecthieght =
-                                      (subjecthieght * subjectcount);
-                                  print(tSubjects.length);
-                                  // }
-                                });
-                              },
-                              child: const Text('Add more subject'),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 50,
-                        ),
-                        Row(
-                          children: const [
-                            Text(
-                              "What services are you able to provide?",
-                              style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                            Text(
-                              "Required, you can select morethan one.*",
-                              style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
-                                fontWeight: FontWeight.normal,
-                                fontSize: 15,
-                                fontStyle: FontStyle.italic,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Column(
-                          children: <Widget>[
-                            Row(
-                              children: [
-                                Container(
-                                  width: 250,
-                                  height: 45,
-                                  alignment: Alignment.centerLeft,
-                                  child: Theme(
-                                    data: ThemeData(
-                                      checkboxTheme: CheckboxThemeData(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                    ),
-                                    child: ListTileTheme(
-                                      child: CheckboxListTile(
-                                        title: const Text('Recovery Lessons'),
-                                        // subtitle: const Text(
-                                        //     'A computer science portal for geeks.'),
-                                        // secondary: const Icon(Icons.code),
-                                        autofocus: false,
-                                        activeColor: Colors.green,
-                                        checkColor: Colors.white,
-                                        selected: selection1,
-                                        value: selection1,
-                                        controlAffinity:
-                                            ListTileControlAffinity.leading,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selection1 = value!;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  width: 320,
-                                  height: 45,
-                                  alignment: Alignment.centerLeft,
-                                  child: Theme(
-                                    data: ThemeData(
-                                      checkboxTheme: CheckboxThemeData(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                    ),
-                                    child: ListTileTheme(
-                                      child: CheckboxListTile(
-                                        title: const Text(
-                                            'Kids with Learning Difficulties'),
-                                        // subtitle: const Text(
-                                        //     'A computer science portal for geeks.'),
-                                        // secondary: const Icon(Icons.code),
-                                        autofocus: false,
-                                        activeColor: Colors.green,
-                                        checkColor: Colors.white,
-                                        selected: selection2,
-                                        value: selection2,
-                                        controlAffinity:
-                                            ListTileControlAffinity.leading,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selection2 = value!;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 250,
-                                  height: 45,
-                                  alignment: Alignment.centerLeft,
-                                  child: Theme(
-                                    data: ThemeData(
-                                      checkboxTheme: CheckboxThemeData(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                    ),
-                                    child: ListTileTheme(
-                                      child: CheckboxListTile(
-                                        title: const Text('Pre Exam Classes'),
-                                        // subtitle: const Text(
-                                        //     'A computer science portal for geeks.'),
-                                        // secondary: const Icon(Icons.code),
-                                        autofocus: false,
-                                        activeColor: Colors.green,
-                                        checkColor: Colors.white,
-                                        selected: selection3,
-                                        value: selection3,
-                                        controlAffinity:
-                                            ListTileControlAffinity.leading,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selection3 = value!;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  width: 250,
-                                  height: 45,
-                                  alignment: Alignment.centerLeft,
-                                  child: Theme(
-                                    data: ThemeData(
-                                      checkboxTheme: CheckboxThemeData(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                    ),
-                                    child: ListTileTheme(
-                                      child: CheckboxListTile(
-                                        title: const Text('Deaf Language'),
-                                        // subtitle: const Text(
-                                        //     'A computer science portal for geeks.'),
-                                        // secondary: const Icon(Icons.code),
-                                        autofocus: false,
-                                        activeColor: Colors.green,
-                                        checkColor: Colors.white,
-                                        selected: selection4,
-                                        value: selection4,
-                                        controlAffinity:
-                                            ListTileControlAffinity.leading,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selection4 = value!;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 250,
-                                  height: 45,
-                                  alignment: Alignment.centerLeft,
-                                  child: Theme(
-                                    data: ThemeData(
-                                      checkboxTheme: CheckboxThemeData(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                    ),
-                                    child: ListTileTheme(
-                                      child: CheckboxListTile(
-                                        title: const Text('Own Program'),
-                                        // subtitle: const Text(
-                                        //     'A computer science portal for geeks.'),
-                                        // secondary: const Icon(Icons.code),
-                                        autofocus: false,
-                                        activeColor: Colors.green,
-                                        checkColor: Colors.white,
-                                        selected: selection5,
-                                        value: selection5,
-                                        controlAffinity:
-                                            ListTileControlAffinity.leading,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selection5 = value!;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 50,
-                        ),
-                        Row(
-                          children: const [
-                            Text(
-                              "Type of classes you can offer.",
-                              style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                            Text(
-                              "Required, you can select morethan one.*",
-                              style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
-                                fontWeight: FontWeight.normal,
-                                fontSize: 15,
-                                fontStyle: FontStyle.italic,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              width: 250,
+                          SizedBox(
+                            width: 600,
+                            height: 45,
+                            child: Container(
+                              width: 600,
                               height: 45,
-                              alignment: Alignment.centerLeft,
-                              child: Theme(
-                                data: ThemeData(
-                                  checkboxTheme: CheckboxThemeData(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
+                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(5)),
+                                  color: Colors.white,
+                                  border: Border.all(
+                                      color: Colors.grey.shade300, width: 1)),
+                              child: DropdownButtonFormField(
+                                decoration: const InputDecoration(
+                                  enabledBorder: InputBorder.none,
                                 ),
-                                child: ListTileTheme(
-                                  child: CheckboxListTile(
-                                    title: const Text('Online Classes'),
-                                    // subtitle: const Text(
-                                    //     'A computer science portal for geeks.'),
-                                    // secondary: const Icon(Icons.code),
-                                    autofocus: false,
-                                    activeColor: Colors.green,
-                                    checkColor: Colors.white,
-                                    selected: onlineclas,
-                                    value: onlineclas,
-                                    controlAffinity:
-                                        ListTileControlAffinity.leading,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        onlineclas = value!;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: 320,
-                              height: 45,
-                              alignment: Alignment.centerLeft,
-                              child: Theme(
-                                data: ThemeData(
-                                  checkboxTheme: CheckboxThemeData(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ),
-                                child: ListTileTheme(
-                                  child: CheckboxListTile(
-                                    title: const Text('In Person Classes'),
-                                    // subtitle: const Text(
-                                    //     'A computer science portal for geeks.'),
-                                    // secondary: const Icon(Icons.code),
-                                    autofocus: false,
-                                    activeColor: Colors.green,
-                                    checkColor: Colors.white,
-                                    selected: inperson,
-                                    value: inperson,
-                                    controlAffinity:
-                                        ListTileControlAffinity.leading,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        inperson = value!;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 50,
-                        ),
-                        Row(
-                          children: const [
-                            Text(
-                              "Upload your documents.",
-                              style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text(
-                              "ID and Picture required, CV, certification\nand presentation recommended*",
-                              style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
-                                fontWeight: FontWeight.normal,
-                                fontSize: 12,
-                                fontStyle: FontStyle.italic,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                                width: 400,
-                                height: 45,
-                                alignment: Alignment.centerLeft,
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: const Color.fromRGBO(242, 242, 242, 1),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                child: Text(uID)),
-                            const Spacer(),
-                            Container(
-                              padding:
-                                  const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                              width: 150,
-                              height: 55,
-                              child: TextButton(
-                                style: TextButton.styleFrom(
-                                  textStyle:
-                                      const TextStyle(color: Colors.black),
-                                  backgroundColor:
-                                      const Color.fromRGBO(103, 195, 208, 1),
-                                  shape: RoundedRectangleBorder(
-                                    side: const BorderSide(
-                                      color: Color.fromRGBO(
-                                          1, 118, 132, 1), // your color here
-                                      width: 1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(30.0),
-                                  ),
-                                ),
-                                onPressed: () async {
-                                  String fileName = await uploadData();
+                                value: dropdownvaluesubject,
+                                hint: const Text("Select your subject"),
+                                isExpanded: true,
+                                icon: const Icon(Icons.arrow_drop_down),
+                                items: uSubjects.map((String items) {
+                                  return DropdownMenuItem(
+                                    value: items,
+                                    child: Text(items),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
                                   setState(() {
-                                    uID = fileName;
-                                    print(fileName);
+                                    SubjectTeach data = SubjectTeach(
+                                        subjectname: newValue!,
+                                        price2: '0',
+                                        price3: '0',
+                                        price5: '0');
+                                    tSubjects.add(data);
                                   });
                                 },
-                                child: const Text(
-                                  'Upload File',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 15,
-                                  ),
-                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                                width: 400,
-                                height: 45,
-                                alignment: Alignment.centerLeft,
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: const Color.fromRGBO(242, 242, 242, 1),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                child: const Text("Upload your Picture")),
-                            const Spacer(),
-                            Container(
-                              padding:
-                                  const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                              width: 150,
-                              height: 55,
-                              child: TextButton(
-                                style: TextButton.styleFrom(
-                                  textStyle:
-                                      const TextStyle(color: Colors.black),
-                                  backgroundColor:
-                                      const Color.fromRGBO(103, 195, 208, 1),
-                                  shape: RoundedRectangleBorder(
-                                    side: const BorderSide(
-                                      color: Color.fromRGBO(
-                                          1, 118, 132, 1), // your color here
-                                      width: 1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(30.0),
-                                  ),
-                                ),
-                                onPressed: () {},
-                                child: const Text(
-                                  'Upload File',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                                width: 400,
-                                height: 45,
-                                alignment: Alignment.centerLeft,
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: const Color.fromRGBO(242, 242, 242, 1),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                child: const Text("Upload your CV")),
-                            const Spacer(),
-                            Container(
-                              padding:
-                                  const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                              width: 150,
-                              height: 55,
-                              child: TextButton(
-                                style: TextButton.styleFrom(
-                                  textStyle:
-                                      const TextStyle(color: Colors.black),
-                                  backgroundColor:
-                                      const Color.fromRGBO(103, 195, 208, 1),
-                                  shape: RoundedRectangleBorder(
-                                    side: const BorderSide(
-                                      color: Color.fromRGBO(
-                                          1, 118, 132, 1), // your color here
-                                      width: 1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(30.0),
-                                  ),
-                                ),
-                                onPressed: () {},
-                                child: const Text(
-                                  'Upload File',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                                width: 400,
-                                height: 45,
-                                alignment: Alignment.centerLeft,
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: const Color.fromRGBO(242, 242, 242, 1),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                child: const Text("Upload your Certificates")),
-                            const Spacer(),
-                            Container(
-                              padding:
-                                  const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                              width: 150,
-                              height: 55,
-                              child: TextButton(
-                                style: TextButton.styleFrom(
-                                  textStyle:
-                                      const TextStyle(color: Colors.black),
-                                  backgroundColor:
-                                      const Color.fromRGBO(103, 195, 208, 1),
-                                  shape: RoundedRectangleBorder(
-                                    side: const BorderSide(
-                                      color: Color.fromRGBO(
-                                          1, 118, 132, 1), // your color here
-                                      width: 1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(30.0),
-                                  ),
-                                ),
-                                onPressed: () {},
-                                child: const Text(
-                                  'Upload File',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                                width: 400,
-                                height: 45,
-                                alignment: Alignment.centerLeft,
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: const Color.fromRGBO(242, 242, 242, 1),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                child:
-                                    const Text("Upload a video presentation")),
-                            const Spacer(),
-                            Container(
-                              padding:
-                                  const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                              width: 150,
-                              height: 55,
-                              child: TextButton(
-                                style: TextButton.styleFrom(
-                                  textStyle:
-                                      const TextStyle(color: Colors.black),
-                                  backgroundColor:
-                                      const Color.fromRGBO(103, 195, 208, 1),
-                                  shape: RoundedRectangleBorder(
-                                    side: const BorderSide(
-                                      color: Color.fromRGBO(
-                                          1, 118, 132, 1), // your color here
-                                      width: 1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(30.0),
-                                  ),
-                                ),
-                                onPressed: () {},
-                                child: const Text(
-                                  'Upload File',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 50,
-                        ),
-                        Column(
-                          children: [
-                            Row(
-                              children: const [
-                                Text(
-                                  'Describe your skills, your approach, your teaching method, and tell us',
-                                  style: TextStyle(
-                                    color: Color.fromRGBO(0, 0, 0, 1),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: const [
-                                Text(
-                                  'why a student should choose you! (max 5000 characters)',
-                                  style: TextStyle(
-                                    color: Color.fromRGBO(0, 0, 0, 1),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
-                                  textAlign: TextAlign.left,
-                                ),
-                                Text(
-                                  "Required.*",
-                                  style: TextStyle(
-                                    color: Color.fromRGBO(0, 0, 0, 1),
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 15,
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 14,
-                        ),
-                        Container(
-                          width: 600,
-                          height: 350,
-                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                          decoration: BoxDecoration(
-                            color: const Color.fromRGBO(242, 242, 242, 1),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              fillColor: Colors.grey,
-                              hintText:
-                                  'Describe your skills, your approach, your teaching method, and tell us why a student should you! (max 5000 characters)',
-                              hintStyle: TextStyle(color: Colors.black),
                             ),
                           ),
-                        ),
-                        Container(
-                          alignment: Alignment.topLeft,
-                          child: CheckboxListTile(
-                            title: const Text(
-                              'Agree to Work4uTutor Terms & Condition and Privacy Policy.',
-                              style: TextStyle(fontSize: 15),
-                            ),
-                            // subtitle: const Text(
-                            //     'A computer science portal for geeks.'),
-                            // secondary: const Icon(Icons.code),
-                            autofocus: false,
-                            activeColor: Colors.green,
-                            checkColor: Colors.white,
-                            selected: termStatus,
-                            value: termStatus,
-                            controlAffinity: ListTileControlAffinity.leading,
-                            onChanged: (value) {
-                              setState(() {
-                                termStatus = value!;
-                              });
-                                 setState(() {
-                              showDialog(
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (_) => const TermPage());
-                            });
-                            },
+                          const SizedBox(
+                            height: 5,
                           ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                          width: 380,
-                          height: 75,
-                          child: TextButton(
-                            style: TextButton.styleFrom(
-                              textStyle: const TextStyle(color: Colors.black),
-                              backgroundColor:
-                                  const Color.fromRGBO(103, 195, 208, 1),
-                              shape: RoundedRectangleBorder(
-                                side: const BorderSide(
-                                  color: Color.fromRGBO(
-                                      1, 118, 132, 1), // your color here
-                                  width: 1,
-                                ),
-                                borderRadius: BorderRadius.circular(40.0),
+                          Row(
+                            children: const [
+                              Text(
+                                "(You can select more than one subject you teach.)",
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w100,
+                                    fontSize: 12,
+                                    fontStyle: FontStyle.italic),
+                                textAlign: TextAlign.left,
                               ),
-                            ),
-                            onPressed: () => {
-                //               Navigator.pushReplacement(
-                //   context,
-                //   MaterialPageRoute(builder: (context) =>  DashboardPage()),
-                // ),
-                            },
-                            child: const Text(
-                              'Proceed Now',
-                              style: TextStyle(
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 50,
+                          ),
+                          Row(
+                            children: const [
+                              Text(
+                                "What services are you able to provide?",
+                                style: TextStyle(
+                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                              Text(
+                                "Required, you can select morethan one.*",
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Column(
+                            children: <Widget>[
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 250,
+                                    height: 45,
+                                    alignment: Alignment.centerLeft,
+                                    child: Theme(
+                                      data: ThemeData(
+                                        checkboxTheme: CheckboxThemeData(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                      ),
+                                      child: ListTileTheme(
+                                        child: CheckboxListTile(
+                                          title: const Text('Recovery Lessons'),
+                                          // subtitle: const Text(
+                                          //     'A computer science portal for geeks.'),
+                                          // secondary: const Icon(Icons.code),
+                                          autofocus: false,
+                                          activeColor: Colors.green,
+                                          checkColor: Colors.white,
+                                          selected: selection1,
+                                          value: selection1,
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              selection1 = value!;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 320,
+                                    height: 45,
+                                    alignment: Alignment.centerLeft,
+                                    child: Theme(
+                                      data: ThemeData(
+                                        checkboxTheme: CheckboxThemeData(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                      ),
+                                      child: ListTileTheme(
+                                        child: CheckboxListTile(
+                                          title: const Text(
+                                              'Kids with Learning Difficulties'),
+                                          // subtitle: const Text(
+                                          //     'A computer science portal for geeks.'),
+                                          // secondary: const Icon(Icons.code),
+                                          autofocus: false,
+                                          activeColor: Colors.green,
+                                          checkColor: Colors.white,
+                                          selected: selection2,
+                                          value: selection2,
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              selection2 = value!;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 250,
+                                    height: 45,
+                                    alignment: Alignment.centerLeft,
+                                    child: Theme(
+                                      data: ThemeData(
+                                        checkboxTheme: CheckboxThemeData(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                      ),
+                                      child: ListTileTheme(
+                                        child: CheckboxListTile(
+                                          title: const Text('Pre Exam Classes'),
+                                          // subtitle: const Text(
+                                          //     'A computer science portal for geeks.'),
+                                          // secondary: const Icon(Icons.code),
+                                          autofocus: false,
+                                          activeColor: Colors.green,
+                                          checkColor: Colors.white,
+                                          selected: selection3,
+                                          value: selection3,
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              selection3 = value!;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 250,
+                                    height: 45,
+                                    alignment: Alignment.centerLeft,
+                                    child: Theme(
+                                      data: ThemeData(
+                                        checkboxTheme: CheckboxThemeData(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                      ),
+                                      child: ListTileTheme(
+                                        child: CheckboxListTile(
+                                          title: const Text('Deaf Language'),
+                                          // subtitle: const Text(
+                                          //     'A computer science portal for geeks.'),
+                                          // secondary: const Icon(Icons.code),
+                                          autofocus: false,
+                                          activeColor: Colors.green,
+                                          checkColor: Colors.white,
+                                          selected: selection4,
+                                          value: selection4,
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              selection4 = value!;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 250,
+                                    height: 45,
+                                    alignment: Alignment.centerLeft,
+                                    child: Theme(
+                                      data: ThemeData(
+                                        checkboxTheme: CheckboxThemeData(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                      ),
+                                      child: ListTileTheme(
+                                        child: CheckboxListTile(
+                                          title: const Text('Own Program'),
+                                          // subtitle: const Text(
+                                          //     'A computer science portal for geeks.'),
+                                          // secondary: const Icon(Icons.code),
+                                          autofocus: false,
+                                          activeColor: Colors.green,
+                                          checkColor: Colors.white,
+                                          selected: selection5,
+                                          value: selection5,
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              selection5 = value!;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 50,
+                          ),
+                          Row(
+                            children: const [
+                              Text(
+                                "Type of classes you can offer.",
+                                style: TextStyle(
+                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                              Text(
+                                "Required, you can select morethan one.*",
+                                style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                width: 250,
+                                height: 45,
+                                alignment: Alignment.centerLeft,
+                                child: Theme(
+                                  data: ThemeData(
+                                    checkboxTheme: CheckboxThemeData(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                  child: ListTileTheme(
+                                    child: CheckboxListTile(
+                                      title: const Text('Online Classes'),
+                                      // subtitle: const Text(
+                                      //     'A computer science portal for geeks.'),
+                                      // secondary: const Icon(Icons.code),
+                                      autofocus: false,
+                                      activeColor: Colors.green,
+                                      checkColor: Colors.white,
+                                      selected: onlineclas,
+                                      value: onlineclas,
+                                      controlAffinity:
+                                          ListTileControlAffinity.leading,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          onlineclas = value!;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                width: 320,
+                                height: 45,
+                                alignment: Alignment.centerLeft,
+                                child: Theme(
+                                  data: ThemeData(
+                                    checkboxTheme: CheckboxThemeData(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                  child: ListTileTheme(
+                                    child: CheckboxListTile(
+                                      title: const Text('In Person Classes'),
+                                      // subtitle: const Text(
+                                      //     'A computer science portal for geeks.'),
+                                      // secondary: const Icon(Icons.code),
+                                      autofocus: false,
+                                      activeColor: Colors.green,
+                                      checkColor: Colors.white,
+                                      selected: inperson,
+                                      value: inperson,
+                                      controlAffinity:
+                                          ListTileControlAffinity.leading,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          inperson = value!;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 50,
+                          ),
+                          Row(
+                            children: const [
+                              Text(
+                                "Upload your documents.",
+                                style: TextStyle(
+                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                "ID and Picture required, CV, certification\nand presentation recommended*",
+                                style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                  width: 400,
+                                  height: 45,
+                                  alignment: Alignment.centerLeft,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(5)),
+                                      color: Colors.white,
+                                      border: Border.all(
+                                          color: Colors.grey.shade300,
+                                          width: 1)),
+                                  child: Text(uID)),
+                              const Spacer(),
+                              Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                width: 150,
+                                height: 55,
+                                child: TextButton(
+                                  style: TextButton.styleFrom(
+                                    textStyle:
+                                        const TextStyle(color: Colors.black),
+                                    backgroundColor:
+                                        const Color.fromRGBO(103, 195, 208, 1),
+                                    shape: RoundedRectangleBorder(
+                                      side: const BorderSide(
+                                        color: Color.fromRGBO(
+                                            1, 118, 132, 1), // your color here
+                                        width: 1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    String? fileName =
+                                        await uploadData(widget.uid);
+                                    setState(() {
+                                      uID = fileName!;
+                                      print(fileName);
+                                    });
+                                  },
+                                  child: const Text(
+                                    'Upload File',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                  width: 400,
+                                  height: 45,
+                                  alignment: Alignment.centerLeft,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(5)),
+                                      color: Colors.white,
+                                      border: Border.all(
+                                          color: Colors.grey.shade300,
+                                          width: 1)),
+                                  child: const Text("Upload your CV")),
+                              const Spacer(),
+                              Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                width: 150,
+                                height: 55,
+                                child: TextButton(
+                                  style: TextButton.styleFrom(
+                                    textStyle:
+                                        const TextStyle(color: Colors.black),
+                                    backgroundColor:
+                                        const Color.fromRGBO(103, 195, 208, 1),
+                                    shape: RoundedRectangleBorder(
+                                      side: const BorderSide(
+                                        color: Color.fromRGBO(
+                                            1, 118, 132, 1), // your color here
+                                        width: 1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                  ),
+                                  onPressed: () {},
+                                  child: const Text(
+                                    'Upload File',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                  width: 400,
+                                  height: 45,
+                                  alignment: Alignment.centerLeft,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(5)),
+                                      color: Colors.white,
+                                      border: Border.all(
+                                          color: Colors.grey.shade300,
+                                          width: 1)),
+                                  child:
+                                      const Text("Upload your Certificates")),
+                              const Spacer(),
+                              Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                width: 150,
+                                height: 55,
+                                child: TextButton(
+                                  style: TextButton.styleFrom(
+                                    textStyle:
+                                        const TextStyle(color: Colors.black),
+                                    backgroundColor:
+                                        const Color.fromRGBO(103, 195, 208, 1),
+                                    shape: RoundedRectangleBorder(
+                                      side: const BorderSide(
+                                        color: Color.fromRGBO(
+                                            1, 118, 132, 1), // your color here
+                                        width: 1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                  ),
+                                  onPressed: () {},
+                                  child: const Text(
+                                    'Upload File',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                  width: 400,
+                                  height: 45,
+                                  alignment: Alignment.centerLeft,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(5)),
+                                      color: Colors.white,
+                                      border: Border.all(
+                                          color: Colors.grey.shade300,
+                                          width: 1)),
+                                  child: const Text(
+                                      "Upload a video presentation")),
+                              const Spacer(),
+                              Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                width: 150,
+                                height: 55,
+                                child: TextButton(
+                                  style: TextButton.styleFrom(
+                                    textStyle:
+                                        const TextStyle(color: Colors.black),
+                                    backgroundColor:
+                                        const Color.fromRGBO(103, 195, 208, 1),
+                                    shape: RoundedRectangleBorder(
+                                      side: const BorderSide(
+                                        color: Color.fromRGBO(
+                                            1, 118, 132, 1), // your color here
+                                        width: 1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                  ),
+                                  onPressed: () {},
+                                  child: const Text(
+                                    'Upload File',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 50,
+                          ),
+                          Column(
+                            children: [
+                              Row(
+                                children: const [
+                                  Text(
+                                    'Describe your skills, your approach, your teaching method, and tell',
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(0, 0, 0, 1),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: const [
+                                  Text(
+                                    'us why a student should choose you! (max 5000 characters)',
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(0, 0, 0, 1),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                    textAlign: TextAlign.left,
+                                  ),
+                                  Text(
+                                    "Required.*",
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.redAccent,
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 12,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 14,
+                          ),
+                          Container(
+                            width: 600,
+                            height: 350,
+                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(5)),
                                 color: Colors.white,
-                                fontSize: 20,
+                                border: Border.all(
+                                    color: Colors.grey.shade300, width: 1)),
+                            child: TextFormField(
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                fillColor: Colors.grey,
+                                hintText:
+                                    'Describe your skills, your approach, your teaching method, and tell us why a student should you! (max 5000 characters)',
+                                hintStyle: TextStyle(color: Colors.black),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                          Container(
+                            alignment: Alignment.topLeft,
+                            child: CheckboxListTile(
+                              title: const Text(
+                                'Agree to Work4uTutor Terms & Condition and Privacy Policy.',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                              // subtitle: const Text(
+                              //     'A computer science portal for geeks.'),
+                              // secondary: const Icon(Icons.code),
+                              autofocus: false,
+                              activeColor: Colors.green,
+                              checkColor: Colors.white,
+                              selected: termStatus,
+                              value: termStatus,
+                              controlAffinity: ListTileControlAffinity.leading,
+                              onChanged: (value) {
+                                setState(() {
+                                  termStatus = value!;
+                                });
+                                setState(() {
+                                  showDialog(
+                                      barrierDismissible: false,
+                                      context: context,
+                                      builder: (_) => const TermPage());
+                                });
+                              },
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                            width: 380,
+                            height: 75,
+                            child: TextButton(
+                              style: TextButton.styleFrom(
+                                textStyle: const TextStyle(color: Colors.black),
+                                backgroundColor:
+                                    const Color.fromRGBO(103, 195, 208, 1),
+                                shape: RoundedRectangleBorder(
+                                  side: const BorderSide(
+                                    color: Color.fromRGBO(
+                                        1, 118, 132, 1), // your color here
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(40.0),
+                                ),
+                              ),
+                              onPressed: () => {
+                                if (tutorformKey.currentState!.validate())
+                                  {
+                                    updateTutorInformation(
+                                            widget.uid,
+                                            tCity.text,
+                                            selectedCountry,
+                                            firstname.text,
+                                            middlename.text,
+                                            lastname.text,
+                                            tlanguages,
+                                            tutorIDNumber,
+                                            widget.uid,
+                                            phoneNumber.phoneNumber.toString(),
+                                            DateTime.now(),
+                                            age.toString(),
+                                            selectedDate.toString(),
+                                            _selectedTimeZone,
+                                            applicantsID,
+                                            tSubjects,
+                                            'completed')
+                                        .then(
+                                      (value) async {
+                                        dynamic result =
+                                            await _auth.signOutAnon();
+                                        deleteAllData();
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const LoginPage()),
+                                        );
+                                      },
+                                    )
+                                  }
+                              },
+                              child: const Text(
+                                'Proceed Now',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -1652,31 +1898,52 @@ class _InputInfoState extends State<InputInfo> {
   }
 
 //Display all the Countries
-_buildCountryPickerDropdownSoloExpanded() {
-  String valueme = "Select your Country";
-  return CountryPickerDropdown(
-    hint: const Text("Select your Country"),
-    // initialValue: valueme,
-    onValuePicked: (Country country) {
-      valueme = country.toString();
-      setState(() {
-         _initData();
-      });
-     
-    },
-    itemBuilder: (Country country) {
-      return Row(
-        children: <Widget>[
-          Expanded(child: Text(country.name)),
+  _buildCountryPickerDropdownSoloExpanded() {
+    String valueme = "Select your Country";
+    return CountryPickerDropdown(
+      hint: const Text("Select your Country"),
+      // initialValue: valueme,
+      onValuePicked: (Country country) {
+        valueme = country.toString();
+        setState(() {
+          _initData();
+        });
+      },
+      itemBuilder: (Country country) {
+        return Row(
+          children: <Widget>[
+            Expanded(child: Text(country.name)),
+          ],
+        );
+      },
+      itemHeight: 50,
+      isExpanded: true,
+      icon: const Icon(Icons.arrow_drop_down),
+    );
+  }
+
+  void deleteAllData() async {
+    final box = await Hive.openBox('userID');
+    await box.clear();
+  }
+
+  // ignore: prefer_function_declarations_over_variables
+  final languageBuilder = (language) => Text(language.name);
+
+  Widget _buildDropdownItem(Country country) => Stack(
+        alignment: AlignmentDirectional.bottomStart,
+        children: [
+          Row(
+            children: <Widget>[
+              CountryPickerUtils.getDefaultFlagImage(country),
+              const SizedBox(
+                width: 8.0,
+              ),
+              Text(country.name),
+            ],
+          ),
         ],
       );
-    },
-    itemHeight: 50,
-    isExpanded: true,
-    icon: const Icon(Icons.arrow_drop_down),
-  );
-}
-
 }
 //Identifies the device timezone and datetime
 // Future<void> setup() async {

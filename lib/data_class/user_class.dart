@@ -8,12 +8,12 @@ class Users {
 class UserData {
   final String uid;
   final String email;
-  final String password;
+  final String status;
   final String role;
   UserData({
     required this.uid,
     required this.email,
-    required this.password,
+    required this.status,
     required this.role,
   });
 }
