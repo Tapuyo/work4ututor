@@ -2,12 +2,12 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:wokr4ututor/constant/constant.dart';
-import 'package:wokr4ututor/ui/web/admin/admin_components/user_profile.dart';
-import 'package:wokr4ututor/ui/web/admin/admin_models/admin_model.dart';
-import 'package:wokr4ututor/ui/web/admin/executive_dashboard.dart';
-import 'package:wokr4ututor/ui/web/admin/my_admins/add_admin.dart';
-import 'package:wokr4ututor/ui/web/admin/my_admins/confirmation_dialog.dart';
+import 'package:work4ututor/ui/web/admin/my_admins/add_admin.dart';
+
+import '../../../../constant/constant.dart';
+import '../admin_components/user_profile.dart';
+import '../admin_models/admin_model.dart';
+import '../executive_dashboard.dart';
 
 class AdminData {
   final String admindocid;

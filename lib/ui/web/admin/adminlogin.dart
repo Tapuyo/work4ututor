@@ -2,17 +2,14 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/components/nav_bar.dart';
-import 'package:wokr4ututor/ui/auth/auth.dart';
-import 'package:wokr4ututor/ui/web/admin/executive_dashboard.dart';
-import 'package:wokr4ututor/ui/web/login/forgotpassword.dart';
-import 'package:wokr4ututor/ui/web/terms/termpage.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_dashboard/tutor_dashboard.dart';
 
 import '../../../data_class/user_class.dart';
 import '../../../shared_components/alphacode3.dart';
 import '../../../utils/themes.dart';
+import '../../auth/auth.dart';
 import '../student/main_dashboard/student_dashboard.dart';
+import '../terms/termpage.dart';
+import 'executive_dashboard.dart';
 
 class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({Key? key}) : super(key: key);

@@ -5,14 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/provider/init_provider.dart';
-import 'package:wokr4ututor/ui/web/login/login.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_dashboard/tutor_dashboard.dart';
-import 'package:wokr4ututor/ui/web/web_main.dart';
-import 'package:wokr4ututor/utils/themes.dart';
 
+import '../provider/init_provider.dart';
 import '../ui/auth/auth.dart';
+import '../ui/web/login/login.dart';
 import '../ui/web/terms/termpage.dart';
+import '../utils/themes.dart';
 
 class StudentsMenu extends HookWidget {
   StudentsMenu({Key? key}) : super(key: key);

@@ -5,11 +5,10 @@ import 'dart:math';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:wokr4ututor/ui/web/search_tutor/find_tutors.dart';
-import 'package:wokr4ututor/utils/themes.dart';
 import 'dart:html' as html;
 
 import '../../../../data_class/tutor_info_class.dart';
+import '../../../../utils/themes.dart';
 // import '../../../../routes/routes.dart';
 
 class TutorListLogin extends StatefulWidget {
@@ -57,17 +56,17 @@ class _TutorListLoginState extends State<TutorListLogin> {
     Size size = MediaQuery.of(context).size;
     if (widget.keyword.isEmpty) {
       _foundUsers = widget.tutorslist;
-      if (displayRange > _foundUsers.length) {
+      if (widget.displayRange > _foundUsers.length) {
         displayCount = _foundUsers.length;
       } else {
-        displayCount = displayRange;
+        displayCount = widget.displayRange;
       }
     } else {
       _foundUsers = _runFilter(widget.keyword);
-      if (displayRange > _foundUsers.length) {
+      if (widget.displayRange > _foundUsers.length) {
         displayCount = _foundUsers.length;
       } else {
-        displayCount = displayRange;
+        displayCount = widget.displayRange;
       }
     }
 

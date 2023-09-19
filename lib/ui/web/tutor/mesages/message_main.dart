@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:wokr4ututor/services/getmessages.dart';
 
 import '../../../../data_class/chatmessageclass.dart';
 import '../../../../data_class/classesdataclass.dart';
+import '../../../../services/getmessages.dart';
 
 class IndividualPage extends StatefulWidget {
   final String uID;

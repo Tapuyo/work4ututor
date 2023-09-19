@@ -4,22 +4,18 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:country_pickers/country.dart';
-import 'package:country_pickers/country_picker_dropdown.dart';
 import 'package:country_pickers/country_pickers.dart';
-import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:wokr4ututor/constant/constant.dart';
-import 'package:wokr4ututor/services/send_email.dart';
-import 'package:wokr4ututor/shared_components/alphacode3.dart';
-import 'package:wokr4ututor/ui/web/admin/admin_sharedcomponents/header_text.dart';
-import 'package:wokr4ututor/ui/web/admin/executive_dashboard.dart';
-import 'package:wokr4ututor/ui/web/admin/my_admins/admin_list.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
+import '../../../../services/send_email.dart';
 import '../../../../utils/themes.dart';
+import '../admin_sharedcomponents/header_text.dart';
+import '../executive_dashboard.dart';
+import 'admin_list.dart';
 
 class Newadmin extends StatefulWidget {
   // final Map<String, dynamic> onDataReceived;

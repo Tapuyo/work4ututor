@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/data_class/chatmessageclass.dart';
 
 import 'package:universal_html/html.dart' as html;
+
+import '../data_class/chatmessageclass.dart';
 
 class GetMessageList {
   final String uid;

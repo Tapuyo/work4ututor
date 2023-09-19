@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/data_class/classes_inquiry_model.dart';
-import 'package:wokr4ututor/services/classes_inquiry_service.dart';
 
 import '../data_class/reviewclass.dart';
+import '../services/classes_inquiry_service.dart';
 
 class IndividualReviewProvider with ChangeNotifier {
   bool _onLoading = false;

@@ -4,17 +4,15 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/data_class/classesdataclass.dart';
-import 'package:wokr4ututor/data_class/studentsEnrolledclass.dart';
-import 'package:wokr4ututor/ui/web/student/book_classes/student_view_classinfo.dart';
-import 'package:wokr4ututor/ui/web/tutor/classes/view_classinfo.dart';
-import 'package:wokr4ututor/utils/themes.dart';
-
+import 'package:work4ututor/ui/web/student/book_classes/student_view_classinfo.dart';
+import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../provider/classinfo_provider.dart';
 
 import 'dart:html' as html;
+
+import '../../../../utils/themes.dart';
 
 class MyClasses extends StatefulWidget {
   const MyClasses({super.key});

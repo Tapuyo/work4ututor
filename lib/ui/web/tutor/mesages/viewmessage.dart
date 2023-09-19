@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/provider/chatmessagedisplay.dart';
 
 import '../../../../data_class/chatmessageclass.dart';
-import '../../../../data_class/inquirydetailclass.dart';
-import '../../../../provider/inquirydisplay_provider.dart';
+import '../../../../provider/chatmessagedisplay.dart';
 import '../../../../services/getmessages.dart';
 import '../../../../utils/themes.dart';
 

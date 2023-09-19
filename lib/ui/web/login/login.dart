@@ -1,25 +1,25 @@
-// ignore_for_file: prefer_const_constructors, avoid_print, unnecessary_null_comparison
+// ignore_for_file: prefer_const_constructors, avoid_print, unnecessary_null_comparison, use_build_context_synchronously
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/components/nav_bar.dart';
-import 'package:wokr4ututor/constant/constant.dart';
-import 'package:wokr4ututor/shared_components/responsive_builder.dart';
-import 'package:wokr4ututor/ui/auth/auth.dart';
-import 'package:wokr4ututor/ui/web/login/forgotpassword.dart';
-import 'package:wokr4ututor/ui/web/login/resetpassword.dart';
-import 'package:wokr4ututor/ui/web/signup/student_information_signup.dart';
-import 'package:wokr4ututor/ui/web/signup/student_signup.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
-import 'package:wokr4ututor/ui/web/terms/termpage.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_dashboard/tutor_dashboard.dart';
+import 'package:quickalert/quickalert.dart';
+import 'package:work4ututor/ui/web/login/resetpassword.dart';
 
+import '../../../components/nav_bar.dart';
+import '../../../constant/constant.dart';
 import '../../../data_class/user_class.dart';
 import '../../../shared_components/alphacode3.dart';
+import '../../../shared_components/responsive_builder.dart';
 import '../../../utils/themes.dart';
+import '../../auth/auth.dart';
+import '../signup/student_information_signup.dart';
+import '../signup/student_signup.dart';
+import '../signup/tutor_information_signup.dart';
+import '../signup/tutor_signup.dart';
 import '../student/main_dashboard/student_dashboard.dart';
+import '../terms/termpage.dart';
+import '../tutor/tutor_dashboard/tutor_dashboard.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
                         fit: BoxFit.cover,
                       ),
                     ),
-                   const SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Container(
@@ -1118,7 +1118,7 @@ class _SigniNState extends State<SigniN> {
                       ),
                       onPressed: () async {
                         isLoading ? null : _handleButtonPress;
-                        UserData? result = await _auth.signinwEmailandPassword(
+                        dynamic result = await _auth.signinwEmailandPassword(
                             userEmail, userPassword);
                         // 'mjselma@gmail.com',
                         // '123456');
@@ -1183,6 +1183,28 @@ class _SigniNState extends State<SigniN> {
                                         )),
                               );
                             });
+                          } else {
+                            QuickAlert.show(
+                              context: context,
+                              headerBackgroundColor: Colors.redAccent,
+                              type: QuickAlertType.error,
+                              title: 'Oops...',
+                              text: result.message,
+                              backgroundColor: Colors.black,
+                              titleColor: Colors.white,
+                              textColor: Colors.white,
+                            );
+                            // QuickAlert.show(
+                            //   context: context,
+                            //   type: QuickAlertType.success,
+                            //   text: 'Link sent Successfully!',
+                            //   autoCloseDuration: const Duration(seconds: 3),
+                            //   showConfirmBtn: false,
+                            // ).then((value) => Navigator.pushReplacement(
+                            //       context,
+                            //       MaterialPageRoute(
+                            //           builder: (context) => const LoginPage()),
+                            //     ));
                           }
                         }
                       },

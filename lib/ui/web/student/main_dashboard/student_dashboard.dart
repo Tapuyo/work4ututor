@@ -9,25 +9,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/components/students_navbar.dart';
-import 'package:wokr4ututor/data_class/chatmessageclass.dart';
-import 'package:wokr4ututor/data_class/classesdataclass.dart';
-import 'package:wokr4ututor/data_class/user_class.dart';
-import 'package:wokr4ututor/provider/init_provider.dart';
-import 'package:wokr4ututor/services/getmessages.dart';
-import 'package:wokr4ututor/ui/web/student/book_classes/my_classes.dart';
-import 'package:wokr4ututor/ui/web/student/calendar/student_calendar.dart';
-import 'package:wokr4ututor/ui/web/student/main_dashboard/students_classes.dart';
-import 'package:wokr4ututor/ui/web/student/settings/student_settings.dart';
-import 'package:wokr4ututor/ui/web/student/student_inquiry/student_inquiry.dart';
-import 'package:wokr4ututor/ui/web/tutor/classes/classes_main.dart';
-import 'package:wokr4ututor/ui/web/tutor/mesages/messages.dart';
-import 'package:wokr4ututor/ui/web/tutor/performance/tutor_performance.dart';
+import 'package:work4ututor/ui/web/student/main_dashboard/students_classes.dart';
 
+import '../../../../components/students_navbar.dart';
+import '../../../../data_class/chatmessageclass.dart';
+import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/studentanalyticsclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/studentsEnrolledclass.dart';
+import '../../../../data_class/user_class.dart';
+import '../../../../provider/init_provider.dart';
 import '../../../../services/getenrolledclasses.dart';
+import '../../../../services/getmessages.dart';
 import '../../../../services/getstudentclassesanalytics.dart';
 import '../../../../services/getstudentinfo.dart';
 import '../../../../services/getuser.dart';
@@ -37,6 +30,14 @@ import '../../../../utils/themes.dart';
 import '../../help/help.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:http/http.dart' as http;
+
+import '../../tutor/classes/classes_main.dart';
+import '../../tutor/mesages/messages.dart';
+import '../../tutor/performance/tutor_performance.dart';
+import '../book_classes/my_classes.dart';
+import '../calendar/student_calendar.dart';
+import '../settings/student_settings.dart';
+import '../student_inquiry/student_inquiry.dart';
 
 class StudentDashboardPage extends StatefulWidget {
   final String uID;

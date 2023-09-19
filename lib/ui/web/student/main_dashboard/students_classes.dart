@@ -9,15 +9,13 @@ import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/data_class/studentanalyticsclass.dart';
-import 'package:wokr4ututor/provider/init_provider.dart';
-import 'package:wokr4ututor/ui/web/student/main_dashboard/app_helpers.dart';
-import 'package:wokr4ututor/ui/web/student/main_dashboard/task_progress.dart';
-import 'package:wokr4ututor/utils/themes.dart';
+import 'package:work4ututor/ui/web/student/main_dashboard/task_progress.dart';
 
+import '../../../../data_class/studentanalyticsclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/voucherclass.dart';
 import '../../../../services/getvouchers.dart';
+import '../../../../utils/themes.dart';
 import 'coupon.dart';
 import 'task_in_progress.dart';
 import 'package:timezone/data/latest.dart' as tz;

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/data_class/chatmessageclass.dart';
-import 'package:wokr4ututor/provider/chatmessagedisplay.dart';
-import 'package:wokr4ututor/services/getmessages.dart';
-import 'package:wokr4ututor/ui/web/tutor/mesages/viewmessage.dart';
-import 'package:wokr4ututor/utils/themes.dart';
+import 'package:work4ututor/ui/web/tutor/mesages/viewmessage.dart';
 
+import '../../../../data_class/chatmessageclass.dart';
+import '../../../../provider/chatmessagedisplay.dart';
+import '../../../../services/getmessages.dart';
+import '../../../../utils/themes.dart';
 import '../calendar/tutor_schedule.dart';
 
 class UserList extends StatefulWidget {

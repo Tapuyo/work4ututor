@@ -1,15 +1,10 @@
-import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:language_picker/languages.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/services/getstudentinfo.dart';
-import 'package:wokr4ututor/ui/web/tutor/settings/tutor_information.dart';
 
 import '../../../../data_class/studentinfoclass.dart';
-import '../../../../data_class/voucherclass.dart';
+import '../../../../services/getstudentinfo.dart';
 import '../../../../utils/themes.dart';
 
 class StudentInformation extends StatefulWidget {
@@ -184,7 +179,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                           ),
                                           onPressed: () {
                                             setState(() {
-                                              updateImage(uID, profileurl);
+                                              updateImage(widget.uID, profileurl);
                                             });
                                           },
                                           label: const Text(

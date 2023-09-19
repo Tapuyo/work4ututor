@@ -5,8 +5,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
-import 'package:wokr4ututor/services/services.dart';
 import '../../data_class/user_class.dart';
+import '../../services/services.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -19,8 +19,9 @@ class AuthService {
           .collection('user')
           .doc(user.uid)
           .get();
-
+          print('im here');
       if (snapshot.exists) {
+          print('umabot ako dito');
         UserData userData = _getUser(snapshot);
         return userData;
       }

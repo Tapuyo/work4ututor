@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/ui/web/admin/messages/admin_user_list.dart';
-import 'package:wokr4ututor/ui/web/tutor/mesages/userlist.dart';
+
+import 'admin_user_list.dart';
 
 class AdminMessagePage extends StatefulWidget {
   const AdminMessagePage({super.key});

@@ -4,10 +4,10 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:wokr4ututor/ui/web/admin/admin_sharedcomponents/assigned_task.dart';
-import 'package:wokr4ututor/ui/web/admin/admin_sharedcomponents/rejected.dart';
+import 'package:work4ututor/ui/web/admin/admin_sharedcomponents/rejected.dart';
 
 import '../../../../constant/constant.dart';
+import 'assigned_task.dart';
 
 class ListInterviewDateData {
   final DateTime date;

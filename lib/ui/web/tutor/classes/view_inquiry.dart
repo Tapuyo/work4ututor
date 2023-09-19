@@ -3,10 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/utils/themes.dart';
 
 import '../../../../data_class/inquirydetailclass.dart';
 import '../../../../provider/inquirydisplay_provider.dart';
+import '../../../../utils/themes.dart';
 
 class ViewInquiry extends StatefulWidget {
   const ViewInquiry({super.key});

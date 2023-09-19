@@ -5,18 +5,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:wokr4ututor/ui/web/student/main_dashboard/student_dashboard.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/data_class/helpclass.dart';
-import 'package:wokr4ututor/data_class/subject_class.dart';
-import 'package:wokr4ututor/data_class/tutor_info_class.dart';
-import 'package:wokr4ututor/provider/search_provider.dart';
-import 'package:wokr4ututor/services/subjectServices.dart';
-import 'package:wokr4ututor/ui/web/search_tutor/find_tutors.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_profile/viewschedule.dart';
+import 'package:work4ututor/ui/web/tutor/tutor_profile/viewschedule.dart';
 
 import '../../../../components/nav_bar.dart';
+import '../../../../data_class/subject_class.dart';
+import '../../../../data_class/tutor_info_class.dart';
 import '../../../../utils/themes.dart';
+import '../../admin/executive_dashboard.dart';
 import 'book_lesson.dart';
 import 'contact_teacher.dart';
 import 'view_file.dart';
@@ -143,7 +139,7 @@ class _TutorProfileState extends State<TutorProfile> {
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                                 color: Colors.transparent,
-                                                image: DecorationImage(
+                                                image: const DecorationImage(
                                                     image: AssetImage(
                                                         'assets/images/sample.jpg'),
                                                     fit: BoxFit.cover)),
@@ -841,7 +837,7 @@ class _TutorProfileState extends State<TutorProfile> {
                                                   context: context,
                                                   builder:
                                                       (BuildContext context) {
-                                                    return CalendarDialog();
+                                                    return const CalendarDialog();
                                                   },
                                                 ).then((selectedDate) {
                                                   if (selectedDate != null) {
@@ -1094,7 +1090,7 @@ class _TutorProfileState extends State<TutorProfile> {
                                                     fontWeight: FontWeight.w800,
                                                   ),
                                                 ),
-                                                Spacer(),
+                                                const Spacer(),
                                                 RatingBar(
                                                     initialRating: 4.5,
                                                     minRating: 0,

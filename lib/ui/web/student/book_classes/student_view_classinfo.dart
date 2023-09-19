@@ -4,15 +4,15 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:wokr4ututor/ui/web/student/book_classes/cancelclasses.dart';
-import 'package:wokr4ututor/ui/web/student/book_classes/rescheduleclasses.dart';
-import 'package:wokr4ututor/ui/web/student/main_dashboard/app_helpers.dart';
 
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../utils/themes.dart';
 import '../../communication.dart/videocall.dart';
 import '../../tutor/tutor_profile/view_file.dart';
 import 'package:universal_html/html.dart' as html;
+
+import 'cancelclasses.dart';
+import 'rescheduleclasses.dart';
 
 class StudentViewClassInfo extends StatefulWidget {
   final ClassesData enrolledClass;

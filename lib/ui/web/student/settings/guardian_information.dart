@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/services/getstudentinfo.dart';
 
 import '../../../../data_class/studentinfoclass.dart';
+import '../../../../services/getstudentinfo.dart';
 import '../../../../utils/themes.dart';
 
 class GuardianInfoSettings extends StatefulWidget {

@@ -9,11 +9,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:wokr4ututor/data_class/subject_teach_pricing.dart';
-
 import '../data_class/studentinfoclass.dart';
 
 import 'package:firebase_storage/firebase_storage.dart';
+
+import '../data_class/subject_teach_pricing.dart';
 
 Future<String?> uploadData(String uid) async {
   FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -344,13 +344,14 @@ Future<void> updateStudentInfowGuardian(
     String applicationID,
     List<SubjectTeach> mycourses,
     String status,
+    String promotionalMessage,
   ) async {
     try {
       // Update the main student document
       await FirebaseFirestore.instance.collection('tutor').doc(uid).set({
         "language": language,
         "timezone": timezone,
-        "certificates": "",
+        "certificates": [],
         "country": country,
         "dateSign": dateregistered,
         "birthdate": dateofbirth,
@@ -362,7 +363,7 @@ Future<void> updateStudentInfowGuardian(
         "middleName": middlename,
         "applicationID": applicationID,
         // "presentation": presentationlink,
-        // "promotionalMessage": promotionalMessage,
+        "promotionalMessage": promotionalMessage,
         // "resume": resumelink,
         "tutorID": tutorIDNumber,
         "userID": userid,

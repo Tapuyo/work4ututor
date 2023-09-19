@@ -2,10 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/utils/themes.dart';
 
 import '../../../../constant/constant.dart';
 import '../../../../provider/init_provider.dart';
+import '../../../../utils/themes.dart';
 
 class SelectionButtonData {
   final IconData activeIcon;

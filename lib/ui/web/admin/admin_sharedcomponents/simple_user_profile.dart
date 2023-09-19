@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/ui/web/admin/admin_models/admin_model.dart';
-import 'package:wokr4ututor/ui/web/admin/helpers/app_helpers.dart';
+import 'package:work4ututor/ui/web/admin/helpers/app_helpers.dart';
 
 import '../../../../constant/constant.dart';
+import '../admin_models/admin_model.dart';
 
 class SimpleUserProfile extends StatelessWidget {
   const SimpleUserProfile({

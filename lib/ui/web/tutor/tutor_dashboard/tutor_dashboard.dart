@@ -6,15 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/provider/init_provider.dart';
-import 'package:wokr4ututor/ui/web/tutor/classes/classes_main.dart';
-import 'package:wokr4ututor/ui/web/tutor/classes/classes_inquiry.dart';
-import 'package:wokr4ututor/ui/web/tutor/mesages/messages.dart';
-import 'package:wokr4ututor/ui/web/tutor/performance/tutor_performance.dart';
-import 'package:wokr4ututor/ui/web/tutor/calendar/tutor_schedule.dart';
-import 'package:wokr4ututor/ui/web/tutor/settings/tutor_settings.dart';
-import 'package:wokr4ututor/ui/web/tutor/classes/tutor_students.dart';
-import 'package:wokr4ututor/utils/themes.dart';
 
 import '../../../../components/nav_bar.dart';
 import '../../../../constant/constant.dart';
@@ -24,13 +15,22 @@ import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/studentsEnrolledclass.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../data_class/user_class.dart';
+import '../../../../provider/init_provider.dart';
 import '../../../../services/getenrolledclasses.dart';
 import '../../../../services/getstudentclassesanalytics.dart';
 import '../../../../services/getstudentinfo.dart';
 import '../../../../services/getuser.dart';
 import '../../../../services/services.dart';
 import '../../../../shared_components/responsive_builder.dart';
+import '../../../../utils/themes.dart';
 import '../../help/help.dart';
+import '../calendar/tutor_schedule.dart';
+import '../classes/classes_inquiry.dart';
+import '../classes/classes_main.dart';
+import '../classes/tutor_students.dart';
+import '../mesages/messages.dart';
+import '../performance/tutor_performance.dart';
+import '../settings/tutor_settings.dart';
 
 class DashboardPage extends StatefulWidget {
   final String uID;

@@ -5,15 +5,16 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/provider/classes_inquirey_provider.dart';
-import 'package:wokr4ututor/provider/inquirydisplay_provider.dart';
-import 'package:wokr4ututor/provider/user_id_provider.dart';
-import 'package:wokr4ututor/ui/web/tutor/classes/view_inquiry.dart';
 
 import '../../../../data_class/classes_inquiry_model.dart';
+import '../../../../provider/classes_inquirey_provider.dart';
+import '../../../../provider/inquirydisplay_provider.dart';
+import '../../../../provider/user_id_provider.dart';
 import '../../../../utils/themes.dart';
 
 import 'dart:html' as html;
+
+import '../../tutor/classes/view_inquiry.dart';
 
 class StudentInquiry extends HookWidget {
  final String uID;

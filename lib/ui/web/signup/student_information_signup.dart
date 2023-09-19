@@ -18,16 +18,17 @@ import 'package:provider/provider.dart';
 import 'package:timezone/timezone.dart';
 import 'dart:js' as js;
 
-import 'package:wokr4ututor/components/nav_bar.dart';
-import 'package:wokr4ututor/data_class/studentinfoclass.dart';
-import 'package:wokr4ututor/services/getstudentinfo.dart';
-import 'package:wokr4ututor/ui/auth/auth.dart';
-import 'package:wokr4ututor/ui/web/login/login.dart';
 
+import '../../../components/nav_bar.dart';
+import '../../../data_class/studentinfoclass.dart';
+import '../../../services/getstudentinfo.dart';
 import '../../../shared_components/alphacode3.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:timezone/browser.dart' as tz;
 import 'dart:html' as html;
+
+import '../../auth/auth.dart';
+import '../login/login.dart';
 
 class StudentInfo extends StatefulWidget {
   final String uid;

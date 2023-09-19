@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/data_class/tutor_info_class.dart';
-import 'package:wokr4ututor/ui/web/student/settings/guardian_information.dart';
-import 'package:wokr4ututor/ui/web/student/settings/payments_history.dart';
-import 'package:wokr4ututor/ui/web/student/settings/student_account.dart';
-import 'package:wokr4ututor/ui/web/student/settings/student_information.dart';
-import 'package:wokr4ututor/ui/web/tutor/settings/classes_pricing.dart';
-import 'package:wokr4ututor/ui/web/tutor/settings/payments_withdrawals.dart';
-import 'package:wokr4ututor/ui/web/tutor/settings/personal_information.dart';
-import 'package:wokr4ututor/ui/web/tutor/settings/tutor_information.dart';
-import 'package:wokr4ututor/utils/themes.dart';
+import 'package:work4ututor/ui/web/student/settings/payments_history.dart';
+import 'package:work4ututor/ui/web/student/settings/student_account.dart';
+import 'package:work4ututor/ui/web/student/settings/student_information.dart';
+
+import '../../../../utils/themes.dart';
+import 'guardian_information.dart';
 
 class StudentSettingsPage extends StatefulWidget {
   final String uID;

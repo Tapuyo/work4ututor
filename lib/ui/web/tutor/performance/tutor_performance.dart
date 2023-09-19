@@ -3,9 +3,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/data_class/reviewclass.dart';
-import 'package:wokr4ututor/provider/tutor_reviews_provider.dart';
 
+import '../../../../data_class/reviewclass.dart';
+import '../../../../provider/tutor_reviews_provider.dart';
 import '../../../../utils/themes.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 

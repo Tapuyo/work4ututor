@@ -7,8 +7,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:universal_html/html.dart' as html;
-import 'package:wokr4ututor/data_class/subject_teach_pricing.dart';
-import 'package:wokr4ututor/ui/web/admin/executive_dashboard.dart';
 import '../data_class/studentsEnrolledclass.dart';
 import '../data_class/tutor_info_class.dart';
 
@@ -154,7 +152,7 @@ class DatabaseService {
     await tutorDocumentRef.set({
       "language": [],
       "birthPlace": "",
-      "certificates": "",
+      "certificates": [],
       "country": "",
       "dateSign": "",
       "emailadd": email,

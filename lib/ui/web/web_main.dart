@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:wokr4ututor/ui/web/admin/executive_dashboard.dart';
-import 'package:wokr4ututor/ui/web/communication.dart/videocall.dart';
-import 'package:wokr4ututor/ui/web/login/login.dart';
-import 'package:wokr4ututor/ui/web/signup/student_information_signup.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
 import 'admin/adminlogin.dart';
+import 'login/login.dart';
+import 'signup/student_information_signup.dart';
+import 'signup/tutor_information_signup.dart';
 import 'tutor/tutor_dashboard/tutor_dashboard.dart';
 import 'student/main_dashboard/student_dashboard.dart';
 

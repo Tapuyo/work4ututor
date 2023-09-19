@@ -1,7 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/constant/constant.dart';
-import 'package:wokr4ututor/ui/web/admin/admin_models/daily_info_model.dart';
+
+import '../../../../constant/constant.dart';
+import '../admin_models/daily_info_model.dart';
 
 class MiniInformationWidget extends StatefulWidget {
   const MiniInformationWidget({

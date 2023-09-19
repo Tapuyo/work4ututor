@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/constant/constant.dart';
-import 'package:wokr4ututor/shared_components/responsive_builder.dart';
-import 'package:wokr4ututor/ui/web/admin/admin_models/daily_info_model.dart';
-import 'package:wokr4ututor/ui/web/admin/reports/mini_information_widget.dart';
+
+import '../../../../constant/constant.dart';
+import '../../../../shared_components/responsive_builder.dart';
+import '../admin_models/daily_info_model.dart';
+import 'mini_information_widget.dart';
 
 class MiniInformation extends StatelessWidget {
   const MiniInformation({

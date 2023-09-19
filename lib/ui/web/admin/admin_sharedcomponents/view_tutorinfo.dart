@@ -1,19 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/data_class/tutor_info_class.dart';
-import 'package:wokr4ututor/ui/web/student/main_dashboard/student_dashboard.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_profile/book_lesson.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_profile/contact_teacher.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_profile/view_file.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_profile/viewschedule.dart';
-import 'package:wokr4ututor/utils/themes.dart';
 
 import '../../../../data_class/subject_class.dart';
+import '../../../../data_class/tutor_info_class.dart';
+import '../../../../utils/themes.dart';
+import '../../student/main_dashboard/student_dashboard.dart';
+import '../../tutor/tutor_profile/book_lesson.dart';
+import '../../tutor/tutor_profile/contact_teacher.dart';
+import '../../tutor/tutor_profile/view_file.dart';
+import '../../tutor/tutor_profile/viewschedule.dart';
 
 class ViewTutorsData extends StatefulWidget {
   final String namex;

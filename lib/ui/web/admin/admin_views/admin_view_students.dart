@@ -5,14 +5,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/data_class/studentinfoclass.dart';
-import 'package:wokr4ututor/services/getstudentinfo.dart';
-import 'package:wokr4ututor/ui/web/tutor/tutor_profile/view_file.dart';
 
 import '../../../../data_class/classesdataclass.dart';
+import '../../../../data_class/studentinfoclass.dart';
 import '../../../../utils/themes.dart';
 import '../../student/book_classes/cancelclasses.dart';
 import '../../student/book_classes/rescheduleclasses.dart';
+import '../../tutor/tutor_profile/view_file.dart';
 
 class ViewStudentPersonalInfo extends StatefulWidget {
   final StudentInfoClass data;

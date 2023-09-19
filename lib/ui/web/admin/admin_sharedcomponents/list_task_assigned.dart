@@ -2,7 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:wokr4ututor/ui/web/admin/helpers/app_helpers.dart';
+import 'package:work4ututor/ui/web/admin/helpers/app_helpers.dart';
 
 import '../../../../constant/constant.dart';
 

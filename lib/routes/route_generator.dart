@@ -1,14 +1,14 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:wokr4ututor/splash_page.dart';
-import 'package:wokr4ututor/ui/mobile/mob_main.dart';
-import 'package:wokr4ututor/ui/web/admin/adminlogin.dart';
-import 'package:wokr4ututor/ui/web/login/login.dart';
-import 'package:wokr4ututor/ui/web/search_tutor/find_tutors.dart';
-import 'package:wokr4ututor/ui/web/signup/student_signup.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
-import 'package:wokr4ututor/ui/web/web_main.dart';
 
+import 'package:flutter/material.dart';
+
+import '../splash_page.dart';
+import '../ui/mobile/mob_main.dart';
+import '../ui/web/admin/adminlogin.dart';
+import '../ui/web/login/login.dart';
+import '../ui/web/search_tutor/find_tutors.dart';
+import '../ui/web/signup/student_signup.dart';
+import '../ui/web/signup/tutor_signup.dart';
+import '../ui/web/web_main.dart';
 import 'routes.dart';
 
 class RouteGenerator {

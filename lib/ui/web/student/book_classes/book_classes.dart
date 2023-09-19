@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/utils/themes.dart';
+
+import '../../../../utils/themes.dart';
 
 class BookClassesPage extends StatefulWidget {
   const BookClassesPage({super.key});

@@ -2,10 +2,10 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:wokr4ututor/constant/constant.dart';
-import 'package:wokr4ututor/ui/web/admin/admin_sharedcomponents/header_text.dart';
 
+import '../../../../constant/constant.dart';
 import '../../../../utils/themes.dart';
+import 'header_text.dart';
 
 class RejectedInfo extends StatefulWidget {
   final Map<String, dynamic> onDataReceived;

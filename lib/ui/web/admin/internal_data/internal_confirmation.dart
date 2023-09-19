@@ -3,8 +3,8 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/ui/auth/auth.dart';
 import '../../../../shared_components/alphacode3.dart';
+import '../../../auth/auth.dart';
 import '../../login/login.dart';
 
 class InternalAccess extends StatefulWidget {

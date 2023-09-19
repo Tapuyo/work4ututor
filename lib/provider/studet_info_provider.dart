@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/data_class/studentinfoclass.dart';
+import '../data_class/studentinfoclass.dart';
 
 class StudentInfoProvider with ChangeNotifier {
   late StudentInfoClass _studentData;

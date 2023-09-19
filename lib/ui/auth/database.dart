@@ -2,7 +2,8 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:wokr4ututor/services/services.dart';
+
+import '../../services/services.dart';
 
 class UserDataService {
   final String userUID;

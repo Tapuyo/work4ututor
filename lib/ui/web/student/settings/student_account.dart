@@ -1,17 +1,10 @@
-import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/data_class/user_class.dart';
-import 'package:wokr4ututor/services/getstudentinfo.dart';
-import 'package:wokr4ututor/ui/web/student/settings/accountcancellation.dart';
 
-import '../../../../data_class/studentinfoclass.dart';
-import '../../../../data_class/voucherclass.dart';
+import '../../../../data_class/user_class.dart';
 import '../../../../services/getuser.dart';
 import '../../../../utils/themes.dart';
+import 'accountcancellation.dart';
 
 class StudentAccounts extends StatefulWidget {
   final String uID;
@@ -87,7 +80,7 @@ class _StudentAccountsState extends State<StudentAccounts> {
                                         BorderRadius.all(Radius.circular(5))),
                               ),
                               onPressed: () {
-                              accountCancelationDialog(context);
+                                accountCancelationDialog(context);
                               },
                               child: const Text(
                                 'Cancel Account',

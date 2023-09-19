@@ -1,9 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:wokr4ututor/utils/themes.dart';
 
 import '../../../../constant/constant.dart';
+import '../../../../utils/themes.dart';
 
 class SimpleSelectionButton extends StatefulWidget {
   const SimpleSelectionButton({

@@ -4,16 +4,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:wokr4ututor/components/nav_bar.dart';
-import 'package:wokr4ututor/constant/constant.dart';
-import 'package:wokr4ututor/shared_components/responsive_builder.dart';
-import 'package:wokr4ututor/ui/auth/auth.dart';
-import 'package:wokr4ututor/ui/web/login/login.dart';
-import 'package:wokr4ututor/ui/web/signup/student_signup.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
-import 'package:wokr4ututor/ui/web/terms/termpage.dart';
+import 'package:work4ututor/shared_components/responsive_builder.dart';
+import 'package:work4ututor/ui/auth/auth.dart';
+import 'package:work4ututor/ui/web/login/login.dart';
 
+import '../../../components/nav_bar.dart';
+import '../../../constant/constant.dart';
 import '../../../utils/themes.dart';
+import '../signup/student_signup.dart';
+import '../signup/tutor_signup.dart';
+import '../terms/termpage.dart';
 
 class ResetPage extends StatefulWidget {
   const ResetPage({Key? key}) : super(key: key);

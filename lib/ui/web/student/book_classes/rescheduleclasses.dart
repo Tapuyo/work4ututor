@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/utils/themes.dart';
 
 import '../../../../services/cancelaccount.dart';
+import '../../../../utils/themes.dart';
 
 @override
 rescheduleclass(BuildContext context) {

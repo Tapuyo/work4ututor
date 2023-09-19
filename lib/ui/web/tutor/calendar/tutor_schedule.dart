@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:wokr4ututor/ui/web/tutor/calendar/setup_calendar.dart';
-import 'package:wokr4ututor/utils/themes.dart';
+import 'package:work4ututor/ui/web/tutor/calendar/setup_calendar.dart';
 
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../provider/init_provider.dart';
 import '../../../../services/getenrolledclasses.dart';
+import '../../../../utils/themes.dart';
 
 class TableBasicsExample1 extends StatefulWidget {
   final String uID;

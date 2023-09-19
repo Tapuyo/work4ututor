@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
 
+import '../ui/web/signup/tutor_information_signup.dart';
 import '../utils/themes.dart';
 
 class DialogShow extends StatelessWidget {

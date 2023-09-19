@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:wokr4ututor/data_class/subject_class.dart';
+import '../data_class/subject_class.dart';
 
 class SubjectServices {
   final CollectionReference subjectcollection =

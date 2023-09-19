@@ -5,15 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/data_class/tutor_info_class.dart';
-import 'package:wokr4ututor/provider/init_provider.dart';
-import 'package:wokr4ututor/provider/search_provider.dart';
-import 'package:wokr4ututor/ui/web/search_tutor/tutor_list.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
-import 'package:wokr4ututor/utils/themes.dart';
 
-import '../../../../components/nav_bar.dart';
-import '../../signup/student_signup.dart';
+import '../../../../data_class/tutor_info_class.dart';
+import '../../../../provider/init_provider.dart';
+import '../../../../provider/search_provider.dart';
+import '../../../../utils/themes.dart';
+import '../../search_tutor/tutor_list.dart';
+import '../../signup/tutor_signup.dart';
 
 class FindTutorLogin extends StatefulWidget {
   const FindTutorLogin({super.key});

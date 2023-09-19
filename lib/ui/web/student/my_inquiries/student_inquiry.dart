@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/utils/themes.dart';
+
+import '../../../../utils/themes.dart';
 
 class StudentInquirysPage extends StatefulWidget {
   const StudentInquirysPage({super.key});

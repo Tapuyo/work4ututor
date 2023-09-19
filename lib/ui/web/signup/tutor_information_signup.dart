@@ -15,13 +15,12 @@ import 'package:language_picker/language_picker.dart';
 import 'package:language_picker/languages.dart';
 import 'package:timezone/browser.dart' as tz;
 import 'package:timezone/timezone.dart';
-import 'package:wokr4ututor/components/nav_bar.dart';
-import 'package:wokr4ututor/data_class/subject_teach_pricing.dart';
-import 'package:wokr4ututor/services/getstudentinfo.dart';
-import 'package:wokr4ututor/ui/auth/auth.dart';
-import 'package:wokr4ututor/ui/web/login/login.dart';
-
+import '../../../components/nav_bar.dart';
+import '../../../data_class/subject_teach_pricing.dart';
+import '../../../services/getstudentinfo.dart';
 import '../../../shared_components/alphacode3.dart';
+import '../../auth/auth.dart';
+import '../login/login.dart';
 import '../terms/termpage.dart';
 import '../tutor/tutor_dashboard/tutor_dashboard.dart';
 
@@ -245,6 +244,10 @@ class _InputInfoState extends State<InputInfo> {
     // }
   }
 
+  final TextEditingController price2Controller = TextEditingController();
+  final TextEditingController price3Controller = TextEditingController();
+  final TextEditingController price5Controller = TextEditingController();
+  final TextEditingController aboutme = TextEditingController();
   final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
@@ -322,7 +325,8 @@ class _InputInfoState extends State<InputInfo> {
                                     child: IconButton(
                                       onPressed: () async {
                                         String? downloadURL =
-                                            await uploadTutorProfile(widget.uid);
+                                            await uploadTutorProfile(
+                                                widget.uid);
 
                                         if (downloadURL != null) {
                                           // The upload was successful, and downloadURL contains the URL.
@@ -865,14 +869,21 @@ class _InputInfoState extends State<InputInfo> {
                                 itemCount: tSubjects.length,
                                 itemBuilder: (context, index) {
                                   SubjectTeach subjectdata = tSubjects[index];
+                                  // Set the initial values for the controllers
+                                  // price2Controller.text = subjectdata.price2;
+                                  // price3Controller.text = subjectdata.price3;
+                                  // price5Controller.text = subjectdata.price5;
 
-                                  // Create TextEditingController instances for each TextFormField
-                                  TextEditingController price2Controller =
-                                      TextEditingController();
-                                  TextEditingController price3Controller =
-                                      TextEditingController();
-                                  TextEditingController price5Controller =
-                                      TextEditingController();
+                                  // // Create TextEditingController instances for each TextFormField
+                                  // TextEditingController price2Controller =
+                                  //     TextEditingController(
+                                  //         text: subjectdata.price2);
+                                  // TextEditingController price3Controller =
+                                  //     TextEditingController(
+                                  //         text: subjectdata.price3);
+                                  // TextEditingController price5Controller =
+                                  //     TextEditingController(
+                                  //         text: subjectdata.price5);
 
                                   return Column(
                                     children: [
@@ -956,10 +967,17 @@ class _InputInfoState extends State<InputInfo> {
                                                     hintStyle: TextStyle(
                                                         color: Colors.black),
                                                   ),
-                                                  validator: (val) =>
-                                                      val!.isEmpty
-                                                          ? 'Input price'
-                                                          : null,
+                                                  validator: (val) {
+                                                    if (val!.isEmpty) {
+                                                      return 'Input price';
+                                                    }
+                                                    try {
+                                                      double.parse(val);
+                                                      return null; // Parsing succeeded, val is a valid double
+                                                    } catch (e) {
+                                                      return 'Invalid input, please enter a valid number';
+                                                    }
+                                                  },
                                                   onChanged: (val) {
                                                     // Update the subjectdata when the value changes
                                                     subjectdata.price2 = val;
@@ -1017,10 +1035,17 @@ class _InputInfoState extends State<InputInfo> {
                                                     hintStyle: TextStyle(
                                                         color: Colors.black),
                                                   ),
-                                                  validator: (val) =>
-                                                      val!.isEmpty
-                                                          ? 'Input price'
-                                                          : null,
+                                                  validator: (val) {
+                                                    if (val!.isEmpty) {
+                                                      return 'Input price';
+                                                    }
+                                                    try {
+                                                      double.parse(val);
+                                                      return null; // Parsing succeeded, val is a valid double
+                                                    } catch (e) {
+                                                      return 'Invalid input, please enter a valid number';
+                                                    }
+                                                  },
                                                   onChanged: (val) {
                                                     // Update the subjectdata when the value changes
                                                     subjectdata.price3 = val;
@@ -1078,10 +1103,17 @@ class _InputInfoState extends State<InputInfo> {
                                                     hintStyle: TextStyle(
                                                         color: Colors.black),
                                                   ),
-                                                  validator: (val) =>
-                                                      val!.isEmpty
-                                                          ? 'Input price'
-                                                          : null,
+                                                  validator: (val) {
+                                                    if (val!.isEmpty) {
+                                                      return 'Input price';
+                                                    }
+                                                    try {
+                                                      double.parse(val);
+                                                      return null; // Parsing succeeded, val is a valid double
+                                                    } catch (e) {
+                                                      return 'Invalid input, please enter a valid number';
+                                                    }
+                                                  },
                                                   onChanged: (val) {
                                                     // Update the subjectdata when the value changes
                                                     subjectdata.price5 = val;
@@ -1134,9 +1166,9 @@ class _InputInfoState extends State<InputInfo> {
                                   setState(() {
                                     SubjectTeach data = SubjectTeach(
                                         subjectname: newValue!,
-                                        price2: '0',
-                                        price3: '0',
-                                        price5: '0');
+                                        price2: '',
+                                        price3: '',
+                                        price5: '');
                                     tSubjects.add(data);
                                   });
                                 },
@@ -1783,6 +1815,10 @@ class _InputInfoState extends State<InputInfo> {
                                 border: Border.all(
                                     color: Colors.grey.shade300, width: 1)),
                             child: TextFormField(
+                              controller: aboutme,
+                              textAlignVertical: TextAlignVertical.top,
+                              maxLines: null,
+                              expands: true,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 fillColor: Colors.grey,
@@ -1859,7 +1895,8 @@ class _InputInfoState extends State<InputInfo> {
                                             _selectedTimeZone,
                                             applicantsID,
                                             tSubjects,
-                                            'completed')
+                                            'completed',
+                                            aboutme.text)
                                         .then(
                                       (value) async {
                                         dynamic result =

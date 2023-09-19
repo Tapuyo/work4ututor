@@ -4,9 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/data_class/helpclass.dart';
-import 'package:wokr4ututor/services/send_email.dart';
 
+import '../../../data_class/helpclass.dart';
+import '../../../services/send_email.dart';
 import '../../../utils/themes.dart';
 
 import 'package:http/http.dart' as http;

@@ -8,15 +8,15 @@ import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/provider/init_provider.dart';
-import 'package:wokr4ututor/ui/web/tutor/subscription/subscription_type.dart';
-import 'package:wokr4ututor/utils/themes.dart';
 
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz;
 import 'dart:html' as html;
+
+import '../../../../utils/themes.dart';
+import '../subscription/subscription_type.dart';
 
 class ClassesMain extends StatefulWidget {
   const ClassesMain({super.key});

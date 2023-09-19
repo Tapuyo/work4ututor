@@ -4,15 +4,15 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/provider/init_provider.dart';
-import 'package:wokr4ututor/ui/web/login/login.dart';
-import 'package:wokr4ututor/ui/web/search_tutor/find_tutors.dart';
-import 'package:wokr4ututor/ui/web/signup/student_signup.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
-import 'package:wokr4ututor/utils/themes.dart';
+import 'package:work4ututor/ui/web/login/login.dart';
+import 'package:work4ututor/ui/web/signup/student_signup.dart';
+import 'package:work4ututor/ui/web/signup/tutor_signup.dart';
 
+import '../provider/init_provider.dart';
 import '../ui/auth/auth.dart';
+import '../ui/web/search_tutor/find_tutors.dart';
 import '../ui/web/terms/termpage.dart';
+import '../utils/themes.dart';
 
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({Key? key}) : super(key: key);

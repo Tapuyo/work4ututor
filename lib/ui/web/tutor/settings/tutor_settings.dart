@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:wokr4ututor/data_class/tutor_info_class.dart';
-import 'package:wokr4ututor/ui/web/tutor/settings/classes_pricing.dart';
-import 'package:wokr4ututor/ui/web/tutor/settings/payments_withdrawals.dart';
-import 'package:wokr4ututor/ui/web/tutor/settings/personal_information.dart';
-import 'package:wokr4ututor/ui/web/tutor/settings/tutor_information.dart';
-import 'package:wokr4ututor/utils/themes.dart';
+import 'package:work4ututor/ui/web/tutor/settings/payments_withdrawals%20copy.dart';
+import 'package:work4ututor/ui/web/tutor/settings/personal_information%20copy.dart';
+import 'package:work4ututor/ui/web/tutor/settings/tutor_information%20copy.dart';
+
+import '../../../../utils/themes.dart';
+import 'classes_pricing.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

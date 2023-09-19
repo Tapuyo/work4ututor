@@ -3,18 +3,16 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:wokr4ututor/components/nav_bar.dart';
-import 'package:wokr4ututor/components/tutordialog.dart';
-import 'package:wokr4ututor/constant/constant.dart';
-import 'package:wokr4ututor/shared_components/responsive_builder.dart';
-import 'package:wokr4ututor/ui/auth/auth.dart';
-import 'package:wokr4ututor/ui/web/login/login.dart';
-import 'package:wokr4ututor/ui/web/signup/student_information_signup.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_information_signup.dart';
-import 'package:wokr4ututor/ui/web/signup/tutor_signup.dart';
+import 'package:work4ututor/ui/web/signup/student_information_signup.dart';
+import 'package:work4ututor/ui/web/signup/tutor_signup.dart';
 
+import '../../../components/nav_bar.dart';
+import '../../../constant/constant.dart';
 import '../../../services/services.dart';
+import '../../../shared_components/responsive_builder.dart';
 import '../../../utils/themes.dart';
+import '../../auth/auth.dart';
+import '../login/login.dart';
 import '../terms/termpage.dart';
 
 class StudentSignup extends StatefulWidget {
@@ -46,130 +44,127 @@ class _StudentSignupState extends State<StudentSignup> {
       drawer: ResponsiveBuilder.isDesktop(context)
           ? null
           : Drawer(
-             child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    Container(
-                      margin: const EdgeInsets.only(top: 0),
-                      width: 240,
-                      child: Image.asset(
-                        "assets/images/WORK4U_NO_BG.png",
-                        alignment: Alignment.topCenter,
-                        fit: BoxFit.cover,
-                      ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Container(
+                    margin: const EdgeInsets.only(top: 0),
+                    width: 240,
+                    child: Image.asset(
+                      "assets/images/WORK4U_NO_BG.png",
+                      alignment: Alignment.topCenter,
+                      fit: BoxFit.cover,
                     ),
-                   const SizedBox(
-                      height: 20,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    height: 45,
+                    width: 200,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      color: Color.fromRGBO(1, 118, 132, 1),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
                     ),
-                    Container(
-                      height: 45,
-                      width: 200,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        color: Color.fromRGBO(1, 118, 132, 1),
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          shape: const BeveledRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5))),
-                          // ignore: prefer_const_constructors
-                          textStyle: TextStyle(
-                            color: Colors.black,
-                            // fontFamily: 'Avenir',
-                            fontSize: 12,
-                            fontStyle: FontStyle.normal,
-                            decoration: TextDecoration.none,
-                          ),
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        shape: const BeveledRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                        // ignore: prefer_const_constructors
+                        textStyle: TextStyle(
+                          color: Colors.black,
+                          // fontFamily: 'Avenir',
+                          fontSize: 12,
+                          fontStyle: FontStyle.normal,
+                          decoration: TextDecoration.none,
                         ),
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const StudentSignup()),
-                          );
-                        },
-                        child: const Text('BECOME A STUDENT'),
                       ),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const StudentSignup()),
+                        );
+                      },
+                      child: const Text('BECOME A STUDENT'),
                     ),
-                    const SizedBox(
-                      height: 20,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    height: 45,
+                    width: 200,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      color: Color.fromRGBO(1, 118, 132, 1),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
                     ),
-                    Container(
-                      height: 45,
-                      width: 200,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        color: Color.fromRGBO(1, 118, 132, 1),
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          shape: const BeveledRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5))),
-                          // ignore: prefer_const_constructors
-                          textStyle: TextStyle(
-                            color: Colors.black,
-                            // fontFamily: 'Avenir',
-                            fontSize: 12,
-                            fontStyle: FontStyle.normal,
-                            decoration: TextDecoration.none,
-                          ),
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        shape: const BeveledRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                        // ignore: prefer_const_constructors
+                        textStyle: TextStyle(
+                          color: Colors.black,
+                          // fontFamily: 'Avenir',
+                          fontSize: 12,
+                          fontStyle: FontStyle.normal,
+                          decoration: TextDecoration.none,
                         ),
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const TutorSignup()),
-                          );
-                        },
-                        child: const Text('BECOME A TUTOR'),
                       ),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const TutorSignup()),
+                        );
+                      },
+                      child: const Text('BECOME A TUTOR'),
                     ),
-                    const SizedBox(
-                      height: 20,
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    height: 45,
+                    width: 200,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      color: Color.fromRGBO(103, 195, 208, 1),
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
                     ),
-                    Container(
-                      height: 45,
-                      width: 200,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        color: Color.fromRGBO(103, 195, 208, 1),
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          shape: const BeveledRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5))),
-                          // ignore: prefer_const_constructors
-                          textStyle: TextStyle(
-                            color: Colors.black,
-                            // fontFamily: 'Avenir',
-                            fontSize: 12,
-                            fontStyle: FontStyle.normal,
-                            decoration: TextDecoration.none,
-                          ),
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        shape: const BeveledRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                        // ignore: prefer_const_constructors
+                        textStyle: TextStyle(
+                          color: Colors.black,
+                          // fontFamily: 'Avenir',
+                          fontSize: 12,
+                          fontStyle: FontStyle.normal,
+                          decoration: TextDecoration.none,
                         ),
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginPage()),
-                          );
-                        },
-                        child: const Text('LOG IN'),
                       ),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginPage()),
+                        );
+                      },
+                      child: const Text('LOG IN'),
                     ),
-                    const Spacer(),
-                  ],
-                ),
-                ),
+                  ),
+                  const Spacer(),
+                ],
+              ),
+            ),
       // bottomNavigationBar:
       //     (ResponsiveBuilder.isDesktop(context) || kIsWeb) ? null : null,
       backgroundColor: Colors.white,
@@ -1204,6 +1199,13 @@ class _StudentSignUpState extends State<StudentSignUp> {
                               });
                             } else {
                               setState(() {
+                                print(result.uid);
+                                print(result.role);
+                                _auth.adduserInfo({
+                                  "userID": result.uid,
+                                  "role": result.role,
+                                  "userStatus": result.status
+                                });
                                 if (result.toString().contains(
                                     "The email address is already in use by another account")) {
                                   result =
@@ -1220,14 +1222,14 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                     textColor: Colors.white,
                                   );
                                 } else {
-                                  result =
+                                 String resultdata =
                                       "Account succesfully registered! Click okay to continue.";
                                   print(result.uid);
                                   QuickAlert.show(
                                     context: context,
                                     headerBackgroundColor: Colors.green,
                                     type: QuickAlertType.success,
-                                    text: result,
+                                    text: resultdata,
                                     confirmBtnText: 'Okay',
                                     onConfirmBtnTap: () {
                                       Navigator.pushReplacement(

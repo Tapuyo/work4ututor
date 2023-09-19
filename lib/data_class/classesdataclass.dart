@@ -1,5 +1,5 @@
-import 'package:wokr4ututor/data_class/studentinfoclass.dart';
-import 'package:wokr4ututor/data_class/tutor_info_class.dart';
+import 'package:work4ututor/data_class/studentinfoclass.dart';
+import 'package:work4ututor/data_class/tutor_info_class.dart';
 
 class ClassesData {
   final String classid;

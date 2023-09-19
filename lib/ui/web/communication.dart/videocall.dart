@@ -18,14 +18,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:wokr4ututor/ui/web/communication.dart/classcreationlink.dart';
-import 'package:wokr4ututor/ui/web/communication.dart/whiteboard.dart';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:work4ututor/ui/web/communication.dart/whiteboard.dart';
 
 import '../../../data_class/chatmessageclass.dart';
 import '../../../services/getmessages.dart';
