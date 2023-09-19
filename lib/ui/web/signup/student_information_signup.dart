@@ -15,9 +15,9 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:language_picker/language_picker.dart';
 import 'package:language_picker/languages.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:timezone/timezone.dart';
 import 'dart:js' as js;
-
 
 import '../../../components/nav_bar.dart';
 import '../../../data_class/studentinfoclass.dart';
@@ -1299,12 +1299,22 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                         dynamic result =
                                             await _auth.signOutAnon();
                                         deleteAllData();
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const LoginPage()),
-                                        );
+                                        setState(() {
+                                          QuickAlert.show(
+                                            context: context,
+                                            type: QuickAlertType.success,
+                                            text: 'Sign up succesfully!',
+                                            autoCloseDuration:
+                                                const Duration(seconds: 3),
+                                            showConfirmBtn: false,
+                                          ).then((value) =>
+                                              Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const LoginPage()),
+                                              ));
+                                        });
                                       },
                                     );
                                   }
@@ -1352,12 +1362,22 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                         dynamic result =
                                             await _auth.signOutAnon();
                                         deleteAllData();
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const LoginPage()),
-                                        );
+                                        setState(() {
+                                          QuickAlert.show(
+                                            context: context,
+                                            type: QuickAlertType.success,
+                                            text: 'Sign up succesfully!',
+                                            autoCloseDuration:
+                                                const Duration(seconds: 3),
+                                            showConfirmBtn: false,
+                                          ).then((value) =>
+                                              Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const LoginPage()),
+                                              ));
+                                        });
                                       },
                                     );
                                   } else {

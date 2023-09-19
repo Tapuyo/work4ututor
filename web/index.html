@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -18,16 +19,16 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Elevate your learning with our education website, your gateway to knowledge!">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="wokr4ututor">
+  <meta name="apple-mobile-web-app-title" content="work4ututor">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="logo.png"/>
+  <link rel="icon" type="image/png" href="logo.png" />
 
   <title>wokr4ututor</title>
   <link rel="manifest" href="manifest.json">
@@ -40,36 +41,37 @@
   <script src="flutter.js" defer></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.8.335/pdf.min.js"></script>
   <script type="text/javascript">
-      pdfjsLib.GlobalWorkerOptions.workerSrc = "//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.8.335/pdf.worker.min.js";
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.8.335/pdf.worker.min.js";
   </script>
 </head>
+
 <body>
   <script src="//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.min.js"></script>
-<script type="text/javascript">
-   pdfjsLib.GlobalWorkerOptions.workerSrc = "//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.worker.min.js";
-</script>
-<script src="assets/packages/libphonenumber_plugin/js/libphonenumber.js"></script>
-<script src="assets/packages/libphonenumber_plugin/js/stringbuffer.js"></script>
+  <script type="text/javascript">
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.4.456/pdf.worker.min.js";
+  </script>
+  <script src="assets/packages/libphonenumber_plugin/js/libphonenumber.js"></script>
+  <script src="assets/packages/libphonenumber_plugin/js/stringbuffer.js"></script>
   <script>
     let useHtml = true;
 
-    window.addEventListener('load', function(ev) {
-    _flutter.loader.loadEntrypoint({
-      serviceWorker: {
-        serviceWorkerVersion: serviceWorkerVersion,
-      },
-      onEntrypointLoaded: function(engineInitializer) {
-        let config = {
-          renderer: useHtml ? "html" : "canvaskit",
-        };
-        engineInitializer.initializeEngine(config).then(function(appRunner) {
-          appRunner.runApp();
-        });
-      }
+    window.addEventListener('load', function (ev) {
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        },
+        onEntrypointLoaded: function (engineInitializer) {
+          let config = {
+            renderer: useHtml ? "html" : "canvaskit",
+          };
+          engineInitializer.initializeEngine(config).then(function (appRunner) {
+            appRunner.runApp();
+          });
+        }
+      });
     });
-  });
   </script>
-    <script src="main.dart.js" type="application/javascript"></script>
+  <script src="main.dart.js" type="application/javascript"></script>
 </body>
-</html>
 
+</html>

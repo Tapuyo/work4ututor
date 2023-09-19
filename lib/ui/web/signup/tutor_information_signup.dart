@@ -13,6 +13,7 @@ import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:language_picker/language_picker.dart';
 import 'package:language_picker/languages.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:timezone/browser.dart' as tz;
 import 'package:timezone/timezone.dart';
 import '../../../components/nav_bar.dart';
@@ -1902,12 +1903,22 @@ class _InputInfoState extends State<InputInfo> {
                                         dynamic result =
                                             await _auth.signOutAnon();
                                         deleteAllData();
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const LoginPage()),
-                                        );
+                                        setState(() {
+                                          QuickAlert.show(
+                                            context: context,
+                                            type: QuickAlertType.success,
+                                            text: 'Sign up succesfully!',
+                                            autoCloseDuration:
+                                                const Duration(seconds: 3),
+                                            showConfirmBtn: false,
+                                          ).then((value) =>
+                                              Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const LoginPage()),
+                                              ));
+                                        });
                                       },
                                     )
                                   }

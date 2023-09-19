@@ -1126,6 +1126,16 @@ class _SigniNState extends State<SigniN> {
                           setState(() {
                             error = 'Could not sign in w/ those credential';
                             print(error);
+                             QuickAlert.show(
+                              context: context,
+                              headerBackgroundColor: Colors.redAccent,
+                              type: QuickAlertType.error,
+                              title: 'Oops...',
+                              text: error,
+                              backgroundColor: Colors.black,
+                              titleColor: Colors.white,
+                              textColor: Colors.white,
+                            );
                           });
                         } else {
                           setState(() {
@@ -1140,48 +1150,73 @@ class _SigniNState extends State<SigniN> {
                           if (result.role == 'tutor' &&
                               result.status == 'unfinished') {
                             setState(() {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => TutorInfo(
-                                          uid: result.uid.toString(),
-                                          email: result.email.toString(),
-                                        )),
-                              );
+                              QuickAlert.show(
+                                context: context,
+                                type: QuickAlertType.success,
+                                text: 'You will redirected to sign up!',
+                                autoCloseDuration: const Duration(seconds: 3),
+                                showConfirmBtn: false,
+                              ).then((value) => Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => TutorInfo(
+                                              uid: result.uid.toString(),
+                                              email: result.email.toString(),
+                                            )),
+                                  ));
                             });
 
                             StudentDashboardPage(uID: result.uid.toString());
                           } else if (result.role == 'tutor' &&
                               result.status == 'completed') {
                             setState(() {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DashboardPage(
-                                        uID: result.uid.toString())),
-                              );
+                              QuickAlert.show(
+                                context: context,
+                                type: QuickAlertType.success,
+                                text: 'Log in Succesfully!',
+                                autoCloseDuration: const Duration(seconds: 3),
+                                showConfirmBtn: false,
+                              ).then((value) => Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => DashboardPage(
+                                            uID: result.uid.toString())),
+                                  ));
                             });
                           } else if (result.role == 'student' &&
                               result.status == 'completed') {
                             setState(() {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => StudentDashboardPage(
-                                        uID: result.uid.toString())),
-                              );
+                              QuickAlert.show(
+                                context: context,
+                                type: QuickAlertType.success,
+                                text: 'You will redirected to sign up!',
+                                autoCloseDuration: const Duration(seconds: 3),
+                                showConfirmBtn: false,
+                              ).then((value) => Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            StudentDashboardPage(
+                                                uID: result.uid.toString())),
+                                  ));
                             });
                           } else if (result.role == 'student' &&
                               result.status == 'unfinished') {
                             setState(() {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => StudentInfo(
-                                          uid: result.uid.toString(),
-                                          email: result.email,
-                                        )),
-                              );
+                              QuickAlert.show(
+                                context: context,
+                                type: QuickAlertType.success,
+                                text: 'You will redirected to sign up!',
+                                autoCloseDuration: const Duration(seconds: 3),
+                                showConfirmBtn: false,
+                              ).then((value) => Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => StudentInfo(
+                                              uid: result.uid.toString(),
+                                              email: result.email,
+                                            )),
+                                  ));
                             });
                           } else {
                             QuickAlert.show(
@@ -1189,22 +1224,11 @@ class _SigniNState extends State<SigniN> {
                               headerBackgroundColor: Colors.redAccent,
                               type: QuickAlertType.error,
                               title: 'Oops...',
-                              text: result.message,
+                              text: result.toString(),
                               backgroundColor: Colors.black,
                               titleColor: Colors.white,
                               textColor: Colors.white,
                             );
-                            // QuickAlert.show(
-                            //   context: context,
-                            //   type: QuickAlertType.success,
-                            //   text: 'Link sent Successfully!',
-                            //   autoCloseDuration: const Duration(seconds: 3),
-                            //   showConfirmBtn: false,
-                            // ).then((value) => Navigator.pushReplacement(
-                            //       context,
-                            //       MaterialPageRoute(
-                            //           builder: (context) => const LoginPage()),
-                            //     ));
                           }
                         }
                       },
