@@ -1222,26 +1222,26 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                     textColor: Colors.white,
                                   );
                                 } else {
-                                 String resultdata =
+                                  String resultdata =
                                       "Account succesfully registered! Click okay to continue.";
                                   print(result.uid);
-                                  QuickAlert.show(
-                                    context: context,
-                                    headerBackgroundColor: Colors.green,
-                                    type: QuickAlertType.success,
-                                    text: resultdata,
-                                    confirmBtnText: 'Okay',
-                                    onConfirmBtnTap: () {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => StudentInfo(
-                                                  uid: result.uid,
-                                                  email: result.email,
-                                                )),
-                                      );
-                                    },
-                                  );
+                                  setState(() {
+                                    QuickAlert.show(
+                                      context: context,
+                                      type: QuickAlertType.success,
+                                      text: resultdata,
+                                      autoCloseDuration:
+                                          const Duration(seconds: 1),
+                                      showConfirmBtn: false,
+                                    ).then((value) => Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => StudentInfo(
+                                                    uid: result.uid,
+                                                    email: result.email,
+                                                  )),
+                                        ));
+                                  });
                                 }
                               });
                             }

@@ -25,9 +25,17 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
-        child: CircularProgressIndicator(),
+        child: Container(
+          margin: const EdgeInsets.only(top: 0),
+          width: 240,
+          child: Image.asset(
+            "assets/images/WORK4U_NO_BG.png",
+            alignment: Alignment.topCenter,
+            fit: BoxFit.cover,
+          ),
+        ),
       ),
     );
   }

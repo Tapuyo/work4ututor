@@ -1154,7 +1154,7 @@ class _SigniNState extends State<SigniN> {
                                 context: context,
                                 type: QuickAlertType.success,
                                 text: 'You will redirected to sign up!',
-                                autoCloseDuration: const Duration(seconds: 3),
+                                autoCloseDuration: const Duration(seconds: 1),
                                 showConfirmBtn: false,
                               ).then((value) => Navigator.pushReplacement(
                                     context,
@@ -1174,7 +1174,7 @@ class _SigniNState extends State<SigniN> {
                                 context: context,
                                 type: QuickAlertType.success,
                                 text: 'Log in Succesfully!',
-                                autoCloseDuration: const Duration(seconds: 3),
+                                autoCloseDuration: const Duration(seconds: 1),
                                 showConfirmBtn: false,
                               ).then((value) => Navigator.pushReplacement(
                                     context,
@@ -1189,8 +1189,8 @@ class _SigniNState extends State<SigniN> {
                               QuickAlert.show(
                                 context: context,
                                 type: QuickAlertType.success,
-                                text: 'You will redirected to sign up!',
-                                autoCloseDuration: const Duration(seconds: 3),
+                                text: 'Log in Succesfully!',
+                                autoCloseDuration: const Duration(seconds: 1),
                                 showConfirmBtn: false,
                               ).then((value) => Navigator.pushReplacement(
                                     context,
@@ -1207,7 +1207,7 @@ class _SigniNState extends State<SigniN> {
                                 context: context,
                                 type: QuickAlertType.success,
                                 text: 'You will redirected to sign up!',
-                                autoCloseDuration: const Duration(seconds: 3),
+                                autoCloseDuration: const Duration(seconds: 1),
                                 showConfirmBtn: false,
                               ).then((value) => Navigator.pushReplacement(
                                     context,

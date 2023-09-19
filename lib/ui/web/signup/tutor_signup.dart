@@ -1207,7 +1207,17 @@ class _SignUpState extends State<SignUp> {
                                       tEmail.text, tPassword.text, uType);
                               if (result == null) {
                                 setState(() {
-                                  error = 'Please supply a valid email';
+                                  error = 'Please check your inputs!';
+                                  QuickAlert.show(
+                                    context: context,
+                                    headerBackgroundColor: Colors.red,
+                                    type: QuickAlertType.error,
+                                    title: 'Oops...',
+                                    text: error,
+                                    backgroundColor: Colors.black,
+                                    titleColor: Colors.white,
+                                    textColor: Colors.white,
+                                  );
                                 });
                               } else {
                                 setState(() {
@@ -1237,23 +1247,24 @@ class _SignUpState extends State<SignUp> {
                                     String resultdata =
                                         "Account succesfully registered! Click okay to continue.";
                                     print(result.uid);
-                                    QuickAlert.show(
-                                      context: context,
-                                      headerBackgroundColor: Colors.green,
-                                      type: QuickAlertType.success,
-                                      text: resultdata,
-                                      confirmBtnText: 'Okay',
-                                      onConfirmBtnTap: () {
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => TutorInfo(
-                                                    uid: result.uid,
-                                                    email: result.email,
-                                                  )),
-                                        );
-                                      },
-                                    );
+                                    setState(() {
+                                      QuickAlert.show(
+                                        context: context,
+                                        type: QuickAlertType.success,
+                                        text: resultdata,
+                                        autoCloseDuration:
+                                            const Duration(seconds: 1),
+                                        showConfirmBtn: false,
+                                      ).then((value) =>
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => TutorInfo(
+                                                      uid: result.uid,
+                                                      email: result.email,
+                                                    )),
+                                          ));
+                                    });
                                   }
                                 });
                               }

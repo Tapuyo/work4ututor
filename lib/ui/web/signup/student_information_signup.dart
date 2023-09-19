@@ -223,7 +223,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
   void initState() {
     super.initState();
     // Get a list of all time zones.
-    _initData();
+    // _initData();
     _timeZones = tz.timeZoneDatabase.locations;
   }
 
@@ -1305,7 +1305,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                             type: QuickAlertType.success,
                                             text: 'Sign up succesfully!',
                                             autoCloseDuration:
-                                                const Duration(seconds: 3),
+                                                const Duration(seconds: 1),
                                             showConfirmBtn: false,
                                           ).then((value) =>
                                               Navigator.pushReplacement(
@@ -1368,7 +1368,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                             type: QuickAlertType.success,
                                             text: 'Sign up succesfully!',
                                             autoCloseDuration:
-                                                const Duration(seconds: 3),
+                                                const Duration(seconds: 1),
                                             showConfirmBtn: false,
                                           ).then((value) =>
                                               Navigator.pushReplacement(
