@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +19,6 @@ import 'constant/constant.dart';
 import 'data_class/helpclass.dart';
 import 'data_class/subject_class.dart';
 import 'data_class/tutor_info_class.dart';
-import 'data_class/user_class.dart';
 import 'package:timezone/browser.dart' as tz;
 
 import 'provider/chatmessagedisplay.dart';

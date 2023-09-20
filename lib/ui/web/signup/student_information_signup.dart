@@ -4,11 +4,10 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:country_pickers/country.dart';
-import 'package:csc_picker/csc_picker.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:country_pickers/country_pickers.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
@@ -23,7 +22,6 @@ import '../../../components/nav_bar.dart';
 import '../../../data_class/studentinfoclass.dart';
 import '../../../services/getstudentinfo.dart';
 import '../../../shared_components/alphacode3.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:timezone/browser.dart' as tz;
 import 'dart:html' as html;
 
@@ -43,7 +41,6 @@ class StudentInfo extends StatefulWidget {
 class _StudentInfoState extends State<StudentInfo> {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return MultiProvider(
       providers: [
         StreamProvider<List<StudentInfoClass>>.value(
@@ -74,6 +71,12 @@ class StudentInfoBody extends StatefulWidget {
 }
 
 class _StudentInfoBodyState extends State<StudentInfoBody> {
+  void main() {
+    super.initState();
+    _initData();
+    tz.initializeTimeZone();
+  }
+
   Map<String, Location> _timeZones = {};
   String _selectedTimeZone = 'UTC';
   var dtf = js.context['Intl'].callMethod('DateTimeFormat');
@@ -222,8 +225,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
   @override
   void initState() {
     super.initState();
-    // Get a list of all time zones.
-    // _initData();
+    _initData();
     _timeZones = tz.timeZoneDatabase.locations;
   }
 
@@ -234,20 +236,6 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
     } catch (e) {
       print('Could not get the local timezone');
     }
-    // try {
-    //   _timezone = await FlutterNativeTimezone.getLocalTimezone();
-    // } catch (e) {
-    //   print('Could not get the local timezone');
-    // }
-    // try {
-    //   _availableTimezones = await FlutterNativeTimezone.get();
-    //   _availableTimezones.sort();
-    // } catch (e) {
-    //   print('Could not get available timezones');
-    // }
-    // if (mounted) {
-    //   setState(() {});
-    // }
   }
 
   String getLocalTimeZone() {

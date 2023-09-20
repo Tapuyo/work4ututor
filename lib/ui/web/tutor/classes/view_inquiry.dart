@@ -1,7 +1,6 @@
 // ignore_for_file: sized_box_for_whitespace
 
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../data_class/inquirydetailclass.dart';
@@ -51,12 +50,12 @@ class _ViewInquiryState extends State<ViewInquiry> {
                 const SizedBox(
                   width: 2,
                 ),
-                const CircleAvatar(
+                 const CircleAvatar(
                   backgroundColor: kColorPrimary,
                   backgroundImage: NetworkImage(
                       "<https://randomuser.me/api/portraits/men/5.jpg>"),
                   maxRadius: 20,
-                  child: Icon(FontAwesomeIcons.user),
+                  child: Icon(Icons.person),
                 ),
                 const SizedBox(
                   width: 12,
@@ -127,7 +126,7 @@ class _ViewInquiryState extends State<ViewInquiry> {
                                         backgroundImage: NetworkImage(
                                             "<https://randomuser.me/api/portraits/men/5.jpg>"),
                                         maxRadius: 20,
-                                        child: Icon(FontAwesomeIcons.user),
+                                        child: Icon(Icons.person),
                                       ),
                                     ),
                                   ),
@@ -192,7 +191,7 @@ class _ViewInquiryState extends State<ViewInquiry> {
                                           backgroundImage: NetworkImage(
                                               "<https://randomuser.me/api/portraits/men/5.jpg>"),
                                           maxRadius: 20,
-                                          child: Icon(FontAwesomeIcons.user),
+                                          child: Icon(Icons.person),
                                         ),
                                       ),
                                     ),

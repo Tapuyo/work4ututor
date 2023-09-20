@@ -61,6 +61,7 @@ class _InputInfoState extends State<InputInfo> {
   void main() {
     super.initState();
     _initData();
+    tz.initializeTimeZone();
   }
 
 // timezone
@@ -200,25 +201,13 @@ class _InputInfoState extends State<InputInfo> {
   String _timezone = 'Unknown';
   List<String> _availableTimezones = <String>[];
 
-  // Future<void> _initData() async {
-  //   try {
-  //     _availableTimezones = await FlutterNativeTimezone.getAvailableTimezones();
-  //     _availableTimezones.sort();
-  //     tTimezone = _availableTimezones;
-  //     print(tTimezone.toString());
-  //   } catch (e) {
-  //     print('Could not get available timezones');
-  //   }
-  // }
-
   String tutorIDNumber = 'TTR*********';
   String applicantsID = '';
   final tutorformKey = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
-    // Get a list of all time zones.
-    // _initData();
+    _initData();
     _timeZones = tz.timeZoneDatabase.locations;
   }
 
@@ -229,20 +218,6 @@ class _InputInfoState extends State<InputInfo> {
     } catch (e) {
       print('Could not get the local timezone');
     }
-    // try {
-    //   _timezone = await FlutterNativeTimezone.getLocalTimezone();
-    // } catch (e) {
-    //   print('Could not get the local timezone');
-    // }
-    // try {
-    //   _availableTimezones = await FlutterNativeTimezone.get();
-    //   _availableTimezones.sort();
-    // } catch (e) {
-    //   print('Could not get available timezones');
-    // }
-    // if (mounted) {
-    //   setState(() {});
-    // }
   }
 
   final TextEditingController price2Controller = TextEditingController();

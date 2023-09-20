@@ -52,6 +52,7 @@ class _TermPage extends State<TermPage> {
                     ),
                   ),
                   SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
                     child: Column(
                       children: [
                         SizedBox(
