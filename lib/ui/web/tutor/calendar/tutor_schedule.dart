@@ -175,11 +175,53 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                           ),
                           onPressed: () {
                             showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return const CalendarSetup();
-                              },
-                            );
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  var height =
+                                      MediaQuery.of(context).size.height;
+                                  var width = MediaQuery.of(context).size.width;
+                                  return AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          15.0), // Adjust the radius as needed
+                                    ),
+                                    contentPadding: EdgeInsets.zero,
+                                    content: ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                          15.0), // Same radius as above
+                                      child: Container(
+                                        color: Colors
+                                            .white, // Set the background color of the circular content
+
+                                        child: Stack(
+                                          children: <Widget>[
+                                            SizedBox(
+                                              height: height-300,
+                                              width: 800,
+                                              child: const CalendarSetup(),
+                                            ),
+                                            Positioned(
+                                              top: 10.0,
+                                              right: 10.0,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  Navigator.of(context).pop(
+                                                      false); // Close the dialog
+                                                },
+                                                child: const Icon(
+                                                  Icons.close,
+                                                  color: Colors.red,
+                                                  size: 20,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                });
                           },
                           icon: const Icon(
                             Icons.calendar_month,

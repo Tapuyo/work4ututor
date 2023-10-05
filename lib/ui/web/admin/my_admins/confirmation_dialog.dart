@@ -1,16 +1,15 @@
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
-import 'package:quickalert/quickalert.dart';
 
 showConfirmationDialog(
     BuildContext context, String actiontype, String adminID) {
   final successAlert = buildButton(
     onTap: () {
-      QuickAlert.show(
+      CoolAlert.show(
         context: context,
-        type: QuickAlertType.success,
+        type: CoolAlertType.success,
         text: 'Transaction Completed Successfully!',
         autoCloseDuration: const Duration(seconds: 2),
-        showConfirmBtn: false,
       );
     },
     title: 'Success',
@@ -20,14 +19,12 @@ showConfirmationDialog(
 
   final errorAlert = buildButton(
     onTap: () {
-      QuickAlert.show(
+      CoolAlert.show(
         context: context,
-        type: QuickAlertType.error,
+        type: CoolAlertType.error,
         title: 'Oops...',
         text: 'Sorry, something went wrong',
         backgroundColor: Colors.black,
-        titleColor: Colors.white,
-        textColor: Colors.white,
       );
     },
     title: 'Error',
@@ -38,26 +35,23 @@ showConfirmationDialog(
   Widget cancelButton = TextButton(
     child: const Text("Cancel"),
     onPressed: () {
-      QuickAlert.show(
+      CoolAlert.show(
         context: context,
-        type: QuickAlertType.error,
+        type: CoolAlertType.error,
         title: 'Oops...',
         text: 'Sorry, something went wrong',
         backgroundColor: Colors.black,
-        titleColor: Colors.white,
-        textColor: Colors.white,
       );
     },
   );
   Widget continueButton = TextButton(
     child: const Text("Continue"),
     onPressed: () {
-      QuickAlert.show(
+      CoolAlert.show(
         context: context,
-        type: QuickAlertType.success,
+        type: CoolAlertType.success,
         text: 'Transaction Completed Successfully!',
         autoCloseDuration: const Duration(seconds: 2),
-        showConfirmBtn: false,
       );
     },
   );

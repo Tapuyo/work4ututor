@@ -1,8 +1,8 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:work4ututor/ui/web/signup/student_information_signup.dart';
 import 'package:work4ututor/ui/web/signup/tutor_signup.dart';
 
@@ -566,24 +566,20 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                       result =
                                           "The email address is already in use by another account!\nPlease check your inputs.";
 
-                                      QuickAlert.show(
+                                      CoolAlert.show(
                                         context: context,
-                                        headerBackgroundColor: Colors.red,
-                                        type: QuickAlertType.error,
+                                        type: CoolAlertType.error,
                                         title: 'Oops...',
                                         text: result,
                                         backgroundColor: Colors.black,
-                                        titleColor: Colors.white,
-                                        textColor: Colors.white,
                                       );
                                     } else {
                                       result =
                                           "Account succesfully registered! Click okay to continue.";
                                       print(result.uid);
-                                      QuickAlert.show(
+                                      CoolAlert.show(
                                         context: context,
-                                        headerBackgroundColor: Colors.green,
-                                        type: QuickAlertType.success,
+                                        type: CoolAlertType.success,
                                         text: result,
                                         confirmBtnText: 'Okay',
                                         onConfirmBtnTap: () {
@@ -889,24 +885,20 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                   result =
                                       "The email address is already in use by another account!\nPlease check your inputs.";
 
-                                  QuickAlert.show(
+                                  CoolAlert.show(
                                     context: context,
-                                    headerBackgroundColor: Colors.red,
-                                    type: QuickAlertType.error,
+                                    type: CoolAlertType.error,
                                     title: 'Oops...',
                                     text: result,
                                     backgroundColor: Colors.black,
-                                    titleColor: Colors.white,
-                                    textColor: Colors.white,
                                   );
                                 } else {
                                   result =
                                       "Account succesfully registered! Click okay to continue.";
                                   print(result.uid);
-                                  QuickAlert.show(
+                                  CoolAlert.show(
                                     context: context,
-                                    headerBackgroundColor: Colors.green,
-                                    type: QuickAlertType.success,
+                                    type: CoolAlertType.success,
                                     text: result,
                                     confirmBtnText: 'Okay',
                                     onConfirmBtnTap: () {
@@ -1211,28 +1203,24 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                   result =
                                       "The email address is already in use by another account!\nPlease check your inputs.";
 
-                                  QuickAlert.show(
+                                  CoolAlert.show(
                                     context: context,
-                                    headerBackgroundColor: Colors.red,
-                                    type: QuickAlertType.error,
+                                    type: CoolAlertType.error,
                                     title: 'Oops...',
                                     text: result,
                                     backgroundColor: Colors.black,
-                                    titleColor: Colors.white,
-                                    textColor: Colors.white,
                                   );
                                 } else {
                                   String resultdata =
                                       "Account succesfully registered! Click okay to continue.";
                                   print(result.uid);
                                   setState(() {
-                                    QuickAlert.show(
+                                    CoolAlert.show(
                                       context: context,
-                                      type: QuickAlertType.success,
+                                      type: CoolAlertType.success,
                                       text: resultdata,
                                       autoCloseDuration:
                                           const Duration(seconds: 1),
-                                      showConfirmBtn: false,
                                     ).then((value) => Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(

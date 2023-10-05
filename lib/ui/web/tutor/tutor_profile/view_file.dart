@@ -39,7 +39,7 @@ class _ViewFileState extends State<ViewFile> {
                               image: NetworkImage(
                                 widget.imageURL.toString(),
                               ),
-                              fit: BoxFit.cover)),
+                              fit: BoxFit.fill)),
                     )),
               ),
             ),

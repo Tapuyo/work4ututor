@@ -3,12 +3,12 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:country_pickers/country.dart';
 import 'package:country_pickers/country_pickers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 import '../../../../services/send_email.dart';
@@ -393,25 +393,22 @@ class _NewadminState extends State<Newadmin> {
                               name: 'MJ Amles',
                             );
                             print('Admin data saved successfully');
-                            QuickAlert.show(
+                            CoolAlert.show(
                               context: currentContext,
-                              type: QuickAlertType.success,
+                              type: CoolAlertType.success,
                               text: 'Admin Added Successfully!',
                               autoCloseDuration: const Duration(seconds: 3),
-                              showConfirmBtn: false,
                             ).then((_) {
                               Navigator.of(context).pop();
                             });
                           } catch (error) {
                             print('Error saving admin data: $error');
-                            QuickAlert.show(
+                            CoolAlert.show(
                               context: context,
-                              type: QuickAlertType.error,
+                              type: CoolAlertType.error,
                               title: 'Oops...',
                               text: 'Sorry, something went wrong',
                               backgroundColor: Colors.black,
-                              titleColor: Colors.white,
-                              textColor: Colors.white,
                             );
                           }
                         }

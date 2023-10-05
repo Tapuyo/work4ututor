@@ -23,7 +23,10 @@ import 'package:timezone/standalone.dart' as tz;
 import 'dart:html' as html;
 
 class StudentMainDashboard extends StatefulWidget {
-  const StudentMainDashboard({super.key});
+  final String uid;
+  final String email;
+  const StudentMainDashboard(
+      {super.key, required this.uid, required this.email});
 
   @override
   State<StudentMainDashboard> createState() => _StudentMainDashboardState();
@@ -61,11 +64,11 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
   void initState() {
     prepareData();
     super.initState();
-    updateDateTime();
+    // updateDateTime();
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      updateDateTime();
+      // updateDateTime();
+      printtime();
     });
-    printtime();
   }
 
   @override
@@ -157,60 +160,65 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
         });
   }
 
-  void updateDateTime() {
-    var now = DateTime.now();
-    var formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
-    String formattedDate = formatter.format(now);
-    setState(() {
-      currentDateTime = formattedDate;
-    });
-  }
+  // void updateDateTime() {
+  //   var now = DateTime.now();
+  //   var formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
+  //   String formattedDate = formatter.format(now);
+  //   setState(() {
+  //     currentDateTime = formattedDate;
+  //   });
+  // }
 
-  String convertToLocalTime(DateTime dateTime) {
-    try {
-      // Get the user's current time zone
-      final String currentTimeZone = DateTime.now().timeZoneOffset.toString();
+  // String convertToLocalTime(DateTime dateTime) {
+  //   try {
+  //     // Get the user's current time zone
+  //     final String currentTimeZone = DateTime.now().timeZoneOffset.toString();
 
-      // Create a new DateTime object with the provided DateTime and the user's time zone offset
-      final convertedDateTime =
-          dateTime.add(Duration(hours: int.parse(currentTimeZone)));
+  //     // Create a new DateTime object with the provided DateTime and the user's time zone offset
+  //     final convertedDateTime =
+  //         dateTime.add(Duration(hours: int.parse(currentTimeZone)));
 
-      // Format the converted DateTime object to the desired format
-      final formatter = DateFormat.yMMMMd('en_US').add_jm();
-      return formatter.format(convertedDateTime);
-    } catch (e) {
-      print('Error converting to local time: $e');
-      return ''; // Return an empty string or handle the error in a different way
-    }
-  }
+  //     // Format the converted DateTime object to the desired format
+  //     final formatter = DateFormat('MMMM, dd YYYY / HH:mm:ss').add_jm();
+  //     return formatter.format(convertedDateTime);
+  //   } catch (e) {
+  //     print('Error converting to local time: $e');
+  //     return ''; // Return an empty string or handle the error in a different way
+  //   }
+  // }
 
 //converting timezone
   Future<void> printtime() async {
-    List<String> getTimeZones() {
-      tz.initializeTimeZones();
-      final timeZones = tz.timeZoneDatabase.locations.keys.toList();
-      return timeZones;
-    }
+    // List<String> getTimeZones() {
+    //    final timeZones = tz.timeZoneDatabase.locations.keys.toList();
+    //     return timeZones;
+    //   }
 
-    print(getTimeZones());
+    //   print(getTimeZones());
 
     DateTime originalDateTime = DateTime.now();
-    tz.Location timeZone = tz.getLocation('Asia/Dubai');
-    tz.TZDateTime convertedDateTime =
-        tz.TZDateTime.from(originalDateTime, timeZone);
-    print(convertedDateTime);
+    //   tz.Location timeZone = tz.getLocation('Asia/Dubai');
+    //   tz.TZDateTime convertedDateTime =
+    //       tz.TZDateTime.from(originalDateTime, timeZone);
+    //   print(convertedDateTime);
 
-    final tz.TZDateTime dubaiDateTime =
-        tz.TZDateTime.from(DateTime.now(), timeZone);
-    print('Dubai Time: $dubaiDateTime');
+    //   final tz.TZDateTime dubaiDateTime =
+    //       tz.TZDateTime.from(DateTime.now(), timeZone);
+    //   print('Dubai Time: $dubaiDateTime');
+    //  tz.initializeTimeZones();
 
     String localTimezone = await FlutterNativeTimezone.getLocalTimezone();
     tz.Location mylocaltimezone = tz.getLocation(localTimezone);
-    print(mylocaltimezone);
+    // print(mylocaltimezone);
 
     tz.TZDateTime convertedLocalDateTime =
         tz.TZDateTime.from(originalDateTime, mylocaltimezone);
-    print('Local Time: $convertedLocalDateTime');
+    var formatter = DateFormat('MMMM dd, yyyy / HH:mm:ss');
+    String formattedDate = formatter.format(convertedLocalDateTime);
+    setState(() {
+      currentDateTime = formattedDate;
+    });
+    // print('Local Time: $currentDateTime');
   }
 
 //printsubcollection
@@ -246,6 +254,8 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
       setState(() {
         enrolledclasses = stuanalyticsdata.length.toString();
       });
+    } else {
+      enrolledclasses = '0';
     }
     if (studentinfodata.isNotEmpty) {
       setState(() {
@@ -271,10 +281,10 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
       totalcompletedclasses = completedclasses.length.toString();
     } else {
       totalcompletedclasses = '0';
-    }   
+    }
     Size size = MediaQuery.of(context).size;
     return StreamProvider<List<Voucherclass>>.value(
-        value: GetVouchers(uid: 'UHvVwHVxYZARastsdiA0').voucherlist,
+        value: GetVouchers(uid: widget.uid).voucherlist,
         initialData: [],
         child: Container(
           width: size.width - 300,
@@ -309,7 +319,7 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                         'Local Date and Time: $currentDateTime',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 15,
                           fontWeight: FontWeight.normal,
                         ),
                       ),
@@ -343,8 +353,7 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                                 width: 500,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       'Hi $fullName,',
@@ -365,8 +374,7 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                                       height: 50,
                                       child: ElevatedButton(
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              Colors.orangeAccent,
+                                          backgroundColor: Colors.orangeAccent,
                                           shape: const RoundedRectangleBorder(
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(25))),
@@ -379,8 +387,7 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                                         },
                                         child: const Text(
                                           'Book Now',
-                                          style:
-                                              TextStyle(color: Colors.white),
+                                          style: TextStyle(color: Colors.white),
                                         ),
                                       ),
                                     ),

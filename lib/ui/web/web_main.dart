@@ -29,7 +29,6 @@ class _MainPageState extends State<WebMainPage> {
     }).toList();
     setState(() {
       _items = data.toList();
-      debugPrint(_items.length.toString());
     });
   }
 
@@ -49,12 +48,18 @@ class _MainPageState extends State<WebMainPage> {
       debugPrint(index.toString());
       if (_items[0]['role'].toString() == 'student' &&
           _items[0]['userStatus'].toString() == 'unfinished') {
-        return StudentInfo(uid: _items[0]['userID'].toString(), email: _items[0]['email'].toString(),);
+        return StudentInfo(
+          uid: _items[0]['userID'].toString(),
+          email: _items[0]['email'].toString(),
+        );
         // return const VideoCall(chatID: '', uID: '',);
         // return const AdminLoginPage();
       } else if (_items[0]['role'].toString() == 'student' &&
           _items[0]['userStatus'].toString() == 'completed') {
-        return StudentDashboardPage(uID: _items[0]['userID'].toString());
+        return StudentDashboardPage(
+          uID: _items[0]['userID'].toString(),
+          email: _items[0]['email'].toString(),
+        );
         // return const VideoCall(chatID: '', uID: '',);
         // return const AdminLoginPage();
       } else if (_items[0]['role'].toString() == 'tutor' &&
@@ -62,7 +67,10 @@ class _MainPageState extends State<WebMainPage> {
         return DashboardPage(uID: _items[0]['userID'].toString());
       } else if (_items[0]['role'].toString() == 'tutor' &&
           _items[0]['userStatus'].toString() == 'unfinished') {
-        return TutorInfo(uid: _items[0]['userID'].toString(), email: _items[0]['email'].toString(),);
+        return TutorInfo(
+          uid: _items[0]['userID'].toString(),
+          email: _items[0]['email'].toString(),
+        );
       } else {
         return const LoginPage();
       }

@@ -1,9 +1,11 @@
 // ignore_for_file: avoid_print
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
+import 'package:work4ututor/shared_components/alphacode3.dart';
 import 'package:work4ututor/ui/web/login/login.dart';
 import 'package:work4ututor/ui/web/signup/student_signup.dart';
 import 'package:work4ututor/ui/web/signup/tutor_signup.dart';
@@ -147,6 +149,26 @@ class CustomAppBar extends StatelessWidget {
   }
 }
 
+Future<void> saveCountryNamesToFirestore(List<String> countryNames) async {
+  try {
+    // Get a reference to the Firestore collection
+    CollectionReference countriesCollection =
+        FirebaseFirestore.instance.collection('countries');
+
+    // Clear existing data in the collection (optional)
+    await countriesCollection.doc('country_names').delete();
+
+    // Save the list of country names to Firestore
+    await countriesCollection.doc('country_names').set({
+      'names': countryNames,
+    });
+
+    print('Country names saved to Firestore successfully!');
+  } catch (e) {
+    print('Error saving country names to Firestore: $e');
+  }
+}
+
 class CustomAppBarLog extends StatelessWidget {
   const CustomAppBarLog({Key? key}) : super(key: key);
   @override
@@ -162,13 +184,15 @@ class CustomAppBarLog extends StatelessWidget {
           const SizedBox(
             width: 200,
           ),
-          SizedBox(
-            height: 180,
-            width: 250,
-            child: Image.asset(
-              "assets/images/worklogo.png",
-              alignment: Alignment.topCenter,
-              fit: BoxFit.cover,
+          InkWell(
+            child: SizedBox(
+              height: 180,
+              width: 250,
+              child: Image.asset(
+                "assets/images/worklogo.png",
+                alignment: Alignment.topCenter,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           const Spacer(),
@@ -183,7 +207,19 @@ class CustomAppBarLog extends StatelessWidget {
                 iconSize: 30,
                 color: const Color.fromARGB(255, 9, 93, 116),
                 tooltip: 'Log Out',
-                onPressed: () {},
+                onPressed: () async {
+                  List<String> countryNames = getCountries();
+
+                  // Call the function to save the country names to Firestore
+                  saveCountryNamesToFirestore(countryNames);
+                  // const url =
+                  //     'https://www.facebook.com'; // Replace with the URL you want to navigate to
+                  // if (await canLaunchUrl(Uri.parse(url))) {
+                  //   await launchUrl(Uri.parse(url));
+                  // } else {
+                  //   throw 'Could not launch $url';
+                  // }
+                },
               ),
             ),
           ),

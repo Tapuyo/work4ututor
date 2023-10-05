@@ -1,8 +1,11 @@
 // ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:country_pickers/country.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +17,6 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:language_picker/language_picker.dart';
 import 'package:language_picker/languages.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:timezone/timezone.dart';
 import 'dart:js' as js;
 
@@ -22,7 +24,7 @@ import '../../../components/nav_bar.dart';
 import '../../../data_class/studentinfoclass.dart';
 import '../../../services/getstudentinfo.dart';
 import '../../../shared_components/alphacode3.dart';
-import 'package:timezone/browser.dart' as tz;
+import 'package:http/http.dart' as http;
 import 'dart:html' as html;
 
 import '../../auth/auth.dart';
@@ -71,11 +73,11 @@ class StudentInfoBody extends StatefulWidget {
 }
 
 class _StudentInfoBodyState extends State<StudentInfoBody> {
-  void main() {
-    super.initState();
-    _initData();
-    tz.initializeTimeZone();
-  }
+  // void main() {
+  //   super.initState();
+  //   _initData();
+  //   tz.initializeTimeZone();
+  // }
 
   Map<String, Location> _timeZones = {};
   String _selectedTimeZone = 'UTC';
@@ -222,11 +224,13 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
   String stateValue = "";
   String cityValue = "";
   String address = "";
+  List<String> timezonesList = [];
   @override
   void initState() {
     super.initState();
     _initData();
-    _timeZones = tz.timeZoneDatabase.locations;
+    getTimezones();
+    // _timeZones = tz.timeZoneDatabase.locations;
   }
 
   Future<void> _initData() async {
@@ -234,7 +238,34 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
       _selectedTimeZone = await FlutterNativeTimezone
           .getLocalTimezone(); // Set local timezone here
     } catch (e) {
-      print('Could not get the local timezone');
+      print(e.toString());
+    }
+  }
+
+  Future<void> getTimezones() async {
+    final response =
+        await http.get(Uri.parse('http://worldtimeapi.org/api/timezone'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> timezones = json.decode(response.body);
+      if (timezones.isNotEmpty) {
+        // Initialize Firestore
+        final firestore = FirebaseFirestore.instance;
+
+        // Add the timezonesList to the "timezones" collection
+        // await firestore.collection('timezones').doc('timezone_document').set({
+        //   'timezonesList': timezones,
+        // });
+        setState(() {
+          timezonesList = List<String>.from(timezones);
+        });
+      } else {
+        //to do
+        // final studentinfodata = Provider.of<List<StudentInfoClass>>(context);
+        throw Exception('No timezones found');
+      }
+    } else {
+      throw Exception('Failed to load timezones: ${response.statusCode}');
     }
   }
 
@@ -716,11 +747,10 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                       _selectedTimeZone = newValue!;
                                     });
                                   },
-                                  items: _timeZones.keys
-                                      .map((String timeZoneName) {
+                                  items: timezonesList.map((timezone) {
                                     return DropdownMenuItem<String>(
-                                      value: timeZoneName,
-                                      child: Text(timeZoneName),
+                                      value: timezone,
+                                      child: Text(timezone),
                                     );
                                   }).toList(),
                                   isExpanded: true,
@@ -1288,13 +1318,12 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                             await _auth.signOutAnon();
                                         deleteAllData();
                                         setState(() {
-                                          QuickAlert.show(
+                                          CoolAlert.show(
                                             context: context,
-                                            type: QuickAlertType.success,
+                                            type: CoolAlertType.success,
                                             text: 'Sign up succesfully!',
                                             autoCloseDuration:
                                                 const Duration(seconds: 1),
-                                            showConfirmBtn: false,
                                           ).then((value) =>
                                               Navigator.pushReplacement(
                                                 context,
@@ -1351,13 +1380,12 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                             await _auth.signOutAnon();
                                         deleteAllData();
                                         setState(() {
-                                          QuickAlert.show(
+                                          CoolAlert.show(
                                             context: context,
-                                            type: QuickAlertType.success,
+                                            type: CoolAlertType.success,
                                             text: 'Sign up succesfully!',
                                             autoCloseDuration:
                                                 const Duration(seconds: 1),
-                                            showConfirmBtn: false,
                                           ).then((value) =>
                                               Navigator.pushReplacement(
                                                 context,

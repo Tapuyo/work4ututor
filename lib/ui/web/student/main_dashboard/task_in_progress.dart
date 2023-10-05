@@ -16,9 +16,10 @@ class VoucherData extends StatefulWidget {
   @override
   State<VoucherData> createState() => _VoucherDataState();
 }
+
 Stream<List<Voucherclass>> get voucherlist {
   return FirebaseFirestore.instance
-        .collection('vouchers')
+      .collection('vouchers')
       .doc('XuQyf7S8gCOJBu6gTIb0')
       .collection('myvouchers')
       .snapshots()
@@ -36,6 +37,7 @@ List<Voucherclass> _getVouchers(QuerySnapshot snapshot) {
     );
   }).toList();
 }
+
 class _VoucherDataState extends State<VoucherData> {
   @override
   Widget build(BuildContext context) {
@@ -46,7 +48,6 @@ class _VoucherDataState extends State<VoucherData> {
         child: SizedBox(
             height: 250,
             child: ListView.builder(
-              
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
@@ -68,7 +69,8 @@ class _VoucherDataState extends State<VoucherData> {
       return const Center(
         child: Text(
           'No available voucher.',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
+          style: TextStyle(
+              fontSize: 25, fontWeight: FontWeight.w600, color: Colors.red),
         ),
       );
     }

@@ -2,7 +2,7 @@
     "name": "wokr4ututor",
     "short_name": "wokr4ututor",
     "start_url": ".",
-    "display": "standalone",
+    "display": "browser",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
     "description": "A new Flutter project.",

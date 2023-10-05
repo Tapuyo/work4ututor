@@ -189,11 +189,12 @@ Future<void> updateUserStatus(
     await FirebaseFirestore.instance.collection('user').doc(uid).set({
       "status": status,
     }, SetOptions(merge: true));
-    html.window.alert('Upload Successful');
+    print('Status updated');
   } catch (error) {
-    html.window.alert('Upload Failed: $error');
+    print('Upload Failed: $error');
   }
 }
+
 Future<void> updateProfile(
   String uid,
   String profileurl,
@@ -207,6 +208,7 @@ Future<void> updateProfile(
     html.window.alert('Upload Failed: $error');
   }
 }
+
 Future<void> updateTutorProfile(
   String uid,
   String profileurl,
@@ -220,17 +222,48 @@ Future<void> updateTutorProfile(
     html.window.alert('Upload Failed: $error');
   }
 }
-Future<String?> uploadTutorProfile(String uid) async {
-  FilePickerResult? result = await FilePicker.platform.pickFiles();
 
-  if (result != null) {
-    Uint8List? file = result.files.first.bytes;
-    String filename = result.files.first.name;
+Future<String?> uploadTutorProfile(
+    String uid, Uint8List selectedImage, String filename) async {
+  if (selectedImage == null) {
+    print("No image selected.");
+    return "";
+  }
+
+  Reference storageReference =
+      FirebaseStorage.instance.ref().child("$uid/$filename");
+
+  UploadTask uploadTask = storageReference.putData(selectedImage);
+
+  Completer<String?> completer = Completer<String?>(); // Create a Completer
+
+  await uploadTask.whenComplete(() async {
+    if (uploadTask.snapshot.state == TaskState.success) {
+      // File uploaded successfully, get the download URL
+      String downloadURL = await storageReference.getDownloadURL();
+      completer.complete(downloadURL); // Set the Completer's value
+    } else {
+      // Handle the upload failure
+      print("Upload failed");
+      completer.complete(null); // Set the Completer's value
+    }
+  });
+
+  return completer.future; // Return the Future from the Completer
+}
+
+Future<List<String?>> uploadTutorProfileList(String uid, String type,
+    List<Uint8List?> selectedImages, List<String> filenames) async {
+  List<String?> downloadURLs = [];
+
+  for (int i = 0; i < selectedImages.length; i++) {
+    Uint8List selectedImage = selectedImages[i]!;
+    String filename = filenames[i];
 
     Reference storageReference =
-        FirebaseStorage.instance.ref().child("$uid/$filename");
+        FirebaseStorage.instance.ref().child("$uid/$type/$filename");
 
-    UploadTask uploadTask = storageReference.putData(file!);
+    UploadTask uploadTask = storageReference.putData(selectedImage);
 
     Completer<String?> completer = Completer<String?>(); // Create a Completer
 
@@ -241,42 +274,139 @@ Future<String?> uploadTutorProfile(String uid) async {
         completer.complete(downloadURL); // Set the Completer's value
       } else {
         // Handle the upload failure
-        print("Upload failed");
+        print("Upload failed for file: $filename");
         completer.complete(null); // Set the Completer's value
       }
     });
 
-    return completer.future; // Return the Future from the Completer
-  } else {
-    // Handle the case where the user canceled file selection
-    print("Error");
-    return null;
+    downloadURLs.add(await completer.future);
   }
+
+  return downloadURLs; // Return a list of download URLs
+}
+
+Future<List<String?>> uploadTutorcertificateList(String uid, String type,
+    List<Uint8List?> selectedImages, List<String> filenames) async {
+  List<String?> downloadURLs = [];
+
+  for (int i = 0; i < selectedImages.length; i++) {
+    Uint8List selectedImage = selectedImages[i]!;
+    String filename = filenames[i];
+
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child("$uid/$type/$filename");
+
+    UploadTask uploadTask = storageReference.putData(selectedImage);
+
+    Completer<String?> completer = Completer<String?>(); // Create a Completer
+
+    await uploadTask.whenComplete(() async {
+      if (uploadTask.snapshot.state == TaskState.success) {
+        // File uploaded successfully, get the download URL
+        String downloadURL = await storageReference.getDownloadURL();
+        completer.complete(downloadURL); // Set the Completer's value
+      } else {
+        // Handle the upload failure
+        print("Upload failed for file: $filename");
+        completer.complete(null); // Set the Completer's value
+      }
+    });
+
+    downloadURLs.add(await completer.future);
+  }
+
+  return downloadURLs; // Return a list of download URLs
+}
+
+Future<List<String?>> uploadTutorresumeList(String uid, String type,
+    List<Uint8List?> selectedImages, List<String> filenames) async {
+  List<String?> downloadURLs = [];
+
+  for (int i = 0; i < selectedImages.length; i++) {
+    Uint8List selectedImage = selectedImages[i]!;
+    String filename = filenames[i];
+
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child("$uid/$type/$filename");
+
+    UploadTask uploadTask = storageReference.putData(selectedImage);
+
+    Completer<String?> completer = Completer<String?>(); // Create a Completer
+
+    await uploadTask.whenComplete(() async {
+      if (uploadTask.snapshot.state == TaskState.success) {
+        // File uploaded successfully, get the download URL
+        String downloadURL = await storageReference.getDownloadURL();
+        completer.complete(downloadURL); // Set the Completer's value
+      } else {
+        // Handle the upload failure
+        print("Upload failed for file: $filename");
+        completer.complete(null); // Set the Completer's value
+      }
+    });
+
+    downloadURLs.add(await completer.future);
+  }
+
+  return downloadURLs; // Return a list of download URLs
+}
+
+Future<List<String?>> uploadTutorvideoList(String uid, String type,
+    List<Uint8List?> selectedImages, List<String> filenames) async {
+  List<String?> downloadURLs = [];
+
+  for (int i = 0; i < selectedImages.length; i++) {
+    Uint8List selectedImage = selectedImages[i]!;
+    String filename = filenames[i];
+
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child("$uid/$type/$filename");
+
+    UploadTask uploadTask = storageReference.putData(selectedImage);
+
+    Completer<String?> completer = Completer<String?>(); // Create a Completer
+
+    await uploadTask.whenComplete(() async {
+      if (uploadTask.snapshot.state == TaskState.success) {
+        // File uploaded successfully, get the download URL
+        String downloadURL = await storageReference.getDownloadURL();
+        completer.complete(downloadURL); // Set the Completer's value
+      } else {
+        // Handle the upload failure
+        print("Upload failed for file: $filename");
+        completer.complete(null); // Set the Completer's value
+      }
+    });
+
+    downloadURLs.add(await completer.future);
+  }
+
+  return downloadURLs; // Return a list of download URLs
 }
 
 Future<void> updateStudentInfowGuardian(
-    String uid,
-    String address,
-    String country,
-    String name,
-    String middlename,
-    String lastname,
-    List<dynamic> language,
-    String studentid,
-    String userid,
-    String contact,
-    String profileurl,
-    DateTime dateregistered,
-    String age,
-    String dateofbirth,
-    String timezone,
-    String guardiansfullname,
-    String guardianscontact,
-    String guardiansemail,
-    String guardiansbday,
-    String guardiansge, // Provide updated course data
-    String status,
-    ) async {
+  String uid,
+  String address,
+  String country,
+  String name,
+  String middlename,
+  String lastname,
+  List<dynamic> language,
+  String studentid,
+  String userid,
+  String contact,
+  String profileurl,
+  DateTime dateregistered,
+  String age,
+  String dateofbirth,
+  String timezone,
+  String guardiansfullname,
+  String guardianscontact,
+  String guardiansemail,
+  String guardiansbday,
+  String guardiansge, // Provide updated course data
+  String status,
+) async {
   try {
     // Update the main student document
     await FirebaseFirestore.instance.collection('students').doc(uid).set({
@@ -313,9 +443,9 @@ Future<void> updateStudentInfowGuardian(
         "guardiansemail": guardiansemail,
         "guardiansbirthday": guardiansbday,
         "guardiansge": guardiansge,
-      },SetOptions(merge: true));
+      }, SetOptions(merge: true));
 
-      updateUserStatus(uid, status);
+      await updateUserStatus(uid, status);
     } else {
       html.window.alert('No guardian found in the subcollection');
     }
@@ -324,80 +454,100 @@ Future<void> updateStudentInfowGuardian(
   }
 }
 
-
 // }
- Future<void> updateTutorInformation(
-    String uid,
-    String address,
-    String country,
-    String name,
-    String middlename,
-    String lastname,
-    List<dynamic> language,
-    String tutorIDNumber,
-    String userid,
-    String contact,
-    DateTime dateregistered,
-    String age,
-    String dateofbirth,
-    String timezone,
-    String applicationID,
-    List<SubjectTeach> mycourses,
-    String status,
-    String promotionalMessage,
-  ) async {
-    try {
-      // Update the main student document
-      await FirebaseFirestore.instance.collection('tutor').doc(uid).set({
-        "language": language,
-        "timezone": timezone,
-        "certificates": [],
-        "country": country,
-        "dateSign": dateregistered,
-        "birthdate": dateofbirth,
-        "age": age,
-        "extensionName": "",
-        "firstName": name,
-        // "imageID": profileurl,
-        "lastName": lastname,
-        "middleName": middlename,
-        "applicationID": applicationID,
-        // "presentation": presentationlink,
-        "promotionalMessage": promotionalMessage,
-        // "resume": resumelink,
-        "tutorID": tutorIDNumber,
-        "userID": userid,
-        "withdrawal": "",
-      }, SetOptions(merge: true));
+Future<String?> updateTutorInformation(
+  String uid,
+  String address,
+  String country,
+  String birthCountry,
+  String birthCity,
+  String city,
+  String name,
+  String middlename,
+  String lastname,
+  List<dynamic> language,
+  String tutorIDNumber,
+  String userid,
+  String contact,
+  DateTime dateregistered,
+  String age,
+  String dateofbirth,
+  String timezone,
+  String applicationID,
+  List<SubjectTeach> mycourses,
+  String status,
+  String promotionalMessage,
+  String profileurl,
+  List<String?> certificates,
+  List<String?> certificatestype,
+  List<String?> resumelink,
+  List<String?> resumelinktype,
+  List<String?> presentationlink,
+  List<String?> validIDs,
+  List<String?> validIDstypes,
+  List<String?> servicesprovided,
+) async {
+  try {
+    // Update the main student document
+    await FirebaseFirestore.instance.collection('tutor').doc(uid).set({
+      "age": age,
+      "applicationID": applicationID,
+      "birthPlace": birthCountry,
+      "birthCity": birthCity,
+      "birthdate": dateofbirth,
+      "certificates": certificates,
+      "certificatestype": certificatestype,
+      "country": country,
+      "city": city,
+      "contact": contact,
+      "dateSign": dateregistered,
+      "extensionName": "",
+      "language": language,
+      "timezone": timezone,
+      "firstName": name,
+      "lastName": lastname,
+      "middleName": middlename,
+      "promotionalMessage": promotionalMessage,
+      "tutorID": tutorIDNumber,
+      "userID": userid,
+      "imageID": profileurl,
+      "resume": resumelink,
+      "resumetype": resumelinktype,
+      "presentation": presentationlink,
+      "validIDs": validIDs,
+      "validIDstype": validIDstypes,
+      "servicesprovided": servicesprovided,
+      "withdrawal": "",
+    }, SetOptions(merge: true));
 
-      // Get a reference to the "mycourses" subcollection
-      final coursesCollectionRef = FirebaseFirestore.instance
-          .collection('tutor')
-          .doc(uid)
-          .collection('mycourses');
+    // Get a reference to the "mycourses" subcollection
+    final coursesCollectionRef = FirebaseFirestore.instance
+        .collection('tutor')
+        .doc(uid)
+        .collection('mycourses');
 
-      // Clear the existing documents in the subcollection
-      await coursesCollectionRef.get().then((querySnapshot) {
-        querySnapshot.docs.forEach((doc) {
-          doc.reference.delete();
-        });
+    // Clear the existing documents in the subcollection
+    await coursesCollectionRef.get().then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        doc.reference.delete();
       });
+    });
 
-      // Add all the new SubjectTeach objects to the subcollection
-      for (int i = 0; i < mycourses.length; i++) {
-        await coursesCollectionRef.add({
-          "subjectname": mycourses[i].subjectname,
-          "price2": mycourses[i].price2,
-          "price3": mycourses[i].price3,
-          "price5": mycourses[i].price5,
-        });
-      }
-      updateUserStatus(uid, status);
-    } catch (error) {
-      html.window.alert('Update Failed: $error');
+    // Add all the new SubjectTeach objects to the subcollection
+    for (int i = 0; i < mycourses.length; i++) {
+      await coursesCollectionRef.add({
+        "subjectname": mycourses[i].subjectname,
+        "price2": mycourses[i].price2,
+        "price3": mycourses[i].price3,
+        "price5": mycourses[i].price5,
+      });
     }
+    await updateUserStatus(uid, status);
+    return 'success';
+  } catch (error) {
+    return error.toString();
   }
-
+}
 
 Future<void> updateImage(String uID, String path) async {
   // Select a new image from the device's file picker
@@ -474,6 +624,7 @@ Future<void> updateGuardianInfo(
     html.window.alert('Update Failed: $error');
   }
 }
+
 Future<void> updatetutorprofile(
   String uid,
   String path,

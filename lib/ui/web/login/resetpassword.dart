@@ -1,9 +1,9 @@
 // ignore_for_file: prefer_const_constructors, avoid_print, unnecessary_null_comparison, use_build_context_synchronously
 
+import 'package:cool_alert/cool_alert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:work4ututor/shared_components/responsive_builder.dart';
 import 'package:work4ututor/ui/auth/auth.dart';
 import 'package:work4ututor/ui/web/login/login.dart';
@@ -40,7 +40,7 @@ class _ResetPageState extends State<ResetPage> {
         drawer: ResponsiveBuilder.isDesktop(context)
             ? null
             : Drawer(
-                 child: Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     Container(
@@ -52,7 +52,7 @@ class _ResetPageState extends State<ResetPage> {
                         fit: BoxFit.cover,
                       ),
                     ),
-                   const SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Container(
@@ -166,7 +166,7 @@ class _ResetPageState extends State<ResetPage> {
               ),
         // bottomNavigationBar:
         //     (ResponsiveBuilder.isDesktop(context) || kIsWeb) ? null : null,
-        
+
         body: SafeArea(
           child: Center(
             child: Column(
@@ -883,12 +883,11 @@ class _ResetViewState extends State<ResetView> {
       await FirebaseAuth.instance
           .sendPasswordResetEmail(email: emailcontroller.text.trim());
       print('Password Reset email Sent');
-      QuickAlert.show(
+      CoolAlert.show(
         context: context,
-        type: QuickAlertType.success,
+        type: CoolAlertType.success,
         text: 'Link sent Successfully!',
         autoCloseDuration: const Duration(seconds: 3),
-        showConfirmBtn: false,
       ).then((value) => Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -896,15 +895,12 @@ class _ResetViewState extends State<ResetView> {
       // Navigator.of(context).popUntil((route) => route.isFirst);
     } on FirebaseAuthException catch (e) {
       print(e);
-      QuickAlert.show(
+      CoolAlert.show(
         context: context,
-        headerBackgroundColor: Colors.redAccent,
-        type: QuickAlertType.error,
+        type: CoolAlertType.error,
         title: 'Oops...',
         text: e.message,
         backgroundColor: Colors.black,
-        titleColor: Colors.white,
-        textColor: Colors.white,
       );
     }
   }

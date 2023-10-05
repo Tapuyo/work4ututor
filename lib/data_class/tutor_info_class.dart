@@ -1,24 +1,50 @@
 class TutorInformation {
-  List<String> language;
+  final String age;
+  final String applicationID;
+  final String birthCity;
+  final String birthdate;
   final String birthPlace;
-  List<String> certificates;
+  List<dynamic> certificates;
+  List<dynamic> certificatestype;
+  final String city;
   final String country;
+  List<dynamic> language;
   final DateTime dateSign;
+  final String emailadd;
   final String extensionName;
   final String firstName;
   final String imageID;
   final String lastname;
   final String middleName;
-  final String presentation;
+  List<dynamic> presentation;
   final String promotionalMessage;
-  final String resume;
+  List<dynamic> resume;
+  List<dynamic> resumelinktype;
+  List<dynamic> servicesprovided;
+  List<dynamic> validIds;
+  List<dynamic> validIDstype;
+  final String timezone;
   final String status;
   final String tutorID;
   final String userId;
   final String withdrawal;
+  final String contact;
 
   TutorInformation({
+    required this.certificatestype,
+    required this.resumelinktype,
+    required this.validIDstype,
+    required this.contact,
+    required this.age,
+    required this.applicationID,
+    required this.birthCity,
+    required this.birthdate,
+    required this.city,
+    required this.emailadd,
+    required this.timezone,
     required this.language,
+    required this.validIds,
+    required this.servicesprovided,
     required this.birthPlace,
     required this.certificates,
     required this.country,

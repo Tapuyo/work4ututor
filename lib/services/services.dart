@@ -8,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:universal_html/html.dart' as html;
 import '../data_class/studentsEnrolledclass.dart';
+import '../data_class/subject_teach_pricing.dart';
 import '../data_class/tutor_info_class.dart';
 
 Future<String?> uploadData(String uid) async {
@@ -94,6 +95,23 @@ class DatabaseService {
         presentation: tutordata['presentation'] ?? '',
         tutorID: tutordata['tutorID'] ?? '',
         userId: tutordata['userID'] ?? '',
+        age: tutordata['age'] ?? '',
+        applicationID: tutordata['applicationID'] ?? '',
+        birthCity: tutordata['birthCity'] ?? '',
+        birthdate: tutordata['birthdate'] ?? '',
+        emailadd: tutordata['emailadd'] ?? '',
+        city: tutordata['city'] ?? '',
+        servicesprovided:
+            (tutordata['servicesprovided'] as List<dynamic>).cast<String>(),
+        timezone: tutordata['timezone'] ?? '',
+        validIds: (tutordata['validIDs'] as List<dynamic>).cast<String>(),
+        contact: tutordata['contact'] ?? '',
+        certificatestype:
+            (tutordata['certificatestype'] as List<dynamic>).cast<String>(),
+        resumelinktype:
+            (tutordata['resumetype'] as List<dynamic>).cast<String>(),
+        validIDstype:
+            (tutordata['validIDstype'] as List<dynamic>).cast<String>(),
       );
     }).toList();
   }
@@ -270,8 +288,8 @@ class DatabaseService {
     return await FirebaseFirestore.instance
         .collection('tutorSchedule')
         .doc(uid)
-        .update({
-      'availableDays': [
+        .set({
+      'dayoffs': [
         'Monday',
         'Tuesday',
         'Wednesday',
@@ -331,6 +349,7 @@ class TutorInfoData {
       DocumentSnapshot<Map<String, dynamic>> snapshot) {
     return [
       TutorInformation(
+        contact: snapshot.get('contact') ?? '',
         birthPlace: snapshot.get('birthPlace') ?? '',
         country: snapshot.get('country') ?? '',
         certificates:
@@ -346,9 +365,26 @@ class TutorInfoData {
         language: (snapshot.get('language') as List<dynamic>).cast<String>(),
         lastname: snapshot.get('lastName') ?? '',
         middleName: snapshot.get('middleName') ?? '',
-        presentation: snapshot.get('presentation') ?? '',
+        presentation:
+            (snapshot.get('presentation') as List<dynamic>).cast<String>(),
         tutorID: snapshot.get('tutorID') ?? '',
         userId: snapshot.get('userID') ?? '',
+        age: snapshot.get('age') ?? '',
+        applicationID: snapshot.get('applicationID') ?? '',
+        birthCity: snapshot.get('birthCity') ?? '',
+        birthdate: snapshot.get('birthdate') ?? '',
+        emailadd: snapshot.get('emailadd') ?? '',
+        city: snapshot.get('city') ?? '',
+        servicesprovided:
+            (snapshot.get('servicesprovided') as List<dynamic>).cast<String>(),
+        timezone: snapshot.get('timezone') ?? '',
+        validIds: (snapshot.get('validIDs') as List<dynamic>).cast<String>(),
+        certificatestype:
+            (snapshot.get('certificatestype') as List<dynamic>).cast<String>(),
+        resumelinktype:
+            (snapshot.get('resumetype') as List<dynamic>).cast<String>(),
+        validIDstype:
+            (snapshot.get('validIDstype') as List<dynamic>).cast<String>(),
       )
     ];
   }
@@ -359,5 +395,26 @@ class TutorInfoData {
         .doc(uid)
         .snapshots()
         .map(_getTutorInfo);
+  }
+
+  Stream<List<SubjectTeach>> get gettutorsubjects {
+    return FirebaseFirestore.instance
+        .collection('tutor')
+        .doc(uid)
+        .collection('mycourses')
+        .snapshots()
+        .map((QuerySnapshot<Map<String, dynamic>> snapshot) {
+      return snapshot.docs
+          .map((QueryDocumentSnapshot<Map<String, dynamic>> courseDoc) {
+        Map<String, dynamic> courseData = courseDoc.data();
+        return SubjectTeach(
+          subjectid: courseDoc.id,
+          subjectname: courseData['subjectname'] ?? '',
+          price2: courseData['price2'] ?? '',
+          price3: courseData['price3'] ?? '',
+          price5: courseData['price5'] ?? '',
+        );
+      }).toList();
+    });
   }
 }

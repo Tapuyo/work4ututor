@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:work4ututor/ui/web/tutor/settings/payments_withdrawals%20copy.dart';
-import 'package:work4ututor/ui/web/tutor/settings/personal_information%20copy.dart';
-import 'package:work4ututor/ui/web/tutor/settings/tutor_information%20copy.dart';
+import 'package:work4ututor/ui/web/tutor/settings/personal_information.dart';
 
 import '../../../../utils/themes.dart';
 import 'classes_pricing.dart';
+import 'payments_withdrawals.dart';
+import 'tutor_information.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -20,27 +20,15 @@ class _SettingsPageState extends State<SettingsPage> {
     Size size = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10),
-      child: Container(
-        alignment: Alignment.topCenter,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(
-            color: Colors.black45,
-            width: .1,
-          ),
-          borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(5.0),
-            topLeft: Radius.circular(5.0),
-          ),
-        ),
-        width: size.width - 320,
-        height: size.height,
-        child: Column(
-          children: <Widget>[
-            Container(
+      child: Column(
+        children: <Widget>[
+          Card(
+            margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+            elevation: 5,
+            child: Container(
               height: 50,
               width: size.width - 310,
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 shape: BoxShape.rectangle,
@@ -157,21 +145,20 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
             ),
-            const SizedBox(
-              height: 10,
-              child: Divider(color: Colors.grey),
-            ),
-            if (settingsView == "/personalinfo") ...{
-              const PersonalInformation(),
-            }else if(settingsView == "/tutorinfo") ...{
-              const TutorInfoSettings(),
-            }else if(settingsView == "/classespricing") ...{
-              const ClassesPricing(),
-            }else if(settingsView == "/withdrawals") ...{
-              const PaymentsWithdrwals(),
-            }
-          ],
-        ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          if (settingsView == "/personalinfo") ...{
+            const PersonalInformation(),
+          } else if (settingsView == "/tutorinfo") ...{
+            const TutorInfoSettings(),
+          } else if (settingsView == "/classespricing") ...{
+            const ClassesPricing(),
+          } else if (settingsView == "/withdrawals") ...{
+            const PaymentsWithdrwals(),
+          }
+        ],
       ),
     );
   }

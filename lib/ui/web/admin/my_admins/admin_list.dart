@@ -1,7 +1,7 @@
+import 'package:cool_alert/cool_alert.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:work4ututor/ui/web/admin/my_admins/add_admin.dart';
 
 import '../../../../constant/constant.dart';
@@ -236,26 +236,24 @@ class AdminList extends StatelessWidget {
           onPressed: () async {
             final currentContext = context;
             try {
-              await AdminService.updateAdminData(adminId: data.docid, adminstatus: 'Block');
+              await AdminService.updateAdminData(
+                  adminId: data.docid, adminstatus: 'Block');
               print('Admin data saved successfully');
               // ignore: use_build_context_synchronously
-              QuickAlert.show(
+              CoolAlert.show(
                 context: currentContext,
-                type: QuickAlertType.success,
+                type: CoolAlertType.success,
                 text: 'Admin Blocked Successfully!',
                 autoCloseDuration: const Duration(seconds: 2),
-                showConfirmBtn: false,
               );
             } catch (error) {
               print('Error saving admin data: $error');
-              QuickAlert.show(
+              CoolAlert.show(
                 context: context,
-                type: QuickAlertType.error,
+                type: CoolAlertType.error,
                 title: 'Oops...',
                 text: 'Sorry, something went wrong',
                 backgroundColor: Colors.black,
-                titleColor: Colors.white,
-                textColor: Colors.white,
               );
             }
           },
@@ -269,28 +267,26 @@ class AdminList extends StatelessWidget {
         const Spacer(),
         ElevatedButton.icon(
           onPressed: () async {
-             final currentContext = context;
+            final currentContext = context;
             try {
-              await AdminService.updateAdminData(adminId: data.docid, adminstatus: 'Cancel');
+              await AdminService.updateAdminData(
+                  adminId: data.docid, adminstatus: 'Cancel');
               print('Admin data saved successfully');
               // ignore: use_build_context_synchronously
-              QuickAlert.show(
+              CoolAlert.show(
                 context: currentContext,
-                type: QuickAlertType.success,
+                type: CoolAlertType.success,
                 text: 'Admin Cancel Successfully!',
                 autoCloseDuration: const Duration(seconds: 3),
-                showConfirmBtn: false,
               );
             } catch (error) {
               print('Error saving admin data: $error');
-              QuickAlert.show(
+              CoolAlert.show(
                 context: context,
-                type: QuickAlertType.error,
+                type: CoolAlertType.error,
                 title: 'Oops...',
                 text: 'Sorry, something went wrong',
                 backgroundColor: Colors.black,
-                titleColor: Colors.white,
-                textColor: Colors.white,
               );
             }
           },

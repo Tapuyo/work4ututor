@@ -16,7 +16,6 @@ import '../../../../data_class/chatmessageclass.dart';
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/studentanalyticsclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
-import '../../../../data_class/studentsEnrolledclass.dart';
 import '../../../../data_class/user_class.dart';
 import '../../../../provider/init_provider.dart';
 import '../../../../services/getenrolledclasses.dart';
@@ -24,7 +23,6 @@ import '../../../../services/getmessages.dart';
 import '../../../../services/getstudentclassesanalytics.dart';
 import '../../../../services/getstudentinfo.dart';
 import '../../../../services/getuser.dart';
-import '../../../../services/services.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
 import '../../help/help.dart';
@@ -41,7 +39,9 @@ import '../student_inquiry/student_inquiry.dart';
 
 class StudentDashboardPage extends StatefulWidget {
   final String uID;
-  const StudentDashboardPage({super.key, required this.uID});
+  final String email;
+  const StudentDashboardPage(
+      {super.key, required this.uID, required this.email});
   @override
   State<StudentDashboardPage> createState() => _StudentDashboardPageState();
 }
@@ -63,7 +63,6 @@ int newnotificationcount = 0;
 class _StudentDashboardPageState extends State<StudentDashboardPage> {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return MultiProvider(
       providers: [
         // StreamProvider<List<StudentsList>>.value(
@@ -74,8 +73,9 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
         //   },
         //   initialData: const [],
         // ),
-         StreamProvider<List<ChatMessage>>.value(
-          value: GetMessageList(uid: widget.uID, role: 'student').getmessageinfo,
+        StreamProvider<List<ChatMessage>>.value(
+          value:
+              GetMessageList(uid: widget.uID, role: 'student').getmessageinfo,
           catchError: (context, error) {
             print('Error occurred: $error');
             return [];
@@ -107,8 +107,7 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
           initialData: const [],
         ),
         StreamProvider<List<ClassesData>>.value(
-          value: EnrolledClass(uid: widget.uID, role: 'student')
-              .getenrolled,
+          value: EnrolledClass(uid: widget.uID, role: 'student').getenrolled,
           catchError: (context, error) {
             // Handle the error here
             print('Error occurred: $error');
@@ -130,6 +129,7 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
       ],
       child: MainPageBody(
         uID: widget.uID,
+        email: widget.email,
       ),
     );
   }
@@ -137,7 +137,8 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
 
 class MainPageBody extends StatefulWidget {
   final String uID;
-  const MainPageBody({super.key, required this.uID});
+  final String email;
+  const MainPageBody({super.key, required this.uID, required this.email});
   @override
   State<MainPageBody> createState() => _MainPageBodyPageState();
 }
@@ -197,151 +198,193 @@ class _MainPageBodyPageState extends State<MainPageBody> {
     }
     return Stack(
       children: [
-        Scaffold(
-          backgroundColor: const Color.fromRGBO(245, 247, 248, 1),
-          drawer: ResponsiveBuilder.isDesktop(context)
-              ? null
-              : Drawer(
-                  child: SafeArea(
-                    child: SingleChildScrollView(child: _buildSidebar(context)),
-                  ),
-                ),
-          appBar: AppBar(
-            toolbarHeight: 65,
-            backgroundColor: kColorPrimary,
-            elevation: 4,
-            shadowColor: Colors.black,
-            title: Container(
-              padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
-              width: 240,
-              child: Image.asset(
-                "assets/images/worklogo.png",
-                alignment: Alignment.topCenter,
-                fit: BoxFit.cover,
-              ),
-            ),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
-                child: Badge(
-                  isLabelVisible: newmessagecount == 0 ? false : true,
-                  alignment: AlignmentDirectional.centerEnd,
-                  label: Text(
-                    newmessagecount.toString(),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  child: IconButton(
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      padding: EdgeInsets.zero,
-                      icon: const Icon(
-                        EvaIcons.email,
-                        color: Colors.white,
-                        size: 25,
-                      ),
-                      onPressed: () {
-                        final provider = context.read<InitProvider>();
-                        provider.setMenuIndex(2);
-                      }),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
-                child: Badge(
-                  isLabelVisible: newnotificationcount == 0 ? false : true,
-                  alignment: AlignmentDirectional.centerEnd,
-                  label: Text(
-                    newnotificationcount.toString(),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  child: IconButton(
-                      key: _buttonKey,
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      padding: EdgeInsets.zero,
-                      icon: const Icon(
-                        EvaIcons.bell,
-                        color: Colors.white,
-                        size: 25,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _showModal = !_showModal;
-                        });
-                      }),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      fullName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _showModal = false;
+            });
+          },
+          child: Scaffold(
+            backgroundColor: const Color.fromRGBO(245, 247, 248, 1),
+            drawer: ResponsiveBuilder.isDesktop(context)
+                ? null
+                : Drawer(
+                    child: SafeArea(
+                      child:
+                          SingleChildScrollView(child: _buildSidebar(context)),
                     ),
-                    Text(
-                      studentID,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: Colors.white,
-                        fontSize: 12,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    RatingBar(
-                        initialRating: 4,
-                        direction: Axis.horizontal,
-                        allowHalfRating: true,
-                        itemCount: 5,
-                        itemSize: 16,
-                        ratingWidget: RatingWidget(
-                            full: const Icon(Icons.star, color: Colors.orange),
-                            half: const Icon(
-                              Icons.star_half,
-                              color: Colors.orange,
-                            ),
-                            empty: const Icon(
-                              Icons.star_outline,
-                              color: Colors.orange,
-                            )),
-                        onRatingUpdate: (value) {
-                          // _ratingValue = value;
-                        }),
-                  ],
+                  ),
+            appBar: AppBar(
+              toolbarHeight: 65,
+              backgroundColor: kColorPrimary,
+              elevation: 4,
+              shadowColor: Colors.black,
+              title: Container(
+                padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
+                width: 240,
+                child: Image.asset(
+                  "assets/images/worklogo.png",
+                  alignment: Alignment.topCenter,
+                  fit: BoxFit.cover,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(0, 5, 10, 5),
-                child: downloadURL1 == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          downloadURL1.toString(),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
+                  child: Badge(
+                    isLabelVisible: newmessagecount == 0 ? false : true,
+                    alignment: AlignmentDirectional.centerEnd,
+                    label: Text(
+                      newmessagecount.toString(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    child: IconButton(
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        padding: EdgeInsets.zero,
+                        icon: const Icon(
+                          EvaIcons.email,
+                          color: Colors.white,
+                          size: 25,
                         ),
-                        radius: 25,
-                      ),
-              ),
-            ],
-          ),
-          body: Padding(
-            padding: const EdgeInsets.only(top: 5.0),
-            child: ResponsiveBuilder(
-              mobileBuilder: (context, constraints) {
-                return SingleChildScrollView(
+                        onPressed: () {
+                          final provider = context.read<InitProvider>();
+                          provider.setMenuIndex(2);
+                        }),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
+                  child: Badge(
+                    isLabelVisible: newnotificationcount == 0 ? false : true,
+                    alignment: AlignmentDirectional.centerEnd,
+                    label: Text(
+                      newnotificationcount.toString(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    child: IconButton(
+                        key: _buttonKey,
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        padding: EdgeInsets.zero,
+                        icon: const Icon(
+                          EvaIcons.bell,
+                          color: Colors.white,
+                          size: 25,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _showModal = !_showModal;
+                          });
+                        }),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(2.0),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(
+                        fullName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.normal,
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        studentID,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.normal,
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      RatingBar(
+                          initialRating: 0,
+                          direction: Axis.horizontal,
+                          allowHalfRating: true,
+                          itemCount: 5,
+                          itemSize: 16,
+                          ratingWidget: RatingWidget(
+                              full:
+                                  const Icon(Icons.star, color: Colors.orange),
+                              half: const Icon(
+                                Icons.star_half,
+                                color: Colors.orange,
+                              ),
+                              empty: const Icon(
+                                Icons.star_outline,
+                                color: Colors.orange,
+                              )),
+                          onRatingUpdate: (value) {
+                            // _ratingValue = value;
+                          }),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 5, 10, 5),
+                  child: downloadURL1 == null
+                      ? const Center(child: Icon(Icons.person))
+                      : CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            downloadURL1.toString(),
+                          ),
+                          radius: 25,
+                        ),
+                ),
+              ],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.only(top: 5.0),
+              child: ResponsiveBuilder(
+                mobileBuilder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (menuIndex == 0) ...[
+                          StudentMainDashboard(
+                            email: widget.email,
+                            uid: widget.uID,
+                          )
+                        ] else if (menuIndex == 1) ...[
+                          const StudentCalendar()
+                        ] else if (menuIndex == 2) ...[
+                          const MessagePage()
+                        ] else if (menuIndex == 3) ...[
+                          gotoList()
+                        ] else if (menuIndex == 4) ...[
+                          StudentInquiry(widget.uID)
+                        ] else if (menuIndex == 5) ...[
+                          PerformancePage(
+                            uID: widget.uID,
+                          )
+                        ] else if (menuIndex == 6)
+                          ...[]
+                        else if (menuIndex == 7) ...[
+                          const HelpPage()
+                        ] else ...[
+                          const ClassesMain()
+                        ],
+                      ],
+                    ),
+                  );
+                },
+                tabletBuilder: (context, constraints) {
+                  return Column(
+                    children: [
                       if (menuIndex == 0) ...[
-                        const StudentMainDashboard()
+                        StudentMainDashboard(
+                          email: widget.uID,
+                          uid: '',
+                        )
                       ] else if (menuIndex == 1) ...[
                         const StudentCalendar()
                       ] else if (menuIndex == 2) ...[
@@ -354,124 +397,98 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                         PerformancePage(
                           uID: widget.uID,
                         )
-                      ] else if (menuIndex == 6)
-                        ...[]
-                      else if (menuIndex == 7) ...[
+                      ] else if (menuIndex == 6) ...[
+                        StudentSettingsPage(
+                          uID: widget.uID,
+                        )
+                      ] else if (menuIndex == 7) ...[
                         const HelpPage()
                       ] else ...[
                         const ClassesMain()
                       ],
                     ],
-                  ),
-                );
-              },
-              tabletBuilder: (context, constraints) {
-                return Column(
-                  children: [
-                    if (menuIndex == 0) ...[
-                      const StudentMainDashboard()
-                    ] else if (menuIndex == 1) ...[
-                      const StudentCalendar()
-                    ] else if (menuIndex == 2) ...[
-                      const MessagePage()
-                    ] else if (menuIndex == 3) ...[
-                      gotoList()
-                    ] else if (menuIndex == 4) ...[
-                      StudentInquiry(widget.uID)
-                    ] else if (menuIndex == 5) ...[
-                      PerformancePage(
-                        uID: widget.uID,
-                      )
-                    ] else if (menuIndex == 6) ...[
-                      StudentSettingsPage(
-                        uID: widget.uID,
-                      )
-                    ] else if (menuIndex == 7) ...[
-                      const HelpPage()
-                    ] else ...[
-                      const ClassesMain()
-                    ],
-                  ],
-                );
-              },
-              desktopBuilder: (context, constraints) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Flexible(
-                      flex: constraints.maxWidth > 1350 ? 3 : 4,
-                      child: SingleChildScrollView(
-                        controller: ScrollController(),
-                        child: Card(
-                            margin: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                            elevation: 4,
-                            child: StudentsMenu()),
-                      ),
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height,
-                    ),
-                    Flexible(
-                      flex: 13,
-                      child: SingleChildScrollView(
-                        controller: ScrollController(),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            if (menuIndex == 0) ...[
-                              const StudentMainDashboard()
-                            ] else if (menuIndex == 1) ...[
-                              const StudentCalendar()
-                            ] else if (menuIndex == 2) ...[
-                              const MessagePage()
-                            ] else if (menuIndex == 3) ...[
-                              gotoList()
-                            ] else if (menuIndex == 4) ...[
-                              StudentInquiry(widget.uID)
-                            ] else if (menuIndex == 5) ...[
-                              PerformancePage(
-                                uID: widget.uID,
-                              )
-                            ] else if (menuIndex == 6) ...[
-                              StudentSettingsPage(
-                                uID: widget.uID,
-                              )
-                            ] else if (menuIndex == 7) ...[
-                              const HelpPage()
-                            ] else ...[
-                              const ClassesMain()
-                            ],
-                          ],
+                  );
+                },
+                desktopBuilder: (context, constraints) {
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Flexible(
+                        flex: constraints.maxWidth > 1350 ? 3 : 4,
+                        child: SingleChildScrollView(
+                          controller: ScrollController(),
+                          child: Card(
+                              margin: const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                              elevation: 4,
+                              child: StudentsMenu()),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              },
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height,
+                      ),
+                      Flexible(
+                        flex: 13,
+                        child: SingleChildScrollView(
+                          controller: ScrollController(),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              if (menuIndex == 0) ...[
+                                StudentMainDashboard(
+                                  email: widget.email,
+                                  uid: widget.uID,
+                                )
+                              ] else if (menuIndex == 1) ...[
+                                const StudentCalendar()
+                              ] else if (menuIndex == 2) ...[
+                                const MessagePage()
+                              ] else if (menuIndex == 3) ...[
+                                gotoList()
+                              ] else if (menuIndex == 4) ...[
+                                StudentInquiry(widget.uID)
+                              ] else if (menuIndex == 5) ...[
+                                PerformancePage(
+                                  uID: widget.uID,
+                                )
+                              ] else if (menuIndex == 6) ...[
+                                StudentSettingsPage(
+                                  uID: widget.uID,
+                                )
+                              ] else if (menuIndex == 7) ...[
+                                const HelpPage()
+                              ] else ...[
+                                const ClassesMain()
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),
         if (_showModal)
-          Overlay(
-            initialEntries: [
-              OverlayEntry(
-                builder: (context) {
-                  final buttonRenderBox = _buttonKey.currentContext!
-                      .findRenderObject() as RenderBox;
-                  final buttonOffset =
-                      buttonRenderBox.localToGlobal(Offset.zero);
-                  final modalOffset = Offset(
-                      buttonOffset.dx + buttonRenderBox.size.width,
-                      buttonOffset.dy + buttonRenderBox.size.height);
-                  return Positioned(
-                    top: modalOffset.dy + 10,
-                    left: modalOffset.dx - 220,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _showModal = false;
-                        });
-                      },
+          GestureDetector(
+            onTap: () {
+              null;
+            },
+            child: Overlay(
+              initialEntries: [
+                OverlayEntry(
+                  builder: (context) {
+                    final buttonRenderBox = _buttonKey.currentContext!
+                        .findRenderObject() as RenderBox;
+                    final buttonOffset =
+                        buttonRenderBox.localToGlobal(Offset.zero);
+                    final modalOffset = Offset(
+                        buttonOffset.dx + buttonRenderBox.size.width,
+                        buttonOffset.dy + buttonRenderBox.size.height);
+                    return Positioned(
+                      top: modalOffset.dy + 10,
+                      left: modalOffset.dx - 220,
                       child: Container(
                         width: 200,
                         padding: const EdgeInsets.all(16),
@@ -514,11 +531,11 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                           ),
                         ),
                       ),
-                    ),
-                  );
-                },
-              ),
-            ],
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
       ],
     );
@@ -531,7 +548,13 @@ class _MainPageBodyPageState extends State<MainPageBody> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        StudentsMenu(),
+        GestureDetector(
+            onTap: () {
+              setState(() {
+                _showModal = false;
+              });
+            },
+            child: StudentsMenu()),
       ],
     );
   }

@@ -1,7 +1,7 @@
+import 'package:cool_alert/cool_alert.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:work4ututor/ui/web/admin/my_admins/add_admin.dart';
 
 import '../../../../constant/constant.dart';
@@ -195,31 +195,29 @@ class ArchieveAdminList extends StatelessWidget {
   Widget _acceptButton(BuildContext context, AdminsInformation data) {
     if (data.adminstatus == 'Block') {
       return ElevatedButton.icon(
-        onPressed: ()async {
-            final currentContext = context;
-            try {
-              await AdminService.updateAdminData(adminId: data.docid, adminstatus: 'Active');
-              print('Admin data saved successfully');
-              // ignore: use_build_context_synchronously
-              QuickAlert.show(
-                context: currentContext,
-                type: QuickAlertType.success,
-                text: 'Admin Unblocked Successfuly!',
-                autoCloseDuration: const Duration(seconds: 2),
-                showConfirmBtn: false,
-              );
-            } catch (error) {
-              print('Error saving admin data: $error');
-              QuickAlert.show(
-                context: context,
-                type: QuickAlertType.error,
-                title: 'Oops...',
-                text: 'Sorry, something went wrong',
-                backgroundColor: Colors.black,
-                titleColor: Colors.white,
-                textColor: Colors.white,
-              );
-            }
+        onPressed: () async {
+          final currentContext = context;
+          try {
+            await AdminService.updateAdminData(
+                adminId: data.docid, adminstatus: 'Active');
+            print('Admin data saved successfully');
+            // ignore: use_build_context_synchronously
+            CoolAlert.show(
+              context: currentContext,
+              type: CoolAlertType.success,
+              text: 'Admin Unblocked Successfuly!',
+              autoCloseDuration: const Duration(seconds: 2),
+            );
+          } catch (error) {
+            print('Error saving admin data: $error');
+            CoolAlert.show(
+              context: context,
+              type: CoolAlertType.error,
+              title: 'Oops...',
+              text: 'Sorry, something went wrong',
+              backgroundColor: Colors.black,
+            );
+          }
         },
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white,
@@ -231,30 +229,28 @@ class ArchieveAdminList extends StatelessWidget {
     } else if (data.adminstatus == 'Cancel') {
       return ElevatedButton.icon(
         onPressed: () async {
-            final currentContext = context;
-            try {
-              await AdminService.updateAdminData(adminId: data.docid, adminstatus: 'Active');
-              print('Admin data saved successfully');
-              // ignore: use_build_context_synchronously
-              QuickAlert.show(
-                context: currentContext,
-                type: QuickAlertType.success,
-                text: 'Admin is now Active!',
-                autoCloseDuration: const Duration(seconds: 2),
-                showConfirmBtn: false,
-              );
-            } catch (error) {
-              print('Error saving admin data: $error');
-              QuickAlert.show(
-                context: context,
-                type: QuickAlertType.error,
-                title: 'Oops...',
-                text: 'Sorry, something went wrong',
-                backgroundColor: Colors.black,
-                titleColor: Colors.white,
-                textColor: Colors.white,
-              );
-            }
+          final currentContext = context;
+          try {
+            await AdminService.updateAdminData(
+                adminId: data.docid, adminstatus: 'Active');
+            print('Admin data saved successfully');
+            // ignore: use_build_context_synchronously
+            CoolAlert.show(
+              context: currentContext,
+              type: CoolAlertType.success,
+              text: 'Admin is now Active!',
+              autoCloseDuration: const Duration(seconds: 2),
+            );
+          } catch (error) {
+            print('Error saving admin data: $error');
+            CoolAlert.show(
+              context: context,
+              type: CoolAlertType.error,
+              title: 'Oops...',
+              text: 'Sorry, something went wrong',
+              backgroundColor: Colors.black,
+            );
+          }
         },
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white,

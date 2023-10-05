@@ -315,6 +315,23 @@ class EnrolledClass {
           presentation: tutordata['presentation'] ?? '',
           tutorID: tutordata['tutorID'] ?? '',
           userId: tutordata['userID'] ?? '',
+          age: tutordata['age'] ?? '',
+          applicationID: tutordata['applicationID'] ?? '',
+          birthCity: tutordata['birthCity'] ?? '',
+          birthdate: tutordata['birthdate'] ?? '',
+          emailadd: tutordata['emailadd'] ?? '',
+          city: tutordata['city'] ?? '',
+          servicesprovided:
+              (tutordata['servicesprovided'] as List<dynamic>).cast<String>(),
+          timezone: tutordata['timezone'] ?? '',
+          validIds: (tutordata['validIDs'] as List<dynamic>).cast<String>(),
+          contact: tutordata['contact'] ?? '',
+          certificatestype:
+              (tutordata['certificatestype'] as List<dynamic>).cast<String>(),
+          resumelinktype:
+              (tutordata['resumetype'] as List<dynamic>).cast<String>(),
+          validIDstype:
+              (tutordata['validIDstype'] as List<dynamic>).cast<String>(),
         );
         tutorinfo.add(temptutorinfo);
       }

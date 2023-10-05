@@ -11,7 +11,10 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:work4ututor/data_class/studentsEnrolledclass.dart';
 import 'package:work4ututor/provider/init_provider.dart';
 import 'package:work4ututor/provider/search_provider.dart';
+import 'package:work4ututor/provider/update_tutor_provider.dart';
 import 'package:work4ututor/provider/user_id_provider.dart';
+import 'package:work4ututor/services/getcountries.dart';
+import 'package:work4ututor/services/getlanguages.dart';
 import 'package:work4ututor/services/services.dart';
 import 'package:work4ututor/services/subjectServices.dart';
 
@@ -33,7 +36,7 @@ import 'ui/web/admin/executive_dashboard.dart';
 import 'ui/web/web_main.dart';
 
 Future<void> setup() async {
-  await tz.initializeTimeZone();
+  await tz.initializeTimeZone('packages/timezone/data/latest_all.tzf');
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -81,7 +84,18 @@ void main() async {
 
   runApp(MultiProvider(
     providers: [
+      StreamProvider<List<String>>(
+        create: (_) => streamCountryNamesFromFirestore(),
+        initialData: [], // Initial data while the stream is initializing
+      ),
+      StreamProvider<List<LanguageData>>(
+        create: (_) => streamLanguageNamesFromFirestore(),
+        initialData: [], // Initial data while the stream is initializing
+      ),
       ChangeNotifierProvider(create: (_) => InitProvider()),
+      ChangeNotifierProvider(create: (_) => MyModel()),
+      ChangeNotifierProvider(create: (_) => TutorInformationProvider()),
+      ChangeNotifierProvider(create: (_) => TutorInformationPricing()),
       StreamProvider<List<TutorInformation>>.value(
         value: DatabaseService(uid: '').tutorlist,
         initialData: const [],

@@ -1,9 +1,8 @@
 // ignore_for_file: prefer_const_constructors, avoid_print, unnecessary_null_comparison, use_build_context_synchronously
 
-import 'package:flutter/foundation.dart';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:work4ututor/ui/web/login/resetpassword.dart';
 
 import '../../../components/nav_bar.dart';
@@ -438,7 +437,12 @@ class _SigniNState extends State<SigniN> {
                                         obscure = !obscure;
                                       });
                                     },
-                                    icon: Icon(Icons.remove_red_eye_rounded),
+                                    icon: obscure
+                                        ? Icon(Icons.remove_red_eye_outlined)
+                                        : Icon(
+                                            Icons.remove_red_eye_outlined,
+                                            color: Colors.blue,
+                                          ),
                                   ),
                                   suffixIconColor: Colors.black,
                                 ),
@@ -510,8 +514,6 @@ class _SigniNState extends State<SigniN> {
                               });
                             } else {
                               setState(() {
-                                print(result.uid);
-                                print(result.role);
                                 _auth.adduserInfo({
                                   "userID": result.uid,
                                   "role": result.role,
@@ -532,7 +534,9 @@ class _SigniNState extends State<SigniN> {
                                 });
 
                                 StudentDashboardPage(
-                                    uID: result.uid.toString());
+                                  uID: result.uid.toString(),
+                                  email: result.email.toString(),
+                                );
                               } else if (result.role == 'tutor' &&
                                   result.status == 'completed') {
                                 setState(() {
@@ -545,7 +549,9 @@ class _SigniNState extends State<SigniN> {
                                 });
 
                                 StudentDashboardPage(
-                                    uID: result.uid.toString());
+                                  uID: result.uid.toString(),
+                                  email: result.email.toString(),
+                                );
                               } else if (result.role == 'student' &&
                                   result.status == 'completed') {
                                 setState(() {
@@ -554,7 +560,9 @@ class _SigniNState extends State<SigniN> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             StudentDashboardPage(
-                                                uID: result.uid.toString())),
+                                              uID: result.uid.toString(),
+                                              email: result.email.toString(),
+                                            )),
                                   );
                                 });
                               } else if (result.role == 'student' &&
@@ -823,8 +831,6 @@ class _SigniNState extends State<SigniN> {
                           });
                         } else {
                           setState(() {
-                            print(result.uid);
-                            print(result.role);
                             _auth.adduserInfo({
                               "userID": result.uid,
                               "role": result.role,
@@ -844,7 +850,10 @@ class _SigniNState extends State<SigniN> {
                               );
                             });
 
-                            StudentDashboardPage(uID: result.uid.toString());
+                            StudentDashboardPage(
+                              uID: result.uid.toString(),
+                              email: result.email.toString(),
+                            );
                           } else if (result.role == 'tutor' &&
                               result.status == 'completed') {
                             setState(() {
@@ -856,7 +865,10 @@ class _SigniNState extends State<SigniN> {
                               );
                             });
 
-                            StudentDashboardPage(uID: result.uid.toString());
+                            StudentDashboardPage(
+                              uID: result.uid.toString(),
+                              email: result.email.toString(),
+                            );
                           } else if (result.role == 'student' &&
                               result.status == 'completed') {
                             setState(() {
@@ -864,7 +876,9 @@ class _SigniNState extends State<SigniN> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => StudentDashboardPage(
-                                        uID: result.uid.toString())),
+                                          uID: result.uid.toString(),
+                                          email: result.email.toString(),
+                                        )),
                               );
                             });
                           } else if (result.role == 'student' &&
@@ -984,33 +998,33 @@ class _SigniNState extends State<SigniN> {
                       fit: BoxFit.contain,
                     ),
                   ),
-                  Container(
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                    child: Column(
-                      children: const [
-                        Text(
-                          " Welcome Back!",
-                          style: TextStyle(
-                            // textStyle: Theme.of(context).textTheme.headlineMedium,
-                            color: Color.fromRGBO(1, 118, 132, 1),
-                            fontWeight: FontWeight.w600,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text(
-                          " Have a great day ahead.",
-                          style: TextStyle(
-                            // textStyle: Theme.of(context).textTheme.headlineMedium,
-                            color: Colors.black87,
-                            fontSize: 18,
-                            fontWeight: FontWeight.normal,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
+                  // Container(
+                  //   alignment: Alignment.center,
+                  //   padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  //   child: Column(
+                  //     children: const [
+                  //       Text(
+                  //         " Welcome Back!",
+                  //         style: TextStyle(
+                  //           // textStyle: Theme.of(context).textTheme.headlineMedium,
+                  //           color: Color.fromRGBO(1, 118, 132, 1),
+                  //           fontWeight: FontWeight.w600,
+                  //         ),
+                  //         textAlign: TextAlign.center,
+                  //       ),
+                  //       Text(
+                  //         " Have a great day ahead.",
+                  //         style: TextStyle(
+                  //           // textStyle: Theme.of(context).textTheme.headlineMedium,
+                  //           color: Colors.black87,
+                  //           fontSize: 18,
+                  //           fontWeight: FontWeight.normal,
+                  //         ),
+                  //         textAlign: TextAlign.center,
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                   Container(
                     padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
                     child: Column(
@@ -1101,8 +1115,8 @@ class _SigniNState extends State<SigniN> {
                   ),
                   Container(
                     padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                    width: 380,
-                    height: 75,
+                    width: 330,
+                    height: 70,
                     child: TextButton(
                       style: TextButton.styleFrom(
                         textStyle: const TextStyle(color: Colors.black),
@@ -1117,30 +1131,25 @@ class _SigniNState extends State<SigniN> {
                         ),
                       ),
                       onPressed: () async {
-                        isLoading ? null : _handleButtonPress;
                         dynamic result = await _auth.signinwEmailandPassword(
                             userEmail, userPassword);
                         // 'mjselma@gmail.com',
                         // '123456');
-                        if (result == null) {
+                        setState(() {
+                          isLoading ? _handleButtonPress : null;
+                          if (result == null) {
                           setState(() {
                             error = 'Could not sign in w/ those credential';
                             print(error);
-                             QuickAlert.show(
+                            CoolAlert.show(
                               context: context,
-                              headerBackgroundColor: Colors.redAccent,
-                              type: QuickAlertType.error,
-                              title: 'Oops...',
+                              width: 200,
+                              type: CoolAlertType.error,
                               text: error,
-                              backgroundColor: Colors.black,
-                              titleColor: Colors.white,
-                              textColor: Colors.white,
                             );
                           });
                         } else {
                           setState(() {
-                            print(result.uid);
-                            print(result.role);
                             _auth.adduserInfo({
                               "userID": result.uid,
                               "role": result.role,
@@ -1150,12 +1159,12 @@ class _SigniNState extends State<SigniN> {
                           if (result.role == 'tutor' &&
                               result.status == 'unfinished') {
                             setState(() {
-                              QuickAlert.show(
+                              CoolAlert.show(
                                 context: context,
-                                type: QuickAlertType.success,
-                                text: 'You will redirected to sign up!',
+                                width: 200,
+                                type: CoolAlertType.success,
+                                text: "You will redirected to sign up!",
                                 autoCloseDuration: const Duration(seconds: 1),
-                                showConfirmBtn: false,
                               ).then((value) => Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
@@ -1166,16 +1175,19 @@ class _SigniNState extends State<SigniN> {
                                   ));
                             });
 
-                            StudentDashboardPage(uID: result.uid.toString());
+                            StudentDashboardPage(
+                              uID: result.uid.toString(),
+                              email: result.email.toString(),
+                            );
                           } else if (result.role == 'tutor' &&
                               result.status == 'completed') {
                             setState(() {
-                              QuickAlert.show(
+                              CoolAlert.show(
                                 context: context,
-                                type: QuickAlertType.success,
+                                width: 200,
+                                type: CoolAlertType.success,
                                 text: 'Log in Succesfully!',
                                 autoCloseDuration: const Duration(seconds: 1),
-                                showConfirmBtn: false,
                               ).then((value) => Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
@@ -1186,29 +1198,31 @@ class _SigniNState extends State<SigniN> {
                           } else if (result.role == 'student' &&
                               result.status == 'completed') {
                             setState(() {
-                              QuickAlert.show(
+                              CoolAlert.show(
                                 context: context,
-                                type: QuickAlertType.success,
+                                width: 200,
+                                type: CoolAlertType.success,
                                 text: 'Log in Succesfully!',
                                 autoCloseDuration: const Duration(seconds: 1),
-                                showConfirmBtn: false,
                               ).then((value) => Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             StudentDashboardPage(
-                                                uID: result.uid.toString())),
+                                              uID: result.uid.toString(),
+                                              email: result.email.toString(),
+                                            )),
                                   ));
                             });
                           } else if (result.role == 'student' &&
                               result.status == 'unfinished') {
                             setState(() {
-                              QuickAlert.show(
+                              CoolAlert.show(
                                 context: context,
-                                type: QuickAlertType.success,
+                                width: 200,
+                                type: CoolAlertType.success,
                                 text: 'You will redirected to sign up!',
                                 autoCloseDuration: const Duration(seconds: 1),
-                                showConfirmBtn: false,
                               ).then((value) => Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
@@ -1219,27 +1233,27 @@ class _SigniNState extends State<SigniN> {
                                   ));
                             });
                           } else {
-                            QuickAlert.show(
+                            CoolAlert.show(
                               context: context,
-                              headerBackgroundColor: Colors.redAccent,
-                              type: QuickAlertType.error,
+                              width: 200,
+                              type: CoolAlertType.error,
                               title: 'Oops...',
                               text: result.toString(),
                               backgroundColor: Colors.black,
-                              titleColor: Colors.white,
-                              textColor: Colors.white,
                             );
                           }
                         }
+                        });
+                        
                       },
                       child: isLoading
                           ? CircularProgressIndicator() // Display progress indicator
                           : Text(
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 18,
+                                fontSize: 16,
                               ),
-                              'Confirm Submission',
+                              'Sign in',
                             ),
                     ),
                   ),
