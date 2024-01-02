@@ -1144,6 +1144,7 @@ class _SigniNState extends State<SigniN> {
                             CoolAlert.show(
                               context: context,
                               width: 200,
+                              title: 'Error!',
                               type: CoolAlertType.error,
                               text: error,
                             );
@@ -1187,7 +1188,7 @@ class _SigniNState extends State<SigniN> {
                                 width: 200,
                                 type: CoolAlertType.success,
                                 text: 'Log in Succesfully!',
-                                autoCloseDuration: const Duration(seconds: 1),
+                                autoCloseDuration: const Duration(seconds: 5),
                               ).then((value) => Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(

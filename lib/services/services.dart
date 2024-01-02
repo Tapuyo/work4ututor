@@ -77,6 +77,7 @@ class DatabaseService {
   List<TutorInformation> _getTutorInformation(QuerySnapshot snapshot) {
     return snapshot.docs.map((tutordata) {
       return TutorInformation(
+        contact: tutordata['contact'] ?? '',
         birthPlace: tutordata['birthPlace'] ?? '',
         country: tutordata['country'] ?? '',
         certificates:
@@ -92,7 +93,8 @@ class DatabaseService {
         language: (tutordata['language'] as List<dynamic>).cast<String>(),
         lastname: tutordata['lastName'] ?? '',
         middleName: tutordata['middleName'] ?? '',
-        presentation: tutordata['presentation'] ?? '',
+        presentation:
+            (tutordata['presentation'] as List<dynamic>).cast<String>(),
         tutorID: tutordata['tutorID'] ?? '',
         userId: tutordata['userID'] ?? '',
         age: tutordata['age'] ?? '',
@@ -105,7 +107,6 @@ class DatabaseService {
             (tutordata['servicesprovided'] as List<dynamic>).cast<String>(),
         timezone: tutordata['timezone'] ?? '',
         validIds: (tutordata['validIDs'] as List<dynamic>).cast<String>(),
-        contact: tutordata['contact'] ?? '',
         certificatestype:
             (tutordata['certificatestype'] as List<dynamic>).cast<String>(),
         resumelinktype:
@@ -284,21 +285,11 @@ class DatabaseService {
     });
   }
 
-  addDayoffs() async {
+  addDayoffs(List<String> dayoffs, String dayoffid) async {
     return await FirebaseFirestore.instance
         .collection('tutorSchedule')
-        .doc(uid)
-        .set({
-      'dayoffs': [
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-        'Sunday'
-      ],
-    });
+        .doc()
+        .set({'uid': dayoffid, 'dayoffs': dayoffs});
   }
 
   addBlockDates() async {

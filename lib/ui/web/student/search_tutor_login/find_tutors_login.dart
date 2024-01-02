@@ -60,9 +60,9 @@ List<String> city = [
   'China',
 ];
 bool _showModal = false;
-  GlobalKey _buttonKey = GlobalKey();
-  int newmessagecount = 1;
-  int newnotificationcount = 1;
+GlobalKey _buttonKey = GlobalKey();
+int newmessagecount = 1;
+int newnotificationcount = 1;
 final TextEditingController _typeAheadController = TextEditingController();
 
 final TextEditingController _typeAheadController1 = TextEditingController();
@@ -88,129 +88,129 @@ class _FindTutorLoginState extends State<FindTutorLogin> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-              toolbarHeight: 65,
-              backgroundColor: kColorPrimary,
-              elevation: 4,
-              shadowColor: Colors.black,
-              title: Container(
-                padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
-                width: 240,
-                child: Image.asset(
-                  "assets/images/worklogo.png",
-                  alignment: Alignment.topCenter,
-                  fit: BoxFit.cover,
-                ),
+        toolbarHeight: 65,
+        backgroundColor: kColorPrimary,
+        elevation: 4,
+        shadowColor: Colors.black,
+        title: Container(
+          padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
+          width: 240,
+          child: Image.asset(
+            "assets/images/worklogo.png",
+            alignment: Alignment.topCenter,
+            fit: BoxFit.cover,
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
+            child: Badge(
+              isLabelVisible: newmessagecount == 0 ? false : true,
+              alignment: AlignmentDirectional.centerEnd,
+              label: Text(
+                newmessagecount.toString(),
+                style: const TextStyle(color: Colors.white),
               ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
-                  child: Badge(
-                    isLabelVisible: newmessagecount == 0 ? false : true,
-                    alignment: AlignmentDirectional.centerEnd,
-                    label: Text(
-                      newmessagecount.toString(),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    child: IconButton(
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        padding: EdgeInsets.zero,
-                        icon: const Icon(
-                          EvaIcons.email,
-                          color: Colors.white,
-                          size: 25,
-                        ),
-                        onPressed: () {
-                          final provider = context.read<InitProvider>();
-                          provider.setMenuIndex(2);
-                        }),
+              child: IconButton(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(
+                    EvaIcons.email,
+                    color: Colors.white,
+                    size: 25,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
-                  child: Badge(
-                    isLabelVisible: newnotificationcount == 0 ? false : true,
-                    alignment: AlignmentDirectional.centerEnd,
-                    label: Text(
-                      newnotificationcount.toString(),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    child: IconButton(
-                        key: _buttonKey,
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        padding: EdgeInsets.zero,
-                        icon: const Icon(
-                          EvaIcons.bell,
-                          color: Colors.white,
-                          size: 25,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _showModal = !_showModal;
-                          });
-                        }),
+                  onPressed: () {
+                    final provider = context.read<InitProvider>();
+                    provider.setMenuIndex(2);
+                  }),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
+            child: Badge(
+              isLabelVisible: newnotificationcount == 0 ? false : true,
+              alignment: AlignmentDirectional.centerEnd,
+              label: Text(
+                newnotificationcount.toString(),
+                style: const TextStyle(color: Colors.white),
+              ),
+              child: IconButton(
+                  key: _buttonKey,
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(
+                    EvaIcons.bell,
+                    color: Colors.white,
+                    size: 25,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: Column(
-                    mainAxisAlignment:MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                    const  Text(
-                        "MJ Selma",
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                       const  Text(
-                        "STUPHL202301",
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      RatingBar(
-                          initialRating: 4,
-                          direction: Axis.horizontal,
-                          allowHalfRating: true,
-                          itemCount: 5,
-                          itemSize: 16,
-                          ratingWidget: RatingWidget(
-                              full: const Icon(Icons.star, color: Colors.orange),
-                              half: const Icon(
-                                Icons.star_half,
-                                color: Colors.orange,
-                              ),
-                              empty: const Icon(
-                                Icons.star_outline,
-                                color: Colors.orange,
-                              )),
-                          onRatingUpdate: (value) {
-                            // _ratingValue = value;
-                          }),
-                    ],
+                  onPressed: () {
+                    setState(() {
+                      _showModal = !_showModal;
+                    });
+                  }),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "MJ Selma",
+                  style: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    color: Colors.white,
+                    fontSize: 16,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(0, 5, 10, 5),
-                  child: CircleAvatar(
-                    backgroundImage: AssetImage(
-                      'assets/images/sample.jpg',
-                    ),
-                    radius: 25,
+                const Text(
+                  "STUPHL202301",
+                  style: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    color: Colors.white,
+                    fontSize: 12,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                RatingBar(
+                    initialRating: 4,
+                    direction: Axis.horizontal,
+                    allowHalfRating: true,
+                    itemCount: 5,
+                    itemSize: 16,
+                    ratingWidget: RatingWidget(
+                        full: const Icon(Icons.star, color: Colors.orange),
+                        half: const Icon(
+                          Icons.star_half,
+                          color: Colors.orange,
+                        ),
+                        empty: const Icon(
+                          Icons.star_outline,
+                          color: Colors.orange,
+                        )),
+                    onRatingUpdate: (value) {
+                      // _ratingValue = value;
+                    }),
               ],
             ),
+          ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(0, 5, 10, 5),
+            child: CircleAvatar(
+              backgroundImage: AssetImage(
+                'assets/images/sample.jpg',
+              ),
+              radius: 25,
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -303,17 +303,17 @@ class _FindTutorLoginState extends State<FindTutorLogin> {
                                       padding: const EdgeInsets.all(0.0),
                                       child: InkWell(
                                         onTap: () {
-                                          setState(() {
-                                            final provider = context
-                                                .read<SearchTutorProvider>();
-                                            provider.setSearch(tName);
-                                            TutorList(
-                                              tutorslist: tutorsinfo,
-                                              keyword: setSearch,
-                                              displayRange: displayRange,
-                                              isLoading: false,
-                                            );
-                                          });
+                                          // setState(() {
+                                          //   final provider = context
+                                          //       .read<SearchTutorProvider>();
+                                          //   provider.setSearch(tName);
+                                          //   TutorList(
+                                          //     keyword: setSearch,
+                                          //     displayRange: displayRange,
+                                          //     isLoading: false,
+                                          //     studentdata: null,
+                                          //   );
+                                          // });
                                         },
                                         child: const Icon(
                                           Icons.search_rounded,
@@ -519,7 +519,7 @@ class _FindTutorLoginState extends State<FindTutorLogin> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                             Text(
+                                            Text(
                                               'Pricing: $_pricevalue',
                                               style: const TextStyle(
                                                 color: Colors.white,
@@ -605,7 +605,7 @@ class _FindTutorLoginState extends State<FindTutorLogin> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                           Text(
+                                          Text(
                                             'Rating: $_rating',
                                             style: const TextStyle(
                                               color: Colors.white,
@@ -618,7 +618,8 @@ class _FindTutorLoginState extends State<FindTutorLogin> {
                                             children: [
                                               IconButton(
                                                 padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
+                                                constraints:
+                                                    const BoxConstraints(),
                                                 icon: Icon(
                                                   _rating >= 1
                                                       ? Icons.star
@@ -633,7 +634,7 @@ class _FindTutorLoginState extends State<FindTutorLogin> {
                                                     if (_rating > 1 ||
                                                         _rating == 0) {
                                                       _rating = 1;
-                                                    }else{
+                                                    } else {
                                                       _rating = 0;
                                                     }
                                                   });
@@ -641,7 +642,8 @@ class _FindTutorLoginState extends State<FindTutorLogin> {
                                               ),
                                               IconButton(
                                                 padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
+                                                constraints:
+                                                    const BoxConstraints(),
                                                 icon: Icon(
                                                   _rating >= 2
                                                       ? Icons.star
@@ -659,7 +661,8 @@ class _FindTutorLoginState extends State<FindTutorLogin> {
                                               ),
                                               IconButton(
                                                 padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
+                                                constraints:
+                                                    const BoxConstraints(),
                                                 icon: Icon(
                                                   _rating >= 3
                                                       ? Icons.star
@@ -677,7 +680,8 @@ class _FindTutorLoginState extends State<FindTutorLogin> {
                                               ),
                                               IconButton(
                                                 padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
+                                                constraints:
+                                                    const BoxConstraints(),
                                                 icon: Icon(
                                                   _rating >= 4
                                                       ? Icons.star
@@ -695,7 +699,8 @@ class _FindTutorLoginState extends State<FindTutorLogin> {
                                               ),
                                               IconButton(
                                                 padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
+                                                constraints:
+                                                    const BoxConstraints(),
                                                 icon: Icon(
                                                   _rating >= 5
                                                       ? Icons.star
@@ -898,12 +903,11 @@ class _FindTutorLoginState extends State<FindTutorLogin> {
                           controller: ScrollController(),
                           child: Column(
                             children: [
-                              TutorList(
-                                tutorslist: tutorsinfo,
-                                keyword: setSearch,
-                                displayRange: displayRange,
-                                isLoading: false,
-                              ),
+                              // TutorList(
+                              //   keyword: setSearch,
+                              //   displayRange: displayRange,
+                              //   isLoading: false, studentdata: null,
+                              // ),
                               const SizedBox(
                                 height: 20,
                               ),

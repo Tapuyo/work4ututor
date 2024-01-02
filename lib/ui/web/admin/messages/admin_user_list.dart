@@ -306,7 +306,7 @@ class _AdminUserListState extends State<AdminUserList> {
                       )
                     : ViewMessage(
                         uID: _items.first['userID'].toString(),
-                        chatID: chatID,
+                        chatID: chatID, convo: messagelist.first,
                       ),
               )),
         ],

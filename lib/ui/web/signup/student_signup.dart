@@ -569,6 +569,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                       CoolAlert.show(
                                         context: context,
                                         type: CoolAlertType.error,
+                                        width: 200,
                                         title: 'Oops...',
                                         text: result,
                                         backgroundColor: Colors.black,
@@ -579,6 +580,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                       print(result.uid);
                                       CoolAlert.show(
                                         context: context,
+                                        width: 200,
                                         type: CoolAlertType.success,
                                         text: result,
                                         confirmBtnText: 'Okay',

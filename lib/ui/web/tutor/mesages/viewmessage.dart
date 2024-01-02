@@ -1,15 +1,24 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:work4ututor/ui/web/tutor/mesages/declineoffer.dart';
+import 'package:work4ututor/ui/web/tutor/mesages/offerinquiry.dart';
+import 'package:work4ututor/ui/web/tutor/mesages/refusedinquiry.dart';
 
 import '../../../../data_class/chatmessageclass.dart';
+import '../../../../data_class/studentinfoclass.dart';
+import '../../../../data_class/tutor_info_class.dart';
 import '../../../../provider/chatmessagedisplay.dart';
 import '../../../../services/getmessages.dart';
+import '../../../../services/getstudentinfo.dart';
 import '../../../../utils/themes.dart';
 
 class ViewMessage extends StatefulWidget {
   final String uID;
   final String chatID;
-  const ViewMessage({Key? key, required this.uID, required this.chatID})
+  final ChatMessage? convo;
+  const ViewMessage(
+      {Key? key, required this.uID, required this.chatID, required this.convo})
       : super(key: key);
 
   @override
@@ -19,18 +28,29 @@ class ViewMessage extends StatefulWidget {
 class _ViewMessageState extends State<ViewMessage> {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return StreamProvider<List<MessageContent>>.value(
-      value: GetMessageConversation(chatID: widget.chatID, userID: widget.uID)
-          .getmessage,
-      catchError: (context, error) {
-        print('Error occurred: $error');
-        return [];
-      },
-      initialData: const [],
+    return MultiProvider(
+      providers: [
+        StreamProvider<List<StudentInfoClass>>.value(
+          value: StudentInfoData(uid: widget.convo!.studentID).getstudentinfo,
+          catchError: (context, error) {
+            return [];
+          },
+          initialData: const [],
+        ),
+        StreamProvider<List<MessageContent>>.value(
+          value:
+              GetMessageConversation(chatID: widget.chatID, userID: widget.uID)
+                  .getmessage,
+          catchError: (context, error) {
+            return [];
+          },
+          initialData: const [],
+        )
+      ],
       child: ViewMessageBody(
         userID: widget.uID,
         chatID: widget.chatID,
+        convo: widget.convo,
       ),
     );
   }
@@ -39,17 +59,20 @@ class _ViewMessageState extends State<ViewMessage> {
 class ViewMessageBody extends StatefulWidget {
   final String userID;
   final String chatID;
+  final ChatMessage? convo;
   const ViewMessageBody(
-      {super.key, required this.userID, required this.chatID});
+      {super.key,
+      required this.userID,
+      required this.chatID,
+      required this.convo});
 
   @override
   State<ViewMessageBody> createState() => _ViewMessageBodyState();
 }
 
-ScrollController _scrollController = ScrollController();
-
 class _ViewMessageBodyState extends State<ViewMessageBody> {
   TextEditingController messageContent = TextEditingController();
+  ScrollController scrollController = ScrollController();
 
   bool select = false;
   @override
@@ -61,27 +84,32 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
   }
 
   void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    if (scrollController.hasClients) {
+      scrollController.jumpTo(scrollController.position.maxScrollExtent);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    final bool openChat =
-        context.select((ChatDisplayProvider p) => p.openMessage);
+    TutorInformation tutorsList =
+        Provider.of<List<TutorInformation>>(context).firstWhere(
+      (tutor) => tutor.userId == widget.convo!.tutorID,
+    );
+    final studentinfodata = Provider.of<List<StudentInfoClass>>(context);
     final messagedata = Provider.of<List<MessageContent>>(context);
     if (messagedata.isNotEmpty) {
       setState(() {
         messagedata.sort((a, b) => a.dateSent.compareTo(b.dateSent));
       });
     }
+    if (studentinfodata.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return Column(
       children: [
         SafeArea(
           child: Container(
-            padding: const EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.only(right: 16, top: 5, bottom: 5),
             child: Row(
               children: <Widget>[
                 IconButton(
@@ -97,12 +125,11 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                 const SizedBox(
                   width: 2,
                 ),
-                const CircleAvatar(
+                CircleAvatar(
                   backgroundColor: Colors.black12,
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.grey,
-                  ),
+                  backgroundImage: tutorsList.userId == widget.userID
+                      ? NetworkImage(studentinfodata.first.profilelink)
+                      : NetworkImage(tutorsList.imageID),
                 ),
                 const SizedBox(
                   width: 12,
@@ -112,18 +139,22 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      const Text(
-                        "Melvin Jhon Selma",
-                        style: TextStyle(
+                      Text(
+                        tutorsList.userId == widget.userID
+                            ? '${studentinfodata.first.studentFirstname} ${studentinfodata.first.studentLastname}'
+                            : '${tutorsList.firstName} ${tutorsList.lastname}',
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(
-                        height: 6,
+                        height: 4,
                       ),
                       Text(
-                        "Online",
+                        tutorsList.userId == widget.userID
+                            ? studentinfodata.first.studentID
+                            : tutorsList.tutorID,
                         style: TextStyle(
-                            color: Colors.grey.shade600, fontSize: 13),
+                            color: Colors.grey.shade600, fontSize: 12),
                       ),
                     ],
                   ),
@@ -146,7 +177,7 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
           child: Stack(
             children: <Widget>[
               ListView.builder(
-                controller: _scrollController,
+                controller: scrollController,
                 itemCount: messagedata.length,
                 shrinkWrap: true,
                 padding: const EdgeInsets.only(top: 10, bottom: 70),
@@ -159,90 +190,3831 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                             ? Alignment.topRight
                             : Alignment.topLeft),
                         child: messagedata[index].userID != widget.userID
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Center(
-                                    child: Align(
-                                      alignment: Alignment.topLeft,
-                                      child: CircleAvatar(
-                                        backgroundColor: Colors.black12,
-                                        child: Icon(
-                                          Icons.person,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Container(
-                                    constraints: const BoxConstraints(
-                                        minWidth: 0, maxWidth: 450),
-                                    decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.only(
-                                          topRight: Radius.circular(20),
-                                          bottomLeft: Radius.circular(20),
-                                          bottomRight: Radius.circular(20)),
-                                      color: (messagedata[index].userID ==
-                                              widget.userID
-                                          ? kColorLight
-                                          : Colors.grey.shade200),
-                                    ),
-                                    padding: const EdgeInsets.all(16),
-                                    child: Text(
-                                      messagedata[index].messageContent,
-                                      style: const TextStyle(fontSize: 15),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : SizedBox(
-                                width: 500,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      constraints: const BoxConstraints(
-                                          minWidth: 0, maxWidth: 450),
-                                      decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(20),
-                                            bottomLeft: Radius.circular(20),
-                                            bottomRight: Radius.circular(20)),
-                                        color: (messagedata[index].userID ==
-                                                widget.userID
-                                            ? kColorLight
-                                            : Colors.grey.shade200),
-                                      ),
-                                      padding: const EdgeInsets.all(16),
-                                      child: Text(
-                                        messagedata[index].messageContent,
-                                        style: const TextStyle(fontSize: 15),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    const Positioned(
-                                      top: 0,
-                                      child: Align(
-                                        alignment: Alignment.topRight,
-                                        child: CircleAvatar(
-                                          backgroundColor: Colors.black12,
-                                          child: Icon(
-                                            Icons.person,
-                                            color: Colors.grey,
+                            ? messagedata[index].userID == widget.convo!.tutorID
+                                ? messagedata[index].type == 'offer'
+                                    ? Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Center(
+                                            child: Align(
+                                              alignment: Alignment.topLeft,
+                                              child: CircleAvatar(
+                                                radius: 10,
+                                                backgroundColor: Colors.black12,
+                                                backgroundImage:
+                                                    tutorsList.userId ==
+                                                            widget.userID
+                                                        ? NetworkImage(
+                                                            studentinfodata
+                                                                .first
+                                                                .profilelink)
+                                                        : NetworkImage(
+                                                            tutorsList.imageID),
+                                              ),
+                                            ),
                                           ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                constraints:
+                                                    const BoxConstraints(
+                                                        minWidth: 0,
+                                                        maxWidth: 450),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      const BorderRadius.only(
+                                                          topRight: Radius
+                                                              .circular(20),
+                                                          bottomLeft:
+                                                              Radius.circular(
+                                                                  20),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  20)),
+                                                  color: (messagedata[index]
+                                                              .userID ==
+                                                          widget.userID
+                                                      ? kColorLight
+                                                      : Colors.grey.shade200),
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        2, 2, 2, 10),
+                                                child: Column(
+                                                  children: [
+                                                    Container(
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          2, 2, 2, 10),
+                                                      decoration: const BoxDecoration(
+                                                          borderRadius: BorderRadius.only(
+                                                              topLeft: Radius
+                                                                  .circular(10),
+                                                              topRight: Radius
+                                                                  .circular(20),
+                                                              bottomLeft: Radius
+                                                                  .circular(10),
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          10)),
+                                                          color: Color.fromRGBO(
+                                                              181,
+                                                              226,
+                                                              250,
+                                                              1)),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        child: RichText(
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          text: TextSpan(
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .headlineSmall
+                                                                ?.copyWith(
+                                                                  color: const Color
+                                                                          .fromARGB(
+                                                                      255,
+                                                                      59,
+                                                                      59,
+                                                                      59),
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .normal,
+                                                                ),
+                                                            children: <
+                                                                TextSpan>[
+                                                              TextSpan(
+                                                                  text:
+                                                                      '${tutorsList.firstName} ${tutorsList.lastname} offer',
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        15,
+                                                                  )),
+                                                              TextSpan(
+                                                                  text:
+                                                                      ' \$${messagedata[index]
+                                                              .classPrice} for Mathematics',
+                                                                  style: Theme
+                                                                          .of(
+                                                                              context)
+                                                                      .textTheme
+                                                                      .headlineSmall
+                                                                      ?.copyWith(
+                                                                          color:
+                                                                              kColorLight,
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontStyle: FontStyle
+                                                                              .italic),
+                                                                  recognizer:
+                                                                      TapGestureRecognizer()
+                                                                        ..onTap =
+                                                                            () {}),
+                                                              const TextSpan(
+                                                                  text:
+                                                                      ' subject with'),
+                                                              TextSpan(
+                                                                text:
+                                                                    ' ${messagedata[index].noofclasses} ',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .headlineSmall
+                                                                    ?.copyWith(
+                                                                        color:
+                                                                            kColorLight,
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w500,
+                                                                        fontStyle:
+                                                                            FontStyle.italic),
+                                                              ),
+                                                              const TextSpan(
+                                                                  text:
+                                                                      'classes.'),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      messagedata[index]
+                                                          .messageContent,
+                                                      style: const TextStyle(
+                                                          fontSize: 15),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Visibility(
+                                                visible: widget.userID ==
+                                                    widget.convo!.studentID,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        showDialog<DateTime>(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return DeclineInquiry(
+                                                              messageinfo:
+                                                                  messagedata[
+                                                                      index],
+                                                              currentID:
+                                                                  widget.userID,
+                                                            );
+                                                          },
+                                                        ).then((selectedDate) {
+                                                          if (selectedDate !=
+                                                              null) {
+                                                            // Do something with the selected date
+                                                          }
+                                                        });
+                                                      },
+                                                      child: const Text(
+                                                        'Decline',
+                                                        style: TextStyle(
+                                                            color: Colors.red),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                        width:
+                                                            16.0), // Add some spacing between the buttons
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        showDialog<DateTime>(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return OfferInquiry(
+                                                              messageinfo:
+                                                                  messagedata[
+                                                                      index],
+                                                              currentID:
+                                                                  widget.userID,
+                                                            );
+                                                          },
+                                                        ).then((selectedDate) {
+                                                          if (selectedDate !=
+                                                              null) {
+                                                            // Do something with the selected date
+                                                          }
+                                                        });
+                                                      },
+                                                      child: Text(
+                                                        'Add Cart',
+                                                        style: TextStyle(
+                                                            color: Colors
+                                                                .grey[600]),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      )
+                                    : messagedata[index].type == 'inquiry'
+                                        ? Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Center(
+                                                child: Align(
+                                                  alignment: Alignment.topLeft,
+                                                  child: CircleAvatar(
+                                                    radius: 10,
+                                                    backgroundColor:
+                                                        Colors.black12,
+                                                    backgroundImage: tutorsList
+                                                                .userId ==
+                                                            widget.userID
+                                                        ? NetworkImage(
+                                                            studentinfodata
+                                                                .first
+                                                                .profilelink)
+                                                        : NetworkImage(
+                                                            tutorsList.imageID),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                            minWidth: 0,
+                                                            maxWidth: 450),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                                  .only(
+                                                              topRight: Radius
+                                                                  .circular(20),
+                                                              bottomLeft: Radius
+                                                                  .circular(20),
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          20)),
+                                                      color: (messagedata[index]
+                                                                  .userID ==
+                                                              widget.userID
+                                                          ? kColorLight
+                                                          : Colors
+                                                              .grey.shade200),
+                                                    ),
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(2, 2, 2, 10),
+                                                    child: Column(
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .fromLTRB(
+                                                                  2, 2, 2, 10),
+                                                          decoration: const BoxDecoration(
+                                                              borderRadius: BorderRadius.only(
+                                                                  topLeft: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  topRight: Radius
+                                                                      .circular(
+                                                                          20),
+                                                                  bottomLeft: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  bottomRight: Radius
+                                                                      .circular(
+                                                                          10)),
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      181,
+                                                                      226,
+                                                                      250,
+                                                                      1)),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(10),
+                                                            child: RichText(
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              text: TextSpan(
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .headlineSmall
+                                                                    ?.copyWith(
+                                                                      color: const Color
+                                                                              .fromARGB(
+                                                                          255,
+                                                                          59,
+                                                                          59,
+                                                                          59),
+                                                                      fontSize:
+                                                                          15,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                    ),
+                                                                children: <
+                                                                    TextSpan>[
+                                                                  TextSpan(
+                                                                      text:
+                                                                          '${tutorsList.firstName} ${tutorsList.lastname}',
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        fontSize:
+                                                                            15,
+                                                                      )),
+                                                                  TextSpan(
+                                                                      text:
+                                                                          ' \$40 for Mathematics',
+                                                                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                          color:
+                                                                              kColorLight,
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontStyle: FontStyle
+                                                                              .italic),
+                                                                      recognizer: TapGestureRecognizer()
+                                                                        ..onTap =
+                                                                            () {}),
+                                                                  const TextSpan(
+                                                                      text:
+                                                                          ' subject with'),
+                                                                  TextSpan(
+                                                                    text:
+                                                                        ' ${messagedata[index].noofclasses} ',
+                                                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                        color:
+                                                                            kColorLight,
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w500,
+                                                                        fontStyle:
+                                                                            FontStyle.italic),
+                                                                  ),
+                                                                  const TextSpan(
+                                                                      text:
+                                                                          'classes.'),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          messagedata[index]
+                                                              .messageContent,
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 15),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Visibility(
+                                                    visible: widget.userID ==
+                                                        widget.convo!.tutorID,
+                                                    child: Center(
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              showDialog<
+                                                                  DateTime>(
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  return RefusedInquiry(
+                                                                    messageinfo:
+                                                                        messagedata[
+                                                                            index],
+                                                                    currentID:
+                                                                        widget
+                                                                            .userID,
+                                                                  );
+                                                                },
+                                                              ).then(
+                                                                  (selectedDate) {
+                                                                if (selectedDate !=
+                                                                    null) {
+                                                                  // Do something with the selected date
+                                                                }
+                                                              });
+                                                            },
+                                                            child: const Text(
+                                                              'REFUSE',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width:
+                                                                  16.0), // Add some spacing between the buttons
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              showDialog<
+                                                                  DateTime>(
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  return OfferInquiry(
+                                                                    messageinfo:
+                                                                        messagedata[
+                                                                            index],
+                                                                    currentID:
+                                                                        widget
+                                                                            .userID,
+                                                                  );
+                                                                },
+                                                              ).then(
+                                                                  (selectedDate) {
+                                                                if (selectedDate !=
+                                                                    null) {
+                                                                  // Do something with the selected date
+                                                                }
+                                                              });
+                                                            },
+                                                            child: Text(
+                                                              'OFFER',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                          .grey[
+                                                                      600]),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          )
+                                        :messagedata[index].type == 'declinedoffer'
+                                        ? Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Center(
+                                                child: Align(
+                                                  alignment: Alignment.topLeft,
+                                                  child: CircleAvatar(
+                                                    radius: 10,
+                                                    backgroundColor:
+                                                        Colors.black12,
+                                                    backgroundImage: tutorsList
+                                                                .userId ==
+                                                            widget.userID
+                                                        ? NetworkImage(
+                                                            studentinfodata
+                                                                .first
+                                                                .profilelink)
+                                                        : NetworkImage(
+                                                            tutorsList.imageID),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                            minWidth: 0,
+                                                            maxWidth: 450),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                                  .only(
+                                                              topRight: Radius
+                                                                  .circular(20),
+                                                              bottomLeft: Radius
+                                                                  .circular(20),
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          20)),
+                                                      color: (messagedata[index]
+                                                                  .userID !=
+                                                              widget.userID
+                                                          ? Colors.red.shade200
+                                                          : Colors
+                                                              .grey.shade200),
+                                                    ),
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(2, 2, 2, 10),
+                                                    child: Column(
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .fromLTRB(
+                                                                  2, 2, 2, 10),
+                                                          decoration: const BoxDecoration(
+                                                              borderRadius: BorderRadius.only(
+                                                                  topLeft: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  topRight: Radius
+                                                                      .circular(
+                                                                          20),
+                                                                  bottomLeft: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  bottomRight: Radius
+                                                                      .circular(
+                                                                          10)),
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      181,
+                                                                      226,
+                                                                      250,
+                                                                      1)),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(10),
+                                                            child: RichText(
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              text: TextSpan(
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .headlineSmall
+                                                                    ?.copyWith(
+                                                                      color: const Color
+                                                                              .fromARGB(
+                                                                          255,
+                                                                          59,
+                                                                          59,
+                                                                          59),
+                                                                      fontSize:
+                                                                          15,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                    ),
+                                                                children: <
+                                                                    TextSpan>[
+                                                                  TextSpan(
+                                                                      text:
+                                                                          '${tutorsList.firstName} ${tutorsList.lastname}',
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        fontSize:
+                                                                            15,
+                                                                      )),
+                                                                  TextSpan(
+                                                                      text:
+                                                                          ' \$40 for Mathematics',
+                                                                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                          color:
+                                                                              kColorLight,
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontStyle: FontStyle
+                                                                              .italic),
+                                                                      recognizer: TapGestureRecognizer()
+                                                                        ..onTap =
+                                                                            () {}),
+                                                                  const TextSpan(
+                                                                      text:
+                                                                          ' subject with'),
+                                                                  TextSpan(
+                                                                    text:
+                                                                        ' ${messagedata[index].noofclasses} ',
+                                                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                        color:
+                                                                            kColorLight,
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w500,
+                                                                        fontStyle:
+                                                                            FontStyle.italic),
+                                                                  ),
+                                                                  const TextSpan(
+                                                                      text:
+                                                                          'classes.'),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          messagedata[index]
+                                                              .messageContent,
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 15),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Visibility(
+                                                    visible: widget.userID ==
+                                                        widget.convo!.tutorID,
+                                                    child: Center(
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              showDialog<
+                                                                  DateTime>(
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  return RefusedInquiry(
+                                                                    messageinfo:
+                                                                        messagedata[
+                                                                            index],
+                                                                    currentID:
+                                                                        widget
+                                                                            .userID,
+                                                                  );
+                                                                },
+                                                              ).then(
+                                                                  (selectedDate) {
+                                                                if (selectedDate !=
+                                                                    null) {
+                                                                  // Do something with the selected date
+                                                                }
+                                                              });
+                                                            },
+                                                            child: const Text(
+                                                              'REFUSE',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width:
+                                                                  16.0), // Add some spacing between the buttons
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              showDialog<
+                                                                  DateTime>(
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  return OfferInquiry(
+                                                                    messageinfo:
+                                                                        messagedata[
+                                                                            index],
+                                                                    currentID:
+                                                                        widget
+                                                                            .userID,
+                                                                  );
+                                                                },
+                                                              ).then(
+                                                                  (selectedDate) {
+                                                                if (selectedDate !=
+                                                                    null) {
+                                                                  // Do something with the selected date
+                                                                }
+                                                              });
+                                                            },
+                                                            child: Text(
+                                                              'OFFER',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                          .grey[
+                                                                      600]),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          )
+                                        :messagedata[index].type == 'declinedinquiry'
+                                        ? Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Center(
+                                                child: Align(
+                                                  alignment: Alignment.topLeft,
+                                                  child: CircleAvatar(
+                                                    radius: 10,
+                                                    backgroundColor:
+                                                        Colors.black12,
+                                                    backgroundImage: tutorsList
+                                                                .userId ==
+                                                            widget.userID
+                                                        ? NetworkImage(
+                                                            studentinfodata
+                                                                .first
+                                                                .profilelink)
+                                                        : NetworkImage(
+                                                            tutorsList.imageID),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                            minWidth: 0,
+                                                            maxWidth: 450),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                                  .only(
+                                                              topRight: Radius
+                                                                  .circular(20),
+                                                              bottomLeft: Radius
+                                                                  .circular(20),
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          20)),
+                                                      color: (messagedata[index]
+                                                                  .userID !=
+                                                              widget.userID
+                                                          ? Colors.red.shade200
+                                                          : Colors
+                                                              .grey.shade200),
+                                                    ),
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(2, 2, 2, 10),
+                                                    child: Column(
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .fromLTRB(
+                                                                  2, 2, 2, 10),
+                                                          decoration: const BoxDecoration(
+                                                              borderRadius: BorderRadius.only(
+                                                                  topLeft: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  topRight: Radius
+                                                                      .circular(
+                                                                          20),
+                                                                  bottomLeft: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  bottomRight: Radius
+                                                                      .circular(
+                                                                          10)),
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      181,
+                                                                      226,
+                                                                      250,
+                                                                      1)),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(10),
+                                                            child: RichText(
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              text: TextSpan(
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .headlineSmall
+                                                                    ?.copyWith(
+                                                                      color: const Color
+                                                                              .fromARGB(
+                                                                          255,
+                                                                          59,
+                                                                          59,
+                                                                          59),
+                                                                      fontSize:
+                                                                          15,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                    ),
+                                                                children: <
+                                                                    TextSpan>[
+                                                                  TextSpan(
+                                                                      text:
+                                                                          '${tutorsList.firstName} ${tutorsList.lastname} refuse ',
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        fontSize:
+                                                                            15,
+                                                                      )),
+                                                                  TextSpan(
+                                                                      text:
+                                                                          ' inquiry for Mathematics',
+                                                                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                          color:
+                                                                              kColorLight,
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontStyle: FontStyle
+                                                                              .italic),
+                                                                      recognizer: TapGestureRecognizer()
+                                                                        ..onTap =
+                                                                            () {}),
+                                                                  const TextSpan(
+                                                                      text:
+                                                                          ' subject with'),
+                                                                  TextSpan(
+                                                                    text:
+                                                                        ' ${messagedata[index].noofclasses} ',
+                                                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                        color:
+                                                                            kColorLight,
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w500,
+                                                                        fontStyle:
+                                                                            FontStyle.italic),
+                                                                  ),
+                                                                  const TextSpan(
+                                                                      text:
+                                                                          'classes.'),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          messagedata[index]
+                                                              .messageContent,
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 15),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),],
+                                              ),
+                                            ],
+                                          )
+                                        : Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Center(
+                                                child: Align(
+                                                  alignment: Alignment.topLeft,
+                                                  child: CircleAvatar(
+                                                    radius: 10,
+                                                    backgroundColor:
+                                                        Colors.black12,
+                                                    backgroundImage: tutorsList
+                                                                .userId ==
+                                                            widget.userID
+                                                        ? NetworkImage(
+                                                            studentinfodata
+                                                                .first
+                                                                .profilelink)
+                                                        : NetworkImage(
+                                                            tutorsList.imageID),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              Container(
+                                                constraints:
+                                                    const BoxConstraints(
+                                                        minWidth: 0,
+                                                        maxWidth: 450),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      const BorderRadius.only(
+                                                          topRight: Radius
+                                                              .circular(20),
+                                                          bottomLeft:
+                                                              Radius.circular(
+                                                                  20),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  20)),
+                                                  color: (messagedata[index]
+                                                              .userID ==
+                                                          widget.userID
+                                                      ? kColorLight
+                                                      : Colors.grey.shade200),
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.all(16),
+                                                child: Text(
+                                                  messagedata[index]
+                                                      .messageContent,
+                                                  style: const TextStyle(
+                                                      fontSize: 15),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                : messagedata[index].type == 'offer'
+                                    ? Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Center(
+                                            child: Align(
+                                              alignment: Alignment.topLeft,
+                                              child: CircleAvatar(
+                                                radius: 10,
+                                                backgroundColor: Colors.black12,
+                                                backgroundImage:
+                                                    tutorsList.userId ==
+                                                            widget.userID
+                                                        ? NetworkImage(
+                                                            studentinfodata
+                                                                .first
+                                                                .profilelink)
+                                                        : NetworkImage(
+                                                            tutorsList.imageID),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                constraints:
+                                                    const BoxConstraints(
+                                                        minWidth: 0,
+                                                        maxWidth: 450),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      const BorderRadius.only(
+                                                          topRight: Radius
+                                                              .circular(20),
+                                                          bottomLeft:
+                                                              Radius.circular(
+                                                                  20),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  20)),
+                                                  color: (messagedata[index]
+                                                              .userID ==
+                                                          widget.userID
+                                                      ? kColorLight
+                                                      : Colors.grey.shade200),
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        2, 2, 2, 10),
+                                                child: Column(
+                                                  children: [
+                                                    Container(
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          2, 2, 2, 10),
+                                                      decoration: const BoxDecoration(
+                                                          borderRadius: BorderRadius.only(
+                                                              topLeft: Radius
+                                                                  .circular(20),
+                                                              bottomLeft: Radius
+                                                                  .circular(10),
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          10),
+                                                              topRight: Radius
+                                                                  .circular(
+                                                                      10)),
+                                                          color: Color.fromRGBO(
+                                                              181,
+                                                              226,
+                                                              250,
+                                                              1)),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(10.0),
+                                                        child: RichText(
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          text: TextSpan(
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .headlineSmall
+                                                                ?.copyWith(
+                                                                  color: const Color
+                                                                          .fromARGB(
+                                                                      255,
+                                                                      59,
+                                                                      59,
+                                                                      59),
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .normal,
+                                                                ),
+                                                            children: <
+                                                                TextSpan>[
+                                                              TextSpan(
+                                                                  text:
+                                                                      '${tutorsList.firstName} ${tutorsList.lastname}',
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        15,
+                                                                  )),
+                                                              TextSpan(
+                                                                  text:
+                                                                      ' \$40 for Mathematics',
+                                                                  style: Theme
+                                                                          .of(
+                                                                              context)
+                                                                      .textTheme
+                                                                      .headlineSmall
+                                                                      ?.copyWith(
+                                                                          color:
+                                                                              kColorLight,
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontStyle: FontStyle
+                                                                              .italic),
+                                                                  recognizer:
+                                                                      TapGestureRecognizer()
+                                                                        ..onTap =
+                                                                            () {}),
+                                                              const TextSpan(
+                                                                  text:
+                                                                      ' subject with'),
+                                                              TextSpan(
+                                                                text:
+                                                                    ' ${messagedata[index].noofclasses} ',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .headlineSmall
+                                                                    ?.copyWith(
+                                                                        color:
+                                                                            kColorLight,
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w500,
+                                                                        fontStyle:
+                                                                            FontStyle.italic),
+                                                              ),
+                                                              const TextSpan(
+                                                                  text:
+                                                                      'classes.'),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      messagedata[index]
+                                                          .messageContent,
+                                                      style: const TextStyle(
+                                                          fontSize: 15),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Visibility(
+                                                visible: widget.userID ==
+                                                    widget.convo!.studentID,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        showDialog<DateTime>(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return DeclineInquiry(
+                                                              messageinfo:
+                                                                  messagedata[
+                                                                      index],
+                                                              currentID:
+                                                                  widget.userID,
+                                                            );
+                                                          },
+                                                        ).then((selectedDate) {
+                                                          if (selectedDate !=
+                                                              null) {
+                                                            // Do something with the selected date
+                                                          }
+                                                        });
+                                                      },
+                                                      child: const Text(
+                                                        'Decline',
+                                                        style: TextStyle(
+                                                            color: Colors.red),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                        width:
+                                                            16.0), // Add some spacing between the buttons
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        showDialog<DateTime>(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return OfferInquiry(
+                                                              messageinfo:
+                                                                  messagedata[
+                                                                      index],
+                                                              currentID:
+                                                                  widget.userID,
+                                                            );
+                                                          },
+                                                        ).then((selectedDate) {
+                                                          if (selectedDate !=
+                                                              null) {
+                                                            // Do something with the selected date
+                                                          }
+                                                        });
+                                                      },
+                                                      child: Text(
+                                                        'Add Cart',
+                                                        style: TextStyle(
+                                                            color: Colors
+                                                                .grey[600]),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      )
+                                    : messagedata[index].type == 'inquiry'
+                                        ? Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Center(
+                                                child: Align(
+                                                  alignment: Alignment.topLeft,
+                                                  child: CircleAvatar(
+                                                    radius: 10,
+                                                    backgroundColor:
+                                                        Colors.black12,
+                                                    backgroundImage: tutorsList
+                                                                .userId ==
+                                                            widget.userID
+                                                        ? NetworkImage(
+                                                            studentinfodata
+                                                                .first
+                                                                .profilelink)
+                                                        : NetworkImage(
+                                                            tutorsList.imageID),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                            minWidth: 0,
+                                                            maxWidth: 450),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                                  .only(
+                                                              topRight: Radius
+                                                                  .circular(20),
+                                                              bottomLeft: Radius
+                                                                  .circular(20),
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          20)),
+                                                      color: (messagedata[index]
+                                                                  .userID ==
+                                                              widget.userID
+                                                          ? kColorLight
+                                                          : Colors
+                                                              .grey.shade200),
+                                                    ),
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(2, 2, 2, 10),
+                                                    child: Column(
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .fromLTRB(
+                                                                  2, 2, 2, 10),
+                                                          decoration: const BoxDecoration(
+                                                              borderRadius: BorderRadius.only(
+                                                                  topLeft: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  topRight: Radius
+                                                                      .circular(
+                                                                          20),
+                                                                  bottomLeft: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  bottomRight: Radius
+                                                                      .circular(
+                                                                          10)),
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      181,
+                                                                      226,
+                                                                      250,
+                                                                      1)),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(10),
+                                                            child: RichText(
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              text: TextSpan(
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .headlineSmall
+                                                                    ?.copyWith(
+                                                                      color: const Color
+                                                                              .fromARGB(
+                                                                          255,
+                                                                          59,
+                                                                          59,
+                                                                          59),
+                                                                      fontSize:
+                                                                          15,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                    ),
+                                                                children: <
+                                                                    TextSpan>[
+                                                                  TextSpan(
+                                                                      text:
+                                                                          '${studentinfodata.first.studentFirstname} ${studentinfodata.first.studentLastname}',
+                                                                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                          color:
+                                                                              kColorLight,
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontStyle: FontStyle
+                                                                              .italic),
+                                                                      recognizer: TapGestureRecognizer()
+                                                                        ..onTap =
+                                                                            () {}),
+                                                                  const TextSpan(
+                                                                      text:
+                                                                          ' is inquiring for ',
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            15,
+                                                                      )),
+                                                                  TextSpan(
+                                                                      text:
+                                                                          'Mathematics',
+                                                                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                          color:
+                                                                              kColorLight,
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontStyle: FontStyle
+                                                                              .italic),
+                                                                      recognizer: TapGestureRecognizer()
+                                                                        ..onTap =
+                                                                            () {}),
+                                                                  const TextSpan(
+                                                                      text:
+                                                                          ' subject with'),
+                                                                  TextSpan(
+                                                                    text:
+                                                                        ' ${messagedata[index].noofclasses} ',
+                                                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                        color:
+                                                                            kColorLight,
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w500,
+                                                                        fontStyle:
+                                                                            FontStyle.italic),
+                                                                  ),
+                                                                  const TextSpan(
+                                                                      text:
+                                                                          'classes.'),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          messagedata[index]
+                                                              .messageContent,
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 15),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Visibility(
+                                                    visible: widget.userID ==
+                                                        widget.convo!.tutorID,
+                                                    child: Center(
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              showDialog<
+                                                                  DateTime>(
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  return RefusedInquiry(
+                                                                    messageinfo:
+                                                                        messagedata[
+                                                                            index],
+                                                                    currentID:
+                                                                        widget
+                                                                            .userID,
+                                                                  );
+                                                                },
+                                                              ).then(
+                                                                  (selectedDate) {
+                                                                if (selectedDate !=
+                                                                    null) {
+                                                                  // Do something with the selected date
+                                                                }
+                                                              });
+                                                            },
+                                                            child: const Text(
+                                                              'Refuse',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width:
+                                                                  16.0), // Add some spacing between the buttons
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              showDialog<
+                                                                  DateTime>(
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  return OfferInquiry(
+                                                                    messageinfo:
+                                                                        messagedata[
+                                                                            index],
+                                                                    currentID:
+                                                                        widget
+                                                                            .userID,
+                                                                  );
+                                                                },
+                                                              ).then(
+                                                                  (selectedDate) {
+                                                                if (selectedDate !=
+                                                                    null) {
+                                                                  // Do something with the selected date
+                                                                }
+                                                              });
+                                                            },
+                                                            child: Text(
+                                                              'Offer',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                          .grey[
+                                                                      600]),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          )
+                                        : messagedata[index].type ==
+                                                'declinedoffer'
+                                            ? Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Center(
+                                                    child: Align(
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: CircleAvatar(
+                                                        radius: 10,
+                                                        backgroundColor:
+                                                            Colors.black12,
+                                                        backgroundImage: tutorsList
+                                                                    .userId ==
+                                                                widget.userID
+                                                            ? NetworkImage(
+                                                                studentinfodata
+                                                                    .first
+                                                                    .profilelink)
+                                                            : NetworkImage(
+                                                                tutorsList
+                                                                    .imageID),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Container(
+                                                        constraints:
+                                                            const BoxConstraints(
+                                                                minWidth: 0,
+                                                                maxWidth: 450),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius: const BorderRadius
+                                                                  .only(
+                                                              topRight: Radius
+                                                                  .circular(20),
+                                                              bottomLeft: Radius
+                                                                  .circular(20),
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          20)),
+                                                          color: (messagedata[
+                                                                          index]
+                                                                      .userID !=
+                                                                  widget.userID
+                                                              ? Colors.red.shade200
+                                                              : Colors.grey
+                                                                  .shade200),
+                                                        ),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                2, 2, 2, 10),
+                                                        child: Column(
+                                                          children: [
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .fromLTRB(
+                                                                      2,
+                                                                      2,
+                                                                      2,
+                                                                      10),
+                                                              decoration: const BoxDecoration(
+                                                                  borderRadius: BorderRadius.only(
+                                                                      topLeft:
+                                                                          Radius.circular(
+                                                                              10),
+                                                                      topRight:
+                                                                          Radius.circular(
+                                                                              20),
+                                                                      bottomLeft:
+                                                                          Radius.circular(
+                                                                              10),
+                                                                      bottomRight:
+                                                                          Radius.circular(
+                                                                              10)),
+                                                                  color: Color
+                                                                      .fromRGBO(
+                                                                          181,
+                                                                          226,
+                                                                          250,
+                                                                          1)),
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(10),
+                                                                child: RichText(
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                  text:
+                                                                      TextSpan(
+                                                                    style: Theme.of(
+                                                                            context)
+                                                                        .textTheme
+                                                                        .headlineSmall
+                                                                        ?.copyWith(
+                                                                          color: const Color.fromARGB(
+                                                                              255,
+                                                                              59,
+                                                                              59,
+                                                                              59),
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight:
+                                                                              FontWeight.normal,
+                                                                        ),
+                                                                    children: <
+                                                                        TextSpan>[
+                                                                      TextSpan(
+                                                                          text:
+                                                                              '${studentinfodata.first.studentFirstname} ${studentinfodata.first.studentLastname}',
+                                                                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                              color: kColorLight,
+                                                                              fontSize: 15,
+                                                                              fontWeight: FontWeight.w500,
+                                                                              fontStyle: FontStyle.italic),
+                                                                          recognizer: TapGestureRecognizer()..onTap = () {}),
+                                                                      const TextSpan(
+                                                                          text:
+                                                                              ' declined offer for ',
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                15,
+                                                                          )),
+                                                                      TextSpan(
+                                                                          text:
+                                                                              'Mathematics',
+                                                                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                              color: kColorLight,
+                                                                              fontSize: 15,
+                                                                              fontWeight: FontWeight.w500,
+                                                                              fontStyle: FontStyle.italic),
+                                                                          recognizer: TapGestureRecognizer()..onTap = () {}),
+                                                                      const TextSpan(
+                                                                          text:
+                                                                              ' subject with'),
+                                                                      TextSpan(
+                                                                        text:
+                                                                            ' ${messagedata[index].noofclasses} ',
+                                                                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                            color:
+                                                                                kColorLight,
+                                                                            fontSize:
+                                                                                15,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                            fontStyle: FontStyle.italic),
+                                                                      ),
+                                                                      const TextSpan(
+                                                                          text:
+                                                                              'classes.'),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              messagedata[index]
+                                                                  .messageContent,
+                                                              style:
+                                                                  const TextStyle(
+                                                                      fontSize:
+                                                                          15),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ), ],
+                                                  ),
+                                                ],
+                                              )
+                                            : messagedata[index].type ==
+                                                    'declinedinquiry'
+                                                ? Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Center(
+                                                        child: Align(
+                                                          alignment:
+                                                              Alignment.topLeft,
+                                                          child: CircleAvatar(
+                                                            radius: 10,
+                                                            backgroundColor:
+                                                                Colors.black12,
+                                                            backgroundImage: tutorsList
+                                                                        .userId ==
+                                                                    widget
+                                                                        .userID
+                                                                ? NetworkImage(
+                                                                    studentinfodata
+                                                                        .first
+                                                                        .profilelink)
+                                                                : NetworkImage(
+                                                                    tutorsList
+                                                                        .imageID),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Container(
+                                                            constraints:
+                                                                const BoxConstraints(
+                                                                    minWidth: 0,
+                                                                    maxWidth:
+                                                                        450),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius: const BorderRadius
+                                                                      .only(
+                                                                  topRight: Radius
+                                                                      .circular(
+                                                                          20),
+                                                                  bottomLeft: Radius
+                                                                      .circular(
+                                                                          20),
+                                                                  bottomRight: Radius
+                                                                      .circular(
+                                                                          20)),
+                                                              color: (messagedata[
+                                                                              index]
+                                                                          .userID !=
+                                                                      widget
+                                                                          .userID
+                                                                  ? Colors.red.shade200
+                                                                  : Colors.grey
+                                                                      .shade200),
+                                                            ),
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .fromLTRB(
+                                                                    2,
+                                                                    2,
+                                                                    2,
+                                                                    10),
+                                                            child: Column(
+                                                              children: [
+                                                                Container(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .fromLTRB(
+                                                                          2,
+                                                                          2,
+                                                                          2,
+                                                                          10),
+                                                                  decoration: const BoxDecoration(
+                                                                      borderRadius: BorderRadius.only(
+                                                                          topLeft: Radius.circular(
+                                                                              10),
+                                                                          topRight: Radius.circular(
+                                                                              20),
+                                                                          bottomLeft: Radius.circular(
+                                                                              10),
+                                                                          bottomRight: Radius.circular(
+                                                                              10)),
+                                                                      color: Color.fromRGBO(
+                                                                          181,
+                                                                          226,
+                                                                          250,
+                                                                          1)),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding:
+                                                                        const EdgeInsets.all(
+                                                                            10),
+                                                                    child:
+                                                                        RichText(
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      text:
+                                                                          TextSpan(
+                                                                        style: Theme.of(context)
+                                                                            .textTheme
+                                                                            .headlineSmall
+                                                                            ?.copyWith(
+                                                                              color: const Color.fromARGB(255, 59, 59, 59),
+                                                                              fontSize: 15,
+                                                                              fontWeight: FontWeight.normal,
+                                                                            ),
+                                                                        children: <
+                                                                            TextSpan>[
+                                                                          TextSpan(
+                                                                              text: '${studentinfodata.first.studentFirstname} ${studentinfodata.first.studentLastname}',
+                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: kColorLight, fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
+                                                                              recognizer: TapGestureRecognizer()..onTap = () {}),
+                                                                          const TextSpan(
+                                                                              text: ' is inquiring for ',
+                                                                              style: TextStyle(
+                                                                                fontSize: 15,
+                                                                              )),
+                                                                          TextSpan(
+                                                                              text: 'Mathematics',
+                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: kColorLight, fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
+                                                                              recognizer: TapGestureRecognizer()..onTap = () {}),
+                                                                          const TextSpan(
+                                                                              text: ' subject with'),
+                                                                          TextSpan(
+                                                                            text:
+                                                                                ' ${messagedata[index].noofclasses} ',
+                                                                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                                color: kColorLight,
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                fontStyle: FontStyle.italic),
+                                                                          ),
+                                                                          const TextSpan(
+                                                                              text: 'classes.'),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  messagedata[
+                                                                          index]
+                                                                      .messageContent,
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          15),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Visibility(
+                                                            visible: widget
+                                                                    .userID ==
+                                                                widget.convo!
+                                                                    .tutorID,
+                                                            child: Center(
+                                                              child: Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .start,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  TextButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      showDialog<
+                                                                          DateTime>(
+                                                                        context:
+                                                                            context,
+                                                                        builder:
+                                                                            (BuildContext
+                                                                                context) {
+                                                                          return RefusedInquiry(
+                                                                            messageinfo:
+                                                                                messagedata[index],
+                                                                            currentID:
+                                                                                widget.userID,
+                                                                          );
+                                                                        },
+                                                                      ).then(
+                                                                          (selectedDate) {
+                                                                        if (selectedDate !=
+                                                                            null) {
+                                                                          // Do something with the selected date
+                                                                        }
+                                                                      });
+                                                                    },
+                                                                    child:
+                                                                        const Text(
+                                                                      'Refuse',
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.red),
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                      width:
+                                                                          16.0), // Add some spacing between the buttons
+                                                                  TextButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      showDialog<
+                                                                          DateTime>(
+                                                                        context:
+                                                                            context,
+                                                                        builder:
+                                                                            (BuildContext
+                                                                                context) {
+                                                                          return OfferInquiry(
+                                                                            messageinfo:
+                                                                                messagedata[index],
+                                                                            currentID:
+                                                                                widget.userID,
+                                                                          );
+                                                                        },
+                                                                      ).then(
+                                                                          (selectedDate) {
+                                                                        if (selectedDate !=
+                                                                            null) {
+                                                                          // Do something with the selected date
+                                                                        }
+                                                                      });
+                                                                    },
+                                                                    child: Text(
+                                                                      'Offer',
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.grey[600]),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  )
+                                                : Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Center(
+                                                        child: Align(
+                                                          alignment:
+                                                              Alignment.topLeft,
+                                                          child: CircleAvatar(
+                                                            radius: 10,
+                                                            backgroundColor:
+                                                                Colors.black12,
+                                                            backgroundImage: tutorsList
+                                                                        .userId ==
+                                                                    widget
+                                                                        .userID
+                                                                ? NetworkImage(
+                                                                    studentinfodata
+                                                                        .first
+                                                                        .profilelink)
+                                                                : NetworkImage(
+                                                                    tutorsList
+                                                                        .imageID),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Container(
+                                                        constraints:
+                                                            const BoxConstraints(
+                                                                minWidth: 0,
+                                                                maxWidth: 450),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius: const BorderRadius
+                                                                  .only(
+                                                              topRight: Radius
+                                                                  .circular(20),
+                                                              bottomLeft: Radius
+                                                                  .circular(20),
+                                                              bottomRight:
+                                                                  Radius
+                                                                      .circular(
+                                                                          20)),
+                                                          color: (messagedata[
+                                                                          index]
+                                                                      .userID ==
+                                                                  widget.userID
+                                                              ? kColorLight
+                                                              : Colors.grey
+                                                                  .shade200),
+                                                        ),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(16),
+                                                        child: Text(
+                                                          messagedata[index]
+                                                              .messageContent,
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 15),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                            : messagedata[index].userID == widget.convo!.tutorID
+                                ? messagedata[index].type == 'inquiry'
+                                    ? SizedBox(
+                                        width: 500,
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  constraints:
+                                                      const BoxConstraints(
+                                                          minWidth: 0,
+                                                          maxWidth: 450),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        const BorderRadius.only(
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                    20),
+                                                            bottomLeft:
+                                                                Radius.circular(
+                                                                    20),
+                                                            bottomRight:
+                                                                Radius.circular(
+                                                                    20)),
+                                                    color: (messagedata[index]
+                                                                .userID ==
+                                                            widget.userID
+                                                        ? kColorLight
+                                                        : Colors.grey.shade200),
+                                                  ),
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          2, 2, 2, 10),
+                                                  child: Column(
+                                                    children: [
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                2, 2, 2, 10),
+                                                        decoration: const BoxDecoration(
+                                                            borderRadius: BorderRadius.only(
+                                                                topLeft: Radius
+                                                                    .circular(
+                                                                        20),
+                                                                bottomLeft: Radius
+                                                                    .circular(
+                                                                        10),
+                                                                bottomRight:
+                                                                    Radius
+                                                                        .circular(
+                                                                            10),
+                                                                topRight: Radius
+                                                                    .circular(
+                                                                        10)),
+                                                            color:
+                                                                Color.fromRGBO(
+                                                                    181,
+                                                                    226,
+                                                                    250,
+                                                                    1)),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10.0),
+                                                          child: RichText(
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            text: TextSpan(
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .headlineSmall
+                                                                  ?.copyWith(
+                                                                    color: const Color
+                                                                            .fromARGB(
+                                                                        255,
+                                                                        59,
+                                                                        59,
+                                                                        59),
+                                                                    fontSize:
+                                                                        15,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal,
+                                                                  ),
+                                                              children: <
+                                                                  TextSpan>[
+                                                                const TextSpan(
+                                                                    text:
+                                                                        'You are inquiring for ',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          15,
+                                                                    )),
+                                                                TextSpan(
+                                                                    text:
+                                                                        'Mathematics',
+                                                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                        color:
+                                                                            kColorLight,
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w500,
+                                                                        fontStyle:
+                                                                            FontStyle
+                                                                                .italic),
+                                                                    recognizer:
+                                                                        TapGestureRecognizer()
+                                                                          ..onTap =
+                                                                              () {}),
+                                                                const TextSpan(
+                                                                    text:
+                                                                        ' subject with'),
+                                                                TextSpan(
+                                                                  text:
+                                                                      ' ${messagedata[index].noofclasses} ',
+                                                                  style: Theme
+                                                                          .of(
+                                                                              context)
+                                                                      .textTheme
+                                                                      .headlineSmall
+                                                                      ?.copyWith(
+                                                                          color:
+                                                                              kColorLight,
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontStyle:
+                                                                              FontStyle.italic),
+                                                                ),
+                                                                const TextSpan(
+                                                                    text:
+                                                                        'classes.'),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        messagedata[index]
+                                                            .messageContent,
+                                                        style: const TextStyle(
+                                                            fontSize: 15),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Visibility(
+                                              visible: widget.userID ==
+                                                  widget.convo!.tutorID,
+                                              child: Center(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        showDialog<DateTime>(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return RefusedInquiry(
+                                                              messageinfo:
+                                                                  messagedata[
+                                                                      index],
+                                                              currentID:
+                                                                  widget.userID,
+                                                            );
+                                                          },
+                                                        ).then((selectedDate) {
+                                                          if (selectedDate !=
+                                                              null) {
+                                                            // Do something with the selected date
+                                                          }
+                                                        });
+                                                      },
+                                                      child: const Text(
+                                                        'Refuse',
+                                                        style: TextStyle(
+                                                            color: Colors.red),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                        width:
+                                                            16.0), // Add some spacing between the buttons
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        showDialog<DateTime>(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return OfferInquiry(
+                                                              messageinfo:
+                                                                  messagedata[
+                                                                      index],
+                                                              currentID:
+                                                                  widget.userID,
+                                                            );
+                                                          },
+                                                        ).then((selectedDate) {
+                                                          if (selectedDate !=
+                                                              null) {
+                                                            // Do something with the selected date
+                                                          }
+                                                        });
+                                                      },
+                                                      child: Text(
+                                                        'Offer',
+                                                        style: TextStyle(
+                                                            color: Colors
+                                                                .grey[600]),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )),
+                                      )
+                                    : messagedata[index].type == 'offer'
+                                        ? SizedBox(
+                                            width: 500,
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      constraints:
+                                                          const BoxConstraints(
+                                                              minWidth: 0,
+                                                              maxWidth: 450),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                    .only(
+                                                                topLeft:
+                                                                    Radius
+                                                                        .circular(
+                                                                            20),
+                                                                bottomLeft:
+                                                                    Radius
+                                                                        .circular(
+                                                                            20),
+                                                                bottomRight: Radius
+                                                                    .circular(
+                                                                        20)),
+                                                        color: (messagedata[
+                                                                        index]
+                                                                    .userID ==
+                                                                widget.userID
+                                                            ? kColorLight
+                                                            : Colors
+                                                                .grey.shade200),
+                                                      ),
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          2, 2, 2, 10),
+                                                      child: Column(
+                                                        children: [
+                                                          Container(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .fromLTRB(
+                                                                    5, 2, 5, 5),
+                                                            child: Column(
+                                                              children: [
+                                                                Container(
+                                                                  decoration: const BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.all(Radius.circular(
+                                                                              10)),
+                                                                      color: Color.fromRGBO(
+                                                                          181,
+                                                                          226,
+                                                                          250,
+                                                                          1)),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: const EdgeInsets
+                                                                            .all(
+                                                                        10.0),
+                                                                    child:
+                                                                        RichText(
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      text:
+                                                                          TextSpan(
+                                                                        style: Theme.of(context)
+                                                                            .textTheme
+                                                                            .headlineSmall
+                                                                            ?.copyWith(
+                                                                              color: const Color.fromARGB(255, 59, 59, 59),
+                                                                              fontSize: 15,
+                                                                              fontWeight: FontWeight.normal,
+                                                                            ),
+                                                                        children: <
+                                                                            TextSpan>[
+                                                                          const TextSpan(
+                                                                              text: 'You offer',
+                                                                              style: TextStyle(
+                                                                                fontSize: 15,
+                                                                              )),
+                                                                          TextSpan(
+                                                                              text: ' \$40',
+                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: kColorLight, fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
+                                                                              recognizer: TapGestureRecognizer()..onTap = () {}),
+                                                                          TextSpan(
+                                                                              text: ' for',
+                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                                    fontSize: 15,
+                                                                                    fontWeight: FontWeight.w500,
+                                                                                  ),
+                                                                              recognizer: TapGestureRecognizer()..onTap = () {}),
+                                                                          TextSpan(
+                                                                              text: ' Mathematics',
+                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: kColorLight, fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
+                                                                              recognizer: TapGestureRecognizer()..onTap = () {}),
+                                                                          const TextSpan(
+                                                                              text: ' subject with'),
+                                                                          TextSpan(
+                                                                            text:
+                                                                                ' ${messagedata[index].noofclasses} ',
+                                                                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                                color: kColorLight,
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                fontStyle: FontStyle.italic),
+                                                                          ),
+                                                                          const TextSpan(
+                                                                              text: 'classes.'),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            messagedata[index]
+                                                                .messageContent,
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        15),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Visibility(
+                                                  visible: widget.userID ==
+                                                      widget.convo!.studentID,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    children: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          showDialog<DateTime>(
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return DeclineInquiry(
+                                                                messageinfo:
+                                                                    messagedata[
+                                                                        index],
+                                                                currentID:
+                                                                    widget
+                                                                        .userID,
+                                                              );
+                                                            },
+                                                          ).then(
+                                                              (selectedDate) {
+                                                            if (selectedDate !=
+                                                                null) {
+                                                              // Do something with the selected date
+                                                            }
+                                                          });
+                                                        },
+                                                        child: const Text(
+                                                          'Decline',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.red),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                          width:
+                                                              16.0), // Add some spacing between the buttons
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          showDialog<DateTime>(
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return OfferInquiry(
+                                                                messageinfo:
+                                                                    messagedata[
+                                                                        index],
+                                                                currentID:
+                                                                    widget
+                                                                        .userID,
+                                                              );
+                                                            },
+                                                          ).then(
+                                                              (selectedDate) {
+                                                            if (selectedDate !=
+                                                                null) {
+                                                              // Do something with the selected date
+                                                            }
+                                                          });
+                                                        },
+                                                        child: Text(
+                                                          'Add Cart',
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .grey[600]),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : messagedata[index].type ==
+                                                'declinedoffer'
+                                            ? SizedBox(
+                                                width: 500,
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Container(
+                                                          constraints:
+                                                              const BoxConstraints(
+                                                                  minWidth: 0,
+                                                                  maxWidth:
+                                                                      450),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius: const BorderRadius
+                                                                    .only(
+                                                                topLeft: Radius
+                                                                    .circular(
+                                                                        20),
+                                                                bottomLeft: Radius
+                                                                    .circular(
+                                                                        20),
+                                                                bottomRight: Radius
+                                                                    .circular(
+                                                                        20)),
+                                                            color: (messagedata[
+                                                                            index]
+                                                                        .userID ==
+                                                                    widget
+                                                                        .userID
+                                                                ? Colors.red
+                                                                    .shade200
+                                                                : Colors.grey
+                                                                    .shade200),
+                                                          ),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .fromLTRB(
+                                                                  2, 2, 2, 10),
+                                                          child: Column(
+                                                            children: [
+                                                              Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .fromLTRB(
+                                                                        2,
+                                                                        2,
+                                                                        2,
+                                                                        10),
+                                                                decoration: const BoxDecoration(
+                                                                    borderRadius: BorderRadius.only(
+                                                                        topLeft:
+                                                                            Radius.circular(
+                                                                                20),
+                                                                        bottomLeft:
+                                                                            Radius.circular(
+                                                                                10),
+                                                                        bottomRight:
+                                                                            Radius.circular(
+                                                                                10),
+                                                                        topRight:
+                                                                            Radius.circular(
+                                                                                10)),
+                                                                    color: Color
+                                                                        .fromRGBO(
+                                                                            181,
+                                                                            226,
+                                                                            250,
+                                                                            1)),
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          10.0),
+                                                                  child:
+                                                                      RichText(
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    text:
+                                                                        TextSpan(
+                                                                      style: Theme.of(
+                                                                              context)
+                                                                          .textTheme
+                                                                          .headlineSmall
+                                                                          ?.copyWith(
+                                                                            color: const Color.fromARGB(
+                                                                                255,
+                                                                                59,
+                                                                                59,
+                                                                                59),
+                                                                            fontSize:
+                                                                                15,
+                                                                            fontWeight:
+                                                                                FontWeight.normal,
+                                                                          ),
+                                                                      children: <
+                                                                          TextSpan>[
+                                                                        const TextSpan(
+                                                                            text:
+                                                                                'You declined  offer for ',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontSize: 15,
+                                                                            )),
+                                                                        TextSpan(
+                                                                            text:
+                                                                                'Mathematics',
+                                                                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                                color: kColorLight,
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                fontStyle: FontStyle.italic),
+                                                                            recognizer: TapGestureRecognizer()..onTap = () {}),
+                                                                        const TextSpan(
+                                                                            text:
+                                                                                ' subject with'),
+                                                                        TextSpan(
+                                                                          text:
+                                                                              ' ${messagedata[index].noofclasses} ',
+                                                                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                              color: kColorLight,
+                                                                              fontSize: 15,
+                                                                              fontWeight: FontWeight.w500,
+                                                                              fontStyle: FontStyle.italic),
+                                                                        ),
+                                                                        const TextSpan(
+                                                                            text:
+                                                                                'classes.'),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                messagedata[
+                                                                        index]
+                                                                    .messageContent,
+                                                                style:
+                                                                    const TextStyle(
+                                                                        fontSize:
+                                                                            15),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Visibility(
+                                                      visible: widget.userID ==
+                                                          widget.convo!.tutorID,
+                                                      child: Center(
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .end,
+                                                          children: [
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                showDialog<
+                                                                    DateTime>(
+                                                                  context:
+                                                                      context,
+                                                                  builder:
+                                                                      (BuildContext
+                                                                          context) {
+                                                                    return RefusedInquiry(
+                                                                      messageinfo:
+                                                                          messagedata[
+                                                                              index],
+                                                                      currentID:
+                                                                          widget
+                                                                              .userID,
+                                                                    );
+                                                                  },
+                                                                ).then(
+                                                                    (selectedDate) {
+                                                                  if (selectedDate !=
+                                                                      null) {
+                                                                    // Do something with the selected date
+                                                                  }
+                                                                });
+                                                              },
+                                                              child: const Text(
+                                                                'Refuse',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .red),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                width:
+                                                                    16.0), // Add some spacing between the buttons
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                showDialog<
+                                                                    DateTime>(
+                                                                  context:
+                                                                      context,
+                                                                  builder:
+                                                                      (BuildContext
+                                                                          context) {
+                                                                    return OfferInquiry(
+                                                                      messageinfo:
+                                                                          messagedata[
+                                                                              index],
+                                                                      currentID:
+                                                                          widget
+                                                                              .userID,
+                                                                    );
+                                                                  },
+                                                                ).then(
+                                                                    (selectedDate) {
+                                                                  if (selectedDate !=
+                                                                      null) {
+                                                                    // Do something with the selected date
+                                                                  }
+                                                                });
+                                                              },
+                                                              child: Text(
+                                                                'Offer',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                            .grey[
+                                                                        600]),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            : messagedata[index].type ==
+                                                    'declinedinquiry'
+                                                ? SizedBox(
+                                                    width: 500,
+                                                    child: Column(
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Container(
+                                                              constraints:
+                                                                  const BoxConstraints(
+                                                                      minWidth:
+                                                                          0,
+                                                                      maxWidth:
+                                                                          450),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius: const BorderRadius
+                                                                        .only(
+                                                                    topLeft: Radius
+                                                                        .circular(
+                                                                            20),
+                                                                    bottomLeft:
+                                                                        Radius.circular(
+                                                                            20),
+                                                                    bottomRight:
+                                                                        Radius.circular(
+                                                                            20)),
+                                                                color: (messagedata[
+                                                                                index]
+                                                                            .userID ==
+                                                                        widget
+                                                                            .userID
+                                                                    ? Colors.red
+                                                                        .shade200
+                                                                    : Colors
+                                                                        .grey
+                                                                        .shade200),
+                                                              ),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .fromLTRB(
+                                                                      2,
+                                                                      2,
+                                                                      2,
+                                                                      10),
+                                                              child: Column(
+                                                                children: [
+                                                                  Container(
+                                                                    padding:
+                                                                        const EdgeInsets.fromLTRB(
+                                                                            2,
+                                                                            2,
+                                                                            2,
+                                                                            10),
+                                                                    decoration: const BoxDecoration(
+                                                                        borderRadius: BorderRadius.only(
+                                                                            topLeft: Radius.circular(
+                                                                                20),
+                                                                            bottomLeft: Radius.circular(
+                                                                                10),
+                                                                            bottomRight: Radius.circular(
+                                                                                10),
+                                                                            topRight: Radius.circular(
+                                                                                10)),
+                                                                        color: Color.fromRGBO(
+                                                                            181,
+                                                                            226,
+                                                                            250,
+                                                                            1)),
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: const EdgeInsets
+                                                                              .all(
+                                                                          10.0),
+                                                                      child:
+                                                                          RichText(
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                        text:
+                                                                            TextSpan(
+                                                                          style: Theme.of(context)
+                                                                              .textTheme
+                                                                              .headlineSmall
+                                                                              ?.copyWith(
+                                                                                color: const Color.fromARGB(255, 59, 59, 59),
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.normal,
+                                                                              ),
+                                                                          children: <
+                                                                              TextSpan>[
+                                                                            const TextSpan(
+                                                                                text: 'You refuse inquiry for ',
+                                                                                style: TextStyle(
+                                                                                  fontSize: 15,
+                                                                                )),
+                                                                            TextSpan(
+                                                                                text: 'Mathematics',
+                                                                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: kColorLight, fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
+                                                                                recognizer: TapGestureRecognizer()..onTap = () {}),
+                                                                            const TextSpan(text: ' subject with'),
+                                                                            TextSpan(
+                                                                              text: ' ${messagedata[index].noofclasses} ',
+                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: kColorLight, fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
+                                                                            ),
+                                                                            const TextSpan(text: 'classes.'),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    messagedata[
+                                                                            index]
+                                                                        .messageContent,
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            15),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                : SizedBox(
+                                                    width: 500,
+                                                    child: Column(
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Container(
+                                                              constraints:
+                                                                  const BoxConstraints(
+                                                                      minWidth:
+                                                                          0,
+                                                                      maxWidth:
+                                                                          450),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius: const BorderRadius
+                                                                        .only(
+                                                                    topLeft: Radius
+                                                                        .circular(
+                                                                            20),
+                                                                    bottomLeft:
+                                                                        Radius.circular(
+                                                                            20),
+                                                                    bottomRight:
+                                                                        Radius.circular(
+                                                                            20)),
+                                                                color: (messagedata[index]
+                                                                            .userID ==
+                                                                        widget
+                                                                            .userID
+                                                                    ? kColorLight
+                                                                    : Colors
+                                                                        .grey
+                                                                        .shade200),
+                                                              ),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(16),
+                                                              child: Text(
+                                                                messagedata[
+                                                                        index]
+                                                                    .messageContent,
+                                                                style:
+                                                                    const TextStyle(
+                                                                        fontSize:
+                                                                            15),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                : messagedata[index].type == 'inquiry'
+                                    ? SizedBox(
+                                        width: 500,
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  constraints:
+                                                      const BoxConstraints(
+                                                          minWidth: 0,
+                                                          maxWidth: 450),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        const BorderRadius.only(
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                    20),
+                                                            bottomLeft:
+                                                                Radius.circular(
+                                                                    20),
+                                                            bottomRight:
+                                                                Radius.circular(
+                                                                    20)),
+                                                    color: (messagedata[index]
+                                                                .userID ==
+                                                            widget.userID
+                                                        ? kColorLight
+                                                        : Colors.grey.shade200),
+                                                  ),
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          2, 2, 2, 10),
+                                                  child: Column(
+                                                    children: [
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                2, 2, 2, 10),
+                                                        decoration: const BoxDecoration(
+                                                            borderRadius: BorderRadius.only(
+                                                                topLeft: Radius
+                                                                    .circular(
+                                                                        20),
+                                                                bottomLeft: Radius
+                                                                    .circular(
+                                                                        10),
+                                                                bottomRight:
+                                                                    Radius
+                                                                        .circular(
+                                                                            10),
+                                                                topRight: Radius
+                                                                    .circular(
+                                                                        10)),
+                                                            color:
+                                                                Color.fromRGBO(
+                                                                    181,
+                                                                    226,
+                                                                    250,
+                                                                    1)),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10.0),
+                                                          child: RichText(
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            text: TextSpan(
+                                                              style: Theme.of(
+                                                                      context)
+                                                                  .textTheme
+                                                                  .headlineSmall
+                                                                  ?.copyWith(
+                                                                    color: const Color
+                                                                            .fromARGB(
+                                                                        255,
+                                                                        59,
+                                                                        59,
+                                                                        59),
+                                                                    fontSize:
+                                                                        15,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal,
+                                                                  ),
+                                                              children: <
+                                                                  TextSpan>[
+                                                                const TextSpan(
+                                                                    text:
+                                                                        'You are inquiring for ',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          15,
+                                                                    )),
+                                                                TextSpan(
+                                                                    text:
+                                                                        'Mathematics',
+                                                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                        color:
+                                                                            kColorLight,
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w500,
+                                                                        fontStyle:
+                                                                            FontStyle
+                                                                                .italic),
+                                                                    recognizer:
+                                                                        TapGestureRecognizer()
+                                                                          ..onTap =
+                                                                              () {}),
+                                                                const TextSpan(
+                                                                    text:
+                                                                        ' subject with'),
+                                                                TextSpan(
+                                                                  text:
+                                                                      ' ${messagedata[index].noofclasses} ',
+                                                                  style: Theme
+                                                                          .of(
+                                                                              context)
+                                                                      .textTheme
+                                                                      .headlineSmall
+                                                                      ?.copyWith(
+                                                                          color:
+                                                                              kColorLight,
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontStyle:
+                                                                              FontStyle.italic),
+                                                                ),
+                                                                const TextSpan(
+                                                                    text:
+                                                                        'classes.'),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        messagedata[index]
+                                                            .messageContent,
+                                                        style: const TextStyle(
+                                                            fontSize: 15),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Visibility(
+                                              visible: widget.userID ==
+                                                  widget.convo!.tutorID,
+                                              child: Center(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        showDialog<DateTime>(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return RefusedInquiry(
+                                                              messageinfo:
+                                                                  messagedata[
+                                                                      index],
+                                                              currentID:
+                                                                  widget.userID,
+                                                            );
+                                                          },
+                                                        ).then((selectedDate) {
+                                                          if (selectedDate !=
+                                                              null) {
+                                                            // Do something with the selected date
+                                                          }
+                                                        });
+                                                      },
+                                                      child: const Text(
+                                                        'Refuse',
+                                                        style: TextStyle(
+                                                            color: Colors.red),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                        width:
+                                                            16.0), // Add some spacing between the buttons
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        showDialog<DateTime>(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return OfferInquiry(
+                                                              messageinfo:
+                                                                  messagedata[
+                                                                      index],
+                                                              currentID:
+                                                                  widget.userID,
+                                                            );
+                                                          },
+                                                        ).then((selectedDate) {
+                                                          if (selectedDate !=
+                                                              null) {
+                                                            // Do something with the selected date
+                                                          }
+                                                        });
+                                                      },
+                                                      child: Text(
+                                                        'Offer',
+                                                        style: TextStyle(
+                                                            color: Colors
+                                                                .grey[600]),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : messagedata[index].type == 'offer'
+                                        ? SizedBox(
+                                            width: 500,
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      constraints:
+                                                          const BoxConstraints(
+                                                              minWidth: 0,
+                                                              maxWidth: 450),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                    .only(
+                                                                topLeft:
+                                                                    Radius
+                                                                        .circular(
+                                                                            20),
+                                                                bottomLeft:
+                                                                    Radius
+                                                                        .circular(
+                                                                            20),
+                                                                bottomRight: Radius
+                                                                    .circular(
+                                                                        20)),
+                                                        color: (messagedata[
+                                                                        index]
+                                                                    .userID ==
+                                                                widget.userID
+                                                            ? kColorLight
+                                                            : Colors
+                                                                .grey.shade200),
+                                                      ),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              16),
+                                                      child: Column(
+                                                        children: [
+                                                          Container(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .fromLTRB(
+                                                                    5,
+                                                                    2,
+                                                                    5,
+                                                                    10),
+                                                            child: Column(
+                                                              children: [
+                                                                Container(
+                                                                  decoration: const BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.all(Radius.circular(
+                                                                              10)),
+                                                                      color: Color.fromRGBO(
+                                                                          181,
+                                                                          226,
+                                                                          250,
+                                                                          1)),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: const EdgeInsets
+                                                                            .all(
+                                                                        10.0),
+                                                                    child:
+                                                                        RichText(
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      text:
+                                                                          TextSpan(
+                                                                        style: Theme.of(context)
+                                                                            .textTheme
+                                                                            .headlineSmall
+                                                                            ?.copyWith(
+                                                                              color: const Color.fromARGB(255, 59, 59, 59),
+                                                                              fontSize: 15,
+                                                                              fontWeight: FontWeight.normal,
+                                                                            ),
+                                                                        children: <
+                                                                            TextSpan>[
+                                                                          const TextSpan(
+                                                                              text: 'You are inquiring for ',
+                                                                              style: TextStyle(
+                                                                                fontSize: 15,
+                                                                              )),
+                                                                          TextSpan(
+                                                                              text: 'Mathematics',
+                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: kColorLight, fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
+                                                                              recognizer: TapGestureRecognizer()..onTap = () {}),
+                                                                          const TextSpan(
+                                                                              text: ' subject with'),
+                                                                          TextSpan(
+                                                                            text:
+                                                                                ' ${messagedata[index].noofclasses} ',
+                                                                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                                color: kColorLight,
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                fontStyle: FontStyle.italic),
+                                                                          ),
+                                                                          const TextSpan(
+                                                                              text: 'classes.'),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            messagedata[index]
+                                                                .messageContent,
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        15),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Visibility(
+                                                  visible: widget.userID ==
+                                                      widget.convo!.studentID,
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    children: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          showDialog<DateTime>(
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return RefusedInquiry(
+                                                                messageinfo:
+                                                                    messagedata[
+                                                                        index],
+                                                                currentID:
+                                                                    widget
+                                                                        .userID,
+                                                              );
+                                                            },
+                                                          ).then(
+                                                              (selectedDate) {
+                                                            if (selectedDate !=
+                                                                null) {
+                                                              // Do something with the selected date
+                                                            }
+                                                          });
+                                                        },
+                                                        child: const Text(
+                                                          'Decline',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.red),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                          width:
+                                                              16.0), // Add some spacing between the buttons
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          showDialog<DateTime>(
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return OfferInquiry(
+                                                                messageinfo:
+                                                                    messagedata[
+                                                                        index],
+                                                                currentID:
+                                                                    widget
+                                                                        .userID,
+                                                              );
+                                                            },
+                                                          ).then(
+                                                              (selectedDate) {
+                                                            if (selectedDate !=
+                                                                null) {
+                                                              // Do something with the selected date
+                                                            }
+                                                          });
+                                                        },
+                                                        child: Text(
+                                                          'Add Cart',
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .grey[600]),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : messagedata[index].type ==
+                                                'declinedoffer'
+                                            ? SizedBox(
+                                                width: 500,
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Container(
+                                                          constraints:
+                                                              const BoxConstraints(
+                                                                  minWidth: 0,
+                                                                  maxWidth:
+                                                                      450),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius: const BorderRadius
+                                                                    .only(
+                                                                topLeft: Radius
+                                                                    .circular(
+                                                                        20),
+                                                                bottomLeft: Radius
+                                                                    .circular(
+                                                                        20),
+                                                                bottomRight: Radius
+                                                                    .circular(
+                                                                        20)),
+                                                            color: (messagedata[
+                                                                            index]
+                                                                        .userID ==
+                                                                    widget
+                                                                        .userID
+                                                                ? Colors.red
+                                                                    .shade200
+                                                                : Colors.grey
+                                                                    .shade200),
+                                                          ),
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .fromLTRB(
+                                                                  2, 2, 2, 10),
+                                                          child: Column(
+                                                            children: [
+                                                              Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .fromLTRB(
+                                                                        2,
+                                                                        2,
+                                                                        2,
+                                                                        10),
+                                                                decoration: const BoxDecoration(
+                                                                    borderRadius: BorderRadius.only(
+                                                                        topLeft:
+                                                                            Radius.circular(
+                                                                                20),
+                                                                        bottomLeft:
+                                                                            Radius.circular(
+                                                                                10),
+                                                                        bottomRight:
+                                                                            Radius.circular(
+                                                                                10),
+                                                                        topRight:
+                                                                            Radius.circular(
+                                                                                10)),
+                                                                    color: Color
+                                                                        .fromRGBO(
+                                                                            181,
+                                                                            226,
+                                                                            250,
+                                                                            1)),
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          10.0),
+                                                                  child:
+                                                                      RichText(
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                    text:
+                                                                        TextSpan(
+                                                                      style: Theme.of(
+                                                                              context)
+                                                                          .textTheme
+                                                                          .headlineSmall
+                                                                          ?.copyWith(
+                                                                            color: const Color.fromARGB(
+                                                                                255,
+                                                                                59,
+                                                                                59,
+                                                                                59),
+                                                                            fontSize:
+                                                                                15,
+                                                                            fontWeight:
+                                                                                FontWeight.normal,
+                                                                          ),
+                                                                      children: <
+                                                                          TextSpan>[
+                                                                        const TextSpan(
+                                                                            text:
+                                                                                'You declined  offer for ',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontSize: 15,
+                                                                            )),
+                                                                        TextSpan(
+                                                                            text:
+                                                                                'Mathematics',
+                                                                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                                color: kColorLight,
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                fontStyle: FontStyle.italic),
+                                                                            recognizer: TapGestureRecognizer()..onTap = () {}),
+                                                                        const TextSpan(
+                                                                            text:
+                                                                                ' subject with'),
+                                                                        TextSpan(
+                                                                          text:
+                                                                              ' ${messagedata[index].noofclasses} ',
+                                                                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                              color: kColorLight,
+                                                                              fontSize: 15,
+                                                                              fontWeight: FontWeight.w500,
+                                                                              fontStyle: FontStyle.italic),
+                                                                        ),
+                                                                        const TextSpan(
+                                                                            text:
+                                                                                'classes.'),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                messagedata[
+                                                                        index]
+                                                                    .messageContent,
+                                                                style:
+                                                                    const TextStyle(
+                                                                        fontSize:
+                                                                            15),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Visibility(
+                                                      visible: widget.userID ==
+                                                          widget.convo!.tutorID,
+                                                      child: Center(
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .end,
+                                                          children: [
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                showDialog<
+                                                                    DateTime>(
+                                                                  context:
+                                                                      context,
+                                                                  builder:
+                                                                      (BuildContext
+                                                                          context) {
+                                                                    return RefusedInquiry(
+                                                                      messageinfo:
+                                                                          messagedata[
+                                                                              index],
+                                                                      currentID:
+                                                                          widget
+                                                                              .userID,
+                                                                    );
+                                                                  },
+                                                                ).then(
+                                                                    (selectedDate) {
+                                                                  if (selectedDate !=
+                                                                      null) {
+                                                                    // Do something with the selected date
+                                                                  }
+                                                                });
+                                                              },
+                                                              child: const Text(
+                                                                'Refuse',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .red),
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                width:
+                                                                    16.0), // Add some spacing between the buttons
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                showDialog<
+                                                                    DateTime>(
+                                                                  context:
+                                                                      context,
+                                                                  builder:
+                                                                      (BuildContext
+                                                                          context) {
+                                                                    return OfferInquiry(
+                                                                      messageinfo:
+                                                                          messagedata[
+                                                                              index],
+                                                                      currentID:
+                                                                          widget
+                                                                              .userID,
+                                                                    );
+                                                                  },
+                                                                ).then(
+                                                                    (selectedDate) {
+                                                                  if (selectedDate !=
+                                                                      null) {
+                                                                    // Do something with the selected date
+                                                                  }
+                                                                });
+                                                              },
+                                                              child: Text(
+                                                                'Offer',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                            .grey[
+                                                                        600]),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            : messagedata[index].type ==
+                                                    'declinedinquiry'
+                                                ? SizedBox(
+                                                    width: 500,
+                                                    child: Column(
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Container(
+                                                              constraints:
+                                                                  const BoxConstraints(
+                                                                      minWidth:
+                                                                          0,
+                                                                      maxWidth:
+                                                                          450),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius: const BorderRadius
+                                                                        .only(
+                                                                    topLeft: Radius
+                                                                        .circular(
+                                                                            20),
+                                                                    bottomLeft:
+                                                                        Radius.circular(
+                                                                            20),
+                                                                    bottomRight:
+                                                                        Radius.circular(
+                                                                            20)),
+                                                                color: (messagedata[
+                                                                                index]
+                                                                            .userID ==
+                                                                        widget
+                                                                            .userID
+                                                                    ? Colors.red
+                                                                        .shade200
+                                                                    : Colors
+                                                                        .grey
+                                                                        .shade200),
+                                                              ),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .fromLTRB(
+                                                                      2,
+                                                                      2,
+                                                                      2,
+                                                                      10),
+                                                              child: Column(
+                                                                children: [
+                                                                  Container(
+                                                                    padding:
+                                                                        const EdgeInsets.fromLTRB(
+                                                                            2,
+                                                                            2,
+                                                                            2,
+                                                                            10),
+                                                                    decoration: const BoxDecoration(
+                                                                        borderRadius: BorderRadius.only(
+                                                                            topLeft: Radius.circular(
+                                                                                20),
+                                                                            bottomLeft: Radius.circular(
+                                                                                10),
+                                                                            bottomRight: Radius.circular(
+                                                                                10),
+                                                                            topRight: Radius.circular(
+                                                                                10)),
+                                                                        color: Color.fromRGBO(
+                                                                            181,
+                                                                            226,
+                                                                            250,
+                                                                            1)),
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: const EdgeInsets
+                                                                              .all(
+                                                                          10.0),
+                                                                      child:
+                                                                          RichText(
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                        text:
+                                                                            TextSpan(
+                                                                          style: Theme.of(context)
+                                                                              .textTheme
+                                                                              .headlineSmall
+                                                                              ?.copyWith(
+                                                                                color: const Color.fromARGB(255, 59, 59, 59),
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.normal,
+                                                                              ),
+                                                                          children: <
+                                                                              TextSpan>[
+                                                                            const TextSpan(
+                                                                                text: 'You refuse inquiry for ',
+                                                                                style: TextStyle(
+                                                                                  fontSize: 15,
+                                                                                )),
+                                                                            TextSpan(
+                                                                                text: 'Mathematics',
+                                                                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: kColorLight, fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
+                                                                                recognizer: TapGestureRecognizer()..onTap = () {}),
+                                                                            const TextSpan(text: ' subject with'),
+                                                                            TextSpan(
+                                                                              text: ' ${messagedata[index].noofclasses} ',
+                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: kColorLight, fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
+                                                                            ),
+                                                                            const TextSpan(text: 'classes.'),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    messagedata[
+                                                                            index]
+                                                                        .messageContent,
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            15),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                : SizedBox(
+                                                    width: 500,
+                                                    child: Column(
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Container(
+                                                              constraints:
+                                                                  const BoxConstraints(
+                                                                      minWidth:
+                                                                          0,
+                                                                      maxWidth:
+                                                                          450),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius: const BorderRadius
+                                                                        .only(
+                                                                    topLeft: Radius
+                                                                        .circular(
+                                                                            20),
+                                                                    bottomLeft:
+                                                                        Radius.circular(
+                                                                            20),
+                                                                    bottomRight:
+                                                                        Radius.circular(
+                                                                            20)),
+                                                                color: (messagedata[index]
+                                                                            .userID ==
+                                                                        widget
+                                                                            .userID
+                                                                    ? kColorLight
+                                                                    : Colors
+                                                                        .grey
+                                                                        .shade200),
+                                                              ),
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(16),
+                                                              child: Text(
+                                                                messagedata[
+                                                                        index]
+                                                                    .messageContent,
+                                                                style:
+                                                                    const TextStyle(
+                                                                        fontSize:
+                                                                            15),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )),
                   );
                 },
               ),
@@ -256,7 +4028,10 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                   child: Row(
                     children: <Widget>[
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          scrollController.jumpTo(
+                              scrollController.position.maxScrollExtent);
+                        },
                         child: Container(
                           height: 30,
                           width: 30,
@@ -284,8 +4059,8 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                           onSubmitted: (value) {
                             sendmessage(messageContent.text, widget.chatID,
                                 widget.userID);
-                            _scrollController.jumpTo(
-                                _scrollController.position.maxScrollExtent);
+                            scrollController.jumpTo(
+                                scrollController.position.maxScrollExtent);
                           },
                         ),
                       ),
@@ -293,7 +4068,12 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                         width: 15,
                       ),
                       FloatingActionButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          sendmessage(messageContent.text, widget.chatID,
+                              widget.userID);
+                          scrollController.jumpTo(
+                              scrollController.position.maxScrollExtent);
+                        },
                         backgroundColor: kColorPrimary,
                         elevation: 0,
                         child: const Icon(

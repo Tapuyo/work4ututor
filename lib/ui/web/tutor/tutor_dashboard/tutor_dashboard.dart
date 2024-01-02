@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:work4ututor/data_class/subject_teach_pricing.dart';
 
 import '../../../../components/nav_bar.dart';
+import '../../../../data_class/chatmessageclass.dart';
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/studentanalyticsclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
@@ -18,6 +19,7 @@ import '../../../../data_class/tutor_info_class.dart';
 import '../../../../data_class/user_class.dart';
 import '../../../../provider/init_provider.dart';
 import '../../../../services/getenrolledclasses.dart';
+import '../../../../services/getmessages.dart';
 import '../../../../services/getstudentclassesanalytics.dart';
 import '../../../../services/getstudentinfo.dart';
 import '../../../../services/getuser.dart';
@@ -59,6 +61,14 @@ class _DashboardPageState extends State<DashboardPage> {
     Size size = MediaQuery.of(context).size;
     return MultiProvider(
       providers: [
+        StreamProvider<List<ChatMessage>>.value(
+          value: GetMessageList(uid: widget.uID, role: 'tutor').getmessageinfo,
+          catchError: (context, error) {
+            print('Error occurred: $error');
+            return [];
+          },
+          initialData: const [],
+        ),
         StreamProvider<List<TutorInformation>>.value(
           value: TutorInfoData(uid: widget.uID).gettutorinfo,
           catchError: (context, error) {
@@ -129,7 +139,6 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
   String? downloadURL1;
   ImageProvider? imageProvider;
   bool _showModal = false;
-  GlobalKey _buttonKey = GlobalKey();
   int newmessagecount = 0;
   int newnotificationcount = 0;
   bool tutorstatus = true;
@@ -346,7 +355,9 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                             uID: widget.uID,
                           )
                         ] else if (menuIndex == 2) ...[
-                          const MessagePage()
+                          MessagePage(
+                            uID: widget.uID,
+                          )
                         ] else if (menuIndex == 3) ...[
                           ClassInquiry(widget.uID)
                         ] else if (menuIndex == 4) ...[
@@ -395,7 +406,9 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                                     uID: widget.uID,
                                   )
                                 ] else if (menuIndex == 2) ...[
-                                  const MessagePage()
+                                  MessagePage(
+                                    uID: widget.uID,
+                                  )
                                 ] else if (menuIndex == 3) ...[
                                   ClassInquiry(widget.uID)
                                 ] else if (menuIndex == 4) ...[

@@ -1,27 +1,28 @@
-// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, use_build_context_synchronously
+// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, use_build_context_synchronously, prefer_final_fields
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:country_pickers/country.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:country_pickers/country_pickers.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
-import 'package:language_picker/language_picker.dart';
-import 'package:language_picker/languages.dart';
 import 'package:provider/provider.dart';
-import 'package:timezone/timezone.dart';
 import 'dart:js' as js;
 
 import '../../../components/nav_bar.dart';
 import '../../../data_class/studentinfoclass.dart';
+import '../../../services/getlanguages.dart';
 import '../../../services/getstudentinfo.dart';
 import '../../../shared_components/alphacode3.dart';
 import 'package:http/http.dart' as http;
@@ -29,6 +30,7 @@ import 'dart:html' as html;
 
 import '../../auth/auth.dart';
 import '../login/login.dart';
+import '../terms/termpage.dart';
 
 class StudentInfo extends StatefulWidget {
   final String uid;
@@ -79,7 +81,6 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
   //   tz.initializeTimeZone();
   // }
 
-  Map<String, Location> _timeZones = {};
   String _selectedTimeZone = 'UTC';
   var dtf = js.context['Intl'].callMethod('DateTimeFormat');
   var ops = js.context['Intl']
@@ -133,6 +134,18 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
   TextEditingController guardiancontactnumber = TextEditingController();
   TextEditingController guardiansemail = TextEditingController();
 
+  //new added
+
+  TextEditingController _selectedBirthCountryController =
+      TextEditingController();
+  bool countryStatus = false;
+  TextEditingController birthtCity = TextEditingController();
+  String selectedbirthCountry = "";
+  FocusNode _selectedTimeZonefocusNode = FocusNode();
+  TextEditingController tCity1 = TextEditingController();
+  bool showselectedTimeZoneSuggestions = false;
+  TextEditingController _selectedTimeZone1 = TextEditingController();
+
   void _selectDate(String infodata) async {
     final DateTime? picked = await showDatePicker(
         context: context,
@@ -146,13 +159,21 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
           bdate = selectedDate.toString();
         } else if (infodata == 'guardian') {
           selectedDateguardian = picked;
-          guardianbdate = selectedDateguardian.toString();
+          guardianbdate =
+              DateFormat("MMMM dd, yyyy").format(selectedDateguardian);
         }
         bdate = DateFormat("MMMM dd, yyyy").format(selectedDate);
         calculateAge(picked, infodata);
       });
     }
   }
+
+  List<Color> vibrantColors = [
+    const Color.fromRGBO(185, 237, 221, 1),
+    const Color.fromRGBO(135, 203, 185, 1),
+    const Color.fromRGBO(86, 157, 170, 1),
+    const Color.fromRGBO(87, 125, 134, 1),
+  ];
 
   void calculateAge(DateTime birthDate, String info) {
     DateTime currentDate = DateTime.now();
@@ -284,28 +305,79 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
 
   final AuthService _auth = AuthService();
 
+  Uint8List? selectedImage;
+  String filename = '';
+  Uint8List? guardianselectedImage;
+  String guadianfilename = '';
+
+// Function to select an image
+  void selectImage(String role) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png'],
+    );
+    if (result != null && role == 'student') {
+      setState(() {
+        selectedImage = result.files.first.bytes;
+        filename = result.files.first.name;
+      });
+    } else if (result != null && role == 'guardian') {
+      setState(() {
+        guardianselectedImage = result.files.first.bytes;
+        guadianfilename = result.files.first.name;
+      });
+    }
+  }
+
+  List<Uint8List?> selectedIDfiles = [];
+  List<String> idfilenames = [];
+  List<String> idfilenamestype = [];
+  void selectImagesID() async {
+    FilePickerResult? result =
+        await FilePicker.platform.pickFiles(allowMultiple: true);
+
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        selectedIDfiles.addAll(result.files.map((file) => file.bytes));
+        idfilenames.addAll(result.files.map((file) => file.name));
+        // Determine file types and add them to idfilenamestype list
+        List<String> fileExtensions = result.files.map((file) {
+          final fileName = file.name;
+          final extension = fileName.split('.').last.toLowerCase();
+          return extension;
+        }).toList();
+
+        idfilenamestype.addAll(fileExtensions.map((extension) {
+          // List common image extensions
+          List<String> imageExtensions = [
+            'jpg',
+            'jpeg',
+            'png',
+            'gif',
+            'bmp',
+            'webp'
+          ];
+
+          // Check if the extension is in the list of image extensions
+          if (imageExtensions.contains(extension)) {
+            return "Image";
+          } else {
+            return extension;
+          }
+        }));
+      });
+
+      print("Images selected: $idfilenames");
+    }
+  }
+
+  ScrollController _scrollController = ScrollController();
+  ScrollController _scrollController1 = ScrollController();
   @override
   Widget build(BuildContext context) {
-    // final studentinfodata = Provider.of<List<StudentInfoClass>>(context);
-    // if (studentinfodata.isNotEmpty) {
-    //   final studentdata = studentinfodata.first;
-    //     firstname.text = studentdata.studentFirstname;
-    //     middlename.text = studentdata.studentMiddlename;
-    //     lastname.text = studentdata.studentLastname;
-    //     studentIDNumber = studentdata.studentID == ''
-    //         ? studentIDNumber
-    //         : studentdata.studentID;
-    //     profileurl = studentdata.profilelink;
-    //     selectedDate = studentdata.dateofbirth == ''
-    //         ? DateTime.now()
-    //         : DateTime.parse(studentdata.dateofbirth);
-    //     age = studentdata.age == '' ? 0 : int.parse(studentdata.age);
-    //     selectedCountry = studentdata.country;
-    //     tCity = studentdata.address;
-    //     _selectedTimeZone =
-    //         studentdata.timezone == '' ? 'UTC' : studentdata.timezone;
-    //     tlanguages = studentdata.languages;
-    // }
+    List<String> countryNames = Provider.of<List<String>>(context);
+    List<LanguageData> names = Provider.of<List<LanguageData>>(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -344,30 +416,31 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                               decoration: BoxDecoration(
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(20)),
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey.shade300, width: 1)),
+                                  color: Colors.grey.shade100,
+                                  border:
+                                      Border.all(color: Colors.grey, width: 1)),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: FadeInImage(
-                                  fadeInDuration:
-                                      const Duration(milliseconds: 500),
-                                  placeholder: const AssetImage(
-                                      "assets/images/login.png"), // Use AssetImage here
-                                  image: profileurl.isEmpty
-                                      ? const NetworkImage(
-                                          "https://img.icons8.com/fluency/48/null/no-image.png")
-                                      : NetworkImage(profileurl),
-                                  imageErrorBuilder:
-                                      (context, error, stackTrace) {
-                                    return Image.asset(
-                                        "assets/images/login.png");
-                                  },
-                                  fit: BoxFit.cover,
-                                  height: 70,
-                                  width: 70,
-                                ),
-                              ),
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: FadeInImage(
+                                    fadeInDuration:
+                                        const Duration(milliseconds: 500),
+                                    placeholder: const AssetImage(
+                                        "assets/images/login.png"),
+                                    image: (selectedImage != null)
+                                        ? MemoryImage(selectedImage!)
+                                        : const AssetImage(
+                                                "assets/images/login.png")
+                                            as ImageProvider<
+                                                Object>, // Display image from profileurl
+                                    // imageErrorBuilder:
+                                    //     (context, error, stackTrace) {
+                                    //   return Image.asset(
+                                    //       "assets/images/login.png");
+                                    // },
+                                    fit: BoxFit.cover,
+                                    height: 70,
+                                    width: 70,
+                                  )),
                             ),
                             Positioned(
                                 bottom: 12,
@@ -380,21 +453,22 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                   ),
                                   child: IconButton(
                                     onPressed: () async {
-                                      String? downloadURL =
-                                          await uploadData(widget.uid);
+                                      // String? downloadURL =
+                                      // await uploadData(widget.uid);
 
-                                      if (downloadURL != null) {
-                                        // The upload was successful, and downloadURL contains the URL.
-                                        print(
-                                            "File uploaded successfully. URL: $downloadURL");
-                                        setState(() {
-                                          profileurl = downloadURL;
-                                          updateProfile(widget.uid, profileurl);
-                                        });
-                                      } else {
-                                        // There was an error during file selection or upload.
-                                        print("Error uploading file.");
-                                      }
+                                      // if (downloadURL != null) {
+                                      //   // The upload was successful, and downloadURL contains the URL.
+                                      //   print(
+                                      //       "File uploaded successfully. URL: $downloadURL");
+                                      //   setState(() {
+                                      //     profileurl = downloadURL;
+                                      //     updateProfile(widget.uid, profileurl);
+                                      //   });
+                                      // } else {
+                                      //   // There was an error during file selection or upload.
+                                      //   print("Error uploading file.");
+                                      // }
+                                      selectImage('student');
                                     },
                                     icon: const Icon(
                                       Icons.add_a_photo,
@@ -655,180 +729,300 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                         ),
                         Row(
                           children: [
-                            Container(
-                                width: 300,
-                                height: 45,
-                                padding:
-                                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(5)),
-                                    color: Colors.white,
-                                    border: Border.all(
-                                        color: Colors.grey.shade300, width: 1)),
-                                child: CountryPickerDropdown(
-                                  initialValue: 'PH',
-                                  itemBuilder: _buildDropdownItem,
-                                  sortComparator: (Country a, Country b) =>
-                                      a.isoCode.compareTo(b.isoCode),
-                                  onValuePicked: (Country country) {
-                                    final alpha3Code =
-                                        getAlpha3Code(country.name);
-                                    Random random = Random();
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 300,
+                                  height: 45,
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(5)),
+                                      color: Colors.white,
+                                      border: Border.all(
+                                          color: Colors.grey.shade300,
+                                          width: 1)),
+                                  child: TypeAheadFormField<String>(
+                                    textFieldConfiguration:
+                                        TextFieldConfiguration(
+                                      controller:
+                                          _selectedBirthCountryController,
+                                      decoration: const InputDecoration(
+                                        contentPadding: EdgeInsets.all(10),
+                                        hintText: 'Select a Country',
+                                        hintStyle:
+                                            TextStyle(color: Colors.black),
+                                        border: InputBorder.none,
+                                        suffixIcon: Icon(Icons.arrow_drop_down),
+                                      ),
+                                    ),
+                                    suggestionsCallback: (String pattern) {
+                                      return countryNames.where((country) =>
+                                          country
+                                              .toLowerCase()
+                                              .contains(pattern.toLowerCase()));
+                                    },
+                                    itemBuilder: (context, String suggestion) {
+                                      return ListTile(
+                                        title: Text(suggestion),
+                                      );
+                                    },
+                                    onSuggestionSelected: (String suggestion) {
+                                      final alpha3Code =
+                                          getAlpha3Code(suggestion);
+                                      Random random = Random();
 
-                                    DateTime datenow = DateTime.now();
-                                    String currenttime =
-                                        DateFormat('HHmmss').format(datenow);
-                                    String randomNumber =
-                                        random.nextInt(1000000).toString() +
-                                            currenttime.toString();
-                                    String currentyear =
-                                        DateFormat('yyyyMMdd').format(datenow);
-                                    //todo please replace the random number with legnth of students enrolled
-                                    setState(() {
-                                      selectedCountry = country.name;
-                                      studentIDNumber =
-                                          'STU$alpha3Code$currentyear$currenttime';
-                                    });
-                                  },
-                                  isExpanded: true,
-                                )
-                                // country.name
+                                      DateTime datenow = DateTime.now();
+                                      String currenttime =
+                                          DateFormat('HHmmss').format(datenow);
+                                      String randomNumber =
+                                          random.nextInt(1000000).toString() +
+                                              currenttime.toString();
+                                      String currentyear =
+                                          DateFormat('yyyyMMdd')
+                                              .format(datenow);
+                                      //todo please replace the random number with legnth of students enrolled
+                                      setState(() {
+                                        studentIDNumber =
+                                            'STU$alpha3Code$currentyear$currenttime';
+                                        selectedbirthCountry = suggestion;
+                                        _selectedBirthCountryController.text =
+                                            suggestion;
+                                      });
+                                    },
+                                  ),
+                                  // country.name
                                 ),
-                            const SizedBox(
-                              width: 14,
+                              ],
                             ),
-                            Container(
-                              width: 266,
-                              height: 45,
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                              decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(5)),
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey.shade300, width: 1)),
-                              child: TextFormField(
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  fillColor: Colors.grey,
-                                  hintText: 'City',
-                                  hintStyle: TextStyle(color: Colors.black),
+                            const Spacer(),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 266,
+                                  height: 45,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(5)),
+                                      color: Colors.white,
+                                      border: Border.all(
+                                          color: Colors.grey.shade300,
+                                          width: 1)),
+                                  child: TextFormField(
+                                    controller: birthtCity,
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      fillColor: Colors.grey,
+                                      hintText: 'City',
+                                      hintStyle: TextStyle(
+                                          color: Colors.black, fontSize: 15),
+                                    ),
+                                    validator: (val) =>
+                                        val!.isEmpty ? 'Enter your City' : null,
+                                    // onChanged: (val) {
+                                    //   tCity = val;
+                                    // },
+                                  ),
                                 ),
-                                validator: (val) =>
-                                    val!.isEmpty ? 'Enter your City' : null,
-                                onChanged: (val) {
-                                  tCity = val;
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 14,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                                width: 250,
-                                height: 45,
-                                padding:
-                                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(5)),
-                                    color: Colors.white,
-                                    border: Border.all(
-                                        color: Colors.grey.shade300, width: 1)),
-                                child: DropdownButton<String>(
-                                  value: _selectedTimeZone,
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      _selectedTimeZone = newValue!;
-                                    });
-                                  },
-                                  items: timezonesList.map((timezone) {
-                                    return DropdownMenuItem<String>(
-                                      value: timezone,
-                                      child: Text(timezone),
-                                    );
-                                  }).toList(),
-                                  isExpanded: true,
-                                  underline: Container(),
-                                )),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Container(
-                              width: 280,
-                              height: 45,
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: const Color.fromARGB(255, 159, 159,
-                                      159), // Set your desired border color here
-                                  width: .5, // Set the border width
-                                ),
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: InternationalPhoneNumberInput(
-                                onInputChanged: (PhoneNumber number) {
-                                  setState(() {
-                                    phoneNumber = number;
-                                  });
-                                },
-                                selectorConfig: const SelectorConfig(
-                                  selectorType: PhoneInputSelectorType.DIALOG,
-                                ),
-                                ignoreBlank: false,
-                                // autoValidateMode: AutovalidateMode.onUserInteraction,
-                                inputDecoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                ),
-                                initialValue: phoneNumber,
-                                textFieldController: phoneNumberController,
-                              ),
+                              ],
                             ),
                           ],
                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        Visibility(
-                          visible: tlanguages.isNotEmpty ? true : false,
-                          child: Container(
-                            width: 600,
-                            height: 45,
-                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(5)),
-                                color: Colors.white,
-                                border: Border.all(
-                                    color: Colors.grey.shade300, width: 1)),
-                            child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: tlanguages.length,
-                                itemBuilder: (context, index) {
-                                  String language = tlanguages[index];
-                                  return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(language),
-                                        IconButton(
-                                          icon: const Icon(Icons.delete),
-                                          color: Colors.red,
-                                          onPressed: () {
-                                            setState(() {
-                                              tlanguages.removeAt(index);
-                                            });
-                                          },
-                                        ),
-                                      ]);
-                                }),
+                        Row(children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 300,
+                                height: 45,
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(5)),
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: Colors.grey.shade300, width: 1)),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    if (_selectedTimeZonefocusNode.hasFocus) {
+                                      _selectedTimeZonefocusNode.unfocus();
+                                      setState(() {
+                                        showselectedTimeZoneSuggestions = false;
+                                      });
+                                    }
+                                  },
+                                  child: TypeAheadFormField<String>(
+                                    textFieldConfiguration:
+                                        TextFieldConfiguration(
+                                      controller: _selectedTimeZone1,
+                                      focusNode: _selectedTimeZonefocusNode,
+                                      onTap: () {
+                                        setState(() {
+                                          showselectedTimeZoneSuggestions =
+                                              false;
+                                        });
+                                      },
+                                      decoration: const InputDecoration(
+                                        contentPadding: EdgeInsets.all(10),
+                                        hintText: 'Select your Timezone',
+                                        hintStyle:
+                                            TextStyle(color: Colors.black),
+                                        border: InputBorder.none,
+                                        suffixIcon: Icon(Icons.arrow_drop_down),
+                                      ),
+                                    ),
+                                    suggestionsCallback: (String pattern) {
+                                      return timezonesList.where((timezone) =>
+                                          timezone
+                                              .toLowerCase()
+                                              .contains(pattern.toLowerCase()));
+                                    },
+                                    itemBuilder: (context, String suggestion) {
+                                      return ListTile(
+                                        title: Text(suggestion),
+                                      );
+                                    },
+                                    onSuggestionSelected: (String suggestion) {
+                                      setState(() {
+                                        _selectedTimeZone1.text = suggestion;
+                                        _selectedTimeZone = suggestion;
+                                      });
+                                    },
+                                    hideOnEmpty:
+                                        true, // Hide suggestions when the input is empty.
+                                    hideOnLoading:
+                                        true, // Hide suggestions during loading.
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
+                          const Spacer(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 266,
+                                height: 45,
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(5)),
+                                    color: Colors.white,
+                                    border: Border.all(
+                                        color: Colors.grey.shade300, width: 1)),
+                                child: InternationalPhoneNumberInput(
+                                  maxLength: 20,
+                                  onInputChanged: (PhoneNumber number) {
+                                    phoneNumber = number;
+                                  },
+                                  selectorConfig: const SelectorConfig(
+                                    selectorType: PhoneInputSelectorType.DIALOG,
+                                    trailingSpace: false,
+                                    leadingPadding: 0,
+                                    setSelectorButtonAsPrefixIcon: true,
+                                  ),
+                                  ignoreBlank: false,
+                                  autoValidateMode: AutovalidateMode.disabled,
+                                  selectorTextStyle: const TextStyle(
+                                      color: Colors.black, fontSize: 15),
+                                  formatInput: true,
+                                  inputDecoration: const InputDecoration(
+                                      filled: false,
+                                      isCollapsed: false,
+                                      isDense: false,
+                                      border: InputBorder.none,
+                                      contentPadding:
+                                          EdgeInsets.only(bottom: 9)),
+                                  // keyboardType:
+                                  //     const TextInputType.numberWithOptions(
+                                  //         signed: true, decimal: true),
+                                  initialValue: phoneNumber,
+                                  textFieldController: phoneNumberController,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ]),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                Text(
+                                  "(You can select more than one language.)",
+                                  style: TextStyle(
+                                      color: Colors.redAccent,
+                                      fontWeight: FontWeight.w100,
+                                      fontSize: 12,
+                                      fontStyle: FontStyle.italic),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ],
+                            ),
+                            Container(
+                              width: 600,
+                              height: 45,
+                              decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(5)),
+                                  color: Colors.white,
+                                  border: Border.all(
+                                      color: Colors.grey.shade300, width: 1)),
+                              child: TypeAheadFormField<LanguageData>(
+                                // Specify LanguageData as the generic type
+                                textFieldConfiguration:
+                                    const TextFieldConfiguration(
+                                  // controller: _selectedLanguageController,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.all(10),
+                                    hintText: 'Choose your language',
+                                    hintStyle: TextStyle(color: Colors.black),
+                                    border: InputBorder.none,
+                                    suffixIcon: Icon(Icons.arrow_drop_down),
+                                  ),
+                                ),
+                                suggestionsCallback: (pattern) async {
+                                  // Assuming names is a List<LanguageData>
+                                  final suggestions = names
+                                      .where((language) => language
+                                          .languageNamesStream
+                                          .toLowerCase()
+                                          .contains(pattern.toLowerCase()))
+                                      .toList(); // Return a list of LanguageData objects
+                                  return suggestions;
+                                },
+                                itemBuilder: (context, suggestions) {
+                                  return ListTile(
+                                    title: Text(suggestions
+                                        .languageNamesStream), // Access the language name
+                                  );
+                                },
+                                onSuggestionSelected: (suggestion) {
+                                  if (tlanguages.contains(
+                                      suggestion.languageNamesStream)) {
+                                    null;
+                                  } else {
+                                    setState(() {
+                                      tlanguages.add(suggestion
+                                          .languageNamesStream
+                                          .toString()); // Add the LanguageData object to tlanguages
+                                    });
+                                  }
+                                },
+                              ),
+                            )
+                          ],
                         ),
                         Visibility(
                           visible: tlanguages.isNotEmpty ? true : false,
@@ -836,38 +1030,58 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                             height: 5,
                           ),
                         ),
-                        Container(
+                        Visibility(
+                          visible: tlanguages.isNotEmpty ? true : false,
+                          child: Container(
                             width: 600,
                             height: 45,
                             padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(5)),
-                                color: Colors.white,
-                                border: Border.all(
-                                    color: Colors.grey.shade300, width: 1)),
-                            child: LanguagePickerDropdown(
-                                itemBuilder: languageBuilder,
-                                onValuePicked: (Language language) {
-                                  setState(() {
-                                    tlanguages.add(language.name);
-                                  });
-                                })),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Row(
-                          children: const [
-                            Text(
-                              "(You can select more than one language.)",
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.w100,
-                                  fontSize: 12,
-                                  fontStyle: FontStyle.italic),
-                              textAlign: TextAlign.left,
-                            ),
-                          ],
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: tlanguages.length,
+                                itemBuilder: (context, index) {
+                                  String language = tlanguages[index];
+                                  Color color = vibrantColors[index %
+                                      vibrantColors
+                                          .length]; // Cycle through colors
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 10.0, right: 10),
+                                    child: Container(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                      decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(15)),
+                                        color: color,
+                                      ),
+                                      child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(language),
+                                            IconButton(
+                                              padding: EdgeInsets.zero,
+                                              visualDensity:
+                                                  const VisualDensity(
+                                                      horizontal: -4,
+                                                      vertical: -4),
+                                              icon: const Icon(Icons
+                                                  .delete_outline_outlined),
+                                              color: Colors.red,
+                                              iconSize: 15,
+                                              onPressed: () {
+                                                setState(() {
+                                                  tlanguages.removeAt(index);
+                                                });
+                                              },
+                                            ),
+                                          ]),
+                                    ),
+                                  );
+                                }),
+                          ),
                         ),
                         Visibility(
                           visible: age < 18 && age > 0 ? true : false,
@@ -918,11 +1132,12 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                   decoration: const InputDecoration(
                                     border: InputBorder.none,
                                     fillColor: Colors.grey,
-                                    hintText: 'Fullname',
+                                    hintText: 'Full Name',
                                     hintStyle: TextStyle(color: Colors.black),
                                   ),
-                                  validator: (val) =>
-                                      val!.isEmpty ? 'Enter an Fullname' : null,
+                                  validator: (val) => val!.isEmpty
+                                      ? 'Enter an Full Name'
+                                      : null,
                                   // onChanged: (val) {
                                   //   guardianfullname = val;
                                   // },
@@ -952,7 +1167,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                             _selectDate('guardian');
                                           },
                                           child: Text(
-                                            guardianbdate.toString(),
+                                            guardianbdate,
                                             style: const TextStyle(
                                                 fontSize: 16,
                                                 color: Colors.black),
@@ -1090,23 +1305,9 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                               Row(
                                 children: [
                                   Container(
-                                      width: 400,
-                                      height: 45,
-                                      alignment: Alignment.centerLeft,
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(5)),
-                                          color: Colors.white,
-                                          border: Border.all(
-                                              color: Colors.grey.shade300,
-                                              width: 1)),
-                                      child: Text(uID)),
-                                  const Spacer(),
-                                  Container(
                                     padding: const EdgeInsets.fromLTRB(
                                         10, 10, 10, 10),
-                                    width: 150,
+                                    width: 180,
                                     height: 55,
                                     child: TextButton(
                                       style: TextButton.styleFrom(
@@ -1125,15 +1326,10 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                         ),
                                       ),
                                       onPressed: () async {
-                                        String? fileName =
-                                            await uploadData(widget.uid);
-                                        setState(() {
-                                          guardianID = fileName!;
-                                          print(fileName);
-                                        });
+                                        selectImagesID();
                                       },
                                       child: const Text(
-                                        'Upload File',
+                                        'Upload ID',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 15,
@@ -1141,6 +1337,131 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                       ),
                                     ),
                                   ),
+                                  const Spacer(),
+                                  idfilenames.isNotEmpty
+                                      ? Container(
+                                          width: 400,
+                                          height: 55,
+                                          padding: const EdgeInsets.fromLTRB(
+                                              10, 0, 10, 0),
+                                          child: Row(
+                                            children: [
+                                              IconButton(
+                                                iconSize: 15,
+                                                icon: const Icon(
+                                                  Icons
+                                                      .arrow_back_ios, // Left arrow icon
+                                                  color: Colors.blue,
+                                                ),
+                                                onPressed: () {
+                                                  // Scroll to the left
+                                                  _scrollController.animateTo(
+                                                    _scrollController.offset -
+                                                        100.0, // Adjust the value as needed
+                                                    duration: const Duration(
+                                                        milliseconds:
+                                                            500), // Adjust the duration as needed
+                                                    curve: Curves.ease,
+                                                  );
+                                                },
+                                              ),
+                                              Expanded(
+                                                child: ListView.builder(
+                                                  controller:
+                                                      _scrollController, // Assign the ScrollController to the ListView
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  itemCount: idfilenames.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    Color color = vibrantColors[
+                                                        index %
+                                                            vibrantColors
+                                                                .length];
+
+                                                    return Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 10.0,
+                                                              right: 10),
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                5, 0, 5, 0),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              const BorderRadius
+                                                                      .all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          15)),
+                                                          color: color,
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Text(idfilenames[
+                                                                index]),
+                                                            IconButton(
+                                                              iconSize: 15,
+                                                              icon: const Icon(
+                                                                Icons.delete,
+                                                                color:
+                                                                    Colors.red,
+                                                              ),
+                                                              onPressed: () {
+                                                                setState(() {
+                                                                  idfilenames
+                                                                      .removeAt(
+                                                                          index);
+                                                                  selectedIDfiles
+                                                                      .removeAt(
+                                                                          index);
+                                                                });
+                                                              },
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                              IconButton(
+                                                iconSize: 15,
+                                                icon: const Icon(
+                                                  Icons
+                                                      .arrow_forward_ios, // Right arrow icon
+                                                  color: Colors.blue,
+                                                ),
+                                                onPressed: () {
+                                                  // Scroll to the right
+                                                  _scrollController.animateTo(
+                                                    _scrollController.offset +
+                                                        100.0, // Adjust the value as needed
+                                                    duration: const Duration(
+                                                        milliseconds:
+                                                            500), // Adjust the duration as needed
+                                                    curve: Curves.ease,
+                                                  );
+                                                },
+                                              ),
+                                            ],
+                                          ))
+                                      : Container(
+                                          width: 400,
+                                          height: 55,
+                                          padding: const EdgeInsets.fromLTRB(
+                                              10, 0, 10, 0),
+                                          child: const Center(
+                                            child: Text(
+                                                '"You can upload front and back of ID."'),
+                                          ),
+                                        )
                                 ],
                               ),
                               const SizedBox(
@@ -1149,24 +1470,9 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                               Row(
                                 children: [
                                   Container(
-                                      width: 400,
-                                      height: 45,
-                                      alignment: Alignment.centerLeft,
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(5)),
-                                          color: Colors.white,
-                                          border: Border.all(
-                                              color: Colors.grey.shade300,
-                                              width: 1)),
-                                      child: const Text(
-                                          "Upload Guardian Picture")),
-                                  const Spacer(),
-                                  Container(
                                     padding: const EdgeInsets.fromLTRB(
                                         10, 10, 10, 10),
-                                    width: 150,
+                                    width: 180,
                                     height: 55,
                                     child: TextButton(
                                       style: TextButton.styleFrom(
@@ -1185,15 +1491,10 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                         ),
                                       ),
                                       onPressed: () async {
-                                        String? fileName =
-                                            await uploadData(widget.uid);
-                                        setState(() {
-                                          guardianpPicture = fileName!;
-                                          print(fileName);
-                                        });
+                                        selectImage('guardian');
                                       },
                                       child: const Text(
-                                        'Upload File',
+                                        'Upload Picture',
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 15,
@@ -1201,6 +1502,71 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                       ),
                                     ),
                                   ),
+                                  const Spacer(),
+                                  guadianfilename.isNotEmpty
+                                      ? Container(
+                                          width: 400,
+                                          height: 55,
+                                          padding: const EdgeInsets.fromLTRB(
+                                              10, 0, 10, 0),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10.0,
+                                                          right: 10),
+                                                  child: Container(
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(5, 0, 5, 0),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                                  .all(
+                                                              Radius.circular(
+                                                                  15)),
+                                                      color: vibrantColors[1 %
+                                                          vibrantColors.length],
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(guadianfilename),
+                                                        IconButton(
+                                                          iconSize: 15,
+                                                          icon: const Icon(
+                                                            Icons.delete,
+                                                            color: Colors.red,
+                                                          ),
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              guadianfilename ==
+                                                                  '';
+                                                              guardianselectedImage ==
+                                                                  null;
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ))
+                                      : Container(
+                                          width: 400,
+                                          height: 55,
+                                          padding: const EdgeInsets.fromLTRB(
+                                              10, 0, 10, 0),
+                                          child: const Center(
+                                            child: Text(
+                                                '"Please upload your personal Picture"'),
+                                          ),
+                                        )
                                 ],
                               ),
                             ],
@@ -1214,7 +1580,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                           child: CheckboxListTile(
                             title: const Text(
                               'Agree to Work4uTutor Terms & Condition and Privacy Policy.',
-                              style: TextStyle(fontSize: 12),
+                              style: TextStyle(fontSize: 15),
                             ),
                             // subtitle: const Text(
                             //     'A computer science portal for geeks.'),
@@ -1225,9 +1591,59 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                             selected: termStatus,
                             value: termStatus,
                             controlAffinity: ListTileControlAffinity.leading,
-                            onChanged: (value) {
+                            onChanged: (value) async {
+                              dynamic accept = await showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    var height =
+                                        MediaQuery.of(context).size.height;
+                                    return AlertDialog(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            15.0), // Adjust the radius as needed
+                                      ),
+                                      contentPadding: EdgeInsets.zero,
+                                      content: ClipRRect(
+                                        borderRadius: BorderRadius.circular(
+                                            15.0), // Same radius as above
+                                        child: Container(
+                                          color: Colors
+                                              .white, // Set the background color of the circular content
+
+                                          child: Stack(
+                                            children: <Widget>[
+                                              SizedBox(
+                                                height: height,
+                                                width: 900,
+                                                child: const TermPage(),
+                                              ),
+                                              Positioned(
+                                                top: 10.0,
+                                                right: 10.0,
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.of(context).pop(
+                                                        false); // Close the dialog
+                                                  },
+                                                  child: const Icon(
+                                                    Icons.close,
+                                                    color: Colors.red,
+                                                    size: 20,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  });
+
                               setState(() {
-                                termStatus = value!;
+                                if (accept != null) {
+                                  termStatus = accept;
+                                }
                               });
                             },
                           ),
@@ -1251,23 +1667,101 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                 ),
                               ),
                               onPressed: () async {
-                                print(
-                                    '$studentIDNumber/$firstname/$middlename$lastname/$age/$selectedCountry/$tCity/$_selectedTimeZone$tlanguages');
                                 if (age >= 18) {
-                                  if (studentIDNumber.isNotEmpty &&
+                                  if (firstname.text.isEmpty) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Firstname Required!",
+                                    );
+                                  } else if (lastname.text == '') {
+                                    CoolAlert.show(
+                                      context: context,
+                                      title: 'Error',
+                                      width: 200,
+                                      type: CoolAlertType.error,
+                                      text: "Lastname Required!",
+                                    );
+                                  } else if (filename == '') {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Profile Picture Required!",
+                                    );
+                                  } else if (age == 0) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Select Birth Date!",
+                                    );
+                                  } else if (termStatus == false) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      type: CoolAlertType.error,
+                                      text: "Please accept terms & conditions!",
+                                    );
+                                  } else if (birthtCity.text == '') {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Input City!",
+                                    );
+                                  } else if (_selectedBirthCountryController
+                                          .text ==
+                                      '') {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Select Country!",
+                                    );
+                                  } else if (_selectedTimeZone1.text == '') {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Select Timezone!",
+                                    );
+                                  } else if (tlanguages.isEmpty) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Select Language!",
+                                    );
+                                  } else if (studentIDNumber.isNotEmpty &&
                                       studentIDNumber != 'STU*********' &&
                                       firstname.text.isNotEmpty &&
-                                      middlename.text.isNotEmpty &&
                                       lastname.text.isNotEmpty &&
                                       age != 0 &&
-                                      selectedCountry.isNotEmpty &&
-                                      tCity.isNotEmpty &&
-                                      _selectedTimeZone.isNotEmpty &&
+                                      _selectedBirthCountryController
+                                          .text.isNotEmpty &&
+                                      birthtCity.text.isNotEmpty &&
+                                      _selectedTimeZone1.text.isNotEmpty &&
                                       tlanguages.isNotEmpty) {
+                                    CoolAlert.show(
+                                        context: context,
+                                        width: 200,
+                                        barrierDismissible: false,
+                                        type: CoolAlertType.loading,
+                                        text: 'Uploading your data....');
                                     updateStudentInfo(
                                             widget.uid,
-                                            tCity,
-                                            selectedCountry,
+                                            birthtCity.text,
+                                            _selectedBirthCountryController
+                                                .text,
                                             firstname.text,
                                             middlename.text,
                                             lastname.text,
@@ -1275,16 +1769,18 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                             studentIDNumber,
                                             widget.uid,
                                             phoneNumber.phoneNumber.toString(),
-                                            profileurl,
+                                            await uploadStudentProfile(
+                                                widget.uid,
+                                                selectedImage!,
+                                                filename),
                                             DateTime.now(),
                                             age.toString(),
-                                            selectedDate.toString(),
-                                            _selectedTimeZone,
+                                            bdate.toString(),
+                                            _selectedTimeZone1.text,
                                             'completed')
                                         .then(
                                       (value) async {
-                                        dynamic result =
-                                            await _auth.signOutAnon();
+                                        _auth.signOutAnon();
                                         deleteAllData();
                                         Navigator.pushReplacement(
                                           context,
@@ -1294,68 +1790,209 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                         );
                                       },
                                     );
-                                  } else {
-                                    updateStudentInfo(
-                                            widget.uid,
-                                            tCity,
-                                            selectedCountry,
-                                            firstname.text,
-                                            middlename.text,
-                                            lastname.text,
-                                            tlanguages,
-                                            studentIDNumber,
-                                            widget.uid,
-                                            phoneNumber.phoneNumber.toString(),
-                                            profileurl,
-                                            DateTime.now(),
-                                            age.toString(),
-                                            selectedDate.toString(),
-                                            _selectedTimeZone,
-                                            'unfinished')
-                                        .then(
-                                      (value) async {
-                                        dynamic result =
-                                            await _auth.signOutAnon();
-                                        deleteAllData();
-                                        setState(() {
-                                          CoolAlert.show(
-                                            context: context,
-                                            type: CoolAlertType.success,
-                                            text: 'Sign up succesfully!',
-                                            autoCloseDuration:
-                                                const Duration(seconds: 1),
-                                          ).then((value) =>
-                                              Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const LoginPage()),
-                                              ));
-                                        });
-                                      },
-                                    );
                                   }
+                                  //else {
+                                  //   CoolAlert.show(
+                                  //       context: context,
+                                  //       width: 200,
+                                  //       barrierDismissible: false,
+                                  //       type: CoolAlertType.loading,
+                                  //       text: 'Uploading your data....');
+                                  //   updateStudentInfo(
+                                  //           widget.uid,
+                                  //           birthtCity.text,
+                                  //           _selectedBirthCountryController
+                                  //               .text,
+                                  //           firstname.text,
+                                  //           middlename.text,
+                                  //           lastname.text,
+                                  //           tlanguages,
+                                  //           studentIDNumber,
+                                  //           widget.uid,
+                                  //           phoneNumber.phoneNumber.toString(),
+                                  //           uploadStudentProfile(
+                                  //               widget.uid,
+                                  //               selectedImage!,
+                                  //               filename) as String,
+                                  //           DateTime.now(),
+                                  //           age.toString(),
+                                  //           bdate.toString(),
+                                  //           _selectedTimeZone1.text,
+                                  //           'unfinished')
+                                  //       .then(
+                                  //     (value) async {
+                                  //       _auth.signOutAnon();
+                                  //       deleteAllData();
+                                  //       setState(() {
+                                  //         CoolAlert.show(
+                                  //           context: context,
+                                  //           type: CoolAlertType.success,
+                                  //           text: 'Sign up succesfully!',
+                                  //           autoCloseDuration:
+                                  //               const Duration(seconds: 1),
+                                  //         ).then((value) =>
+                                  //             Navigator.pushReplacement(
+                                  //               context,
+                                  //               MaterialPageRoute(
+                                  //                   builder: (context) =>
+                                  //                       const LoginPage()),
+                                  //             ));
+                                  //       });
+                                  //     },
+                                  //   );
+                                  // }
                                 } else if (age < 18 && age != 0) {
-                                  if (studentIDNumber.isNotEmpty &&
+                                  if (firstname.text.isEmpty) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Firstname Required!",
+                                    );
+                                  } else if (termStatus == false) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      type: CoolAlertType.error,
+                                      text: "Please accept terms & conditions!",
+                                    );
+                                  } else if (lastname.text == '') {
+                                    CoolAlert.show(
+                                      context: context,
+                                      title: 'Error',
+                                      width: 200,
+                                      type: CoolAlertType.error,
+                                      text: "Lastname Required!",
+                                    );
+                                  } else if (filename == '') {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Profile Picture Required!",
+                                    );
+                                  } else if (age == 0) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Select Birth Date!",
+                                    );
+                                  } else if (birthtCity.text == '') {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Input City!",
+                                    );
+                                  } else if (_selectedBirthCountryController
+                                          .text ==
+                                      '') {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Select Country!",
+                                    );
+                                  } else if (_selectedTimeZone1.text == '') {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Select Timezone!",
+                                    );
+                                  } else if (tlanguages.isEmpty) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Select Language!",
+                                    );
+                                  } else if (guardianfullname.text.isEmpty) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Input Guardian Fullname!",
+                                    );
+                                  } else if (guardianage.isEmpty ||
+                                      guardianage == '0') {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Select Guardian Birthdate!",
+                                    );
+                                  } else if (guardiancontactnumber
+                                      .text.isEmpty) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Input Contact Number!",
+                                    );
+                                  } else if (guadianfilename.isEmpty) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Select Guardian Picture!",
+                                    );
+                                  } else if (idfilenames.isEmpty) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Upload ID Pictures!",
+                                    );
+                                  } else if (guardiansemail.text.isEmpty) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please input Guradian Email!",
+                                    );
+                                  } else if (studentIDNumber.isNotEmpty &&
                                       studentIDNumber != 'STU*********' &&
                                       firstname.text.isNotEmpty &&
                                       middlename.text.isNotEmpty &&
                                       lastname.text.isNotEmpty &&
                                       age != 0 &&
-                                      selectedCountry.isNotEmpty &&
-                                      tCity.isNotEmpty &&
-                                      _selectedTimeZone.isNotEmpty &&
+                                      _selectedBirthCountryController
+                                          .text.isNotEmpty &&
+                                      birthtCity.text.isNotEmpty &&
+                                      _selectedTimeZone1.text.isNotEmpty &&
                                       tlanguages.isNotEmpty &&
                                       guardianfullname.text.isNotEmpty &&
-                                      // ignore: unrelated_type_equality_checks
-                                      guardianage != 0 &&
+                                      guardianage != '0' &&
                                       guardiancontactnumber.text.isNotEmpty &&
-                                      guardianID.isNotEmpty &&
-                                      guardianpPicture.isNotEmpty) {
+                                      guadianfilename.isNotEmpty &&
+                                      guardiansemail.text.isNotEmpty &&
+                                      idfilenames.isNotEmpty) {
+                                    CoolAlert.show(
+                                        context: context,
+                                        width: 200,
+                                        barrierDismissible: false,
+                                        type: CoolAlertType.loading,
+                                        text: 'Uploading your data....');
                                     updateStudentInfowGuardian(
                                             widget.uid,
-                                            tCity,
-                                            selectedCountry,
+                                            birthtCity.text,
+                                            _selectedBirthCountryController
+                                                .text,
                                             firstname.text,
                                             middlename.text,
                                             lastname.text,
@@ -1363,21 +2000,33 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                             studentIDNumber,
                                             widget.uid,
                                             phoneNumber.phoneNumber.toString(),
-                                            profileurl,
+                                            await uploadStudentProfile(
+                                                widget.uid,
+                                                selectedImage!,
+                                                filename),
                                             DateTime.now(),
                                             age.toString(),
-                                            selectedDate.toString(),
-                                            _selectedTimeZone,
+                                            bdate.toString(),
+                                            _selectedTimeZone1.text,
                                             guardianfullname.text,
                                             guardiancontactnumber.text,
                                             guardiansemail.text,
                                             guardianbdate,
                                             guardianage,
-                                            'completed')
+                                            'completed',
+                                            await uploadGuardianIDList(
+                                                widget.uid,
+                                                'guardian',
+                                                selectedIDfiles,
+                                                idfilenames),
+                                            await uploadGuardianProfile(
+                                                widget.uid,
+                                                guardianselectedImage!,
+                                                'guardian',
+                                                guadianfilename))
                                         .then(
                                       (value) async {
-                                        dynamic result =
-                                            await _auth.signOutAnon();
+                                        _auth.signOutAnon();
                                         deleteAllData();
                                         setState(() {
                                           CoolAlert.show(
@@ -1396,118 +2045,147 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                         });
                                       },
                                     );
-                                  } else {
-                                    updateStudentInfowGuardian(
-                                            widget.uid,
-                                            tCity,
-                                            selectedCountry,
-                                            firstname.text,
-                                            middlename.text,
-                                            lastname.text,
-                                            tlanguages,
-                                            studentIDNumber,
-                                            widget.uid,
-                                            phoneNumber.phoneNumber.toString(),
-                                            profileurl,
-                                            DateTime.now(),
-                                            age.toString(),
-                                            selectedDate.toString(),
-                                            _selectedTimeZone,
-                                            guardianfullname.text,
-                                            guardiancontactnumber.text,
-                                            guardiansemail.text,
-                                            guardianbdate,
-                                            guardianage,
-                                            'unfinished')
-                                        .then(
-                                      (value) async {
-                                        dynamic result =
-                                            await _auth.signOutAnon();
-                                        deleteAllData();
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const LoginPage()),
-                                        );
-                                      },
-                                    );
                                   }
+                                  // else {
+                                  //   CoolAlert.show(
+                                  //       context: context,
+                                  //       width: 200,
+                                  //       barrierDismissible: false,
+                                  //       type: CoolAlertType.loading,
+                                  //       text: 'Uploading your data....');
+                                  //   updateStudentInfowGuardian(
+                                  //           widget.uid,
+                                  //           birthtCity.text,
+                                  //           _selectedBirthCountryController
+                                  //               .text,
+                                  //           firstname.text,
+                                  //           middlename.text,
+                                  //           lastname.text,
+                                  //           tlanguages,
+                                  //           studentIDNumber,
+                                  //           widget.uid,
+                                  //           phoneNumber.phoneNumber.toString(),
+                                  //           await uploadStudentProfile(
+                                  //               widget.uid,
+                                  //               selectedImage!,
+                                  //               filename),
+                                  //           DateTime.now(),
+                                  //           age.toString(),
+                                  //           bdate.toString(),
+                                  //           _selectedTimeZone1.text,
+                                  //           guardianfullname.text,
+                                  //           guardiancontactnumber.text,
+                                  //           guardiansemail.text,
+                                  //           guardianbdate,
+                                  //           guardianage,
+                                  //           'unfinished',
+                                  //           await uploadGuardianIDList(
+                                  //               widget.uid,
+                                  //               'guardian',
+                                  //               selectedIDfiles,
+                                  //               idfilenames),
+                                  //           await uploadGuardianProfile(
+                                  //               widget.uid,
+                                  //               guardianselectedImage!,
+                                  //               'guardian',
+                                  //               guadianfilename))
+                                  //       .then(
+                                  //     (value) async {
+                                  //       _auth.signOutAnon();
+                                  //       deleteAllData();
+                                  //       Navigator.pushReplacement(
+                                  //         context,
+                                  //         MaterialPageRoute(
+                                  //             builder: (context) =>
+                                  //                 const LoginPage()),
+                                  //       );
+                                  //     },
+                                  //   );
+                                  // }
+                                } else {
+                                  CoolAlert.show(
+                                    context: context,
+                                    width: 200,
+                                    title: 'Error',
+                                    type: CoolAlertType.error,
+                                    text: "Please Check Inputs!",
+                                  );
                                 }
                               },
-                              child: Text(
-                                age >= 18 &&
-                                        studentIDNumber.isNotEmpty &&
-                                        studentIDNumber != 'STU*********' &&
-                                        firstname.text.isNotEmpty &&
-                                        middlename.text.isNotEmpty &&
-                                        lastname.text.isNotEmpty &&
-                                        age != 0 &&
-                                        selectedCountry.isNotEmpty &&
-                                        tCity.isNotEmpty &&
-                                        _selectedTimeZone.isNotEmpty &&
-                                        tlanguages.isNotEmpty
-                                    ? 'Proceed Now'
-                                    : age >= 18 && studentIDNumber.isEmpty ||
-                                            studentIDNumber == 'STU*********' ||
-                                            firstname.text.isEmpty ||
-                                            middlename.text.isEmpty ||
-                                            lastname.text.isEmpty ||
-                                            age == 0 ||
-                                            selectedCountry.isEmpty ||
-                                            tCity.isEmpty ||
-                                            _selectedTimeZone.isEmpty ||
-                                            tlanguages.isEmpty
-                                        ? 'Save Temporarily'
-                                        : age < 18 ||
-                                                age == 0 &&
-                                                    studentIDNumber.isEmpty ||
-                                                studentIDNumber ==
-                                                    'STU*********' ||
-                                                firstname.text.isEmpty ||
-                                                middlename.text.isEmpty ||
-                                                lastname.text.isEmpty ||
-                                                age == 0 ||
-                                                selectedCountry.isEmpty ||
-                                                tCity.isEmpty ||
-                                                _selectedTimeZone.isEmpty ||
-                                                tlanguages.isEmpty ||
-                                                guardianfullname.text.isEmpty ||
-                                                // ignore: unrelated_type_equality_checks
-                                                guardianage == 0 ||
-                                                guardiancontactnumber
-                                                    .text.isEmpty ||
-                                                guardiansemail.text.isEmpty ||
-                                                guardianbdate.isEmpty
-                                            ? 'Save Temporarily'
-                                            : age >= 18 &&
-                                                    studentIDNumber
-                                                        .isNotEmpty &&
-                                                    studentIDNumber !=
-                                                        'STU*********' &&
-                                                    firstname.text.isNotEmpty &&
-                                                    middlename
-                                                        .text.isNotEmpty &&
-                                                    lastname.text.isNotEmpty &&
-                                                    age != 0 &&
-                                                    selectedCountry
-                                                        .isNotEmpty &&
-                                                    tCity.isNotEmpty &&
-                                                    _selectedTimeZone
-                                                        .isNotEmpty &&
-                                                    tlanguages.isNotEmpty &&
-                                                    guardianfullname
-                                                        .text.isNotEmpty &&
-                                                    // ignore: unrelated_type_equality_checks
-                                                    guardianage == 0 &&
-                                                    guardiancontactnumber
-                                                        .text.isNotEmpty &&
-                                                    guardiansemail
-                                                        .text.isNotEmpty &&
-                                                    guardianbdate.isNotEmpty
-                                                ? 'Proceed Now'
-                                                : 'Proceed Now',
-                                style: const TextStyle(
+                              child: const Text(
+                                // age >= 18 &&
+                                //         studentIDNumber.isNotEmpty &&
+                                //         studentIDNumber != 'STU*********' &&
+                                //         firstname.text.isNotEmpty &&
+                                //         middlename.text.isNotEmpty &&
+                                //         lastname.text.isNotEmpty &&
+                                //         age != 0 &&
+                                //         selectedCountry.isNotEmpty &&
+                                //         tCity.isNotEmpty &&
+                                //         _selectedTimeZone.isNotEmpty &&
+                                //         tlanguages.isNotEmpty
+                                //     ? 'Proceed Now'
+                                //     : age >= 18 && studentIDNumber.isEmpty ||
+                                //             studentIDNumber == 'STU*********' ||
+                                //             firstname.text.isEmpty ||
+                                //             middlename.text.isEmpty ||
+                                //             lastname.text.isEmpty ||
+                                //             age == 0 ||
+                                //             selectedCountry.isEmpty ||
+                                //             tCity.isEmpty ||
+                                //             _selectedTimeZone.isEmpty ||
+                                //             tlanguages.isEmpty
+                                //         ? 'Save Temporarily'
+                                //         : age < 18 ||
+                                //                 age == 0 &&
+                                //                     studentIDNumber.isEmpty ||
+                                //                 studentIDNumber ==
+                                //                     'STU*********' ||
+                                //                 firstname.text.isEmpty ||
+                                //                 middlename.text.isEmpty ||
+                                //                 lastname.text.isEmpty ||
+                                //                 age == 0 ||
+                                //                 selectedCountry.isEmpty ||
+                                //                 tCity.isEmpty ||
+                                //                 _selectedTimeZone.isEmpty ||
+                                //                 tlanguages.isEmpty ||
+                                //                 guardianfullname.text.isEmpty ||
+                                //                 // ignore: unrelated_type_equality_checks
+                                //                 guardianage == 0 ||
+                                //                 guardiancontactnumber
+                                //                     .text.isEmpty ||
+                                //                 guardiansemail.text.isEmpty ||
+                                //                 guardianbdate.isEmpty
+                                //             ? 'Save Temporarily'
+                                //             : age >= 18 &&
+                                //                     studentIDNumber
+                                //                         .isNotEmpty &&
+                                //                     studentIDNumber !=
+                                //                         'STU*********' &&
+                                //                     firstname.text.isNotEmpty &&
+                                //                     middlename
+                                //                         .text.isNotEmpty &&
+                                //                     lastname.text.isNotEmpty &&
+                                //                     age != 0 &&
+                                //                     selectedCountry
+                                //                         .isNotEmpty &&
+                                //                     tCity.isNotEmpty &&
+                                //                     _selectedTimeZone
+                                //                         .isNotEmpty &&
+                                //                     tlanguages.isNotEmpty &&
+                                //                     guardianfullname
+                                //                         .text.isNotEmpty &&
+                                //                     // ignore: unrelated_type_equality_checks
+                                //                     guardianage == 0 &&
+                                //                     guardiancontactnumber
+                                //                         .text.isNotEmpty &&
+                                //                     guardiansemail
+                                //                         .text.isNotEmpty &&
+                                //                     guardianbdate.isNotEmpty
+                                //                 ? 'Proceed Now'
+                                //                 :
+                                'Proceed Now',
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,
                                 ),

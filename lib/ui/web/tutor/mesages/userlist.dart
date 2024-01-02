@@ -1,15 +1,20 @@
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:work4ututor/ui/web/tutor/mesages/viewmessage.dart';
 
 import '../../../../data_class/chatmessageclass.dart';
+import '../../../../data_class/studentinfoclass.dart';
+import '../../../../data_class/tutor_info_class.dart';
 import '../../../../provider/chatmessagedisplay.dart';
 import '../../../../services/getmessages.dart';
 import '../../../../utils/themes.dart';
 import '../calendar/tutor_schedule.dart';
 
 class UserList extends StatefulWidget {
+  const UserList({super.key});
+
   @override
   _UserListState createState() => _UserListState();
 }
@@ -97,8 +102,23 @@ class _UserListState extends State<UserList> {
   }
 
   String chatID = '';
+  TutorInformation getTutorInformation(
+      String enteredID, List<TutorInformation> data) {
+    TutorInformation selectedTutor = data.firstWhere(
+      (tutor) => tutor.userId == enteredID,
+    );
+
+    return selectedTutor;
+  }
+
+  ChatMessage? currentconvo;
+  bool isSearchVisible = false;
   @override
   Widget build(BuildContext context) {
+    List<TutorInformation> tutorsList =
+        Provider.of<List<TutorInformation>>(context);
+    final studentinfodata = Provider.of<List<StudentInfoClass>>(context);
+
     Size size = MediaQuery.of(context).size;
     final bool openChat =
         context.select((ChatDisplayProvider p) => p.openMessage);
@@ -114,36 +134,53 @@ class _UserListState extends State<UserList> {
         elevation: 1,
         backgroundColor: Colors.white,
         leading: IconButton(
-          padding: EdgeInsets.zero,
+          padding: const EdgeInsets.all(5),
           hoverColor: kCalendarColorFB,
           onPressed: () {
-            print('Write a new message');
+            setState(() {
+              isSearchVisible = !isSearchVisible;
+            });
           },
-          icon: const Icon(Icons.create_outlined),
+          icon: const Icon(EvaIcons.searchOutline),
           iconSize: 25,
           color: Colors.blue,
         ),
         title: PreferredSize(
           preferredSize: const Size.fromHeight(48),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Container(
-              alignment: Alignment.center,
-              width: 250,
-              child: TextField(
-                decoration: const InputDecoration(
-                  // enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black45)),
-                  fillColor: Colors.white,
-                  border: InputBorder.none,
-                  hintText: 'Search users',
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    filterUsers(value);
-                  });
-                },
-              ),
-            ),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: isSearchVisible
+                ? Padding(
+                    key: const Key(
+                        'search-bar-key'), // Add a key to differentiate between widgets
+
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Container(
+                      alignment: Alignment.center,
+                      width: 250,
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          fillColor: Colors.white,
+                          border: InputBorder.none,
+                          hintText: 'Search users',
+                        ),
+                        onChanged: (value) {
+                          // Implement your filtering logic here
+                        },
+                      ),
+                    ),
+                  )
+                : Container(
+                    key: const Key(
+                        'search-bar-key'), // Add a key to differentiate between widgets
+                  ),
+            transitionBuilder: (Widget child, Animation<double> animation) {
+              // Add a fade transition
+              return FadeTransition(
+                opacity: animation,
+                child: child,
+              );
+            },
           ),
         ),
         actions: [
@@ -177,19 +214,27 @@ class _UserListState extends State<UserList> {
                     shrinkWrap: true,
                     itemCount: messagelist.length,
                     itemBuilder: (BuildContext context, int index) {
+                      TutorInformation data = getTutorInformation(
+                          messagelist[index].tutorID, tutorsList);
+                      StudentInfoClass studentdata = studentinfodata.firstWhere(
+                        (student) =>
+                            student.userID == messagelist[index].studentID
+                      );
                       return Container(
                         decoration: const BoxDecoration(
                             border: Border(bottom: BorderSide(width: .05))),
                         child: ListTile(
-                          leading: const CircleAvatar(
+                          leading: CircleAvatar(
                             backgroundColor: Colors.black12,
-                            child: Icon(
-                              Icons.person,
-                              color: Colors.grey,
-                            ),
+                            backgroundImage:
+                                data.userId == _items.first['userID']
+                                    ? NetworkImage(
+                                        studentdata.profilelink)
+                                    : NetworkImage(data.imageID),
                           ),
                           title: Text(
-                            messagelist[index].tutorID,
+                           data.userId == _items.first['userID']
+                                    ?'${studentdata.studentFirstname} ${studentdata.studentLastname}': '${data.firstName} ${data.lastname}',
                             style: const TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold),
@@ -211,7 +256,7 @@ class _UserListState extends State<UserList> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
-                                    iconSize: 15,
+                                    iconSize: 20,
                                     icon: Icon(
                                       messagelist[index]
                                                   .studentFav
@@ -224,7 +269,7 @@ class _UserListState extends State<UserList> {
                                                   .toString() ==
                                               'yes'
                                           ? Colors.orange
-                                          : null,
+                                          : Colors.orange,
                                     ),
                                     splashColor: Colors.transparent,
                                     highlightColor: Colors.transparent,
@@ -235,35 +280,17 @@ class _UserListState extends State<UserList> {
                                       toggleFavorite(index);
                                     },
                                   ),
-                                  IconButton(
-                                    iconSize: 15,
-                                    icon: const Icon(
-                                      Icons.clear,
-                                      color: Colors.grey,
-                                    ),
-                                    splashColor: Colors.transparent,
-                                    highlightColor: Colors.transparent,
-                                    hoverColor: Colors.transparent,
-                                    mouseCursor:
-                                        MaterialStateMouseCursor.clickable,
-                                    onPressed: () {
-                                      deleteUser(index);
-                                    },
-                                  ),
                                 ],
                               ),
                               const Spacer(),
                             ],
                           ),
                           onTap: () {
-                            // Navigate to user profile page
-                            // Navigator.pushNamed(context, '/profile',
-                            //     arguments: {'username': users[index]['name']});
-
                             final provider =
                                 context.read<ChatDisplayProvider>();
                             provider.setOpenMessage(true);
                             setState(() {
+                              currentconvo = messagelist[index];
                               updatemessagestatusInfo(
                                   messagelist[index].chatID);
                               chatID = messagelist[index].chatID;
@@ -323,7 +350,7 @@ class _UserListState extends State<UserList> {
                     : ViewMessage(
                         uID: _items.first['userID'].toString(),
                         chatID: chatID,
-                      ),
+                        convo: currentconvo),
               )),
         ],
       ),

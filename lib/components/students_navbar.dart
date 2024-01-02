@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -18,18 +19,8 @@ class StudentsMenu extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final int menuIndex = context.select((InitProvider p) => p.menuIndex);
-    Size size = MediaQuery.of(context).size;
-    return Container(
-      height: size.height - 75,
-      width: 300,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(
-          color: Colors.black87,
-          width: .1,
-        ),
-        borderRadius: BorderRadius.circular(5.0),
-      ),
+    return SingleChildScrollView(
+      controller: ScrollController(),
       child: Column(
         children: <Widget>[
           GestureDetector(
@@ -244,11 +235,58 @@ class StudentsMenu extends HookWidget {
                 provider.setMenuIndex(4);
               },
               icon: const Icon(
-                Icons.supervised_user_circle,
+                EvaIcons.email,
                 size: 30,
               ),
               label: const Text(
-                'INQUIRIES',
+                'MESSAGES',
+                style: TextStyle(fontSize: 15),
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),Container(
+            height: 50,
+            width: 240,
+            decoration: const BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Color.fromRGBO(1, 118, 132, 1),
+              borderRadius: BorderRadius.all(Radius.circular(25)),
+            ),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.only(left: 50),
+                alignment: Alignment.centerLeft,
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: Colors.white,
+                backgroundColor:
+                    menuIndex != 9 ? kColorSecondary : kColorPrimary,
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(
+                    color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(24.0),
+                ),
+                // ignore: prefer_const_constructors
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontStyle: FontStyle.normal,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+              onPressed: () {
+                final provider = context.read<InitProvider>();
+                provider.setMenuIndex(9);
+              },
+              icon: const Icon(
+                EvaIcons.shoppingCart,
+                size: 30,
+              ),
+              label: const Text(
+                'MY CART',
                 style: TextStyle(fontSize: 15),
               ),
             ),
@@ -383,7 +421,7 @@ class StudentsMenu extends HookWidget {
                 ),
               ),
               onPressed: () async {
-                dynamic result = await _auth.signOutAnon();
+                 await _auth.signOutAnon();
                 deleteAllData();
                 // ignore: use_build_context_synchronously
                 Navigator.pushReplacement(

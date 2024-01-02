@@ -1,4 +1,4 @@
-// ignore_for_file: unused_import, sized_box_for_whitespace
+// ignore_for_file: unused_import, sized_box_for_whitespace, avoid_web_libraries_in_flutter, avoid_function_literals_in_foreach_calls, unused_local_variable, empty_catches, prefer_interpolation_to_compose_strings
 
 import 'dart:async';
 
@@ -9,12 +9,14 @@ import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:work4ututor/routes/routes.dart';
 import 'package:work4ututor/ui/web/student/main_dashboard/task_progress.dart';
 
 import '../../../../data_class/studentanalyticsclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/voucherclass.dart';
 import '../../../../services/getvouchers.dart';
+import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
 import 'coupon.dart';
 import 'task_in_progress.dart';
@@ -34,7 +36,6 @@ class StudentMainDashboard extends StatefulWidget {
 
 class _StudentMainDashboardState extends State<StudentMainDashboard> {
   getUserBooks() {
-    print('im here');
     FirebaseFirestore.instance.collection('vouchers').get().then((value) {
       value.docs.forEach((element) {
         FirebaseFirestore.instance
@@ -43,9 +44,7 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
             .collection("myvouchers")
             .get()
             .then((querySnapshot) {
-          querySnapshot.docs.forEach((element) {
-            print(element.data());
-          });
+          querySnapshot.docs.forEach((element) {});
         });
       });
     });
@@ -56,7 +55,8 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
   String remainingTime = "";
   Timer? _timer;
   StreamController<String> timerStream = StreamController<String>.broadcast();
-  final endDate = DateTime.now().add(Duration(days: 5)); // the date, time u set
+  final endDate =
+      DateTime.now().add(const Duration(days: 5)); // the date, time u set
   final currentDate = DateTime.now();
   String currentDateTime = '';
   Timer? timer;
@@ -65,7 +65,7 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
     prepareData();
     super.initState();
     // updateDateTime();
-    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       // updateDateTime();
       printtime();
     });
@@ -75,19 +75,15 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
   void dispose() {
     try {
       if (_timer != null && _timer!.isActive) _timer!.cancel();
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     timer?.cancel();
     super.dispose();
   }
 
   prepareData() {
     final difference = daysBetween(currentDate, endDate);
-    print(difference);
-    print('difference in days');
     // get remaining time in second
-    var result = Duration(seconds: 0);
+    var result = const Duration(seconds: 0);
     result = endDate.difference(currentDate);
     remainingTime = result.inSeconds.toString(); // convert to second
 //    remainingTime = '10'; // change this value to test for min function
@@ -135,24 +131,18 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
               remainingTime = second.toString();
               if (second == -1) {
                 timer.cancel();
-                print('timer cancelled');
               }
               if (second >= 0) {
                 timerStream.add(remainingTime);
               }
-            } catch (e) {
-              print(e);
-            }
+            } catch (e) {}
           });
           String remainTimeDisplay = "-";
           try {
             int seconds = int.parse(remainingTime);
             var now = Duration(seconds: seconds);
             remainTimeDisplay = dayHourMinuteSecondFunction(now);
-          } catch (e) {
-            print(e);
-          }
-          print(remainTimeDisplay);
+          } catch (e) {}
           return Text(
             remainTimeDisplay,
             textAlign: TextAlign.center,
@@ -234,7 +224,6 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
     subcollectionSnapshot.docs.forEach((DocumentSnapshot doc) {
       Object? data = doc.data();
       // Process the data as needed
-      print(data);
     });
   }
 
@@ -283,308 +272,850 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
       totalcompletedclasses = '0';
     }
     Size size = MediaQuery.of(context).size;
-    return StreamProvider<List<Voucherclass>>.value(
-        value: GetVouchers(uid: widget.uid).voucherlist,
-        initialData: [],
-        child: Container(
-          width: size.width - 300,
-          child: Container(
-            padding: const EdgeInsets.only(left: 10, right: 10),
-            child: SingleChildScrollView(
-              physics: const ScrollPhysics(),
-              child: Column(mainAxisSize: MainAxisSize.max, children: <Widget>[
-                Container(
-                  height: 50,
-                  width: size.width - 310,
-                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    color: kColorPrimary,
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "DASHBOARD",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.normal,
+    return ResponsiveBuilder(
+      mobileBuilder: (BuildContext context, BoxConstraints constraints) {
+        return StreamProvider<List<Voucherclass>>.value(
+            value: GetVouchers(uid: widget.uid).voucherlist,
+            initialData: const [],
+            child: Container(
+              width: size.width,
+              child: Container(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: SingleChildScrollView(
+                  physics: const ScrollPhysics(),
+                  child: Card(
+                    margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                    elevation: 5,
+                    child: Column(children: <Widget>[
+                      Container(
+                        height: 50,
+                        width: size.width - 310,
+                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          color: kColorPrimary,
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "DASHBOARD",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            const Spacer(),
+                            Text(
+                              'Local Date and Time: $currentDateTime',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const Spacer(),
-                      Text(
-                        'Local Date and Time: $currentDateTime',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.normal,
-                        ),
+                      const SizedBox(
+                        height: 10,
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(5),
-                          alignment: Alignment.centerLeft,
-                          width: 905,
-                          height: 310,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(5.0),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.only(left: 35),
-                                height: 300,
-                                width: 500,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Hi $fullName,',
-                                      style: const TextStyle(
-                                          fontSize: 25,
-                                          fontWeight: FontWeight.w800),
-                                    ),
-                                    const SizedBox(height: 20),
-                                    const Text(
-                                      'Welcome back, ready to learn new lesson \nclick the button bellow to book new tutor.',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w300),
-                                    ),
-                                    const SizedBox(height: 20),
-                                    SizedBox(
-                                      width: 320,
-                                      height: 50,
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.orangeAccent,
-                                          shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(25))),
-                                        ),
-                                        onPressed: () {
-                                          html.window.open('/tutorslist', "");
-                                          // setState(() {
-                                          //   fetchSubcollection();
-                                          // });
-                                        },
-                                        child: const Text(
-                                          'Book Now',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Container(
-                                  height: 320,
-                                  width: 320,
-                                  decoration: const BoxDecoration(
-                                    image: DecorationImage(
-                                        image: AssetImage(
-                                            "assets/images/5836.png"),
-                                        fit: BoxFit.cover),
-                                  ),
-                                  child: null // Foreground widget here
-                                  ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Card(
-                          margin: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                          elevation: 4,
-                          child: Container(
+                      Column(
+                        children: [
+                          Container(
                             padding: const EdgeInsets.all(5),
                             alignment: Alignment.centerLeft,
                             width: 905,
-                            height: 300,
+                            height: 310,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(5.0),
                             ),
-                            child: Column(
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                Row(
-                                  children: [
-                                    const Expanded(
-                                      child: Text(
-                                        'Available Vouchers',
-                                        style: TextStyle(
-                                            fontSize: 18,
+                                Container(
+                                  padding: const EdgeInsets.only(left: 35),
+                                  height: 300,
+                                  width: 500,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Hi $fullName,',
+                                        style: const TextStyle(
+                                            fontSize: 25,
                                             fontWeight: FontWeight.w800),
                                       ),
-                                    ),
-                                    const Spacer(),
-                                    SizedBox(
-                                      child: Text(
-                                        DateFormat.yMMMMd()
-                                            .format(DateTime.now()),
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w700),
+                                      const SizedBox(height: 20),
+                                      const Text(
+                                        'Welcome back, ready to learn new lesson \nclick the button bellow to book new tutor.',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w300),
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(height: 20),
+                                      SizedBox(
+                                        width: 320,
+                                        height: 50,
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                Colors.orangeAccent,
+                                            shape: const RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(25))),
+                                          ),
+                                          onPressed: () {
+                                            html.window.open('/tutorList', "");
+                                            // setState(() {
+                                            //   fetchSubcollection();
+                                            // });
+                                          },
+                                          child: const Text(
+                                            'Book Now',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 const SizedBox(
-                                  height: 10,
+                                  width: 10,
                                 ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: VoucherData(),
+                                Container(
+                                    height: 320,
+                                    width: 320,
+                                    decoration: const BoxDecoration(
+                                      image: DecorationImage(
+                                          image: AssetImage(
+                                              "assets/images/5836.png"),
+                                          fit: BoxFit.cover),
                                     ),
-                                  ],
+                                    child: null // Foreground widget here
+                                    ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Card(
+                            margin: const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                            elevation: 4,
+                            child: Container(
+                              padding: const EdgeInsets.all(5),
+                              alignment: Alignment.centerLeft,
+                              width: 905,
+                              height: 300,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Expanded(
+                                        child: Text(
+                                          'Available Vouchers',
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w800),
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      SizedBox(
+                                        child: Text(
+                                          DateFormat.yMMMMd()
+                                              .format(DateTime.now()),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: VoucherData(),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Card(
+                            margin: const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                            elevation: 4,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  alignment: Alignment.center,
+                                  width: (700) / 2,
+                                  height: 300,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    border: Border.all(
+                                      color: Colors.black45,
+                                      width: .2,
+                                    ),
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(10),
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                  child: Center(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 70,
+                                          height: 70,
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Color(0xFF8EF291),
+                                          ),
+                                          child: const Icon(
+                                            FontAwesomeIcons.bookOpen,
+                                            color: kColorPrimary,
+                                            size: 35,
+                                          ),
+                                        ),
+                                        Text(
+                                          enrolledclasses,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: kColorPrimary,
+                                          ),
+                                        ),
+                                        const Text(
+                                          "Enrolled Classes",
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.normal,
+                                            color: kColorPrimary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Container(
+                                  alignment: Alignment.centerLeft,
+                                  width: (700) / 2,
+                                  height: 300,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    border: Border.all(
+                                      color: Colors.black45,
+                                      width: .2,
+                                    ),
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(10),
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                  child: Center(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 70,
+                                          height: 70,
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: kColorLight,
+                                          ),
+                                          child: const Icon(
+                                            FontAwesomeIcons.trophy,
+                                            color: kColorPrimary,
+                                            size: 35,
+                                          ),
+                                        ),
+                                        Text(
+                                          totalcompletedclasses,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: kColorPrimary,
+                                          ),
+                                        ),
+                                        const Text(
+                                          "Completed Classes",
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.normal,
+                                            color: kColorPrimary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Card(
-                      margin: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                      elevation: 4,
-                      child: Container(
-                        padding: const EdgeInsets.all(5),
-                        alignment: Alignment.centerLeft,
-                        width: 300,
-                        height: 615,
+                        ],
+                      ),
+                    ]),
+                  ),
+                ),
+              ),
+            ));
+      },
+      tabletBuilder: (BuildContext context, BoxConstraints constraints) {
+        return StreamProvider<List<Voucherclass>>.value(
+            value: GetVouchers(uid: widget.uid).voucherlist,
+            initialData: const [],
+            child: Container(
+              width: size.width,
+              child: Container(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: SingleChildScrollView(
+                  physics: const ScrollPhysics(),
+                  child: Card(
+                    margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                    elevation: 5,
+                    child: Column(children: <Widget>[
+                      Container(
+                        height: 50,
+                        width: size.width - 310,
+                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                        alignment: Alignment.center,
                         decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          color: kColorPrimary,
                           borderRadius: BorderRadius.circular(5.0),
                         ),
-                        child: Column(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "DASHBOARD",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            const Spacer(),
+                            Text(
+                              'Local Date and Time: $currentDateTime',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        width: size.width,
+                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          color: kColorPrimary,
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              alignment: Alignment.center,
-                              width: (700) / 2,
-                              height: 300,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                border: Border.all(
-                                  color: Colors.black45,
-                                  width: .2,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
-                                color: Colors.white,
-                              ),
-                              child: Center(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      width: 70,
-                                      height: 70,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRect(
+                                  child: Card(
+                                    margin:
+                                        const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                                    elevation: 4,
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      height: 100,
                                       decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Color(0xFF8EF291),
+                                        shape: BoxShape.rectangle,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(10),
+                                        ),
+                                        color: Colors.white,
                                       ),
-                                      child: const Icon(
-                                        FontAwesomeIcons.bookOpen,
-                                        color: kColorPrimary,
-                                        size: 35,
+                                      child: Center(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              width: 70,
+                                              height: 70,
+                                              decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Color(0xFF8EF291),
+                                              ),
+                                              child: const Icon(
+                                                FontAwesomeIcons.bookOpen,
+                                                color: kColorPrimary,
+                                                size: 35,
+                                              ),
+                                            ),
+                                            Text(
+                                              enrolledclasses,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                color: kColorPrimary,
+                                              ),
+                                            ),
+                                            const Text(
+                                              "Enrolled Classes",
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.normal,
+                                                color: kColorPrimary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                    Text(
-                                      enrolledclasses,
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: kColorPrimary,
-                                      ),
-                                    ),
-                                    const Text(
-                                      "Enrolled Classes",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.normal,
-                                        color: kColorPrimary,
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
+                                ClipRect(
+                                  child: Card(
+                                    margin:
+                                        const EdgeInsets.fromLTRB(0, 0, 4, 0),
+                                    elevation: 4,
+                                    child: Container(
+                                      alignment: Alignment.centerLeft,
+                                      height: 100,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(10),
+                                        ),
+                                        color: Colors.white,
+                                      ),
+                                      child: Center(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              width: 70,
+                                              height: 70,
+                                              decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: kColorLight,
+                                              ),
+                                              child: const Icon(
+                                                FontAwesomeIcons.trophy,
+                                                color: kColorPrimary,
+                                                size: 35,
+                                              ),
+                                            ),
+                                            Text(
+                                              totalcompletedclasses,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                color: kColorPrimary,
+                                              ),
+                                            ),
+                                            const Text(
+                                              "Completed Classes",
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.normal,
+                                                color: kColorPrimary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ]),
+                  ),
+                ),
+              ),
+            ));
+      },
+      desktopBuilder: (BuildContext context, BoxConstraints constraints) {
+        return StreamProvider<List<Voucherclass>>.value(
+            value: GetVouchers(uid: widget.uid).voucherlist,
+            initialData: const [],
+            child: Container(
+              width: size.width - 300,
+              child: Container(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: SingleChildScrollView(
+                  physics: const ScrollPhysics(),
+                  child: Card(
+                    margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                    elevation: 5,
+                    child: Column(children: <Widget>[
+                      Container(
+                        height: 50,
+                        width: size.width - 310,
+                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          color: kColorPrimary,
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "DASHBOARD",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.normal,
                               ),
                             ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Container(
-                              alignment: Alignment.centerLeft,
-                              width: (700) / 2,
-                              height: 300,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                border: Border.all(
-                                  color: Colors.black45,
-                                  width: .2,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(10),
-                                ),
+                            const Spacer(),
+                            Text(
+                              'Local Date and Time: $currentDateTime',
+                              style: const TextStyle(
                                 color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.normal,
                               ),
-                              child: Center(
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        width: size.width - 300,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              children: [
+                                Card(
+                                  elevation: 4,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(5),
+                                    alignment: Alignment.centerLeft,
+                                    width: size.width - 680,
+                                    height: 310,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          padding:
+                                              const EdgeInsets.only(left: 35),
+                                          height: 300,
+                                          width: 500,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Hi $fullName,',
+                                                style: const TextStyle(
+                                                    fontSize: 25,
+                                                    fontWeight:
+                                                        FontWeight.w800),
+                                              ),
+                                              const SizedBox(height: 20),
+                                              const Text(
+                                                'Welcome back, ready to learn new lesson \nclick the button bellow to book new tutor.',
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.w300),
+                                              ),
+                                              const SizedBox(height: 20),
+                                              SizedBox(
+                                                width: 320,
+                                                height: 50,
+                                                child: ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.orangeAccent,
+                                                    shape: const RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    25))),
+                                                  ),
+                                                  onPressed: () {
+                                                    html.window
+                                                        .open('/tutorList', "");
+                                                    // setState(() {
+                                                    //   fetchSubcollection();
+                                                    // });
+                                                  },
+                                                  child: const Text(
+                                                    'Book Now',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Container(
+                                            height: 320,
+                                            width: 320,
+                                            decoration: const BoxDecoration(
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      "assets/images/5836.png"),
+                                                  fit: BoxFit.cover),
+                                            ),
+                                            child:
+                                                null // Foreground widget here
+                                            ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Card(
+                                  elevation: 4,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(5),
+                                    alignment: Alignment.centerLeft,
+                                    width: size.width - 680,
+                                    height: 300,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const Expanded(
+                                              child: Text(
+                                                'Available Vouchers',
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.w800),
+                                              ),
+                                            ),
+                                            const Spacer(),
+                                            SizedBox(
+                                              child: Text(
+                                                DateFormat.yMMMMd()
+                                                    .format(DateTime.now()),
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: VoucherData(),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 10),
+                            Card(
+                              elevation: 4,
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                alignment: Alignment.centerLeft,
+                                width: 300,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
-                                      width: 70,
-                                      height: 70,
+                                      alignment: Alignment.center,
+                                      width: 300,
+                                      height: 300,
                                       decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: kColorLight,
+                                        shape: BoxShape.rectangle,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(10),
+                                        ),
+                                        color: Colors.blue,
                                       ),
-                                      child: const Icon(
-                                        FontAwesomeIcons.trophy,
-                                        color: kColorPrimary,
-                                        size: 35,
+                                      child: Center(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              width: 70,
+                                              height: 70,
+                                              decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Color(0xFF8EF291),
+                                              ),
+                                              child: const Icon(
+                                                FontAwesomeIcons.bookOpen,
+                                                color: kColorPrimary,
+                                                size: 35,
+                                              ),
+                                            ),
+                                            Text(
+                                              enrolledclasses,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                color: kColorPrimary,
+                                              ),
+                                            ),
+                                            const Text(
+                                              "Enrolled Classes",
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.normal,
+                                                color: kColorPrimary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                    Text(
-                                      totalcompletedclasses,
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: kColorPrimary,
-                                      ),
+                                    const SizedBox(
+                                      height: 5,
                                     ),
-                                    const Text(
-                                      "Completed Classes",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.normal,
-                                        color: kColorPrimary,
+                                    Container(
+                                      alignment: Alignment.center,
+                                      width: 300,
+                                      height: 300,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(10),
+                                        ),
+                                        color: Colors.red,
+                                      ),
+                                      child: Center(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              width: 70,
+                                              height: 70,
+                                              decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: kColorLight,
+                                              ),
+                                              child: const Icon(
+                                                FontAwesomeIcons.trophy,
+                                                color: kColorPrimary,
+                                                size: 35,
+                                              ),
+                                            ),
+                                            Text(
+                                              totalcompletedclasses,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                color: kColorPrimary,
+                                              ),
+                                            ),
+                                            const Text(
+                                              "Completed Classes",
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.normal,
+                                                color: kColorPrimary,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -594,15 +1125,15 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(
+                        height: 10,
+                      ),
+                    ]),
+                  ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-              ]),
-            ),
-          ),
-        ));
+              ),
+            ));
+      },
+    );
   }
 }

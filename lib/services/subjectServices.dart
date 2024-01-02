@@ -1,3 +1,5 @@
+// ignore_for_file: file_names, unused_local_variable
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../data_class/subject_class.dart';
 
@@ -10,15 +12,15 @@ class SubjectServices {
       String subjectIdx, subjectNamex, tutorIdx, dateTimex, imagex;
       subjectIdx = subjectData['subjectid'] ?? '';
       subjectNamex = subjectData['subjectName'] ?? '';
-      tutorIdx = subjectData['tutorId'] ?? '';
+      tutorIdx = subjectData['totaltutors'] ?? '';
       dateTimex = subjectData['datetime'].toString();
-      imagex = subjectData['image'] ?? '';
+      imagex = subjectData['subjectStatus'] ?? '';
       return Subjects(
         subjectId: subjectIdx,
         subjectName: subjectNamex,
-        tutorId: tutorIdx,
+        totalTutors: tutorIdx,
         dateTime: '',
-        image: imagex,
+        subjectStatus: imagex,
       );
     }).toList();
   }

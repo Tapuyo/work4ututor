@@ -684,17 +684,17 @@ class _ViewTutorsDataState extends State<ViewTutorsData> {
                                                 ),
                                               ),
                                               onPressed: () {
-                                                showDialog<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return const BookLesson();
-                                                  },
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
-                                                  }
-                                                });
+                                                // showDialog<DateTime>(
+                                                //   context: context,
+                                                //   builder:
+                                                //       (BuildContext context) {
+                                                //     return const BookLesson();
+                                                //   },
+                                                // ).then((selectedDate) {
+                                                //   if (selectedDate != null) {
+                                                //     // Do something with the selected date
+                                                //   }
+                                                // });
                                               },
                                               child: const Text(
                                                 'Buy Lesson',
@@ -732,17 +732,17 @@ class _ViewTutorsDataState extends State<ViewTutorsData> {
                                                 ),
                                               ),
                                               onPressed: () {
-                                                showDialog<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return const BookLesson();
-                                                  },
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
-                                                  }
-                                                });
+                                                // showDialog<DateTime>(
+                                                //   context: context,
+                                                //   builder:
+                                                //       (BuildContext context) {
+                                                //     return const BookLesson();
+                                                //   },
+                                                // ).then((selectedDate) {
+                                                //   if (selectedDate != null) {
+                                                //     // Do something with the selected date
+                                                //   }
+                                                // });
                                               },
                                               child: const Text(
                                                 'Book Trial',
@@ -782,17 +782,17 @@ class _ViewTutorsDataState extends State<ViewTutorsData> {
                                                 ),
                                               ),
                                               onPressed: () {
-                                                showDialog<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return const ContactTeacher();
-                                                  },
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
-                                                  }
-                                                });
+                                                // showDialog<DateTime>(
+                                                //   context: context,
+                                                //   builder:
+                                                //       (BuildContext context) {
+                                                //     return const ContactTeacher(studentdata: null, tutordata: null, tutorteach: null,);
+                                                //   },
+                                                // ).then((selectedDate) {
+                                                //   if (selectedDate != null) {
+                                                //     // Do something with the selected date
+                                                //   }
+                                                // });
                                               },
                                               child: const Text(
                                                 'Contact Teacher',
@@ -830,17 +830,17 @@ class _ViewTutorsDataState extends State<ViewTutorsData> {
                                                 ),
                                               ),
                                               onPressed: () {
-                                                showDialog<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return const CalendarDialog();
-                                                  },
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
-                                                  }
-                                                });
+                                                // showDialog<DateTime>(
+                                                //   context: context,
+                                                //   builder:
+                                                //       (BuildContext context) {
+                                                //     return const CalendarDialog(data: ,);
+                                                //   },
+                                                // ).then((selectedDate) {
+                                                //   if (selectedDate != null) {
+                                                //     // Do something with the selected date
+                                                //   }
+                                                // });
                                               },
                                               child: const Text(
                                                 'View Schedule',

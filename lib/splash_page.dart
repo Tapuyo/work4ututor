@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:work4ututor/routes/routes.dart';
 
 class SplashPage extends StatefulWidget {

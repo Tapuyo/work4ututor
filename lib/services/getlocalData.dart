@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable, unused_element
+// ignore_for_file: unused_element, unused_local_variable
 
 import 'package:hive/hive.dart';
 

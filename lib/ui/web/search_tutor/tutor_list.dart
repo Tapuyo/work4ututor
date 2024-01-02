@@ -5,25 +5,28 @@ import 'dart:math';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'dart:html' as html;
 
+import '../../../data_class/studentinfoclass.dart';
 import '../../../data_class/tutor_info_class.dart';
+import '../../../services/getlanguages.dart';
 import '../../../utils/themes.dart';
 import '../tutor/tutor_profile/tutor_profile.dart';
+import '../tutor/tutor_profile/tutor_profile_float.dart';
 // import '../../../routes/routes.dart';
 
 class TutorList extends StatefulWidget {
-  final List<TutorInformation> tutorslist;
   final String keyword;
   final int displayRange;
   final bool isLoading;
+  final String studentdata;
   const TutorList({
     super.key,
-    required this.tutorslist,
     required this.keyword,
     required this.displayRange,
-    required this.isLoading,
+    required this.isLoading, required this.studentdata,
   });
 
   @override
@@ -33,37 +36,64 @@ class TutorList extends StatefulWidget {
 class _TutorListState extends State<TutorList> {
   int displayCount = 0;
   List<TutorInformation> _foundUsers = [];
+  List<TutorInformation> selected = [];
   Reference firebaseStorage = FirebaseStorage.instance.ref();
   Random random = Random();
-
-  void main() {
-    initState();
-    _foundUsers = widget.tutorslist;
-  }
-
-  _runFilter(String enteredKeyword) {
-    print(enteredKeyword);
-    List<TutorInformation> results = [];
-    results = widget.tutorslist
-        .where((user) =>
-            user.firstName.toLowerCase().contains(enteredKeyword.toLowerCase()))
-        .toList();
-
-    return results;
+  Map<String, dynamic> tutorInformationToJson(TutorInformation tutorData) {
+    return {
+      // Add other properties as needed
+      'contact': tutorData.contact,
+      'birthPlace': tutorData.birthPlace,
+      'country': tutorData.country,
+      'certificates': tutorData.certificates,
+      'resume': tutorData.resume,
+      'promotionalMessage': tutorData.promotionalMessage,
+      'withdrawal': tutorData.withdrawal,
+      'status': tutorData.status,
+      'extensionName': tutorData.extensionName,
+      'dateSign': tutorData.dateSign,
+      'firstName': tutorData.firstName,
+      'imageID': tutorData.imageID,
+      'language': tutorData.language,
+      'lastname': tutorData.lastname,
+      'middleName': tutorData.middleName,
+      'presentation': tutorData.presentation,
+      'tutorID': tutorData.tutorID,
+      'userId': tutorData.userId,
+      'age': tutorData.age,
+      'applicationID': tutorData.applicationID,
+      'birthCity': tutorData.birthCity,
+      'birthdate': tutorData.birthdate,
+      'emailadd': tutorData.emailadd,
+      'city': tutorData.city,
+      'servicesprovided': tutorData.servicesprovided,
+      'timezone': tutorData.timezone,
+      'validIds': tutorData.validIds,
+      'certificatestype': tutorData.certificatestype,
+      'resumelinktype': tutorData.resumelinktype,
+      'validIDstype': tutorData.validIDstype,
+    };
   }
 
   @override
   Widget build(BuildContext context) {
+    final tutorsinfo = Provider.of<List<TutorInformation>>(context);
+
     Size size = MediaQuery.of(context).size;
     if (widget.keyword.isEmpty) {
-      _foundUsers = widget.tutorslist;
+      _foundUsers = tutorsinfo;
       if (widget.displayRange > _foundUsers.length) {
         displayCount = _foundUsers.length;
       } else {
         displayCount = widget.displayRange;
       }
     } else {
-      _foundUsers = _runFilter(widget.keyword);
+      _foundUsers = tutorsinfo
+          .where((user) => user.firstName
+              .toLowerCase()
+              .contains(widget.keyword.toLowerCase()))
+          .toList();
+      ;
       if (widget.displayRange > _foundUsers.length) {
         displayCount = _foundUsers.length;
       } else {
@@ -77,229 +107,239 @@ class _TutorListState extends State<TutorList> {
           )
         : _foundUsers.isNotEmpty
             ? Material(
-                color: Colors.white,
+                color: Colors.white60,
                 child: SizedBox(
                   width: size.width - 400,
                   height: size.height,
-                  child: GridView.count(
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                    crossAxisCount: 3,
-                    children: List.generate(displayCount, (index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Card(
+                  child: GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3, // Number of columns
+                        crossAxisSpacing: 20.0, // Adjust spacing as needed
+                        mainAxisSpacing: 20.0, // Adjust spacing as needed
+                      ),
+                      itemCount: _foundUsers.length,
+                      itemBuilder: (context, index) {
+                        return Card(
                           elevation: 2,
                           child: InkWell(
                             onTap: () {
-                              // final provider =
-                              //     context.read<SearchTutorProvider>();
-                              // provider.setSearch(_foundUsers[index].firstName);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => TutorProfile(
-                                          namex: _foundUsers[index].firstName,
-                                        )),
-                              );
+                              setState(() {
+                                Map<String, dynamic> tutorDataMap =
+                                    tutorInformationToJson(_foundUsers[index]);
+                                showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      var height =
+                                          MediaQuery.of(context).size.height;
+                                      var width =
+                                          MediaQuery.of(context).size.width;
+                                      return AlertDialog(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              15.0), // Adjust the radius as needed
+                                        ),
+                                        contentPadding: EdgeInsets.zero,
+                                        content: ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                              15.0), // Same radius as above
+                                          child: Container(
+                                            color: Colors
+                                                .white, // Set the background color of the circular content
 
-                              // html.window.open('/tutorsinfo', "");
-                            },
-                            child: Container(
-                              width: (size.width - 400) / 3 - 20,
-                              height: 650,
-                              child: Column(
-                                children: [
-                                  Container(
-                                    height: 250.0,
-                                    width: MediaQuery.of(context).size.width -
-                                        100.0,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(5),
-                                        color: Colors.transparent,
-                                        image: const DecorationImage(
-                                            image: AssetImage(
-                                                'assets/images/sample.jpg'),
-                                            fit: BoxFit.cover)),
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 20),
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(10.0),
-                                            child: Align(
-                                              alignment: Alignment.topRight,
-                                              child: Material(
-                                                color: Colors.transparent,
-                                                child: InkWell(
-                                                    onTap: () {},
-                                                    child: const Text(
-                                                      "PT",
-                                                      style: TextStyle(
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.w600),
-                                                    )),
-                                              ),
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          Align(
-                                            alignment: Alignment.bottomLeft,
-                                            child: Center(
-                                              heightFactor:
-                                                  BorderSide.strokeAlignCenter,
-                                              child: Container(
-                                                color: Colors.white
-                                                    .withOpacity(.50),
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        5, 10, 5, 2),
-                                                height: 100,
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                              .fromLTRB(
-                                                          0.0, 0, 0, 2),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            "${_foundUsers[index].firstName}, (27)",
-                                                            style: const TextStyle(
-                                                                fontSize: 18,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500),
-                                                          ),
-                                                          const Spacer(),
-                                                          RatingBar(
-                                                              initialRating:
-                                                                  random.nextInt(
-                                                                          4) +
-                                                                      1,
-                                                              minRating: 0,
-                                                              maxRating: 5,
-                                                              direction: Axis
-                                                                  .horizontal,
-                                                              allowHalfRating:
-                                                                  true,
-                                                              itemCount: 5,
-                                                              itemSize: 20,
-                                                              ratingWidget:
-                                                                  RatingWidget(
-                                                                      full: const Icon(
-                                                                          Icons
-                                                                              .star,
-                                                                          color: Colors
-                                                                              .orange),
-                                                                      half:
-                                                                          const Icon(
-                                                                        Icons
-                                                                            .star_half,
-                                                                        color: Colors
-                                                                            .orange,
-                                                                      ),
-                                                                      empty:
-                                                                          const Icon(
-                                                                        Icons
-                                                                            .star_outline,
-                                                                        color: Colors
-                                                                            .orange,
-                                                                      )),
-                                                              onRatingUpdate:
-                                                                  (value) {
-                                                                // _ratingValue = value;
-                                                              }),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                              .fromLTRB(
-                                                          0.0, 0, 0, 2),
-                                                      child: Text(_foundUsers[
-                                                                  index]
-                                                              .country
-                                                              .isEmpty
-                                                          ? 'Add Country'
-                                                          : _foundUsers[index]
-                                                              .country),
-                                                    ),
-                                                    Text(_foundUsers[index]
-                                                            .language
-                                                            .isEmpty
-                                                        ? 'Add Language'
-                                                        : _foundUsers[index]
-                                                            .language
-                                                            .join(', ')),
-                                                  ],
+                                            child: Stack(
+                                              children: <Widget>[
+                                                SizedBox(
+                                                  height: height,
+                                                  width: width - 400,
+                                                  child: TutorProfileFloat(
+                                                    tutorsinfo: tutorDataMap, studentdata: widget.studentdata,
+                                                  ),
                                                 ),
-                                              ),
+                                                Positioned(
+                                                  top: 10.0,
+                                                  right: 10.0,
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.of(context)
+                                                          .pop(); // Close the dialog
+                                                    },
+                                                    child: const Icon(
+                                                      Icons.close,
+                                                      color: Colors.red,
+                                                      size: 20,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                        ],
+                                        ),
+                                      );
+                                    });
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        height: 150.0,
+                                        width: 150.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: Colors.transparent,
+                                            image: DecorationImage(
+                                                image: NetworkImage(
+                                                    _foundUsers[index].imageID),
+                                                fit: BoxFit.cover)),
                                       ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(5.0, 2, 5, 0),
-                                    child: Container(
-                                      height: 55,
-                                      child: Text(
-                                        // 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat',
-                                        _foundUsers[index]
-                                                .promotionalMessage
-                                                .isEmpty
-                                            ? 'Add Message'
-                                            : _foundUsers[index]
-                                                .promotionalMessage,
-                                        textAlign: TextAlign.justify,
-                                        style: const TextStyle(
-                                          fontSize: 12,
+                                      ClipRect(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            RatingBar(
+                                                initialRating: 0,
+                                                minRating: 0,
+                                                maxRating: 5,
+                                                direction: Axis.horizontal,
+                                                allowHalfRating: true,
+                                                itemCount: 5,
+                                                itemSize: 20,
+                                                ratingWidget: RatingWidget(
+                                                    full: const Icon(Icons.star,
+                                                        color: Colors.orange),
+                                                    half: const Icon(
+                                                      Icons.star_half,
+                                                      color: Colors.orange,
+                                                    ),
+                                                    empty: const Icon(
+                                                      Icons.star_outline,
+                                                      color: Colors.orange,
+                                                    )),
+                                                onRatingUpdate: (value) {
+                                                  // _ratingValue = value;
+                                                }),
+                                                 Align(
+                                        alignment: Alignment.topRight,
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: InkWell(
+                                              onTap: () {},
+                                              child: Text(
+                                                'PT',
+                                                style:
+                                                    GoogleFonts.ephesis(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w800),
+                                              )),
                                         ),
                                       ),
-                                    ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const Spacer(
-                                    flex: 1,
-                                  ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(5.0, 0, 5, 2),
-                                    child: Row(
-                                      children: const [
-                                        Text(
-                                          "Starting from \$25 per classes ",
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0.0, 0, 0, 0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "${_foundUsers[index].firstName}, (${_foundUsers[index].age})",
+                                              style: GoogleFonts.roboto(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                            const Spacer(),
+                                          ],
+                                        ),
+                                      ),
+                                      Text(_foundUsers[index].country.isEmpty
+                                          ? 'Add Country'
+                                          : _foundUsers[index].country),
+                                      Tooltip(
+                                        message: _foundUsers[index]
+                                            .language
+                                            .join(', '),
+                                        child: Text(
+                                          _foundUsers[index].language.isEmpty
+                                              ? 'Add Language'
+                                              : _foundUsers[index]
+                                                  .language
+                                                  .join(', '),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           textAlign: TextAlign.left,
-                                          style: TextStyle(
-                                              color: kColorPrimary,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w800),
                                         ),
-                                      ],
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Container(
+                                    alignment: Alignment.topLeft,
+                                    height: 80,
+                                    child: Text(
+                                      _foundUsers[index]
+                                              .promotionalMessage
+                                              .isEmpty
+                                          ? 'Add Message'
+                                          : _foundUsers[index]
+                                              .promotionalMessage,
+                                      maxLines: 5,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.left,
+                                      style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.black87,
+                                          fontStyle: FontStyle.italic),
                                     ),
+                                  ),const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        "Starting from \$${random.nextInt(100) + 1} per classes ",
+                                        textAlign: TextAlign.left,
+                                        style: GoogleFonts.lato(
+                                            color: kColorPrimary,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700),
+                                      ),
+                                     
+                                    ],
                                   ),
                                 ],
                               ),
                             ),
                           ),
-                        ),
-                      );
-                    }),
-                  ),
+                        );
+                      }),
                 ),
               )
             : SizedBox(

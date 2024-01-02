@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use, unused_local_variable
+
 part of dashboard;
 
 class _HeaderWeeklyTask extends StatelessWidget {

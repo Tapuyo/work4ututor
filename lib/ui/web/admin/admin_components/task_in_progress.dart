@@ -1,7 +1,7 @@
 part of dashboard;
 
 class _TaskInProgress extends StatelessWidget {
-  _TaskInProgress({
+  const _TaskInProgress({
     required this.data,
     Key? key,
   }) : super(key: key);
@@ -10,7 +10,6 @@ class _TaskInProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     final chartdata = generateChartData();
     final seriesList = [
       charts.Series<ChartData, String>(

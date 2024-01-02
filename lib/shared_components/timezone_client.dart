@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import '../data_class/timezone.dart';
 
 class TimezoneClient {
   Future<String> getTimezone() async {

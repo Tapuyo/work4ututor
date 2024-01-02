@@ -19,7 +19,6 @@ Future<String?> updatePersonalTutorInformation(
   String timezone,
   String profileurl,
 ) async {
-  print(profileurl);
   if (profileurl == '') {
     try {
       // Update the main student document

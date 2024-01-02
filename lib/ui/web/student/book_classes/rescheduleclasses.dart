@@ -1,10 +1,14 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: use_build_context_synchronously
 
+import 'package:flutter/material.dart';
+import 'package:work4ututor/ui/web/student/book_classes/reschednow.dart';
+
+import '../../../../data_class/classesdataclass.dart';
 import '../../../../services/cancelaccount.dart';
 import '../../../../utils/themes.dart';
 
 @override
-rescheduleclass(BuildContext context) {
+rescheduleclass(BuildContext context, Schedule currentschedule) {
   TextEditingController conreason = TextEditingController();
   TextEditingController conemail = TextEditingController();
   showDialog(
@@ -127,18 +131,15 @@ rescheduleclass(BuildContext context) {
                                   ),
                                 ),
                                 onPressed: () async {
-                                  if (conreason.text.isNotEmpty &&
-                                      conemail.text.isNotEmpty) {
-                                    // updateUserStatus(
-                                    //     'wPPQMtnnC0g8gSQCIU7NXw9iHqu2',
-                                    //     'Cancelled',
-                                    //     conreason.text,
-                                    //     conemail.text,
-                                    //     'student');
-                                    Navigator.pop(context);
-                                  } else {
-                                    null;
-                                  }
+                                  await showDialog(
+                                      barrierDismissible: false,
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return ReSchedNow(
+                                          currentschedule: currentschedule,
+                                        );
+                                      });
+                                  Navigator.pop(context);
                                 },
                                 child: const Text(
                                   style: TextStyle(
@@ -163,6 +164,7 @@ rescheduleclass(BuildContext context) {
                                   ),
                                 ),
                                 onPressed: () {
+                                  Navigator.pop(context);
                                   // // if (dateresult != 'Is Overdue') {
                                   // cancellclass(context, dateresult);
                                   // // } else {

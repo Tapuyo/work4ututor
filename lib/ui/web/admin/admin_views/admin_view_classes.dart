@@ -505,13 +505,14 @@ class _ViewStudentClassInfoState extends State<ViewStudentClassInfo> {
                                                             ),
                                                           ),
                                                           onPressed: () {
+                                                            Schedule data = Schedule(scheduleID: 'scheduleID', session: 'session', schedule: DateTime.now(), timefrom: 'timefrom', timeto: 'timeto');
                                                             // String dateresult =
                                                             //     dueCancelDate(
                                                             //         scheduledata
                                                             //             .schedule);
                                                             // print(dateresult);
                                                             rescheduleclass(
-                                                                context);
+                                                                context, data);
                                                           },
                                                         ),
                                                       ],

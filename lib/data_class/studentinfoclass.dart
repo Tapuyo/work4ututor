@@ -1,5 +1,3 @@
-import 'package:language_picker/languages.dart';
-
 class StudentInfoClass {
   final String address;
   final String age;

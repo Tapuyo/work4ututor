@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 import '../splash_page.dart';
 import '../ui/mobile/mob_main.dart';
@@ -12,6 +13,22 @@ import '../ui/web/web_main.dart';
 import 'routes.dart';
 
 class RouteGenerator {
+  static final _userinfo = Hive.box('userID');
+
+  static String _getUserData() {
+    final data = _userinfo.keys.map((key) {
+      final item = _userinfo.get(key);
+      return {
+        "key": key,
+        "userID": item["userID"],
+        "role": item["role"],
+        "userStatus": item["userStatus"]
+      };
+    }).toList();
+
+    return data.isNotEmpty ? data.first['userID'] : {};
+  }
+   
   static Route<dynamic> generateRoute(RouteSettings settings) {
     //final args = settings.arguments;
 
@@ -38,10 +55,7 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const AdminLoginPage());
 
       case Routes.tutorList:
-        return MaterialPageRoute(builder: (_) => const FindTutor());
-
-      case Routes.deleteAccount:
-        return MaterialPageRoute(builder: (_) => const FindTutor());
+        return MaterialPageRoute(builder: (_) =>  FindTutor(userid: _getUserData(),));
 
       default:
         return _errorRoute();

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../utils/themes.dart';
+import '../../admin/admin_sharedcomponents/header_text.dart';
+
 class ViewFile extends StatefulWidget {
   final String? imageURL;
   const ViewFile({super.key, required this.imageURL});
@@ -11,49 +14,26 @@ class ViewFile extends StatefulWidget {
 class _ViewFileState extends State<ViewFile> {
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: kColorPrimary,
+        title: const HeaderText('Tutor Certificate'),
       ),
-      content: Container(
-        height: 500,
-        width: 700,
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 10.0,
-                right: 10,
-              ),
-              child: Align(
-                alignment: Alignment.topRight,
-                child: InkWell(
-                    onTap: () {},
-                    child: Container(
-                      height: 500,
-                      width: 680,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.transparent,
-                          image: DecorationImage(
-                              image: NetworkImage(
-                                widget.imageURL.toString(),
-                              ),
-                              fit: BoxFit.fill)),
-                    )),
-              ),
-            ),
-          ],
-        ),
+      body: Container(
+        height: height,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.transparent,
+            image: DecorationImage(
+                image: NetworkImage(
+                  widget.imageURL.toString(),
+                ),
+                fit: BoxFit.fill)),
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Close'),
-        ),
-      ],
     );
   }
 }

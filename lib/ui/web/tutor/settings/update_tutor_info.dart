@@ -240,8 +240,7 @@ class UpdateTutorState extends State<UpdateTutor> {
         width: size.width - 320,
         height: size.height - 75,
         child: ScrollConfiguration(
-          behavior:
-              ScrollConfiguration.of(context).copyWith(scrollbars: false),
+          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
           child: SingleChildScrollView(
             controller: ScrollController(),
             child: Column(
@@ -306,8 +305,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                         backgroundColor: Colors.white60,
                                         shape: const RoundedRectangleBorder(
                                             borderRadius: BorderRadius.only(
-                                                bottomLeft:
-                                                    Radius.circular(10),
+                                                bottomLeft: Radius.circular(10),
                                                 bottomRight:
                                                     Radius.circular(10))),
                                       ),
@@ -325,8 +323,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                             tutorlastname.text !=
                                                 tutorDataMap['lastname'] ||
                                             tutormiddleName.text !=
-                                                tutorDataMap[
-                                                    'middleName'] ||
+                                                tutorDataMap['middleName'] ||
                                             birthdate !=
                                                 DateTime.parse(tutorDataMap[
                                                     'birthdate']) ||
@@ -335,11 +332,9 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                     tutorDataMap['age']) ||
                                             country.text !=
                                                 tutorDataMap['country'] ||
-                                            city.text !=
-                                                tutorDataMap['city'] ||
+                                            city.text != tutorDataMap['city'] ||
                                             birthcountry.text !=
-                                                tutorDataMap[
-                                                    'birthPlace'] ||
+                                                tutorDataMap['birthPlace'] ||
                                             birthcity.text !=
                                                 tutorDataMap['birthCity'] ||
                                             timezone.text !=
@@ -361,8 +356,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       },
                                       label: const Text(
                                         '',
-                                        style:
-                                            TextStyle(color: kColorPrimary),
+                                        style: TextStyle(color: kColorPrimary),
                                       ),
                                       icon: const Icon(
                                         Icons.camera_alt_outlined,
@@ -385,8 +379,8 @@ class UpdateTutorState extends State<UpdateTutor> {
                               },
                               icon: const Icon(
                                 Icons.edit_document,
-                                color: Colors
-                                    .white, // Set the icon color to white
+                                color:
+                                    Colors.white, // Set the icon color to white
                               ),
                               label: const Text(
                                 'Edit',
@@ -419,15 +413,13 @@ class UpdateTutorState extends State<UpdateTutor> {
                     ? Container(
                         alignment: Alignment.center,
                         width: size.width - 320,
-                        padding:
-                            const EdgeInsets.only(left: 250, right: 200),
+                        padding: const EdgeInsets.only(left: 250, right: 200),
                         child: Column(
                           children: [
                             Row(
                               children: [
                                 Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
                                       width: 220,
@@ -436,8 +428,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       decoration: BoxDecoration(
                                         color: const Color.fromRGBO(
                                             55, 116, 135, 1),
-                                        borderRadius:
-                                            BorderRadius.circular(5),
+                                        borderRadius: BorderRadius.circular(5),
                                       ),
                                       child: const Align(
                                         alignment: Alignment.centerLeft,
@@ -455,12 +446,12 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       child: Align(
                                         alignment: Alignment.center,
                                         child: TextFormField(
+                                          enabled: false,
                                           controller: tutorfirstname,
                                           decoration: InputDecoration(
                                             border: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(
-                                                      5.0),
+                                                  BorderRadius.circular(5.0),
                                             ),
                                             fillColor: Colors.grey.shade300,
                                             hintText: 'Firstname',
@@ -480,42 +471,34 @@ class UpdateTutorState extends State<UpdateTutor> {
                                             );
                                             if (filename != '' ||
                                                 tutorfirstname.text !=
-                                                    tutorDataMap[
-                                                        'firstName'] ||
+                                                    tutorDataMap['firstName'] ||
                                                 tutorlastname.text !=
-                                                    tutorDataMap[
-                                                        'lastname'] ||
+                                                    tutorDataMap['lastname'] ||
                                                 tutormiddleName.text !=
                                                     tutorDataMap[
                                                         'middleName'] ||
                                                 birthdate !=
-                                                    DateTime.parse(
-                                                        tutorDataMap[
-                                                            'birthdate']) ||
+                                                    DateTime.parse(tutorDataMap[
+                                                        'birthdate']) ||
                                                 newage !=
-                                                    int.parse(tutorDataMap[
-                                                        'age']) ||
+                                                    int.parse(
+                                                        tutorDataMap['age']) ||
                                                 country.text !=
-                                                    tutorDataMap[
-                                                        'country'] ||
+                                                    tutorDataMap['country'] ||
                                                 city.text !=
                                                     tutorDataMap['city'] ||
                                                 birthcountry.text !=
                                                     tutorDataMap[
                                                         'birthPlace'] ||
                                                 birthcity.text !=
-                                                    tutorDataMap[
-                                                        'birthCity'] ||
+                                                    tutorDataMap['birthCity'] ||
                                                 timezone.text !=
-                                                    tutorDataMap[
-                                                        'timezone'] ||
+                                                    tutorDataMap['timezone'] ||
                                                 contactnumber.text !=
-                                                    tutorDataMap[
-                                                        'contact'] ||
+                                                    tutorDataMap['contact'] ||
                                                 selectedDate !=
-                                                    DateTime.parse(
-                                                        tutorDataMap[
-                                                            'birthdate']) ||
+                                                    DateTime.parse(tutorDataMap[
+                                                        'birthdate']) ||
                                                 areListsEqual == false) {
                                               setState(() {
                                                 allowUpdate = true;
@@ -535,8 +518,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                   width: 10,
                                 ),
                                 Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
                                       width: 220,
@@ -545,8 +527,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       decoration: BoxDecoration(
                                         color: const Color.fromRGBO(
                                             55, 116, 135, 1),
-                                        borderRadius:
-                                            BorderRadius.circular(5),
+                                        borderRadius: BorderRadius.circular(5),
                                       ),
                                       child: const Align(
                                         alignment: Alignment.centerLeft,
@@ -564,12 +545,13 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       child: Align(
                                         alignment: Alignment.center,
                                         child: TextFormField(
+                                          enabled: false,
+
                                           controller: tutormiddleName,
                                           decoration: InputDecoration(
                                             border: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(
-                                                      5.0),
+                                                  BorderRadius.circular(5.0),
                                             ),
                                             fillColor: Colors.grey,
                                             hintText: '(Optional)',
@@ -589,42 +571,34 @@ class UpdateTutorState extends State<UpdateTutor> {
                                             );
                                             if (filename != '' ||
                                                 tutorfirstname.text !=
-                                                    tutorDataMap[
-                                                        'firstName'] ||
+                                                    tutorDataMap['firstName'] ||
                                                 tutorlastname.text !=
-                                                    tutorDataMap[
-                                                        'lastname'] ||
+                                                    tutorDataMap['lastname'] ||
                                                 tutormiddleName.text !=
                                                     tutorDataMap[
                                                         'middleName'] ||
                                                 birthdate !=
-                                                    DateTime.parse(
-                                                        tutorDataMap[
-                                                            'birthdate']) ||
+                                                    DateTime.parse(tutorDataMap[
+                                                        'birthdate']) ||
                                                 newage !=
-                                                    int.parse(tutorDataMap[
-                                                        'age']) ||
+                                                    int.parse(
+                                                        tutorDataMap['age']) ||
                                                 country.text !=
-                                                    tutorDataMap[
-                                                        'country'] ||
+                                                    tutorDataMap['country'] ||
                                                 city.text !=
                                                     tutorDataMap['city'] ||
                                                 birthcountry.text !=
                                                     tutorDataMap[
                                                         'birthPlace'] ||
                                                 birthcity.text !=
-                                                    tutorDataMap[
-                                                        'birthCity'] ||
+                                                    tutorDataMap['birthCity'] ||
                                                 timezone.text !=
-                                                    tutorDataMap[
-                                                        'timezone'] ||
+                                                    tutorDataMap['timezone'] ||
                                                 contactnumber.text !=
-                                                    tutorDataMap[
-                                                        'contact'] ||
+                                                    tutorDataMap['contact'] ||
                                                 selectedDate !=
-                                                    DateTime.parse(
-                                                        tutorDataMap[
-                                                            'birthdate']) ||
+                                                    DateTime.parse(tutorDataMap[
+                                                        'birthdate']) ||
                                                 areListsEqual == false) {
                                               setState(() {
                                                 allowUpdate = true;
@@ -644,8 +618,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                   width: 10,
                                 ),
                                 Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
                                       width: 220,
@@ -654,8 +627,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       decoration: BoxDecoration(
                                         color: const Color.fromRGBO(
                                             55, 116, 135, 1),
-                                        borderRadius:
-                                            BorderRadius.circular(5),
+                                        borderRadius: BorderRadius.circular(5),
                                       ),
                                       child: const Align(
                                         alignment: Alignment.centerLeft,
@@ -677,8 +649,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                           decoration: InputDecoration(
                                             border: OutlineInputBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(
-                                                      5.0),
+                                                  BorderRadius.circular(5.0),
                                             ),
                                             fillColor: Colors.grey,
                                             hintText: 'Lastname',
@@ -695,42 +666,34 @@ class UpdateTutorState extends State<UpdateTutor> {
                                             );
                                             if (filename != '' ||
                                                 tutorfirstname.text !=
-                                                    tutorDataMap[
-                                                        'firstName'] ||
+                                                    tutorDataMap['firstName'] ||
                                                 tutorlastname.text !=
-                                                    tutorDataMap[
-                                                        'lastname'] ||
+                                                    tutorDataMap['lastname'] ||
                                                 tutormiddleName.text !=
                                                     tutorDataMap[
                                                         'middleName'] ||
                                                 birthdate !=
-                                                    DateTime.parse(
-                                                        tutorDataMap[
-                                                            'birthdate']) ||
+                                                    DateTime.parse(tutorDataMap[
+                                                        'birthdate']) ||
                                                 newage !=
-                                                    int.parse(tutorDataMap[
-                                                        'age']) ||
+                                                    int.parse(
+                                                        tutorDataMap['age']) ||
                                                 country.text !=
-                                                    tutorDataMap[
-                                                        'country'] ||
+                                                    tutorDataMap['country'] ||
                                                 city.text !=
                                                     tutorDataMap['city'] ||
                                                 birthcountry.text !=
                                                     tutorDataMap[
                                                         'birthPlace'] ||
                                                 birthcity.text !=
-                                                    tutorDataMap[
-                                                        'birthCity'] ||
+                                                    tutorDataMap['birthCity'] ||
                                                 timezone.text !=
-                                                    tutorDataMap[
-                                                        'timezone'] ||
+                                                    tutorDataMap['timezone'] ||
                                                 contactnumber.text !=
-                                                    tutorDataMap[
-                                                        'contact'] ||
+                                                    tutorDataMap['contact'] ||
                                                 selectedDate !=
-                                                    DateTime.parse(
-                                                        tutorDataMap[
-                                                            'birthdate']) ||
+                                                    DateTime.parse(tutorDataMap[
+                                                        'birthdate']) ||
                                                 areListsEqual == false) {
                                               setState(() {
                                                 allowUpdate = true;
@@ -754,8 +717,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                             Row(
                               children: [
                                 Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
                                       width: 400,
@@ -764,8 +726,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       decoration: BoxDecoration(
                                         color: const Color.fromRGBO(
                                             55, 116, 135, 1),
-                                        borderRadius:
-                                            BorderRadius.circular(5),
+                                        borderRadius: BorderRadius.circular(5),
                                       ),
                                       child: const Align(
                                         alignment: Alignment.centerLeft,
@@ -780,16 +741,14 @@ class UpdateTutorState extends State<UpdateTutor> {
                                     Container(
                                       width: 400,
                                       height: 45,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          5, 0, 5, 5),
+                                      padding:
+                                          const EdgeInsets.fromLTRB(5, 0, 5, 5),
                                       decoration: BoxDecoration(
-                                          borderRadius:
-                                              const BorderRadius.all(
-                                                  Radius.circular(5)),
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(5)),
                                           color: Colors.white,
                                           border: Border.all(
-                                              color: Colors.grey,
-                                              width: 1)),
+                                              color: Colors.grey, width: 1)),
                                       child: Row(
                                         children: [
                                           Text(
@@ -810,8 +769,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                             ),
                                             onPressed: () {
                                               _selectDate();
-                                              bool areListsEqual =
-                                                  listEquals(
+                                              bool areListsEqual = listEquals(
                                                 newlanguages,
                                                 (tutorDataMap['language']
                                                         as List<dynamic>)
@@ -832,15 +790,12 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                           tutorDataMap[
                                                               'birthdate']) ||
                                                   newage !=
-                                                      int.parse(
-                                                          tutorDataMap[
-                                                              'age']) ||
+                                                      int.parse(tutorDataMap[
+                                                          'age']) ||
                                                   country.text !=
-                                                      tutorDataMap[
-                                                          'country'] ||
+                                                      tutorDataMap['country'] ||
                                                   city.text !=
-                                                      tutorDataMap[
-                                                          'city'] ||
+                                                      tutorDataMap['city'] ||
                                                   birthcountry.text !=
                                                       tutorDataMap[
                                                           'birthPlace'] ||
@@ -851,8 +806,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                       tutorDataMap[
                                                           'timezone'] ||
                                                   contactnumber.text !=
-                                                      tutorDataMap[
-                                                          'contact'] ||
+                                                      tutorDataMap['contact'] ||
                                                   selectedDate !=
                                                       DateTime.parse(
                                                           tutorDataMap[
@@ -877,8 +831,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                   width: 10,
                                 ),
                                 Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
                                       width: 270,
@@ -887,8 +840,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       decoration: BoxDecoration(
                                         color: const Color.fromRGBO(
                                             55, 116, 135, 1),
-                                        borderRadius:
-                                            BorderRadius.circular(5),
+                                        borderRadius: BorderRadius.circular(5),
                                       ),
                                       child: const Align(
                                         alignment: Alignment.centerLeft,
@@ -903,16 +855,14 @@ class UpdateTutorState extends State<UpdateTutor> {
                                     Container(
                                       width: 270,
                                       height: 45,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          5, 0, 5, 5),
+                                      padding:
+                                          const EdgeInsets.fromLTRB(5, 0, 5, 5),
                                       decoration: BoxDecoration(
-                                          borderRadius:
-                                              const BorderRadius.all(
-                                                  Radius.circular(5)),
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(5)),
                                           color: Colors.white,
                                           border: Border.all(
-                                              color: Colors.grey,
-                                              width: 1)),
+                                              color: Colors.grey, width: 1)),
                                       child: Row(
                                         children: [
                                           Text(
@@ -934,8 +884,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                             Row(
                               children: [
                                 Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
                                       width: 370,
@@ -944,8 +893,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       decoration: BoxDecoration(
                                         color: const Color.fromRGBO(
                                             55, 116, 135, 1),
-                                        borderRadius:
-                                            BorderRadius.circular(5),
+                                        borderRadius: BorderRadius.circular(5),
                                       ),
                                       child: const Align(
                                         alignment: Alignment.centerLeft,
@@ -966,20 +914,19 @@ class UpdateTutorState extends State<UpdateTutor> {
                                           controller: country,
                                           decoration: const InputDecoration(
                                             hintText: 'Select a Country',
-                                            hintStyle: TextStyle(
-                                                color: Colors.grey),
+                                            hintStyle:
+                                                TextStyle(color: Colors.grey),
                                             border: OutlineInputBorder(),
                                             suffixIcon:
                                                 Icon(Icons.arrow_drop_down),
                                           ),
                                         ),
-                                        suggestionsCallback:
-                                            (String pattern) {
+                                        suggestionsCallback: (String pattern) {
                                           return widget.countryNames.where(
                                               (country) => country
                                                   .toLowerCase()
-                                                  .contains(pattern
-                                                      .toLowerCase()));
+                                                  .contains(
+                                                      pattern.toLowerCase()));
                                         },
                                         itemBuilder:
                                             (context, String suggestion) {
@@ -998,40 +945,32 @@ class UpdateTutorState extends State<UpdateTutor> {
                                           );
                                           if (filename != '' ||
                                               tutorfirstname.text !=
-                                                  tutorDataMap[
-                                                      'firstName'] ||
+                                                  tutorDataMap['firstName'] ||
                                               tutorlastname.text !=
-                                                  tutorDataMap[
-                                                      'lastname'] ||
+                                                  tutorDataMap['lastname'] ||
                                               tutormiddleName.text !=
-                                                  tutorDataMap[
-                                                      'middleName'] ||
+                                                  tutorDataMap['middleName'] ||
                                               birthdate !=
-                                                  DateTime.parse(
-                                                      tutorDataMap[
-                                                          'birthdate']) ||
+                                                  DateTime.parse(tutorDataMap[
+                                                      'birthdate']) ||
                                               newage !=
-                                                  int.parse(tutorDataMap[
-                                                      'age']) ||
+                                                  int.parse(
+                                                      tutorDataMap['age']) ||
                                               country.text !=
                                                   tutorDataMap['country'] ||
                                               city.text !=
                                                   tutorDataMap['city'] ||
                                               birthcountry.text !=
-                                                  tutorDataMap[
-                                                      'birthPlace'] ||
+                                                  tutorDataMap['birthPlace'] ||
                                               birthcity.text !=
-                                                  tutorDataMap[
-                                                      'birthCity'] ||
+                                                  tutorDataMap['birthCity'] ||
                                               timezone.text !=
-                                                  tutorDataMap[
-                                                      'timezone'] ||
+                                                  tutorDataMap['timezone'] ||
                                               contactnumber.text !=
                                                   tutorDataMap['contact'] ||
                                               selectedDate !=
-                                                  DateTime.parse(
-                                                      tutorDataMap[
-                                                          'birthdate']) ||
+                                                  DateTime.parse(tutorDataMap[
+                                                      'birthdate']) ||
                                               areListsEqual == false) {
                                             setState(() {
                                               allowUpdate = true;
@@ -1051,8 +990,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                   width: 10,
                                 ),
                                 Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
                                       width: 300,
@@ -1061,8 +999,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       decoration: BoxDecoration(
                                         color: const Color.fromRGBO(
                                             55, 116, 135, 1),
-                                        borderRadius:
-                                            BorderRadius.circular(5),
+                                        borderRadius: BorderRadius.circular(5),
                                       ),
                                       child: const Align(
                                         alignment: Alignment.centerLeft,
@@ -1080,13 +1017,11 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       padding: const EdgeInsets.fromLTRB(
                                           10, 0, 10, 0),
                                       decoration: BoxDecoration(
-                                          borderRadius:
-                                              const BorderRadius.all(
-                                                  Radius.circular(5)),
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(5)),
                                           color: Colors.white,
                                           border: Border.all(
-                                              color: Colors.grey,
-                                              width: 1)),
+                                              color: Colors.grey, width: 1)),
                                       child: TextFormField(
                                         controller: city,
                                         decoration: const InputDecoration(
@@ -1094,8 +1029,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                           fillColor: Colors.grey,
                                           hintText: 'City',
                                           hintStyle: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 15),
+                                              color: Colors.grey, fontSize: 15),
                                         ),
                                         onChanged: (value) {
                                           bool areListsEqual = listEquals(
@@ -1106,40 +1040,32 @@ class UpdateTutorState extends State<UpdateTutor> {
                                           );
                                           if (filename != '' ||
                                               tutorfirstname.text !=
-                                                  tutorDataMap[
-                                                      'firstName'] ||
+                                                  tutorDataMap['firstName'] ||
                                               tutorlastname.text !=
-                                                  tutorDataMap[
-                                                      'lastname'] ||
+                                                  tutorDataMap['lastname'] ||
                                               tutormiddleName.text !=
-                                                  tutorDataMap[
-                                                      'middleName'] ||
+                                                  tutorDataMap['middleName'] ||
                                               birthdate !=
-                                                  DateTime.parse(
-                                                      tutorDataMap[
-                                                          'birthdate']) ||
+                                                  DateTime.parse(tutorDataMap[
+                                                      'birthdate']) ||
                                               newage !=
-                                                  int.parse(tutorDataMap[
-                                                      'age']) ||
+                                                  int.parse(
+                                                      tutorDataMap['age']) ||
                                               country.text !=
                                                   tutorDataMap['country'] ||
                                               city.text !=
                                                   tutorDataMap['city'] ||
                                               birthcountry.text !=
-                                                  tutorDataMap[
-                                                      'birthPlace'] ||
+                                                  tutorDataMap['birthPlace'] ||
                                               birthcity.text !=
-                                                  tutorDataMap[
-                                                      'birthCity'] ||
+                                                  tutorDataMap['birthCity'] ||
                                               timezone.text !=
-                                                  tutorDataMap[
-                                                      'timezone'] ||
+                                                  tutorDataMap['timezone'] ||
                                               contactnumber.text !=
                                                   tutorDataMap['contact'] ||
                                               selectedDate !=
-                                                  DateTime.parse(
-                                                      tutorDataMap[
-                                                          'birthdate']) ||
+                                                  DateTime.parse(tutorDataMap[
+                                                      'birthdate']) ||
                                               areListsEqual == false) {
                                             setState(() {
                                               allowUpdate = true;
@@ -1162,8 +1088,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                             Row(
                               children: [
                                 Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
                                       width: 370,
@@ -1172,8 +1097,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       decoration: BoxDecoration(
                                         color: const Color.fromRGBO(
                                             55, 116, 135, 1),
-                                        borderRadius:
-                                            BorderRadius.circular(5),
+                                        borderRadius: BorderRadius.circular(5),
                                       ),
                                       child: const Align(
                                         alignment: Alignment.centerLeft,
@@ -1195,20 +1119,19 @@ class UpdateTutorState extends State<UpdateTutor> {
                                           controller: birthcountry,
                                           decoration: const InputDecoration(
                                             hintText: 'Select a Country',
-                                            hintStyle: TextStyle(
-                                                color: Colors.grey),
+                                            hintStyle:
+                                                TextStyle(color: Colors.grey),
                                             border: OutlineInputBorder(),
                                             suffixIcon:
                                                 Icon(Icons.arrow_drop_down),
                                           ),
                                         ),
-                                        suggestionsCallback:
-                                            (String pattern) {
+                                        suggestionsCallback: (String pattern) {
                                           return widget.countryNames.where(
                                               (country) => country
                                                   .toLowerCase()
-                                                  .contains(pattern
-                                                      .toLowerCase()));
+                                                  .contains(
+                                                      pattern.toLowerCase()));
                                         },
                                         itemBuilder:
                                             (context, String suggestion) {
@@ -1227,40 +1150,32 @@ class UpdateTutorState extends State<UpdateTutor> {
                                           );
                                           if (filename != '' ||
                                               tutorfirstname.text !=
-                                                  tutorDataMap[
-                                                      'firstName'] ||
+                                                  tutorDataMap['firstName'] ||
                                               tutorlastname.text !=
-                                                  tutorDataMap[
-                                                      'lastname'] ||
+                                                  tutorDataMap['lastname'] ||
                                               tutormiddleName.text !=
-                                                  tutorDataMap[
-                                                      'middleName'] ||
+                                                  tutorDataMap['middleName'] ||
                                               birthdate !=
-                                                  DateTime.parse(
-                                                      tutorDataMap[
-                                                          'birthdate']) ||
+                                                  DateTime.parse(tutorDataMap[
+                                                      'birthdate']) ||
                                               newage !=
-                                                  int.parse(tutorDataMap[
-                                                      'age']) ||
+                                                  int.parse(
+                                                      tutorDataMap['age']) ||
                                               country.text !=
                                                   tutorDataMap['country'] ||
                                               city.text !=
                                                   tutorDataMap['city'] ||
                                               birthcountry.text !=
-                                                  tutorDataMap[
-                                                      'birthPlace'] ||
+                                                  tutorDataMap['birthPlace'] ||
                                               birthcity.text !=
-                                                  tutorDataMap[
-                                                      'birthCity'] ||
+                                                  tutorDataMap['birthCity'] ||
                                               timezone.text !=
-                                                  tutorDataMap[
-                                                      'timezone'] ||
+                                                  tutorDataMap['timezone'] ||
                                               contactnumber.text !=
                                                   tutorDataMap['contact'] ||
                                               selectedDate !=
-                                                  DateTime.parse(
-                                                      tutorDataMap[
-                                                          'birthdate']) ||
+                                                  DateTime.parse(tutorDataMap[
+                                                      'birthdate']) ||
                                               areListsEqual == false) {
                                             setState(() {
                                               allowUpdate = true;
@@ -1280,8 +1195,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                   width: 10,
                                 ),
                                 Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
                                       width: 300,
@@ -1290,8 +1204,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       decoration: BoxDecoration(
                                         color: const Color.fromRGBO(
                                             55, 116, 135, 1),
-                                        borderRadius:
-                                            BorderRadius.circular(5),
+                                        borderRadius: BorderRadius.circular(5),
                                       ),
                                       child: const Align(
                                         alignment: Alignment.centerLeft,
@@ -1309,13 +1222,11 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       padding: const EdgeInsets.fromLTRB(
                                           10, 0, 10, 0),
                                       decoration: BoxDecoration(
-                                          borderRadius:
-                                              const BorderRadius.all(
-                                                  Radius.circular(5)),
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(5)),
                                           color: Colors.white,
                                           border: Border.all(
-                                              color: Colors.grey,
-                                              width: 1)),
+                                              color: Colors.grey, width: 1)),
                                       child: TextFormField(
                                         controller: birthcity,
                                         decoration: const InputDecoration(
@@ -1323,8 +1234,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                           fillColor: Colors.grey,
                                           hintText: 'City',
                                           hintStyle: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 15),
+                                              color: Colors.grey, fontSize: 15),
                                         ),
                                         onChanged: (value) {
                                           bool areListsEqual = listEquals(
@@ -1335,40 +1245,32 @@ class UpdateTutorState extends State<UpdateTutor> {
                                           );
                                           if (filename != '' ||
                                               tutorfirstname.text !=
-                                                  tutorDataMap[
-                                                      'firstName'] ||
+                                                  tutorDataMap['firstName'] ||
                                               tutorlastname.text !=
-                                                  tutorDataMap[
-                                                      'lastname'] ||
+                                                  tutorDataMap['lastname'] ||
                                               tutormiddleName.text !=
-                                                  tutorDataMap[
-                                                      'middleName'] ||
+                                                  tutorDataMap['middleName'] ||
                                               birthdate !=
-                                                  DateTime.parse(
-                                                      tutorDataMap[
-                                                          'birthdate']) ||
+                                                  DateTime.parse(tutorDataMap[
+                                                      'birthdate']) ||
                                               newage !=
-                                                  int.parse(tutorDataMap[
-                                                      'age']) ||
+                                                  int.parse(
+                                                      tutorDataMap['age']) ||
                                               country.text !=
                                                   tutorDataMap['country'] ||
                                               city.text !=
                                                   tutorDataMap['city'] ||
                                               birthcountry.text !=
-                                                  tutorDataMap[
-                                                      'birthPlace'] ||
+                                                  tutorDataMap['birthPlace'] ||
                                               birthcity.text !=
-                                                  tutorDataMap[
-                                                      'birthCity'] ||
+                                                  tutorDataMap['birthCity'] ||
                                               timezone.text !=
-                                                  tutorDataMap[
-                                                      'timezone'] ||
+                                                  tutorDataMap['timezone'] ||
                                               contactnumber.text !=
                                                   tutorDataMap['contact'] ||
                                               selectedDate !=
-                                                  DateTime.parse(
-                                                      tutorDataMap[
-                                                          'birthdate']) ||
+                                                  DateTime.parse(tutorDataMap[
+                                                      'birthdate']) ||
                                               areListsEqual == false) {
                                             setState(() {
                                               allowUpdate = true;
@@ -1390,18 +1292,16 @@ class UpdateTutorState extends State<UpdateTutor> {
                             ),
                             Row(children: [
                               Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(
                                     width: 370,
-                                    padding: const EdgeInsets.fromLTRB(
-                                        10, 5, 10, 5),
+                                    padding:
+                                        const EdgeInsets.fromLTRB(10, 5, 10, 5),
                                     decoration: BoxDecoration(
-                                      color: const Color.fromRGBO(
-                                          55, 116, 135, 1),
-                                      borderRadius:
-                                          BorderRadius.circular(5),
+                                      color:
+                                          const Color.fromRGBO(55, 116, 135, 1),
+                                      borderRadius: BorderRadius.circular(5),
                                     ),
                                     child: const Align(
                                       alignment: Alignment.centerLeft,
@@ -1429,13 +1329,10 @@ class UpdateTutorState extends State<UpdateTutor> {
                                               Icon(Icons.arrow_drop_down),
                                         ),
                                       ),
-                                      suggestionsCallback:
-                                          (String pattern) {
-                                        return timezonesList.where(
-                                            (timezone) => timezone
-                                                .toLowerCase()
-                                                .contains(
-                                                    pattern.toLowerCase()));
+                                      suggestionsCallback: (String pattern) {
+                                        return timezonesList.where((timezone) =>
+                                            timezone.toLowerCase().contains(
+                                                pattern.toLowerCase()));
                                       },
                                       itemBuilder:
                                           (context, String suggestion) {
@@ -1455,40 +1352,32 @@ class UpdateTutorState extends State<UpdateTutor> {
                                           );
                                           if (filename != '' ||
                                               tutorfirstname.text !=
-                                                  tutorDataMap[
-                                                      'firstName'] ||
+                                                  tutorDataMap['firstName'] ||
                                               tutorlastname.text !=
-                                                  tutorDataMap[
-                                                      'lastname'] ||
+                                                  tutorDataMap['lastname'] ||
                                               tutormiddleName.text !=
-                                                  tutorDataMap[
-                                                      'middleName'] ||
+                                                  tutorDataMap['middleName'] ||
                                               birthdate !=
-                                                  DateTime.parse(
-                                                      tutorDataMap[
-                                                          'birthdate']) ||
+                                                  DateTime.parse(tutorDataMap[
+                                                      'birthdate']) ||
                                               newage !=
-                                                  int.parse(tutorDataMap[
-                                                      'age']) ||
+                                                  int.parse(
+                                                      tutorDataMap['age']) ||
                                               country.text !=
                                                   tutorDataMap['country'] ||
                                               city.text !=
                                                   tutorDataMap['city'] ||
                                               birthcountry.text !=
-                                                  tutorDataMap[
-                                                      'birthPlace'] ||
+                                                  tutorDataMap['birthPlace'] ||
                                               birthcity.text !=
-                                                  tutorDataMap[
-                                                      'birthCity'] ||
+                                                  tutorDataMap['birthCity'] ||
                                               timezone.text !=
-                                                  tutorDataMap[
-                                                      'timezone'] ||
+                                                  tutorDataMap['timezone'] ||
                                               contactnumber.text !=
                                                   tutorDataMap['contact'] ||
                                               selectedDate !=
-                                                  DateTime.parse(
-                                                      tutorDataMap[
-                                                          'birthdate']) ||
+                                                  DateTime.parse(tutorDataMap[
+                                                      'birthdate']) ||
                                               areListsEqual == false) {
                                             setState(() {
                                               allowUpdate = true;
@@ -1508,18 +1397,16 @@ class UpdateTutorState extends State<UpdateTutor> {
                                 width: 10,
                               ),
                               Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(
                                     width: 300,
-                                    padding: const EdgeInsets.fromLTRB(
-                                        10, 5, 10, 5),
+                                    padding:
+                                        const EdgeInsets.fromLTRB(10, 5, 10, 5),
                                     decoration: BoxDecoration(
-                                      color: const Color.fromRGBO(
-                                          55, 116, 135, 1),
-                                      borderRadius:
-                                          BorderRadius.circular(5),
+                                      color:
+                                          const Color.fromRGBO(55, 116, 135, 1),
+                                      borderRadius: BorderRadius.circular(5),
                                     ),
                                     child: const Align(
                                       alignment: Alignment.centerLeft,
@@ -1534,12 +1421,11 @@ class UpdateTutorState extends State<UpdateTutor> {
                                   Container(
                                     width: 300,
                                     height: 45,
-                                    padding: const EdgeInsets.fromLTRB(
-                                        10, 0, 10, 0),
+                                    padding:
+                                        const EdgeInsets.fromLTRB(10, 0, 10, 0),
                                     decoration: BoxDecoration(
-                                        borderRadius:
-                                            const BorderRadius.all(
-                                                Radius.circular(5)),
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(5)),
                                         color: Colors.white,
                                         border: Border.all(
                                             color: Colors.grey, width: 1)),
@@ -1550,8 +1436,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                         fillColor: Colors.grey,
                                         hintText: 'Contact Number',
                                         hintStyle: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 15),
+                                            color: Colors.grey, fontSize: 15),
                                       ),
                                       onChanged: (value) {
                                         bool areListsEqual = listEquals(
@@ -1566,8 +1451,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                             tutorlastname.text !=
                                                 tutorDataMap['lastname'] ||
                                             tutormiddleName.text !=
-                                                tutorDataMap[
-                                                    'middleName'] ||
+                                                tutorDataMap['middleName'] ||
                                             birthdate !=
                                                 DateTime.parse(tutorDataMap[
                                                     'birthdate']) ||
@@ -1576,11 +1460,9 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                     tutorDataMap['age']) ||
                                             country.text !=
                                                 tutorDataMap['country'] ||
-                                            city.text !=
-                                                tutorDataMap['city'] ||
+                                            city.text != tutorDataMap['city'] ||
                                             birthcountry.text !=
-                                                tutorDataMap[
-                                                    'birthPlace'] ||
+                                                tutorDataMap['birthPlace'] ||
                                             birthcity.text !=
                                                 tutorDataMap['birthCity'] ||
                                             timezone.text !=
@@ -1611,8 +1493,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                             Row(
                               children: [
                                 Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Container(
                                       width: 680,
@@ -1621,8 +1502,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       decoration: BoxDecoration(
                                         color: const Color.fromRGBO(
                                             55, 116, 135, 1),
-                                        borderRadius:
-                                            BorderRadius.circular(5),
+                                        borderRadius: BorderRadius.circular(5),
                                       ),
                                       child: const Align(
                                         alignment: Alignment.centerLeft,
@@ -1642,42 +1522,34 @@ class UpdateTutorState extends State<UpdateTutor> {
                                           Container(
                                             width: 400,
                                             height: 45,
-                                            padding:
-                                                const EdgeInsets.fromLTRB(
-                                                    10, 0, 10, 0),
+                                            padding: const EdgeInsets.fromLTRB(
+                                                10, 0, 10, 0),
                                             child: ListView.builder(
                                                 scrollDirection:
                                                     Axis.horizontal,
-                                                itemCount:
-                                                    newlanguages.length,
-                                                itemBuilder:
-                                                    (context, index) {
+                                                itemCount: newlanguages.length,
+                                                itemBuilder: (context, index) {
                                                   String datalanguage =
                                                       newlanguages[index];
-                                                  Color color =
-                                                      vibrantColors[index %
+                                                  Color color = vibrantColors[
+                                                      index %
                                                           vibrantColors
                                                               .length]; // Cycle through colors
 
                                                   return Padding(
                                                     padding:
-                                                        const EdgeInsets
-                                                                .only(
+                                                        const EdgeInsets.only(
                                                             left: 10.0,
                                                             right: 10),
                                                     child: Container(
-                                                      padding:
-                                                          const EdgeInsets
-                                                                  .fromLTRB(
-                                                              5, 0, 5, 0),
-                                                      decoration:
-                                                          BoxDecoration(
+                                                      padding: const EdgeInsets
+                                                          .fromLTRB(5, 0, 5, 0),
+                                                      decoration: BoxDecoration(
                                                         borderRadius:
                                                             const BorderRadius
                                                                     .all(
-                                                                Radius
-                                                                    .circular(
-                                                                        15)),
+                                                                Radius.circular(
+                                                                    15)),
                                                         color: color,
                                                       ),
                                                       child: Row(
@@ -1685,8 +1557,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                               MainAxisAlignment
                                                                   .spaceBetween,
                                                           children: [
-                                                            Text(
-                                                                datalanguage),
+                                                            Text(datalanguage),
                                                             IconButton(
                                                               padding:
                                                                   EdgeInsets
@@ -1697,16 +1568,12 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                                           -4,
                                                                       vertical:
                                                                           -4),
-                                                              icon: const Icon(
-                                                                  Icons
-                                                                      .delete_outline_outlined),
-                                                              color: Colors
-                                                                  .red,
+                                                              icon: const Icon(Icons
+                                                                  .delete_outline_outlined),
+                                                              color: Colors.red,
                                                               iconSize: 15,
-                                                              onPressed:
-                                                                  () {
-                                                                setState(
-                                                                    () {
+                                                              onPressed: () {
+                                                                setState(() {
                                                                   newlanguages
                                                                       .removeAt(
                                                                           index);
@@ -1731,21 +1598,20 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                   const TextFieldConfiguration(
                                                 decoration: InputDecoration(
                                                   hintText: 'Add Language',
-                                                  border:
-                                                      OutlineInputBorder(),
-                                                  suffixIcon: Icon(Icons
-                                                      .arrow_drop_down),
+                                                  border: OutlineInputBorder(),
+                                                  suffixIcon: Icon(
+                                                      Icons.arrow_drop_down),
                                                 ),
                                               ),
                                               suggestionsCallback:
                                                   (pattern) async {
-                                                final suggestions = widget
-                                                    .names
-                                                    .where((language) => language
-                                                        .languageNamesStream
-                                                        .toLowerCase()
-                                                        .contains(pattern
-                                                            .toLowerCase()))
+                                                final suggestions = widget.names
+                                                    .where((language) =>
+                                                        language
+                                                            .languageNamesStream
+                                                            .toLowerCase()
+                                                            .contains(pattern
+                                                                .toLowerCase()))
                                                     .toList(); // Return a list of LanguageData objects
                                                 return suggestions;
                                               },
@@ -1769,8 +1635,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                         .toString()); // Add the LanguageData object to tlanguages
                                                   });
                                                 }
-                                                bool areListsEqual =
-                                                    listEquals(
+                                                bool areListsEqual = listEquals(
                                                   newlanguages,
                                                   (tutorDataMap['language']
                                                           as List<dynamic>)
@@ -1791,15 +1656,13 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                             tutorDataMap[
                                                                 'birthdate']) ||
                                                     newage !=
-                                                        int.parse(
-                                                            tutorDataMap[
-                                                                'age']) ||
+                                                        int.parse(tutorDataMap[
+                                                            'age']) ||
                                                     country.text !=
                                                         tutorDataMap[
                                                             'country'] ||
                                                     city.text !=
-                                                        tutorDataMap[
-                                                            'city'] ||
+                                                        tutorDataMap['city'] ||
                                                     birthcountry.text !=
                                                         tutorDataMap[
                                                             'birthPlace'] ||
@@ -1816,8 +1679,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                         DateTime.parse(
                                                             tutorDataMap[
                                                                 'birthdate']) ||
-                                                    areListsEqual ==
-                                                        false) {
+                                                    areListsEqual == false) {
                                                   setState(() {
                                                     allowUpdate = true;
                                                   });
@@ -1861,13 +1723,11 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                   context: context,
                                                   width: 200,
                                                   barrierDismissible: false,
-                                                  type:
-                                                      CoolAlertType.loading,
+                                                  type: CoolAlertType.loading,
                                                   text:
                                                       'Updating your data....');
                                               if (filename != '') {
-                                                data =
-                                                    await uploadTutorProfile(
+                                                data = await uploadTutorProfile(
                                                   tutorDataMap['userId'],
                                                   selectedImage,
                                                   filename,
@@ -1876,8 +1736,7 @@ class UpdateTutorState extends State<UpdateTutor> {
 
                                               String? result =
                                                   await updatePersonalTutorInformation(
-                                                      tutorDataMap[
-                                                          'userId'],
+                                                      tutorDataMap['userId'],
                                                       country.text,
                                                       birthcountry.text,
                                                       birthcity.text,
@@ -1886,8 +1745,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                       tutormiddleName.text,
                                                       tutorlastname.text,
                                                       newlanguages,
-                                                      tutorDataMap[
-                                                          'userId'],
+                                                      tutorDataMap['userId'],
                                                       contactnumber.text,
                                                       newage.toString(),
                                                       birthdate.toString(),
@@ -1901,10 +1759,8 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                   CoolAlert.show(
                                                     context: context,
                                                     width: 200,
-                                                    type: CoolAlertType
-                                                        .success,
-                                                    text:
-                                                        'Update Successful!',
+                                                    type: CoolAlertType.success,
+                                                    text: 'Update Successful!',
                                                     autoCloseDuration:
                                                         const Duration(
                                                             seconds: 1),
@@ -1913,12 +1769,10 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                       filename = '';
                                                       selectedImage =
                                                           Uint8List(0);
-                                                      final provider =
-                                                          context.read<
-                                                              MyModel>();
-                                                      provider
-                                                          .updateBoolValue(
-                                                              false);
+                                                      final provider = context
+                                                          .read<MyModel>();
+                                                      provider.updateBoolValue(
+                                                          false);
                                                       Navigator.of(context)
                                                           .pop();
                                                     },
@@ -1967,8 +1821,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                             tutorlastname.text !=
                                                 tutorDataMap['lastname'] ||
                                             tutormiddleName.text !=
-                                                tutorDataMap[
-                                                    'middleName'] ||
+                                                tutorDataMap['middleName'] ||
                                             birthdate !=
                                                 DateTime.parse(tutorDataMap[
                                                     'birthdate']) ||
@@ -1977,11 +1830,9 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                     tutorDataMap['age']) ||
                                             country.text !=
                                                 tutorDataMap['country'] ||
-                                            city.text !=
-                                                tutorDataMap['city'] ||
+                                            city.text != tutorDataMap['city'] ||
                                             birthcountry.text !=
-                                                tutorDataMap[
-                                                    'birthPlace'] ||
+                                                tutorDataMap['birthPlace'] ||
                                             birthcity.text !=
                                                 tutorDataMap['birthCity'] ||
                                             timezone.text !=
@@ -1997,16 +1848,13 @@ class UpdateTutorState extends State<UpdateTutor> {
                                             barrierDismissible: false,
                                             width: 200,
                                             type: CoolAlertType.confirm,
-                                            text:
-                                                'You want to cancel update?',
+                                            text: 'You want to cancel update?',
                                             confirmBtnText: 'Proceed',
-                                            confirmBtnColor:
-                                                Colors.greenAccent,
+                                            confirmBtnColor: Colors.greenAccent,
                                             cancelBtnText: 'Go back',
                                             showCancelBtn: true,
-                                            cancelBtnTextStyle:
-                                                const TextStyle(
-                                                    color: Colors.red),
+                                            cancelBtnTextStyle: const TextStyle(
+                                                color: Colors.red),
                                             onCancelBtnTap: () {
                                               Navigator.of(context).pop;
                                             },
@@ -2015,8 +1863,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                               initializeWidget();
                                               final provider =
                                                   context.read<MyModel>();
-                                              provider
-                                                  .updateBoolValue(false);
+                                              provider.updateBoolValue(false);
                                             },
                                           );
                                         } else {
@@ -2029,8 +1876,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                                       },
                                       child: const Text(
                                         'Cancel',
-                                        style:
-                                            TextStyle(color: kColorPrimary),
+                                        style: TextStyle(color: kColorPrimary),
                                       ),
                                     ),
                                   ),

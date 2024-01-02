@@ -17,8 +17,8 @@ import 'book_lesson.dart';
 import 'contact_teacher.dart';
 import 'view_file.dart';
 class TutorProfile extends StatefulWidget {
-  final String namex;
-  const TutorProfile({super.key, required this.namex});
+  final TutorInformation data;
+  const TutorProfile({super.key, required this.data});
 
   @override
   State<TutorProfile> createState() => _TutorProfileState();
@@ -43,7 +43,7 @@ class _TutorProfileState extends State<TutorProfile> {
       tutorsinfo.retainWhere((tutorId) {
         return tutorId.firstName
             .toLowerCase()
-            .contains(widget.namex.toLowerCase());
+            .contains(widget.data.firstName.toLowerCase());
       });
     } catch (a) {
       tutorsinfo = [];
@@ -139,9 +139,8 @@ class _TutorProfileState extends State<TutorProfile> {
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                                 color: Colors.transparent,
-                                                image: const DecorationImage(
-                                                    image: AssetImage(
-                                                        'assets/images/sample.jpg'),
+                                                image:  DecorationImage(
+                                                     image: NetworkImage(widget.data.imageID),
                                                     fit: BoxFit.cover)),
                                           )),
                                     ),
@@ -165,7 +164,7 @@ class _TutorProfileState extends State<TutorProfile> {
                                                     context: context,
                                                     builder:
                                                         (BuildContext context) {
-                                                      return const ViewFile(imageURL: '',);
+                                                      return  ViewFile(imageURL: widget.data.imageID,);
                                                     },
                                                   ).then((selectedDate) {
                                                     if (selectedDate != null) {
@@ -687,17 +686,17 @@ class _TutorProfileState extends State<TutorProfile> {
                                                 ),
                                               ),
                                               onPressed: () {
-                                                showDialog<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return const BookLesson();
-                                                  },
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
-                                                  }
-                                                });
+                                              //   showDialog<DateTime>(
+                                              //     context: context,
+                                              //     builder:
+                                              //         (BuildContext context) {
+                                              //       return const BookLesson();
+                                              //     },
+                                              //   ).then((selectedDate) {
+                                              //     if (selectedDate != null) {
+                                              //       // Do something with the selected date
+                                              //     }
+                                              //   });
                                               },
                                               child: const Text(
                                                 'Buy Lesson',
@@ -735,17 +734,17 @@ class _TutorProfileState extends State<TutorProfile> {
                                                 ),
                                               ),
                                               onPressed: () {
-                                                showDialog<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return const BookLesson();
-                                                  },
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
-                                                  }
-                                                });
+                                                // showDialog<DateTime>(
+                                                //   context: context,
+                                                //   builder:
+                                                //       (BuildContext context) {
+                                                //     return const BookLesson();
+                                                //   },
+                                                // ).then((selectedDate) {
+                                                //   if (selectedDate != null) {
+                                                //     // Do something with the selected date
+                                                //   }
+                                                // });
                                               },
                                               child: const Text(
                                                 'Book Trial',
@@ -785,17 +784,17 @@ class _TutorProfileState extends State<TutorProfile> {
                                                 ),
                                               ),
                                               onPressed: () {
-                                                showDialog<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return const ContactTeacher();
-                                                  },
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
-                                                  }
-                                                });
+                                                // showDialog<DateTime>(
+                                                //   context: context,
+                                                //   builder:
+                                                //       (BuildContext context) {
+                                                //     return const ContactTeacher(studentdata: null, tutordata: null, tutorteach: null,);
+                                                //   },
+                                                // ).then((selectedDate) {
+                                                //   if (selectedDate != null) {
+                                                //     // Do something with the selected date
+                                                //   }
+                                                // });
                                               },
                                               child: const Text(
                                                 'Contact Teacher',
@@ -837,7 +836,7 @@ class _TutorProfileState extends State<TutorProfile> {
                                                   context: context,
                                                   builder:
                                                       (BuildContext context) {
-                                                    return const CalendarDialog();
+                                                    return CalendarDialog(data: widget.data,);
                                                   },
                                                 ).then((selectedDate) {
                                                   if (selectedDate != null) {

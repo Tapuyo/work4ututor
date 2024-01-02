@@ -23,9 +23,17 @@ class MessageContent {
   String messageContent;
   DateTime dateSent;
   String userID;
+  String type;
+  String noofclasses;
+  String subjectID;
+  String classPrice;
   MessageContent(
       {required this.messageID,
       required this.messageContent,
       required this.dateSent,
+      required this.type,
+      required this.noofclasses,
+      required this.subjectID,
+      required this.classPrice,
       required this.userID});
 }

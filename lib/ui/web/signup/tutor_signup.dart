@@ -574,6 +574,7 @@ class _SignUpState extends State<SignUp> {
 
                                         CoolAlert.show(
                                             context: context,
+                                            width: 200,
                                             type: CoolAlertType.error,
                                             title: 'Oops...',
                                             text: result,
@@ -585,6 +586,7 @@ class _SignUpState extends State<SignUp> {
                                         CoolAlert.show(
                                           context: context,
                                           type: CoolAlertType.success,
+                                          width: 200,
                                           text: result,
                                           confirmBtnText: 'Okay',
                                           onConfirmBtnTap: () {

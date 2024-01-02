@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -64,6 +66,10 @@ class GetMessageConversation {
         messageContent: data['messageContent'] ?? '',
         userID: data['userID'] ?? '',
         dateSent: data['dateSent']?.toDate() ?? '',
+        noofclasses: data['noofclasses'] ?? '',
+        subjectID: data['subjectID'] ?? '',
+        type: data['type'] ?? '',
+        classPrice: data['classPrice'] ?? '',
       ),
     ];
   }
@@ -85,6 +91,10 @@ sendmessage(String messageContent, messageID, userID) async {
     'dateSent': DateTime.now(),
     'messageContent': messageContent,
     'messageID': messageID,
+    'noofclasses': '',
+    'subjectID': '',
+    'classPrice': '',
+    'type': 'message',
     'userID': userID
   });
 }

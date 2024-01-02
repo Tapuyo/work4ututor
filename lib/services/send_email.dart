@@ -1,3 +1,5 @@
+// ignore_for_file: empty_catches
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -28,12 +30,9 @@ class SendEmailService {
       ),
     );
     if (response.statusCode == 200){
-      print(response.body);
     }else{
-      print(response.body);
     }
     }catch(e){
-      print(e.toString());
     }
   }
 }
@@ -63,12 +62,9 @@ class SendEmailtoadmin {
       ),
     );
     if (response.statusCode == 200){
-      print(response.body);
     }else{
-      print(response.body);
     }
     }catch(e){
-      print(e.toString());
     }
   }
 }

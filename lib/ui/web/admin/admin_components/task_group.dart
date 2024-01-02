@@ -28,7 +28,7 @@ class _TaskGroup extends StatelessWidget {
                     data: e.value,
                     onPressed: () {},
                     dividerColor: _getSequenceColor(e.key),
-                    context: context, onDataReceived: {},
+                    context: context, onDataReceived: const {},
                   ))
               .toList()
         ],

@@ -1,11 +1,11 @@
 {
-    "name": "wokr4ututor",
-    "short_name": "wokr4ututor",
+    "name": "work4ututor",
+    "short_name": "work4ututor",
     "start_url": ".",
     "display": "browser",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Elevate your learning with our education website, your gateway to knowledge!",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../services/bookingfunctions/setscheduletime.dart';
 import '../../../../services/cancelaccount.dart';
 import '../../../../utils/themes.dart';
 
@@ -127,18 +128,11 @@ cancellclass(BuildContext context, String result) {
                                   ),
                                 ),
                                 onPressed: () async {
-                                  if (conreason.text.isNotEmpty &&
-                                      conemail.text.isNotEmpty) {
-                                    updateUserStatus(
-                                        'wPPQMtnnC0g8gSQCIU7NXw9iHqu2',
-                                        'Cancelled',
-                                        conreason.text,
-                                        conemail.text,
-                                        'student');
-                                    Navigator.pop(context);
-                                  } else {
-                                    null;
-                                  }
+                                  updateStatus(
+                                    result,
+                                    'Cancelled',
+                                  );
+                                  Navigator.pop(context);
                                 },
                                 child: const Text(
                                   style: TextStyle(

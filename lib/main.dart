@@ -10,16 +10,19 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:work4ututor/data_class/studentsEnrolledclass.dart';
 import 'package:work4ututor/provider/init_provider.dart';
+import 'package:work4ututor/provider/schedulenotifier.dart';
 import 'package:work4ututor/provider/search_provider.dart';
 import 'package:work4ututor/provider/update_tutor_provider.dart';
 import 'package:work4ututor/provider/user_id_provider.dart';
 import 'package:work4ututor/services/getcountries.dart';
 import 'package:work4ututor/services/getlanguages.dart';
+import 'package:work4ututor/services/getstudentinfo.dart';
 import 'package:work4ututor/services/services.dart';
 import 'package:work4ututor/services/subjectServices.dart';
 
 import 'constant/constant.dart';
 import 'data_class/helpclass.dart';
+import 'data_class/studentinfoclass.dart';
 import 'data_class/subject_class.dart';
 import 'data_class/tutor_info_class.dart';
 import 'package:timezone/browser.dart' as tz;
@@ -86,16 +89,17 @@ void main() async {
     providers: [
       StreamProvider<List<String>>(
         create: (_) => streamCountryNamesFromFirestore(),
-        initialData: [], // Initial data while the stream is initializing
+        initialData: const [], // Initial data while the stream is initializing
       ),
       StreamProvider<List<LanguageData>>(
         create: (_) => streamLanguageNamesFromFirestore(),
-        initialData: [], // Initial data while the stream is initializing
+        initialData: const [], // Initial data while the stream is initializing
       ),
       ChangeNotifierProvider(create: (_) => InitProvider()),
       ChangeNotifierProvider(create: (_) => MyModel()),
       ChangeNotifierProvider(create: (_) => TutorInformationProvider()),
       ChangeNotifierProvider(create: (_) => TutorInformationPricing()),
+      ChangeNotifierProvider(create: (_) => ScheduleListNotifier()),
       StreamProvider<List<TutorInformation>>.value(
         value: DatabaseService(uid: '').tutorlist,
         initialData: const [],
@@ -109,8 +113,14 @@ void main() async {
         initialData: const [],
       ),
       StreamProvider<List<StudentsList>>.value(
-        value:
-            DatabaseService(uid: 'YnLdZm2n7bPZSTbXS0VvHgG0Jor2').enrolleelist,
+        value: DatabaseService(uid: '').enrolleelist,
+        initialData: const [],
+      ),
+      StreamProvider<List<StudentInfoClass>>.value(
+        value: AllStudentInfoData().getallstudentinfo,
+        catchError: (context, error) {
+          return [];
+        },
         initialData: const [],
       ),
       ChangeNotifierProvider(create: (_) => SearchTutorProvider()),

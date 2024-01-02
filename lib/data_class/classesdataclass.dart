@@ -53,12 +53,27 @@ class Schedule {
   final String scheduleID;
   final String session;
   final DateTime schedule;
+  final String timefrom;
+  final String timeto;
 
   Schedule({
     required this.scheduleID,
     required this.session,
     required this.schedule,
+    required this.timefrom,
+    required this.timeto,
   });
+
+  // Convert Schedule instance to a map
+  Map<String, dynamic> toMap() {
+    return {
+      'scheduleID': scheduleID,
+      'session': session,
+      'schedule': schedule.toIso8601String(), // Convert DateTime to String
+      'timefrom': timefrom,
+      'timeto': timeto,
+    };
+  }
 }
 
 class Score {
@@ -77,12 +92,16 @@ class SubjectClass {
   final String docID;
   final String subjectID;
   final String subjectName;
+  final String subjectStatus;
+  final String totaltutors;
   final DateTime datecreated;
 
   SubjectClass({
     required this.docID,
     required this.subjectID,
     required this.subjectName,
+    required this.subjectStatus,
+    required this.totaltutors,
     required this.datecreated,
   });
 }
@@ -92,11 +111,14 @@ class ScheduleData {
   final String tutorID;
   final String classID;
   final String scheduleID;
-  TutorInformation tutorinfo;
-  StudentInfoClass studentinfo;
-  SubjectClass subjectinfo;
+  final TutorInformation? tutorinfo;
+  final StudentInfoClass? studentinfo;
+  final SubjectClass? subjectinfo;
   final String session;
-  final DateTime schedule;
+  final DateTime scheduledate;
+  final String timefrom;
+  final String timeto;
+  final String type;
 
   ScheduleData({
     required this.studentID,
@@ -107,6 +129,9 @@ class ScheduleData {
     required this.studentinfo,
     required this.subjectinfo,
     required this.session,
-    required this.schedule,
+    required this.scheduledate,
+    required this.timefrom,
+    required this.timeto,
+    required this.type,
   });
 }

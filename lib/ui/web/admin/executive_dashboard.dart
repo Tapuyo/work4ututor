@@ -963,13 +963,13 @@ class ExecutiveDashboard extends GetView<DashboardController> {
                             physics: const BouncingScrollPhysics(),
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const TutorProfile(
-                                            namex: '',
-                                          )),
-                                );
+                                // Navigator.push(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //       builder: (context) => const TutorProfile(
+                                //             data: tutorsinfo,
+                                //           )),
+                                // );
                               },
                               child: Column(
                                 children: [
@@ -1274,15 +1274,15 @@ class ExecutiveDashboard extends GetView<DashboardController> {
                                     if (tutorsinfo['status'] == 'new') {
                                       return InkWell(
                                         onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const TutorProfile(
-                                                namex: '',
-                                              ),
-                                            ),
-                                          );
+                                          // Navigator.push(
+                                          //   context,
+                                          //   MaterialPageRoute(
+                                          //     builder: (context) =>
+                                          //         const TutorProfile(
+                                          //       namex: '',
+                                          //     ),
+                                          //   ),
+                                          // );
                                         },
                                         child: Column(
                                           children: [
@@ -2206,14 +2206,14 @@ class ExecutiveDashboard extends GetView<DashboardController> {
                               physics: const BouncingScrollPhysics(),
                               child: GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const TutorProfile(
-                                              namex: '',
-                                            )),
-                                  );
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //       builder: (context) =>
+                                  //           const TutorProfile(
+                                  //             namex: '',
+                                  //           )),
+                                  // );
                                 },
                                 child: Column(
                                   children: [

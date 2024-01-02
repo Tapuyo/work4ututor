@@ -1,6 +1,7 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, no_leading_underscores_for_local_identifiers
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -32,13 +33,16 @@ class CustomAppBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
           const Spacer(),
-          Container(
-            margin: const EdgeInsets.only(top: 0),
-            width: 240,
-            child: Image.asset(
-              "assets/images/WORK4U_NO_BG.png",
-              alignment: Alignment.topCenter,
-              fit: BoxFit.cover,
+          InkWell(
+            onTap: () {},
+            child: Container(
+              margin: const EdgeInsets.only(top: 0),
+              width: 240,
+              child: Image.asset(
+                "assets/images/WORK4U_NO_BG.png",
+                alignment: Alignment.topCenter,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           const Spacer(),
@@ -182,7 +186,7 @@ class CustomAppBarLog extends StatelessWidget {
       child: Row(
         children: <Widget>[
           const SizedBox(
-            width: 200,
+            width: 100,
           ),
           InkWell(
             child: SizedBox(
@@ -224,7 +228,7 @@ class CustomAppBarLog extends StatelessWidget {
             ),
           ),
           const SizedBox(
-            width: 200,
+            width: 100,
           )
         ],
       ),
@@ -233,7 +237,6 @@ class CustomAppBarLog extends StatelessWidget {
 }
 
 Widget navbarmenu(BuildContext context) {
-  // ignore: no_leading_underscores_for_local_identifiers
   final int menuIndex = context.select((InitProvider p) => p.menuIndex);
   final AuthService _auth = AuthService();
   return Column(
@@ -630,12 +633,29 @@ Widget navbarmenu(BuildContext context) {
             ),
           ),
           onPressed: () async {
-            dynamic result = await _auth.signOutAnon();
-            deleteAllData();
-            // ignore: use_build_context_synchronously
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const LoginPage()),
+            CoolAlert.show(
+              context: context,
+              barrierDismissible: false,
+              width: 200,
+              type: CoolAlertType.confirm,
+              text: 'You want to Log Out?',
+              confirmBtnText: 'Proceed',
+              confirmBtnColor: Colors.greenAccent,
+              cancelBtnText: 'Go back',
+              showCancelBtn: true,
+              cancelBtnTextStyle: const TextStyle(color: Colors.red),
+              onCancelBtnTap: () {
+                Navigator.of(context).pop;
+              },
+              onConfirmBtnTap: () async {
+                await _auth.signOutAnon();
+                deleteAllData();
+                // ignore: use_build_context_synchronously
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+              },
             );
           },
           icon: const Icon(
@@ -783,7 +803,7 @@ class FindTutorNavbar extends StatelessWidget {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const FindTutor()),
+                  MaterialPageRoute(builder: (context) => const FindTutor(userid: '',)),
                 );
               },
               child: const Text('FIND TUTOR'),
