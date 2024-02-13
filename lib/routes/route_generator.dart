@@ -1,10 +1,12 @@
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:work4ututor/ui/web/communication.dart/videocall.dart';
 
 import '../splash_page.dart';
 import '../ui/mobile/mob_main.dart';
 import '../ui/web/admin/adminlogin.dart';
+import '../ui/web/communication.dart/videotest.dart';
 import '../ui/web/login/login.dart';
 import '../ui/web/search_tutor/find_tutors.dart';
 import '../ui/web/signup/student_signup.dart';
@@ -28,34 +30,44 @@ class RouteGenerator {
 
     return data.isNotEmpty ? data.first['userID'] : {};
   }
-   
+
   static Route<dynamic> generateRoute(RouteSettings settings) {
     //final args = settings.arguments;
 
     switch (settings.name) {
       case Routes.splash:
-        return MaterialPageRoute(builder: (_) => const SplashPage());
+        return CupertinoPageRoute(builder: (_) => const SplashPage());
 
       case Routes.login:
-        return MaterialPageRoute(builder: (_) => const LoginPage());
+        return CupertinoPageRoute(builder: (_) => const LoginPage());
 
       case Routes.mobMain:
-        return MaterialPageRoute(builder: (_) => const MobMainPage());
+        return CupertinoPageRoute(builder: (_) => const MobMainPage());
 
       case Routes.webMain:
-        return MaterialPageRoute(builder: (_) => const WebMainPage());
+        return CupertinoPageRoute(builder: (_) => const WebMainPage());
 
       case Routes.tutorSignup:
-        return MaterialPageRoute(builder: (_) => const TutorSignup());
+        return CupertinoPageRoute(builder: (_) => const TutorSignup());
 
       case Routes.studentSignup:
-        return MaterialPageRoute(builder: (_) => const StudentSignup());
+        return CupertinoPageRoute(builder: (_) => const StudentSignup());
 
       case Routes.adminLogin:
-        return MaterialPageRoute(builder: (_) => const AdminLoginPage());
+        return CupertinoPageRoute(builder: (_) => const AdminLoginPage());
 
       case Routes.tutorList:
-        return MaterialPageRoute(builder: (_) =>  FindTutor(userid: _getUserData(),));
+        return CupertinoPageRoute(
+            builder: (_) => FindTutor(
+                  userid: _getUserData(),
+                ));
+
+      case Routes.videoCall:
+        return CupertinoPageRoute(
+            builder: (_) => const VideoCall(
+                  chatID: '',
+                  uID: '',
+                ));
 
       default:
         return _errorRoute();

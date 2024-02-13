@@ -20,6 +20,7 @@ import '../../../../data_class/user_class.dart';
 import '../../../../provider/init_provider.dart';
 import '../../../../services/getenrolledclasses.dart';
 import '../../../../services/getmessages.dart';
+import '../../../../services/getschedules.dart';
 import '../../../../services/getstudentclassesanalytics.dart';
 import '../../../../services/getstudentinfo.dart';
 import '../../../../services/getuser.dart';
@@ -107,6 +108,29 @@ class _DashboardPageState extends State<DashboardPage> {
         StreamProvider<List<ClassesData>>.value(
           value: EnrolledClass(uid: widget.uID, role: 'tutor').getenrolled,
           catchError: (context, error) {
+            return [];
+          },
+          initialData: const [],
+        ),
+         StreamProvider<List<ScheduleData>>.value(
+          value: ScheduleEnrolledClassData(
+            uid: widget.uID,
+            role: 'student',
+            context: context,
+          ).getenrolled,
+          catchError: (context, error) {
+            print('Error occurred: $error');
+            return [];
+          },
+          initialData: const [],
+        ),
+        StreamProvider<List<Schedule>>.value(
+          value: ScheduleEnrolledClass(
+            uid: widget.uID,
+            role: 'student',
+          ).getenrolled,
+          catchError: (context, error) {
+            print('Error occurred: $error');
             return [];
           },
           initialData: const [],
@@ -207,6 +231,7 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                 backgroundColor: kColorPrimary,
                 elevation: 4,
                 shadowColor: Colors.black,
+                automaticallyImplyLeading: false,
                 title: Container(
                   padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
                   width: 240,
@@ -217,30 +242,30 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                   ),
                 ),
                 actions: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
-                    child: Badge(
-                      isLabelVisible: newmessagecount == 0 ? false : true,
-                      alignment: AlignmentDirectional.centerEnd,
-                      label: Text(
-                        newmessagecount.toString(),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      child: IconButton(
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          padding: EdgeInsets.zero,
-                          icon: const Icon(
-                            EvaIcons.email,
-                            color: Colors.white,
-                            size: 25,
-                          ),
-                          onPressed: () {
-                            final provider = context.read<InitProvider>();
-                            provider.setMenuIndex(2);
-                          }),
-                    ),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
+                  //   child: Badge(
+                  //     isLabelVisible: newmessagecount == 0 ? false : true,
+                  //     alignment: AlignmentDirectional.centerEnd,
+                  //     label: Text(
+                  //       newmessagecount.toString(),
+                  //       style: const TextStyle(color: Colors.white),
+                  //     ),
+                  //     child: IconButton(
+                  //         splashColor: Colors.transparent,
+                  //         highlightColor: Colors.transparent,
+                  //         padding: EdgeInsets.zero,
+                  //         icon: const Icon(
+                  //           EvaIcons.email,
+                  //           color: Colors.white,
+                  //           size: 25,
+                  //         ),
+                  //         onPressed: () {
+                  //           final provider = context.read<InitProvider>();
+                  //           provider.setMenuIndex(2);
+                  //         }),
+                  //   ),
+                  // ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
                     child: Badge(
@@ -358,9 +383,11 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                           MessagePage(
                             uID: widget.uID,
                           )
-                        ] else if (menuIndex == 3) ...[
-                          ClassInquiry(widget.uID)
-                        ] else if (menuIndex == 4) ...[
+                        ] 
+                        // else if (menuIndex == 3) ...[
+                        //   ClassInquiry(widget.uID)
+                        // ] 
+                        else if (menuIndex == 4) ...[
                           const StudentsEnrolled()
                         ] else if (menuIndex == 5) ...[
                           PerformancePage(
@@ -409,9 +436,11 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                                   MessagePage(
                                     uID: widget.uID,
                                   )
-                                ] else if (menuIndex == 3) ...[
-                                  ClassInquiry(widget.uID)
-                                ] else if (menuIndex == 4) ...[
+                                ] 
+                                // else if (menuIndex == 3) ...[
+                                //   ClassInquiry(widget.uID)
+                                // ] 
+                                else if (menuIndex == 4) ...[
                                   const StudentsEnrolled()
                                 ] else if (menuIndex == 5) ...[
                                   PerformancePage(

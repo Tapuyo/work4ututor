@@ -60,12 +60,16 @@ class _BookLessonState extends State<BookLesson> {
         studentdata: widget.studentdata,
         tutordata: widget.tutordata,
         tutorteach: widget.tutorteach,
+        noofclasses: widget.noofclasses,
+        subject: widget.subject,
       ),
     );
   }
 }
 
 class BookLessonBody extends StatefulWidget {
+  final dynamic subject;
+  final String noofclasses;
   final String studentdata;
   final dynamic tutordata;
   final List<dynamic> tutorteach;
@@ -75,7 +79,9 @@ class BookLessonBody extends StatefulWidget {
       this.book,
       required this.studentdata,
       required this.tutordata,
-      required this.tutorteach});
+      required this.tutorteach,
+      required this.subject,
+      required this.noofclasses});
 
   @override
   State<BookLessonBody> createState() => _BookLessonBodyState();
@@ -110,9 +116,7 @@ class _BookLessonBodyState extends State<BookLessonBody> {
 
   @override
   Widget build(BuildContext context) {
-    final messagelist = Provider.of<List<ChatMessage>>(context);
     final subjectlist = Provider.of<List<Subjects>>(context);
-    print(subjectlist.length);
 
     return AlertDialog(
       shape: RoundedRectangleBorder(
@@ -190,7 +194,7 @@ class _BookLessonBodyState extends State<BookLessonBody> {
                   ),
                   onPressed: () async {
                     Subjects subjectid = subjectlist.firstWhere(
-                      (element) => element.subjectName == 'Math',
+                      (element) => element.subjectName == widget.subject,
                     );
                     List<String> idList = [
                       widget.tutordata['userId'],
@@ -201,7 +205,7 @@ class _BookLessonBodyState extends State<BookLessonBody> {
                         widget.studentdata,
                         myMessage.text,
                         subjectid.subjectId,
-                        3,
+                        int.parse(widget.noofclasses),
                         idList);
                     if (result == 'success') {
                       setState(() {

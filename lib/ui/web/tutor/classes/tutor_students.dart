@@ -21,12 +21,19 @@ class StudentsEnrolled extends StatefulWidget {
 }
 
 class _StudentsEnrolledState extends State<StudentsEnrolled> {
+  String subjectID = 'All';
+
   String actionValue = 'View';
   String dropdownValue = 'English';
-  String statusValue = 'Completed';
+  String statusValue = 'All';
   Color buttonColor = kCalendarColorAB;
   DateTime? _fromselectedDate;
   DateTime? _toselectedDate;
+  String tempactionValue = 'View';
+  String tempdropdownValue = 'All';
+  String tempstatusValue = 'All';
+  DateTime? _tempfromselectedDate;
+  DateTime? _temptoselectedDate;
   ClassesData selectedclass = ClassesData(
       classid: '',
       subjectID: '',
@@ -48,6 +55,7 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
   List<String> imagelinks = [];
   ImageProvider? imageProvider;
   String profileurl = '';
+  List<String> subjectnames = [];
 
   void _pickDateDialog() {
     showDatePicker(
@@ -66,7 +74,7 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
       }
       setState(() {
         //for rebuilding the ui
-        _fromselectedDate = pickedDate;
+        _tempfromselectedDate = pickedDate;
       });
     });
   }
@@ -88,7 +96,7 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
       }
       setState(() {
         //for rebuilding the ui
-        _toselectedDate = pickedDate;
+        _temptoselectedDate = pickedDate;
       });
     });
   }
@@ -106,711 +114,962 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
 
   @override
   Widget build(BuildContext context) {
-     final bool open =
+    final bool open =
         context.select((ViewClassDisplayProvider p) => p.openClassInfo);
-    final enrolledlist = Provider.of<List<ClassesData>>(context);
+    List<ClassesData> newenrolledlist = Provider.of<List<ClassesData>>(context);
+    List<ClassesData> enrolledlist = statusValue == 'All' &&
+            _fromselectedDate == null &&
+            _toselectedDate == null &&
+            subjectID == 'All'
+        ? newenrolledlist
+        : statusValue == 'All' &&
+                _fromselectedDate == null &&
+                _toselectedDate == null &&
+                subjectID != 'All'
+            ? newenrolledlist.where((item) {
+                bool isSubjectMatch = item.subjectID == subjectID;
+                return isSubjectMatch;
+              }).toList()
+            : statusValue != 'All' &&
+                    _fromselectedDate == null &&
+                    _toselectedDate == null &&
+                    subjectID != ''
+                ? newenrolledlist.where((item) {
+                    bool isStatusMatch = item.status == statusValue;
+                    // bool isDateInRange =
+                    //     item.dateEnrolled.isAfter(_fromselectedDate!) &&
+                    //         item.dateEnrolled.isBefore(_toselectedDate!);
+
+                    return isStatusMatch;
+                  }).toList()
+                : statusValue != 'All' &&
+                        _fromselectedDate != null &&
+                        _toselectedDate != null &&
+                        subjectID == 'All'
+                    ? newenrolledlist.where((item) {
+                        bool isStatusMatch = item.status == statusValue;
+                        DateTime formattedFromDate = DateTime(
+                            _fromselectedDate!.year,
+                            _fromselectedDate!.month,
+                            _fromselectedDate!.day);
+                        DateTime formattedToDate = DateTime(
+                            _toselectedDate!.year,
+                            _toselectedDate!.month,
+                            _toselectedDate!.day);
+                        DateTime formatteDateEnrolled = DateTime(
+                            item.dateEnrolled.year,
+                            item.dateEnrolled.month,
+                            item.dateEnrolled.day);
+
+                        bool isDateInRange = formatteDateEnrolled
+                                .isAtSameMomentAs(formattedFromDate) ||
+                            formatteDateEnrolled
+                                .isAtSameMomentAs(formattedToDate) ||
+                            (formatteDateEnrolled.isAfter(_fromselectedDate!) &&
+                                formatteDateEnrolled
+                                    .isBefore(_toselectedDate!));
+
+                        return isStatusMatch && isDateInRange;
+                      }).toList()
+                    : statusValue == 'All' &&
+                            _fromselectedDate != null &&
+                            _toselectedDate != null
+                        ? newenrolledlist.where((item) {
+                            // Format the selected dates to compare only the date part
+                            DateTime formattedFromDate = DateTime(
+                                _fromselectedDate!.year,
+                                _fromselectedDate!.month,
+                                _fromselectedDate!.day);
+                            DateTime formattedToDate = DateTime(
+                                _toselectedDate!.year,
+                                _toselectedDate!.month,
+                                _toselectedDate!.day);
+
+                            bool isStatusMatch = item.status == statusValue;
+                            DateTime formatteDateEnrolled = DateTime(
+                                item.dateEnrolled.year,
+                                item.dateEnrolled.month,
+                                item.dateEnrolled.day);
+
+                            bool isDateInRange = formatteDateEnrolled
+                                    .isAtSameMomentAs(formattedFromDate) ||
+                                formatteDateEnrolled
+                                    .isAtSameMomentAs(formattedToDate) ||
+                                (formatteDateEnrolled
+                                        .isAfter(_fromselectedDate!) &&
+                                    formatteDateEnrolled
+                                        .isBefore(_toselectedDate!));
+
+                            return isDateInRange;
+                          }).toList()
+                        : statusValue == 'All' &&
+                                _fromselectedDate == null &&
+                                _toselectedDate == null &&
+                                subjectID != 'All'
+                            ? newenrolledlist.where((item) {
+                                bool isSubjectMatch =
+                                    item.subjectID == subjectID;
+                                bool isStatusMatch = item.status == statusValue;
+                                DateTime formattedFromDate = DateTime(
+                                    _fromselectedDate!.year,
+                                    _fromselectedDate!.month,
+                                    _fromselectedDate!.day);
+                                DateTime formattedToDate = DateTime(
+                                    _toselectedDate!.year,
+                                    _toselectedDate!.month,
+                                    _toselectedDate!.day);
+                                DateTime formatteDateEnrolled = DateTime(
+                                    item.dateEnrolled.year,
+                                    item.dateEnrolled.month,
+                                    item.dateEnrolled.day);
+
+                                bool isDateInRange = formatteDateEnrolled
+                                        .isAtSameMomentAs(formattedFromDate) ||
+                                    formatteDateEnrolled
+                                        .isAtSameMomentAs(formattedToDate) ||
+                                    (formatteDateEnrolled
+                                            .isAfter(_fromselectedDate!) &&
+                                        formatteDateEnrolled
+                                            .isBefore(_toselectedDate!));
+
+                                return isDateInRange && isSubjectMatch;
+                              }).toList()
+                            : statusValue == 'All' &&
+                                    _fromselectedDate != null &&
+                                    _toselectedDate != null &&
+                                    subjectID != 'All'
+                                ? newenrolledlist.where((item) {
+                                    bool isSubjectMatch =
+                                        item.subjectID == subjectID;
+                                    bool isStatusMatch =
+                                        item.status == statusValue;
+
+                                    return isSubjectMatch;
+                                  }).toList()
+                                : newenrolledlist.where((item) {
+                                    bool isStatusMatch =
+                                        item.status == statusValue;
+
+                                    return isStatusMatch;
+                                  }).toList();
+    if (enrolledlist.isNotEmpty) {
+      setState(() {
+        enrolledlist.sort((b, a) => a.dateEnrolled.compareTo(b.dateEnrolled));
+        List<List<SubjectClass>> allSubjects = enrolledlist.map((classesData) {
+          return classesData.subjectinfo;
+        }).toList();
+        subjectnames = ['All'] +
+            allSubjects
+                .map((subjectList) =>
+                    subjectList.map((subject) => subject.subjectName).toList())
+                .expand((names) => names)
+                .toSet() // Use a Set to eliminate duplicates
+                .toList();
+      });
+    }
     Size size = MediaQuery.of(context).size;
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10),
-      child: Container(
-        alignment: Alignment.topCenter,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(
-            color: Colors.black45,
-            width: .1,
-          ),
-          borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(5.0),
-            topLeft: Radius.circular(5.0),
-          ),
-        ),
-        width: size.width - 320,
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: 50,
-              width: size.width - 310,
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                color: kColorPrimary,
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
-                  Text(
-                    "STUDENTS ENROLLED",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Spacer(),
-                ],
-              ),
+      child: Column(
+        children: <Widget>[
+          Container(
+            height: 50,
+            width: size.width - 310,
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: kColorPrimary,
+              borderRadius: BorderRadius.circular(5.0),
             ),
-            Row(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: const [
+                Text(
+                  "STUDENTS ENROLLED",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Spacer(),
+              ],
+            ),
+          ),
+          Visibility(
+            visible: open == false ? true : false,
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Flexible(
                     flex: 12,
                     child: Container(
-                      width: size.width - 320,
+                      width: size.width - 310,
                       height: 50,
                       child: Card(
-                        elevation: 0.0,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5),
-                          ),
-                          side: BorderSide(width: .1),
-                        ),
+                        elevation: 5.0,
                         child: Row(
                           children: [
-                             Visibility(
-                              visible: open == true ? true : false,
-                              child: TextButton.icon(
-                                // <-- TextButton
-                                onPressed: () {
-                                  setState(
-                                    () {
-                                      final provider = context
-                                          .read<ViewClassDisplayProvider>();
-                                      provider.setViewClassinfo(false);
-                                    },
-                                  );
-                                },
-                                icon: const Icon(
-                                  Icons.arrow_back,
-                                  size: 24.0,
-                                  color: Colors.black,
-                                ),
-                                label: const Text(
-                                  'Back',
+                            // Visibility(
+                            //   visible: open == true ? true : false,
+                            //   child: TextButton.icon(
+                            //     // <-- TextButton
+                            //     onPressed: () {
+                            //       setState(
+                            //         () {
+                            //           final provider = context
+                            //               .read<ViewClassDisplayProvider>();
+                            //           provider.setViewClassinfo(false);
+                            //         },
+                            //       );
+                            //     },
+                            //     icon: const Icon(
+                            //       Icons.arrow_back,
+                            //       size: 24.0,
+                            //       color: Colors.black,
+                            //     ),
+                            //     label: const Text(
+                            //       'Back',
+                            //       style: TextStyle(
+                            //         color: Colors.black,
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Visibility(
+                              visible: open == false ? true : false,
+                              child: const Padding(
+                                padding: EdgeInsets.all(5.0),
+                                child: Text(
+                                  "Date Enrolled:",
                                   style: TextStyle(
-                                    color: Colors.black,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ),
                             ),
-                            const Padding(
-                              padding: EdgeInsets.all(5.0),
-                              child: Text(
-                                "Date Enrolled:",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.all(5),
-                              width: 130,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                  color: Colors.black45,
-                                  width: 1,
-                                ),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 95,
-                                    child: Text(
-                                      _fromselectedDate == null
-                                          ? 'From'
-                                          : DateFormat.yMMMMd()
-                                              .format(_fromselectedDate!),
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w500),
-                                    ),
+                            Visibility(
+                              visible: open == false ? true : false,
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                width: 185,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color: Colors.black45,
+                                    width: 1,
                                   ),
-                                  InkWell(
-                                    onTap: () {
-                                      _pickDateDialog();
-                                    },
-                                    child: const Icon(
-                                      Icons.calendar_month,
-                                      size: 20,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 150,
+                                      child: Text(
+                                        _tempfromselectedDate == null
+                                            ? 'From'
+                                            : DateFormat.yMMMMd().format(
+                                                _tempfromselectedDate!),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w500),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    InkWell(
+                                      onTap: () {
+                                        _pickDateDialog();
+                                      },
+                                      child: const Icon(
+                                        Icons.calendar_month,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                             const SizedBox(width: 10),
-                            Container(
-                              padding: const EdgeInsets.all(5),
-                              width: 130,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                  color: Colors.black45,
-                                  width: 1,
+                            Visibility(
+                              visible: open == false ? true : false,
+                              child: Container(
+                                padding: const EdgeInsets.all(5),
+                                width: 185,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color: Colors.black45,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(5),
                                 ),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 95,
-                                    child: Text(
-                                      _toselectedDate == null
-                                          ? 'To'
-                                          : DateFormat.yMMMMd()
-                                              .format(_toselectedDate!),
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w500),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 150,
+                                      child: Text(
+                                        _temptoselectedDate == null
+                                            ? 'To'
+                                            : DateFormat.yMMMMd()
+                                                .format(_temptoselectedDate!),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w500),
+                                      ),
                                     ),
-                                  ),
-                                  InkWell(
-                                    onTap: () {
-                                      _pickDateDialog();
-                                    },
-                                    child: const Icon(
-                                      Icons.calendar_month,
-                                      size: 20,
+                                    InkWell(
+                                      onTap: () {
+                                        _topickDateDialog();
+                                      },
+                                      child: const Icon(
+                                        Icons.calendar_month,
+                                        size: 20,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                             const SizedBox(
                               width: 30,
                             ),
-                            const Padding(
-                              padding: EdgeInsets.all(5.0),
-                              child: Text(
-                                "Status:",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
+                            Visibility(
+                              visible: open == false ? true : false,
+                              child: const Padding(
+                                padding: EdgeInsets.all(5.0),
+                                child: Text(
+                                  "Status:",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.only(left: 5, right: 5),
-                              width: 150,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.black45,
-                                  width: 1,
+                            Visibility(
+                              visible: open == false ? true : false,
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.only(left: 5, right: 5),
+                                width: 150,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.black45,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: Colors.white,
                                 ),
-                                borderRadius: BorderRadius.circular(5),
-                                color: Colors.white,
-                              ),
-                              child: DropdownButton<String>(
-                                elevation: 10,
-                                value: statusValue,
-                                onChanged: (statValue) {
-                                  setState(() {
-                                    statusValue = statValue!;
-                                  });
-                                },
-                                underline: Container(),
-                                items: <String>[
-                                  'Completed',
-                                  'Ongoing',
-                                  'Cancelled',
-                                ].map<DropdownMenuItem<String>>(
-                                    (String value1) {
-                                  return DropdownMenuItem<String>(
-                                    value: value1,
-                                    child: Container(
-                                      width: 110,
-                                      child: Text(
-                                        value1,
-                                        style: const TextStyle(
-                                          fontSize: 16,
+                                child: DropdownButton<String>(
+                                  elevation: 10,
+                                  value: tempstatusValue,
+                                  onChanged: (statValue) {
+                                    setState(() {
+                                      tempstatusValue = statValue!;
+                                    });
+                                  },
+                                  underline: Container(),
+                                  items: <String>[
+                                    'All',
+                                    'Completed',
+                                    'Ongoing',
+                                    'Pending',
+                                    'Cancelled',
+                                  ].map<DropdownMenuItem<String>>(
+                                      (String value1) {
+                                    return DropdownMenuItem<String>(
+                                      value: value1,
+                                      child: Container(
+                                        width: 110,
+                                        child: Text(
+                                          value1,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                }).toList(),
+                                    );
+                                  }).toList(),
+                                ),
                               ),
                             ),
                             const SizedBox(
                               width: 30,
                             ),
-                            const Padding(
-                              padding: EdgeInsets.all(5.0),
-                              child: Text(
-                                "Subject:",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
+                            Visibility(
+                              visible: open == false ? true : false,
+                              child: const Padding(
+                                padding: EdgeInsets.all(5.0),
+                                child: Text(
+                                  "Subject:",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.only(left: 5, right: 5),
-                              width: 150,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.black45,
-                                  width: 1,
+                            Visibility(
+                              visible: open == false ? true : false,
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.only(left: 5, right: 5),
+                                width: 150,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.black45,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: Colors.white,
                                 ),
-                                borderRadius: BorderRadius.circular(5),
-                                color: Colors.white,
-                              ),
-                              child: DropdownButton<String>(
-                                elevation: 10,
-                                value: dropdownValue,
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    dropdownValue = newValue!;
-                                  });
-                                },
-                                underline: Container(),
-                                items: <String>[
-                                  'English',
-                                  'Math',
-                                  'Filipino',
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Container(
-                                      width: 110,
-                                      child: Text(
-                                        value,
-                                        style: const TextStyle(
-                                          fontSize: 16,
+                                child: DropdownButton<String>(
+                                  elevation: 10,
+                                  value: tempdropdownValue,
+                                  onChanged: (newValue) {
+                                    setState(() {
+                                      tempdropdownValue = newValue!;
+                                    });
+                                  },
+                                  underline: Container(),
+                                  items: subjectnames
+                                      .map<DropdownMenuItem<String>>(
+                                          (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Container(
+                                        width: 110,
+                                        child: Text(
+                                          value,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                }).toList(),
+                                    );
+                                  }).toList(),
+                                ),
                               ),
                             ),
                             const SizedBox(
                               width: 10,
                             ),
-                            SizedBox(
-                              width: 100,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: kColorPrimary,
-                                  shape: const RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5))),
+                            Visibility(
+                              visible: open == false ? true : false,
+                              child: SizedBox(
+                                width: 100,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: kColorPrimary,
+                                    shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5))),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _toselectedDate = _temptoselectedDate;
+                                      _fromselectedDate =
+                                          _tempfromselectedDate;
+                                      statusValue = tempstatusValue;
+                                      List<SubjectClass> filteredSubjects =
+                                          enrolledlist
+                                              .expand((classesData) => classesData
+                                                  .subjectinfo
+                                                  .where((subject) => subject
+                                                      .subjectName
+                                                      .contains(
+                                                          tempdropdownValue)))
+                                              .toList();
+
+                                      subjectID = filteredSubjects.isNotEmpty
+                                          ? filteredSubjects.first.subjectID
+                                              .toString()
+                                          : tempdropdownValue;
+                                    });
+                                  },
+                                  child: const Text('Search'),
                                 ),
-                                onPressed: () {},
-                                child: const Text('Search'),
                               ),
                             ),
+                            const Spacer(),
                           ],
                         ),
                       ),
                     ))
               ],
             ),
-            Container(
-              width: size.width - 320,
-              height: size.height - 80,
-              child: Card(
-                elevation: 0.0,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(5),
-                  ),
-                  side: BorderSide(width: .1),
-                ),
-                child: open == false
-                    ? Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              top: 8.0,
-                              left: 10,
-                              right: 10,
-                              bottom: 8.0,
+          ),
+          Card(
+            elevation: 4.0,
+            // shape: const RoundedRectangleBorder(
+            //   borderRadius: BorderRadius.all(
+            //     Radius.circular(5),
+            //   ),
+            //   side: BorderSide(width: .1),
+            // ),
+            child: open == false
+                ? Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 8.0,
+                          left: 10,
+                          right: 10,
+                          bottom: 8.0,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: const [
+                            // Checkbox(
+                            //   checkColor: Colors.black,
+                            //   activeColor: Colors.green,
+                            //   value: select,
+                            //   onChanged: (value) {
+                            //     setState(() {
+                            //       select = value!;
+                            //     });
+                            //   },
+                            // ),
+                            // const SizedBox(
+                            //   width: 15,
+                            // ),
+                            Text(
+                              "Name",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Checkbox(
-                                  checkColor: Colors.black,
-                                  activeColor: Colors.green,
-                                  value: select,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      select = value!;
-                                    });
-                                  },
-                                ),
-                                const SizedBox(
-                                  width: 15,
-                                ),
-                                const Text(
-                                  "Name",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                const Spacer(
-                                  flex: 2,
-                                ),
-                                const SizedBox(
-                                  width: 35,
-                                ),
-                                const Text(
-                                  "Date Enrolled",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                const Spacer(
-                                    // flex: 2,
-                                    ),
-                                const Text(
-                                  "Subject",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                const Spacer(
-                                    // flex: 1,
-                                    ),
-                                const Text(
-                                  "Status",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                const Spacer(
-                                    // flex: 1,
-                                    ),
-                                const Text(
-                                  "Classes",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                const Spacer(
-                                    // flex: 3,
-                                    ),
-                                const Text(
-                                  "Action",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                const Spacer(
-                                    // flex: 1,
-                                    ),
-                              ],
+                            Spacer(
+                              flex: 2,
                             ),
-                          ),
-                          const SizedBox(
-                            child: Divider(
-                              height: 1,
-                              thickness: 2,
+                            SizedBox(
+                              width: 35,
                             ),
-                          ),
-                          enrolledlist.isNotEmpty
-                              ? Container(
-                                  width: size.width - 320,
-                                  height: size.height - 175,
-                                  child: ListView.builder(
-                                    itemCount: enrolledlist.length,
-                                    itemBuilder: (context, index) {
-                                      final enrolledClass = enrolledlist[index];
-                                      List<SubjectClass> subjectinfo =
-                                          enrolledClass.subjectinfo;
-                                      List<TutorInformation> tutorinfo =
-                                          enrolledClass.tutorinfo;
-                                      List<StudentInfoClass> studentinfo =
-                                          enrolledClass.studentinfo;
-                                      bool dataLoaded = false;
-                                      String tempimage = '';
-                                      if (!dataLoaded) {
-                                        getData(tutorinfo.first.imageID)
-                                            .then((downloadURL) {
-                                          if (downloadURL != null) {
-                                            setState(() {
-                                              tempimage = downloadURL;
-                                              dataLoaded =
-                                                  true; // Mark the data as loaded
-                                            });
-                                          } else {
-                                            print(
-                                                'Failed to retrieve download URL.');
-                                          }
-                                        });
-                                      }
+                            Text(
+                              "Date Enrolled",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            Spacer(
+                                // flex: 2,
+                                ),
+                            Text(
+                              "Subject",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            Spacer(
+                                // flex: 1,
+                                ),
+                            Text(
+                              "Status",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            Spacer(
+                              flex: 1,
+                            ),
+                            Text(
+                              "Classes",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            Spacer(
+                                // flex: 3,
+                                ),
+                            Text(
+                              "Action",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            Spacer(
+                                // flex: 1,
+                                ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        child: Divider(
+                          height: 1,
+                          thickness: 2,
+                        ),
+                      ),
+                      newenrolledlist == null
+                          ? Container(
+                              width: size.width - 320,
+                              height: size.height - 175,
+                              child: const Center(
+                                  child: CircularProgressIndicator(
+                                strokeWidth: 6,
+                                color: Color.fromRGBO(1, 118, 132, 1),
+                              )))
+                          : enrolledlist.isNotEmpty
+                              ? Consumer<List<Schedule>>(
+                                  builder: (context, scheduleListdata, _) {
+                                  dynamic data = scheduleListdata;
+                                  return Container(
+                                    width: size.width - 320,
+                                    height: size.height - 175,
+                                    child: ListView.builder(
+                                      itemCount: enrolledlist.length,
+                                      itemBuilder: (context, index) {
+                                        final enrolledClass =
+                                            enrolledlist[index];
+                                        List<SubjectClass> subjectinfo =
+                                            enrolledClass.subjectinfo;
+                                        List<TutorInformation> tutorinfo =
+                                            enrolledClass.tutorinfo;
+                                        List<StudentInfoClass> studentinfo =
+                                            enrolledClass.studentinfo;
+                                        bool dataLoaded = false;
+                                        List<Schedule>
+                                            filteredScheduleList =
+                                            scheduleListdata
+                                                .where((element) =>
+                                                    element.scheduleID ==
+                                                    enrolledClass.classid)
+                                                .toList();
+                                        String tempimage = '';
+                                        // if (!dataLoaded) {
+                                        //   getData(tutorinfo.first.imageID)
+                                        //       .then((downloadURL) {
+                                        //     if (downloadURL != null) {
+                                        //       setState(() {
+                                        //         tempimage = downloadURL;
+                                        //         dataLoaded =
+                                        //             true; // Mark the data as loaded
+                                        //       });
+                                        //     } else {
+                                        //       print(
+                                        //           'Failed to retrieve download URL.');
+                                        //     }
+                                        //   });
+                                        // }
 
-                                      return Column(
-                                        children: [
-                                          Container(
-                                            color: (index % 2 == 0)
-                                                ? Colors.white
-                                                : Colors.grey[200],
-                                            child: InkWell(
-                                              highlightColor: kCalendarColorFB,
-                                              splashColor: kColorPrimary,
-                                              focusColor:
-                                                  Colors.green.withOpacity(0.0),
-                                              hoverColor: kColorLight,
-                                              onTap: () {
-                                                setState(() {
-                                                  selectedclass = enrolledClass;
-                                                });
-                                                final provider = context.read<
-                                                    ViewClassDisplayProvider>();
-                                                provider.setViewClassinfo(true);
-                                              },
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                  top: 5.0,
-                                                  left: 10,
-                                                  right: 10,
-                                                  bottom: 5.0,
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    Checkbox(
-                                                      checkColor: Colors.black,
-                                                      activeColor: Colors.red,
-                                                      value: select,
-                                                      onChanged: (value) {
-                                                        setState(() {
-                                                          select = value!;
-                                                        });
-                                                      },
-                                                    ),
-                                                    SizedBox(
-                                                      width: 300,
-                                                      child: ListTile(
-                                                        leading: CircleAvatar(
-                                                          backgroundImage:
-                                                              NetworkImage(
-                                                            tempimage
-                                                                .toString(),
+                                        return Column(
+                                          children: [
+                                            Container(
+                                              color: (index % 2 == 0)
+                                                  ? Colors.white
+                                                  : Colors.grey[200],
+                                              child: InkWell(
+                                                highlightColor:
+                                                    kCalendarColorFB,
+                                                splashColor: kColorPrimary,
+                                                focusColor: Colors.green
+                                                    .withOpacity(0.0),
+                                                hoverColor: kColorLight,
+                                                onTap: () {
+                                                  setState(() {
+                                                    selectedclass =
+                                                        enrolledClass;
+                                                  });
+                                                  final provider = context.read<
+                                                      ViewClassDisplayProvider>();
+                                                  provider.setViewClassinfo(
+                                                      true);
+                                                },
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                    top: 5.0,
+                                                    left: 10,
+                                                    right: 10,
+                                                    bottom: 5.0,
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      // Checkbox(
+                                                      //   checkColor: Colors.black,
+                                                      //   activeColor: Colors.red,
+                                                      //   value: select,
+                                                      //   onChanged: (value) {
+                                                      //     setState(() {
+                                                      //       select = value!;
+                                                      //     });
+                                                      //   },
+                                                      // ),
+                                                      SizedBox(
+                                                        width: 300,
+                                                        child: ListTile(
+                                                          leading:
+                                                              CircleAvatar(
+                                                            backgroundImage:
+                                                                NetworkImage(
+                                                              studentinfo
+                                                                  .first
+                                                                  .profilelink
+                                                                  .toString(),
+                                                            ),
+                                                            radius: 25,
                                                           ),
-                                                          radius: 25,
-                                                        ),
-                                                        title: Text(
-                                                          '${(studentinfo.first.studentFirstname)}${(studentinfo.first.studentMiddlename == 'N/A' ? '' : ' ${(studentinfo.first.studentMiddlename)}')} ${(studentinfo.first.studentLastname)}',
-                                                          // 'Name',
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight.w700,
+                                                          title: Text(
+                                                            '${(studentinfo.first.studentFirstname)}${(studentinfo.first.studentMiddlename == 'N/A' ? '' : ' ${(studentinfo.first.studentMiddlename)}')} ${(studentinfo.first.studentLastname)}',
+                                                            // 'Name',
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                            ),
                                                           ),
-                                                        ),
-                                                        subtitle: Text(
-                                                          tutorinfo
-                                                              .first.country,
-                                                          // 'Country',
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 15,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal,
+                                                          subtitle: Text(
+                                                            tutorinfo.first
+                                                                .country,
+                                                            // 'Country',
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 15,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 5,
-                                                    ),
-                                                    SizedBox(
-                                                      width: 200,
-                                                      child: Text(
-                                                        DateFormat(
-                                                                'MMMM dd, yyyy')
-                                                            .format(enrolledlist[
-                                                                    index]
-                                                                .dateEnrolled)
-                                                            .toString(),
-                                                        style: const TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w700),
+                                                      const SizedBox(
+                                                        width: 5,
                                                       ),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    SizedBox(
-                                                      width: 140,
-                                                      child: Text(
-                                                        subjectinfo
-                                                            .first.subjectName,
-                                                        // 'Subject Name',
-                                                        style: const TextStyle(
-                                                            fontSize: 18,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w700),
+                                                      SizedBox(
+                                                        width: 200,
+                                                        child: Text(
+                                                          DateFormat(
+                                                                  'MMMM dd, yyyy')
+                                                              .format(enrolledlist[
+                                                                      index]
+                                                                  .dateEnrolled)
+                                                              .toString(),
+                                                          style: const TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700),
+                                                        ),
                                                       ),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    SizedBox(
+                                                      const SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      SizedBox(
                                                         width: 140,
-                                                        child: Container(
-                                                            alignment: Alignment
-                                                                .center,
+                                                        child: Text(
+                                                          subjectinfo.first
+                                                              .subjectName,
+                                                          // 'Subject Name',
+                                                          style: const TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      SizedBox(
+                                                          width: 100,
+                                                          child: Container(
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(8),
+                                                                color: enrolledlist[index].status ==
+                                                                        'Pending'
+                                                                    ? kCalendarColorFB
+                                                                    : enrolledlist[index].status ==
+                                                                            'Ongoing'
+                                                                        ? kColorSecondary
+                                                                        : enrolledlist[index].status == 'Completed'
+                                                                            ? Colors.green.shade200
+                                                                            : kCalendarColorB,
+                                                              ),
+                                                              child: Align(
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .center,
+                                                                  child: Text(
+                                                                      enrolledlist[index]
+                                                                          .status)))),
+                                                      const SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      SizedBox(
+                                                          width: 230,
+                                                          child: Column(
+                                                            children: [
+                                                              ListTile(
+                                                                title: Text(
+                                                                    '${(enrolledClass.totalClasses)} Classes'),
+                                                                subtitle: enrolledlist[index].status ==
+                                                                        'Cancelled'
+                                                                    ? const Text(
+                                                                        'Cancelled Classes')
+                                                                    : Text(
+                                                                        'Completed: ${(enrolledClass.completedClasses)} Class \nUpcoming: ${(filteredScheduleList.length)} Classes'),
+                                                              )
+                                                            ],
+                                                          )),
+                                                      const SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      SizedBox(
+                                                        width: 140,
+                                                        child: Tooltip(
+                                                          message:
+                                                              'View Class',
+                                                          child: Container(
+                                                            width: 90,
+                                                            height: 30,
                                                             decoration:
                                                                 BoxDecoration(
                                                               borderRadius:
                                                                   BorderRadius
                                                                       .circular(
-                                                                          8),
-                                                              color: (index
-                                                                      .isNegative)
-                                                                  ? Colors.white
-                                                                  : kCalendarColorFB,
+                                                                          20),
+                                                              color: Colors
+                                                                  .green
+                                                                  .shade400,
                                                             ),
-                                                            child: Align(
+                                                            child:
+                                                                TextButton
+                                                                    .icon(
+                                                              style: TextButton
+                                                                  .styleFrom(
+                                                                padding:
+                                                                    const EdgeInsets.all(
+                                                                        10),
                                                                 alignment:
                                                                     Alignment
                                                                         .center,
-                                                                child: Text(
-                                                                    enrolledlist[
-                                                                            index]
-                                                                        .status)))),
-                                                    const SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    SizedBox(
-                                                        width: 180,
-                                                        child: Column(
-                                                          children: [
-                                                            ListTile(
-                                                              title: Text(
-                                                                  '${(enrolledClass.totalClasses)} Classes'),
-                                                              subtitle: Text(
-                                                                  'Completed: ${(enrolledClass.completedClasses)} Class/Upcoming: ${(enrolledClass.pendingClasses)} Classes'),
-                                                            )
-                                                          ],
-                                                        )),
-                                                    const SizedBox(
-                                                      width: 10,
-                                                    ),
-                                                    SizedBox(
-                                                      width: 140,
-                                                      child: Container(
-                                                        width: 90,
-                                                        height: 40,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(20),
-                                                          color: buttonColor,
-                                                        ),
-                                                        child: TextButton.icon(
-                                                          style: TextButton
-                                                              .styleFrom(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(10),
-                                                            alignment: Alignment
-                                                                .center,
-                                                            foregroundColor:
-                                                                const Color
-                                                                        .fromRGBO(
-                                                                    1,
-                                                                    118,
-                                                                    132,
-                                                                    1),
-                                                            disabledBackgroundColor:
-                                                                Colors.white,
-                                                            backgroundColor:
-                                                                Colors.white,
-                                                            shape:
-                                                                RoundedRectangleBorder(
-                                                              side:
-                                                                  const BorderSide(
-                                                                color:
-                                                                    kColorPrimary, // your color here
-                                                                width: 1,
-                                                              ),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
+                                                                foregroundColor:
+                                                                    const Color.fromRGBO(
+                                                                        1,
+                                                                        118,
+                                                                        132,
+                                                                        1),
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .green
+                                                                        .shade200,
+                                                                shape:
+                                                                    RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
                                                                           24.0),
+                                                                ),
+                                                                // ignore: prefer_const_constructors
+                                                                textStyle:
+                                                                    const TextStyle(
+                                                                  color: Colors
+                                                                      .deepPurple,
+                                                                  fontSize:
+                                                                      12,
+                                                                  fontStyle:
+                                                                      FontStyle
+                                                                          .normal,
+                                                                  decoration:
+                                                                      TextDecoration
+                                                                          .none,
+                                                                ),
+                                                              ),
+                                                              onPressed:
+                                                                  () {
+                                                                setState(
+                                                                    () {
+                                                                  selectedclass =
+                                                                      enrolledClass;
+                                                                });
+                                                                final provider =
+                                                                    context.read<
+                                                                        ViewClassDisplayProvider>();
+                                                                provider
+                                                                    .setViewClassinfo(
+                                                                        true);
+                                                              },
+                                                              icon:
+                                                                  const Icon(
+                                                                Icons
+                                                                    .open_in_new,
+                                                                size: 15,
+                                                              ),
+                                                              label:
+                                                                  const Text(
+                                                                'View',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        13),
+                                                              ),
                                                             ),
-                                                            // ignore: prefer_const_constructors
-                                                            textStyle:
-                                                                const TextStyle(
-                                                              color: Colors
-                                                                  .deepPurple,
-                                                              fontSize: 12,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .normal,
-                                                              decoration:
-                                                                  TextDecoration
-                                                                      .none,
-                                                            ),
-                                                          ),
-                                                          onPressed: () {},
-                                                          icon: const Icon(
-                                                            Icons
-                                                                .open_in_browser,
-                                                            size: 15,
-                                                            color: Colors.black,
-                                                          ),
-                                                          label: const Text(
-                                                            'View Class',
-                                                            style: TextStyle(
-                                                                fontSize: 15),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          const Divider(
-                                            height: 1,
-                                            thickness: 1,
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                )
+                                            const Divider(
+                                              height: 1,
+                                              thickness: 1,
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  );
+                                })
                               : Container(
                                   width: size.width - 320,
                                   height: size.height - 175,
-                                  child: const Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                ),
-                        ],
-                      )
-                    : ViewClassInfo(
-                        enrolledClass: selectedclass,
-                      ),
-              ),
-            ),
-          ],
-        ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(
+                                        Icons.list,
+                                        size: 50,
+                                        color: kColorPrimary,
+                                      ),
+                                      Text(
+                                        'No students found!',
+                                        style: TextStyle(
+                                            color: kCalendarColorB,
+                                            fontSize: 18),
+                                      ),
+                                    ],
+                                  ))
+                    ],
+                  )
+                : ViewClassInfo(
+                    enrolledClass: selectedclass,
+                  ),
+          ),
+        ],
       ),
     );
   }

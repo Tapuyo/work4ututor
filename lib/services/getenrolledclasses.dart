@@ -170,6 +170,8 @@ class EnrolledClass {
           schedule: schedule,
           timefrom: data['timefrom'] ?? '',
           timeto: data['timeto'] ?? '',
+          classstatus: data['classstatus'] ?? '',
+          meetinglink: data['meetinglink'] ?? '',
         );
         finalschedule.add(tempschedinfo);
       }
@@ -406,6 +408,8 @@ class EnrolledClassFuture {
           schedule: schedule,
           timefrom: data['timefrom'] ?? '',
           timeto: data['timeto'] ?? '',
+          classstatus: data['classstatus'] ?? '',
+          meetinglink: data['meetinglink'] ?? '',
         );
         finalschedule.add(tempschedinfo);
       }

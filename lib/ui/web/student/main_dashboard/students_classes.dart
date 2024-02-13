@@ -20,8 +20,6 @@ import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
 import 'coupon.dart';
 import 'task_in_progress.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/standalone.dart' as tz;
 import 'dart:html' as html;
 
 class StudentMainDashboard extends StatefulWidget {
@@ -64,7 +62,7 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
   void initState() {
     prepareData();
     super.initState();
-    // updateDateTime();
+    updateDateTime();
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       // updateDateTime();
       printtime();
@@ -150,14 +148,14 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
         });
   }
 
-  // void updateDateTime() {
-  //   var now = DateTime.now();
-  //   var formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
-  //   String formattedDate = formatter.format(now);
-  //   setState(() {
-  //     currentDateTime = formattedDate;
-  //   });
-  // }
+  void updateDateTime() {
+    var now = DateTime.now();
+    var formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
+    String formattedDate = formatter.format(now);
+    setState(() {
+      currentDateTime = formattedDate;
+    });
+  }
 
   // String convertToLocalTime(DateTime dateTime) {
   //   try {
@@ -198,16 +196,16 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
     //  tz.initializeTimeZones();
 
     String localTimezone = await FlutterNativeTimezone.getLocalTimezone();
-    tz.Location mylocaltimezone = tz.getLocation(localTimezone);
-    // print(mylocaltimezone);
+    // tz.Location mylocaltimezone = tz.getLocation(localTimezone);
+    // // print(mylocaltimezone);
 
-    tz.TZDateTime convertedLocalDateTime =
-        tz.TZDateTime.from(originalDateTime, mylocaltimezone);
+    // tz.TZDateTime convertedLocalDateTime =
+    //     tz.TZDateTime.from(originalDateTime, mylocaltimezone);
     var formatter = DateFormat('MMMM dd, yyyy / HH:mm:ss');
-    String formattedDate = formatter.format(convertedLocalDateTime);
-    setState(() {
-      currentDateTime = formattedDate;
-    });
+    // String formattedDate = formatter.format(convertedLocalDateTime);
+    // setState(() {
+    //   currentDateTime = formattedDate;
+    // });
     // print('Local Time: $currentDateTime');
   }
 
@@ -905,8 +903,11 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                                                                     25))),
                                                   ),
                                                   onPressed: () {
-                                                    html.window
-                                                        .open('/tutorList', "");
+                                                    Navigator.of(context)
+                                                        .restorablePushNamed(
+                                                            '/tutorList');
+                                                    // html.window
+                                                    //     .open('/tutorList', "");
                                                     // setState(() {
                                                     //   fetchSubcollection();
                                                     // });

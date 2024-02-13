@@ -1616,7 +1616,9 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                               SizedBox(
                                                 height: height,
                                                 width: 900,
-                                                child: const TermPage(),
+                                                child: const TermPage(
+                                                  pdfurl: '',
+                                                ),
                                               ),
                                               Positioned(
                                                 top: 10.0,

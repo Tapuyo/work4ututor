@@ -625,7 +625,7 @@ class _SigniNState extends State<SigniN> {
                                         showDialog(
                                             barrierDismissible: false,
                                             context: context,
-                                            builder: (_) => TermPage());
+                                            builder: (_) => TermPage(pdfurl: '',));
                                       });
                                     }),
                               TextSpan(text: ' and that you have read our '),
@@ -645,7 +645,7 @@ class _SigniNState extends State<SigniN> {
                                         showDialog(
                                             barrierDismissible: false,
                                             context: context,
-                                            builder: (_) => TermPage());
+                                            builder: (_) => TermPage(pdfurl: '',));
                                       });
                                     }),
                             ],
@@ -938,7 +938,7 @@ class _SigniNState extends State<SigniN> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage());
+                                        builder: (_) => TermPage(pdfurl: '',));
                                   });
                                 }),
                           TextSpan(text: ' and that you have read our '),
@@ -958,7 +958,7 @@ class _SigniNState extends State<SigniN> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage());
+                                        builder: (_) => TermPage(pdfurl: '',));
                                   });
                                 }),
                         ],
@@ -1289,7 +1289,7 @@ class _SigniNState extends State<SigniN> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage());
+                                        builder: (_) => TermPage(pdfurl: '',));
                                   });
                                 }),
                           TextSpan(text: ' and that you have read our '),
@@ -1309,7 +1309,7 @@ class _SigniNState extends State<SigniN> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage());
+                                        builder: (_) => TermPage(pdfurl: '',));
                                   });
                                 }),
                         ],

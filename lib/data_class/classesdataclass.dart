@@ -55,6 +55,8 @@ class Schedule {
   final DateTime schedule;
   final String timefrom;
   final String timeto;
+  final String classstatus;
+  final String meetinglink;
 
   Schedule({
     required this.scheduleID,
@@ -62,6 +64,8 @@ class Schedule {
     required this.schedule,
     required this.timefrom,
     required this.timeto,
+    required this.classstatus,
+    required this.meetinglink,
   });
 
   // Convert Schedule instance to a map
@@ -72,6 +76,8 @@ class Schedule {
       'schedule': schedule.toIso8601String(), // Convert DateTime to String
       'timefrom': timefrom,
       'timeto': timeto,
+      'classstatus': classstatus,
+      'meetinglink': meetinglink,
     };
   }
 }

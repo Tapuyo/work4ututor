@@ -16,9 +16,9 @@ import 'package:intl/intl.dart';
 import 'dart:js' as js;
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:provider/provider.dart';
-import 'package:timezone/timezone.dart';
 import 'package:work4ututor/services/getlanguages.dart';
 import '../../../components/nav_bar.dart';
+import '../../../data_class/subject_class.dart';
 import '../../../data_class/subject_teach_pricing.dart';
 import '../../../services/getstudentinfo.dart';
 import '../../../shared_components/alphacode3.dart';
@@ -77,7 +77,7 @@ class _InputInfoState extends State<InputInfo> {
   bool select = false;
 
 //tutor information
-  Map<String, Location> _timeZones = {};
+  // Map<String, Location> _timeZones = {};
   TextEditingController _selectedTimeZone = TextEditingController();
   FocusNode _selectedTimeZonefocusNode = FocusNode();
   bool _showselectedTimeZoneSuggestions = false;
@@ -98,14 +98,7 @@ class _InputInfoState extends State<InputInfo> {
   TextEditingController birthtCity = TextEditingController();
   List<String> tTimezone = [];
   int age = 0;
-  var uSubjects = [
-    'Others',
-    'Math',
-    'English',
-    'Geometry',
-    'Music',
-    'Language',
-  ];
+  List<String> uSubjects = [];
   String uID = "Upload your ID";
   String uPicture = "";
   List<String> servicesprovided = [];
@@ -668,6 +661,9 @@ class _InputInfoState extends State<InputInfo> {
   Widget build(BuildContext context) {
     List<String> countryNames = Provider.of<List<String>>(context);
     List<LanguageData> names = Provider.of<List<LanguageData>>(context);
+    final subjectlist = Provider.of<List<Subjects>>(context);
+    uSubjects = subjectlist.map((subject) => subject.subjectName).toList();
+    uSubjects.insert(0, 'Others');
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -684,7 +680,7 @@ class _InputInfoState extends State<InputInfo> {
                       height: 130,
                       child: GestureDetector(
                         onTap: () {
-                          saveNamesToFirestore(languages);
+                          // saveNamesToFirestore(languages);
                         },
                         child: const Text(
                           "Subscribe with your information",
@@ -1730,9 +1726,26 @@ class _InputInfoState extends State<InputInfo> {
                                                       controller:
                                                           subjectnameController,
                                                       onChanged: (value) {
-                                                        subjectdata
-                                                                .subjectname =
-                                                            value;
+                                                        if (uSubjects.contains(
+                                                            subjectnameController
+                                                                .text)) {
+                                                          CoolAlert.show(
+                                                            context: context,
+                                                            type: CoolAlertType
+                                                                .warning,
+                                                            title: 'Oops...',
+                                                            width: 200,
+                                                            text:
+                                                                'Subject name already in the subject list. Select the subject or enter a new name!',
+                                                          );
+                                                          subjectnameController
+                                                              .clear();
+                                                        } else {
+                                                          subjectdata
+                                                                  .subjectname =
+                                                              value;
+                                                        }
+
                                                         print(tSubjects[index]
                                                             .subjectname);
                                                       },
@@ -3541,7 +3554,9 @@ class _InputInfoState extends State<InputInfo> {
                                                 SizedBox(
                                                   height: height,
                                                   width: 900,
-                                                  child: const TermPage(),
+                                                  child: const TermPage(
+                                                    pdfurl: '',
+                                                  ),
                                                 ),
                                                 Positioned(
                                                   top: 10.0,

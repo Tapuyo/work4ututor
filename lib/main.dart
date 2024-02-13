@@ -9,11 +9,16 @@ import 'package:provider/provider.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:work4ututor/data_class/studentsEnrolledclass.dart';
+import 'package:work4ututor/provider/displaystarred.dart';
 import 'package:work4ututor/provider/init_provider.dart';
 import 'package:work4ututor/provider/schedulenotifier.dart';
 import 'package:work4ututor/provider/search_provider.dart';
 import 'package:work4ututor/provider/update_tutor_provider.dart';
 import 'package:work4ututor/provider/user_id_provider.dart';
+import 'package:work4ututor/routes/routes.dart';
+import 'package:work4ututor/services/addgetstarmessages.dart';
+import 'package:work4ututor/services/addpreftutor.dart';
+import 'package:work4ututor/services/getcart.dart';
 import 'package:work4ututor/services/getcountries.dart';
 import 'package:work4ututor/services/getlanguages.dart';
 import 'package:work4ututor/services/getstudentinfo.dart';
@@ -25,7 +30,6 @@ import 'data_class/helpclass.dart';
 import 'data_class/studentinfoclass.dart';
 import 'data_class/subject_class.dart';
 import 'data_class/tutor_info_class.dart';
-import 'package:timezone/browser.dart' as tz;
 
 import 'provider/chatmessagedisplay.dart';
 import 'provider/classes_inquirey_provider.dart';
@@ -35,12 +39,13 @@ import 'provider/studet_info_provider.dart';
 import 'provider/tutor_reviews_provider.dart';
 import 'routes/route_generator.dart';
 import 'services/gethelpcategory.dart';
+import 'services/getmaterials.dart';
 import 'ui/web/admin/executive_dashboard.dart';
 import 'ui/web/web_main.dart';
 
-Future<void> setup() async {
-  await tz.initializeTimeZone('packages/timezone/data/latest_all.tzf');
-}
+// Future<void> setup() async {
+//   await tz.initializeTimeZone('packages/timezone/data/latest_all.tzf');
+// }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await setupFlutterNotifications();
@@ -61,7 +66,7 @@ Future<void> setupFlutterNotifications() async {
 }
 
 void main() async {
-  setup();
+  // setup();
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
     usePathUrlStrategy();
@@ -81,7 +86,7 @@ void main() async {
   await Hive.initFlutter();
   await Hive.openBox('userID');
 
-  Get.lazyPut(() => DashboardController());
+  // Get.lazyPut(() => DashboardController());
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -100,6 +105,8 @@ void main() async {
       ChangeNotifierProvider(create: (_) => TutorInformationProvider()),
       ChangeNotifierProvider(create: (_) => TutorInformationPricing()),
       ChangeNotifierProvider(create: (_) => ScheduleListNotifier()),
+      ChangeNotifierProvider(create: (_) => StarMessagesNotifier()),
+      ChangeNotifierProvider(create: (_) => StarDisplayProvider()),
       StreamProvider<List<TutorInformation>>.value(
         value: DatabaseService(uid: '').tutorlist,
         initialData: const [],
@@ -131,6 +138,9 @@ void main() async {
       ChangeNotifierProvider(create: (_) => ClassesInquiryProvider()),
       ChangeNotifierProvider(create: (_) => IndividualReviewProvider()),
       ChangeNotifierProvider(create: (_) => StudentInfoProvider()),
+      ChangeNotifierProvider(create: (_) => PreferredTutorsNotifier()),
+      ChangeNotifierProvider(create: (_) => MaterialNotifier()),
+      ChangeNotifierProvider(create: (_) => CartNotifier()),
     ],
     child: const MyApp(),
   ));
@@ -141,9 +151,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    return MaterialApp(
       title: 'Work4uTutor',
-      initialRoute: '/',
+      initialRoute: Routes.splash,
       onGenerateRoute: RouteGenerator.generateRoute,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -151,7 +161,13 @@ class MyApp extends StatelessWidget {
         canvasColor: Colors.white,
         primarySwatch: Colors.indigo,
       ),
-      home: const WebMainPage(),
     );
+  }
+}
+
+class MyBehavior extends ScrollBehavior {
+  Widget buildViewportChrome(
+      BuildContext context, Widget child, AxisDirection axisDirection) {
+    return child;
   }
 }

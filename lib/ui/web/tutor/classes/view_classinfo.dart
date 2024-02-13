@@ -1,15 +1,28 @@
 // ignore_for_file: unused_field, prefer_final_fields, unused_local_variable, sized_box_for_whitespace
 
+import 'dart:typed_data';
+
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:work4ututor/ui/web/terms/termpage.dart';
 
 import '../../../../data_class/classesdataclass.dart';
+import '../../../../data_class/tutor_info_class.dart';
+import '../../../../provider/classinfo_provider.dart';
+import '../../../../services/addmaterial.dart';
+import '../../../../services/deletematerial.dart';
+import '../../../../services/getmaterials.dart';
 import '../../../../utils/themes.dart';
 import '../../student/book_classes/cancelclasses.dart';
 import '../../student/book_classes/rescheduleclasses.dart';
+import '../../student/book_classes/setschedule.dart';
 import '../tutor_profile/view_file.dart';
+import 'package:universal_html/html.dart' as html;
 
 class ViewClassInfo extends StatefulWidget {
   final ClassesData enrolledClass;
@@ -20,6 +33,17 @@ class ViewClassInfo extends StatefulWidget {
 }
 
 class _ViewClassInfoState extends State<ViewClassInfo> {
+  @override
+  void initState() {
+    super.initState();
+    // Call getMaterials method here
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final materialNotifier =
+          Provider.of<MaterialNotifier>(context, listen: false);
+      materialNotifier.getMaterials(widget.enrolledClass.classid);
+    });
+  }
+
   final List<ClassesData> _tiles = [
     // ClassesData(title: 'Class 1', fields: ['Field 1', 'Field 2', 'Field 3']),
     // ClassesData(title: 'Class 2', fields: ['Field A', 'Field B', 'Field C']),
@@ -50,7 +74,6 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
     String result = await getData();
     setState(() {
       downloadURL1 = result;
-      print('This is the result: $result');
     });
   }
 
@@ -59,14 +82,126 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
       await downloadURLExample(profileurl);
       return downloadURL;
     } catch (e) {
-      debugPrint("Error - $e");
       return null;
     }
   }
 
   Future<void> downloadURLExample(String path) async {
     downloadURL = await FirebaseStorage.instance.ref(path).getDownloadURL();
-    debugPrint(downloadURL.toString());
+  }
+
+  void downloadFile(String fileUrl, String fileName, String mimeType) {
+    html.AnchorElement(href: fileUrl)
+      ..target = 'blank'
+      ..download = fileName
+      ..click();
+  }
+
+  Future<void> fetchFileData(String filepath) async {
+    // Reference to the file in Firebase Storage
+    Reference ref = FirebaseStorage.instance.ref(filepath);
+
+    // Get the download URL
+    String downloadURL = await ref.getDownloadURL();
+
+    // Create an anchor element (a) with the download URL
+    html.AnchorElement(href: downloadURL)
+      ..target = 'blank'
+      ..click();
+  }
+
+  Future<void> fetchFileData1(String fileUrl) async {
+    try {
+      final html.HttpRequest request = await html.HttpRequest.request(
+        fileUrl,
+      );
+
+      if (request.readyState == html.HttpRequest.DONE) {
+        if (request.status == 200) {
+          final ByteBuffer byteBuffer = request.response as ByteBuffer;
+          final Uint8List uint8List = Uint8List.view(byteBuffer);
+          final blob = html.Blob([uint8List]);
+          final url = html.Url.createObjectUrlFromBlob(blob);
+          downloadFile(
+              url, 'Emails_Student v1 (1).pdf', 'application/octet-stream');
+          html.Url.revokeObjectUrl(url);
+        } else {
+          print('Error1: ${request.statusText}');
+        }
+      } else {
+        print('Error2: Request not done');
+      }
+    } catch (e) {
+      print('Error3: $e');
+    }
+  }
+
+  ScrollController updatescrollController1 = ScrollController();
+
+  String getFileNameFromUrl(String downloadUrl) {
+    Uri uri = Uri.parse(downloadUrl);
+    List<String> pathSegments = uri.pathSegments;
+
+    // The last path segment contains the encoded filename
+    String lastSegment = pathSegments.last;
+
+    // Decode the filename
+    String decodedFileName = Uri.decodeFull(lastSegment);
+
+    // Extract only the filename without the path
+    String filenameOnly = decodedFileName.split('/').last;
+
+    return filenameOnly;
+  }
+
+  GlobalKey progressKey = GlobalKey();
+  Uint8List? selectedImage;
+  String filename = '';
+  int progressupload = 0;
+  void selectImage(String classID, classNo) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      // Remove the 'type' parameter to allow any type of file
+      // type: FileType.custom,
+      // allowedExtensions: ['jpg', 'jpeg', 'png'],
+    );
+    if (result != null) {
+      Uint8List selectedImage = result.files.first.bytes!;
+      String filename = result.files.first.name;
+
+      // Function to handle progress updates
+      void updateProgress(int progress) {
+        // Update UI with progress indicator
+        print("Upload progress: $progress%");
+        // Access LinearProgressIndicator and update its progress
+        // setState(() {
+        //   progressupload = progress;
+        // });
+      }
+
+      // Here you can call your upload function
+      bool? downloadURL = await uploadMaterialProfile(
+          classID, selectedImage, filename, classNo, updateProgress);
+      if (downloadURL == true) {
+        handleUpload('Upload successfully!', true);
+      } else {
+        handleUpload('Error Uploading!', false);
+      }
+    }
+  }
+
+  void handleUpload(String message, bool isSuccess) {
+    Color backgroundColor =
+        isSuccess ? Colors.lightGreen.shade500 : Colors.redAccent.shade400;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.fixed,
+        backgroundColor: backgroundColor,
+        duration: const Duration(seconds: 5),
+        dismissDirection: DismissDirection.endToStart,
+      ),
+    );
   }
 
   @override
@@ -87,7 +222,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
     Size size = MediaQuery.of(context).size;
     bool showcancelresched = false;
     profileurl = widget.enrolledClass.studentinfo.first.profilelink;
-    _updateResponse();
+    // _updateResponse();
     List<ClassesMaterials> materials = widget.enrolledClass.materials;
     materials.sort((a, b) => a.session.compareTo(b.session));
     return Padding(
@@ -123,6 +258,37 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        TextButton.icon(
+                          // <-- TextButton
+                          onPressed: () {
+                            setState(
+                              () {
+                                final provider =
+                                    context.read<ViewClassDisplayProvider>();
+                                provider.setViewClassinfo(false);
+                              },
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            size: 24.0,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            'Back',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     Flexible(
                       flex: 10,
                       child: ScrollConfiguration(
@@ -164,7 +330,12 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                               color: Colors.white,
                                               image: DecorationImage(
                                                   image: NetworkImage(
-                                                    downloadURL1.toString(),
+                                                    widget
+                                                        .enrolledClass
+                                                        .studentinfo
+                                                        .first
+                                                        .profilelink
+                                                        .toString(),
                                                   ),
                                                   fit: BoxFit.cover)),
                                           //         child: const Icon(
@@ -430,211 +601,356 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                           const SizedBox(
                                             height: 5,
                                           ),
-                                          Container(
-                                            width: 600,
-                                            // height: 30 * 3,
-                                            child: ListView.builder(
-                                                physics:
-                                                    const NeverScrollableScrollPhysics(),
-                                                shrinkWrap: true,
-                                                itemCount: widget.enrolledClass
-                                                    .schedule.length,
-                                                itemBuilder: (context, index) {
-                                                  final scheduledata = widget
-                                                      .enrolledClass
-                                                      .schedule[index];
-                                                  return Visibility(
-                                                    visible: true,
-                                                    child: Row(
-                                                      children: [
-                                                        Text(
-                                                          (() {
-                                                            if (scheduledata
-                                                                    .session ==
-                                                                '1') {
-                                                              return "${(scheduledata.session)}st session  ${DateFormat('MMMM, dd yyyy').format(scheduledata.schedule)} (Upcoming)";
-                                                            } else if (scheduledata
-                                                                    .session ==
-                                                                '2') {
-                                                              return "${(scheduledata.session)}nd session  ${DateFormat('MMMM, dd yyyy').format(scheduledata.schedule)} (Upcoming)";
-                                                            } else if (scheduledata
-                                                                    .session ==
-                                                                '3') {
-                                                              return "${(scheduledata.session)}rd session  ${DateFormat('MMMM, dd yyyy').format(scheduledata.schedule)} (Upcoming)";
-                                                            } else {
-                                                              return "${(scheduledata.session)}th session  ${DateFormat('MMMM, dd yyyy').format(scheduledata.schedule)} (Upcoming)";
-                                                            }
-                                                          })(),
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 18,
-                                                            fontStyle: FontStyle
-                                                                .normal,
-                                                          ),
-                                                          textAlign:
-                                                              TextAlign.justify,
-                                                        ),
-                                                        const Spacer(),
-                                                        TextButton(
-                                                          child: const Text(
-                                                            "Cancel",
-                                                            style: TextStyle(
-                                                              color: Colors.red,
-                                                              fontSize: 18,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .normal,
-                                                            ),
-                                                          ),
-                                                          onPressed: () {
-                                                            String dateresult =
-                                                                dueCancelDate(
-                                                                    scheduledata
-                                                                        .schedule);
-                                                            print(dateresult);
+                                          Consumer<List<Schedule>>(builder:
+                                              (context, scheduleListdata, _) {
+                                            dynamic data = scheduleListdata;
+                                            ClassesData? newclassdata =
+                                                widget.enrolledClass;
+                                            return Container(
+                                              width: 600,
+                                              // height: 30 * 3,
+                                              child: ListView.builder(
+                                                  physics:
+                                                      const NeverScrollableScrollPhysics(),
+                                                  shrinkWrap: true,
+                                                  itemCount: int.tryParse(
+                                                      newclassdata
+                                                          .totalClasses),
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    Schedule? temp;
+                                                    List<Schedule>
+                                                        filteredScheduleList =
+                                                        data
+                                                            .where((element) =>
+                                                                element
+                                                                    .scheduleID ==
+                                                                widget
+                                                                    .enrolledClass
+                                                                    .classid)
+                                                            .toList();
+                                                    filteredScheduleList.sort(
+                                                        (a, b) => a.schedule
+                                                            .compareTo(
+                                                                b.schedule));
+                                                    final scheduledata =
+                                                        filteredScheduleList
+                                                                    .length >
+                                                                index
+                                                            ? filteredScheduleList[
+                                                                index]
+                                                            : null;
+                                                    return Visibility(
+                                                      visible: true,
+                                                      child: Row(
+                                                        children: [
+                                                          filteredScheduleList
+                                                                  .isEmpty
+                                                              ? Text(
+                                                                  (() {
+                                                                    if (filteredScheduleList
+                                                                            .isEmpty &&
+                                                                        index ==
+                                                                            0) {
+                                                                      return "${(index + 1)}st session (Unschedule)";
+                                                                    } else if (filteredScheduleList
+                                                                            .isEmpty &&
+                                                                        index ==
+                                                                            1) {
+                                                                      return "${(index + 1)}nd session (Unschedule)";
+                                                                    } else if (filteredScheduleList
+                                                                            .isEmpty &&
+                                                                        index ==
+                                                                            2) {
+                                                                      return "${(index + 1)}rd session (Unschedule)";
+                                                                    } else {
+                                                                      return "${(index + 1)}th session (Unschedule)";
+                                                                    }
+                                                                  })(),
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontStyle:
+                                                                        FontStyle
+                                                                            .normal,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .justify,
+                                                                )
+                                                              : Text(
+                                                                  (() {
+                                                                    if (filteredScheduleList
+                                                                            .length >
+                                                                        index) {
+                                                                      if (index ==
+                                                                          0) {
+                                                                        return "${(index + 1)}st session  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                      } else if (index ==
+                                                                          1) {
+                                                                        return "${(index + 1)}nd session  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                      } else if (index ==
+                                                                          2) {
+                                                                        return "${(index + 1)}rd session  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                      } else {
+                                                                        return "${(index + 1)}th session  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                      }
+                                                                    } else {
+                                                                      if (index ==
+                                                                          0) {
+                                                                        return "${(index + 1)}st session (Unschedule)";
+                                                                      } else if (index ==
+                                                                          1) {
+                                                                        return "${(index + 1)}nd session (Unschedule)";
+                                                                      } else if (index ==
+                                                                          2) {
+                                                                        return "${(index + 1)}rd session (Unschedule)";
+                                                                      } else {
+                                                                        return "${(index + 1)}th session (Unschedule)";
+                                                                      }
+                                                                    }
+                                                                  })(),
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontStyle:
+                                                                        FontStyle
+                                                                            .normal,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .justify,
+                                                                ),
+                                                          const Spacer(),
+                                                          newclassdata.status ==
+                                                                  'Cancelled'
+                                                              ? const Center(
+                                                                  child: Text(
+                                                                    'Cancelled Class',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color:
+                                                                          kCalendarColorB,
+                                                                      fontSize:
+                                                                          18,
+                                                                      fontStyle:
+                                                                          FontStyle
+                                                                              .normal,
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                              : filteredScheduleList
+                                                                          .length >
+                                                                      index
+                                                                  ? TextButton(
+                                                                      child:
+                                                                          const Text(
+                                                                        "Reschedule",
+                                                                        style:
+                                                                            TextStyle(
+                                                                          color:
+                                                                              Colors.blue,
+                                                                          fontSize:
+                                                                              18,
+                                                                          fontStyle:
+                                                                              FontStyle.normal,
+                                                                        ),
+                                                                      ),
+                                                                      onPressed:
+                                                                          () {
+                                                                        String
+                                                                            dateresult =
+                                                                            dueCancelDate(scheduledata!.schedule);
 
-                                                            // if (dateresult != 'Is Overdue') {
-                                                            cancellclass(
-                                                                context,
-                                                                dateresult);
-                                                            // } else {
-                                                            //   html.window.alert(
-                                                            //       'You will be charge to cancel');
-                                                            // }
-                                                          },
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 5,
-                                                        ),
-                                                        TextButton(
-                                                          child: const Text(
-                                                            "Reschedule",
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.blue,
-                                                              fontSize: 18,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .normal,
-                                                            ),
-                                                          ),
-                                                          onPressed: () {
-                                                            Schedule data = Schedule(scheduleID: '123', session: '123', schedule: DateTime.now(), timefrom: '123', timeto: '123');
-                                                            String dateresult =
-                                                                dueCancelDate(
-                                                                    scheduledata
-                                                                        .schedule);
-                                                            print(dateresult);
-                                                            rescheduleclass(
-                                                                context, data);
-                                                          },
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                }),
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Container(
-                                            height: 40,
-                                            padding: const EdgeInsets.fromLTRB(
-                                                10, 0, 10, 0),
-                                            decoration: const BoxDecoration(
-                                                color: kColorPrimary),
-                                            child: const Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Text(
-                                                'Class Grade',
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          const Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: SizedBox(
-                                              height: 50,
-                                              child: TextField(
-                                                textAlignVertical:
-                                                    TextAlignVertical.top,
-                                                maxLines: null,
-                                                expands: true,
-                                                decoration: InputDecoration(
-                                                  border: OutlineInputBorder(),
-                                                  hintText: 'eg. 100',
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Container(
-                                            height: 40,
-                                            padding: const EdgeInsets.fromLTRB(
-                                                10, 0, 10, 0),
-                                            decoration: const BoxDecoration(
-                                                color: kColorPrimary),
-                                            child: const Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Text(
-                                                'Write down your comment',
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          const SizedBox(
-                                            height: 200,
-                                            child: TextField(
-                                              textAlignVertical:
-                                                  TextAlignVertical.top,
-                                              maxLines: null,
-                                              expands: true,
-                                              decoration: InputDecoration(
-                                                border: OutlineInputBorder(),
-                                                hintText:
-                                                    'Enter your comment....',
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          Align(
-                                            alignment: Alignment.centerRight,
-                                            child: SizedBox(
-                                              width: 130,
-                                              height: 40,
-                                              child: ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      kColorPrimary,
-                                                  shape:
-                                                      const RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.all(
-                                                                  Radius
-                                                                      .circular(
-                                                                          20))),
-                                                ),
-                                                onPressed: () {},
-                                                child: const Text('SAVE'),
-                                              ),
-                                            ),
-                                          ),
+                                                                        rescheduleclass(
+                                                                            context,
+                                                                            filteredScheduleList[index]);
+                                                                      },
+                                                                    )
+                                                                  :
+                                                                  // TextButton(
+                                                                  //     child:
+                                                                  //         Text(
+                                                                  //       "Set Schedule",
+                                                                  //       style:
+                                                                  //           TextStyle(
+                                                                  //         color: Colors
+                                                                  //             .green
+                                                                  //             .shade400,
+                                                                  //         fontSize:
+                                                                  //             18,
+                                                                  //         fontStyle:
+                                                                  //             FontStyle.normal,
+                                                                  //       ),
+                                                                  //     ),
+                                                                  //     onPressed:
+                                                                  //         () {
+                                                                  //       TutorInformation data = widget
+                                                                  //           .enrolledClass.tutorinfo
+                                                                  //           .first;
+                                                                  //       showDialog(
+                                                                  //           barrierDismissible:
+                                                                  //               false,
+                                                                  //           context:
+                                                                  //               context,
+                                                                  //           builder:
+                                                                  //               (BuildContext context) {
+                                                                  //             var height = MediaQuery.of(context).size.height;
+                                                                  //             var width = MediaQuery.of(context).size.width;
+                                                                  //             return AlertDialog(
+                                                                  //               shape: RoundedRectangleBorder(
+                                                                  //                 borderRadius: BorderRadius.circular(15.0),
+                                                                  //               ),
+                                                                  //               contentPadding: EdgeInsets.zero,
+                                                                  //               content: ClipRRect(
+                                                                  //                 borderRadius: BorderRadius.circular(15.0),
+                                                                  //                 child: Container(
+                                                                  //                   color: Colors.white,
+                                                                  //                   child: Stack(
+                                                                  //                     children: <Widget>[
+                                                                  //                       SizedBox(
+                                                                  //                         height: height - 100,
+                                                                  //                         width: width - 300,
+                                                                  //                         child: SetScheduleData(
+                                                                  //                           data: widget.enrolledClass,
+                                                                  //                           session: index.toString(),
+                                                                  //                           uID: widget.uID,
+                                                                  //                         ),
+                                                                  //                       ),
+                                                                  //                       Positioned(
+                                                                  //                         top: 10.0,
+                                                                  //                         right: 10.0,
+                                                                  //                         child: GestureDetector(
+                                                                  //                           onTap: () {
+                                                                  //                             Navigator.of(context).pop(false); // Close the dialog
+                                                                  //                           },
+                                                                  //                           child: const Icon(
+                                                                  //                             Icons.close,
+                                                                  //                             color: Colors.red,
+                                                                  //                             size: 20,
+                                                                  //                           ),
+                                                                  //                         ),
+                                                                  //                       ),
+                                                                  //                     ],
+                                                                  //                   ),
+                                                                  //                 ),
+                                                                  //               ),
+                                                                  //             );
+                                                                  //           }).then((selectedDate) {});
+                                                                  //     },
+                                                                  //   )
+                                                                  Container(),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  }),
+                                            );
+                                          }),
+                                          // const SizedBox(
+                                          //   height: 10,
+                                          // ),
+                                          // Container(
+                                          //   height: 40,
+                                          //   padding: const EdgeInsets.fromLTRB(
+                                          //       10, 0, 10, 0),
+                                          //   decoration: const BoxDecoration(
+                                          //       color: kColorPrimary),
+                                          //   child: const Align(
+                                          //     alignment: Alignment.centerLeft,
+                                          //     child: Text(
+                                          //       'Class Grade',
+                                          //       style: TextStyle(
+                                          //           fontSize: 18,
+                                          //           fontWeight: FontWeight.bold,
+                                          //           color: Colors.white),
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          // const SizedBox(
+                                          //   height: 10,
+                                          // ),
+                                          // const Align(
+                                          //   alignment: Alignment.centerLeft,
+                                          //   child: SizedBox(
+                                          //     height: 50,
+                                          //     child: TextField(
+                                          //       textAlignVertical:
+                                          //           TextAlignVertical.top,
+                                          //       maxLines: null,
+                                          //       expands: true,
+                                          //       decoration: InputDecoration(
+                                          //         border: OutlineInputBorder(),
+                                          //         hintText: 'eg. 100',
+                                          //       ),
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          // const SizedBox(
+                                          //   height: 10,
+                                          // ),
+                                          // Container(
+                                          //   height: 40,
+                                          //   padding: const EdgeInsets.fromLTRB(
+                                          //       10, 0, 10, 0),
+                                          //   decoration: const BoxDecoration(
+                                          //       color: kColorPrimary),
+                                          //   child: const Align(
+                                          //     alignment: Alignment.centerLeft,
+                                          //     child: Text(
+                                          //       'Write down your comment',
+                                          //       style: TextStyle(
+                                          //           fontSize: 18,
+                                          //           fontWeight: FontWeight.bold,
+                                          //           color: Colors.white),
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          // const SizedBox(
+                                          //   height: 10,
+                                          // ),
+                                          // const SizedBox(
+                                          //   height: 200,
+                                          //   child: TextField(
+                                          //     textAlignVertical:
+                                          //         TextAlignVertical.top,
+                                          //     maxLines: null,
+                                          //     expands: true,
+                                          //     decoration: InputDecoration(
+                                          //       border: OutlineInputBorder(),
+                                          //       hintText:
+                                          //           'Enter your comment....',
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          // const SizedBox(
+                                          //   height: 10,
+                                          // ),
+                                          // Align(
+                                          //   alignment: Alignment.centerRight,
+                                          //   child: SizedBox(
+                                          //     width: 130,
+                                          //     height: 40,
+                                          //     child: ElevatedButton(
+                                          //       style: ElevatedButton.styleFrom(
+                                          //         backgroundColor:
+                                          //             kColorPrimary,
+                                          //         shape:
+                                          //             const RoundedRectangleBorder(
+                                          //                 borderRadius:
+                                          //                     BorderRadius.all(
+                                          //                         Radius
+                                          //                             .circular(
+                                          //                                 20))),
+                                          //       ),
+                                          //       onPressed: () {},
+                                          //       child: const Text('SAVE'),
+                                          //     ),
+                                          //   ),
+                                          // ),
                                           const SizedBox(
                                             height: 10,
                                           ),
@@ -646,10 +962,14 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                             width: 600,
                                             child: ListView.builder(
                                               shrinkWrap: true,
-                                              itemCount: materials.length,
+                                              itemCount: int.tryParse(widget
+                                                  .enrolledClass.totalClasses),
                                               itemBuilder: (context, index) {
                                                 final selectedmaterials =
-                                                    materials[index];
+                                                    materials.length > index
+                                                        ? materials[index]
+                                                        : null;
+
                                                 return Padding(
                                                   padding:
                                                       const EdgeInsets.only(
@@ -658,248 +978,823 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                     child: ExpansionTile(
                                                       title: Text(
                                                         (() {
-                                                          if (selectedmaterials
-                                                                  .session ==
-                                                              '1') {
-                                                            return "${(selectedmaterials.session)}st session materials.";
-                                                          } else if (selectedmaterials
-                                                                  .session ==
-                                                              '2') {
-                                                            return "${(selectedmaterials.session)}nd session materials";
-                                                          } else if (selectedmaterials
-                                                                  .session ==
-                                                              '3') {
-                                                            return "${(selectedmaterials.session)}rd session materials";
+                                                          if (materials
+                                                              .isNotEmpty) {
+                                                            if (materials
+                                                                    .length >
+                                                                index) {
+                                                              if (selectedmaterials!
+                                                                      .session ==
+                                                                  '1') {
+                                                                return "${(selectedmaterials.session)}st session materials.";
+                                                              } else if (selectedmaterials
+                                                                      .session ==
+                                                                  '2') {
+                                                                return "${(selectedmaterials.session)}nd session materials";
+                                                              } else if (selectedmaterials
+                                                                      .session ==
+                                                                  '3') {
+                                                                return "${(selectedmaterials.session)}rd session materials";
+                                                              } else if (int.tryParse(
+                                                                      selectedmaterials
+                                                                          .session)! >
+                                                                  3) {
+                                                                return "${(selectedmaterials.session)}th session materials";
+                                                              } else {
+                                                                return "${(index + 1)}th session materials";
+                                                              }
+                                                            } else {
+                                                              if (index == 0) {
+                                                                return "${(index + 1)}st session materials";
+                                                              } else if (index ==
+                                                                  1) {
+                                                                return "${(index + 1)}nd session materials";
+                                                              } else if (index ==
+                                                                  2) {
+                                                                return "${(index + 1)}rd session materials";
+                                                              } else {
+                                                                return "${(index + 1)}th session materials";
+                                                              }
+                                                            }
                                                           } else {
-                                                            return "${(selectedmaterials.session)}th session materials";
+                                                            if (index == 0) {
+                                                              return "${(index + 1)}st session materials.";
+                                                            } else if (index ==
+                                                                1) {
+                                                              return "${(index + 1)}nd session materials";
+                                                            } else if (index ==
+                                                                2) {
+                                                              return "${(index + 1)}rd session materials";
+                                                            } else {
+                                                              return "${(index + 1)}th session materials";
+                                                            }
                                                           }
                                                         })(),
                                                       ),
                                                       children: <Widget>[
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(16.0),
-                                                          child: Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              const Text(
-                                                                  'Files:'),
-                                                              const SizedBox(
-                                                                width: 10,
-                                                              ),
-                                                              SizedBox(
-                                                                width: 160,
-                                                                height: 40,
-                                                                child:
-                                                                    ElevatedButton
-                                                                        .icon(
-                                                                  style: ElevatedButton
-                                                                      .styleFrom(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    shape: const RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.all(Radius.circular(15))),
-                                                                  ),
-                                                                  onPressed:
-                                                                      () {},
-                                                                  icon:
-                                                                      const Icon(
-                                                                    Icons
-                                                                        .attach_file_outlined,
+                                                        widget.enrolledClass
+                                                                    .status ==
+                                                                'Cancelled'
+                                                            ? const Text(
+                                                                'Cancelled Class',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        20,
                                                                     color:
-                                                                        kColorPrimary,
+                                                                        kCalendarColorB),
+                                                              )
+                                                            : Column(
+                                                                children: [
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                            .all(
+                                                                        16.0),
+                                                                    child: Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .start,
+                                                                      children: [
+                                                                        const Text(
+                                                                            'Files:'),
+                                                                        const SizedBox(
+                                                                          width:
+                                                                              10,
+                                                                        ),
+                                                                        SizedBox(
+                                                                          width:
+                                                                              160,
+                                                                          height:
+                                                                              40,
+                                                                          child:
+                                                                              ElevatedButton.icon(
+                                                                            style:
+                                                                                ElevatedButton.styleFrom(
+                                                                              backgroundColor: Colors.white,
+                                                                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+                                                                            ),
+                                                                            onPressed:
+                                                                                () {
+                                                                              selectImage(widget.enrolledClass.classid, index.toString());
+                                                                            },
+                                                                            icon:
+                                                                                const Icon(
+                                                                              Icons.attach_file_outlined,
+                                                                              color: kColorPrimary,
+                                                                            ),
+                                                                            label:
+                                                                                const Text(
+                                                                              'Add Files',
+                                                                              style: TextStyle(color: kColorPrimary),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                        const SizedBox(
+                                                                          width:
+                                                                              5,
+                                                                        ),
+                                                                        // Visibility(
+                                                                        //   visible: progressupload == 0 || progressupload == 100
+                                                                        //       ? false
+                                                                        //       : true,
+                                                                        //   child:
+                                                                        //       SizedBox(
+                                                                        //     width: 50,
+                                                                        //     height: 5,
+                                                                        //     child: LinearProgressIndicator(
+                                                                        //       key: progressKey,
+                                                                        //       value: double.parse(progressupload.toString()),
+                                                                        //     ),
+                                                                        //   ),
+                                                                        // )
+                                                                      ],
+                                                                    ),
                                                                   ),
-                                                                  label:
-                                                                      const Text(
-                                                                    'Add Files',
-                                                                    style: TextStyle(
-                                                                        color:
-                                                                            kColorPrimary),
+                                                                  // Padding(
+                                                                  //   padding:
+                                                                  //       const EdgeInsets
+                                                                  //               .fromLTRB(
+                                                                  //           50,
+                                                                  //           10,
+                                                                  //           50,
+                                                                  //           10),
+                                                                  //   child: TextFormField(
+                                                                  //     decoration:
+                                                                  //         const InputDecoration(
+                                                                  //       labelText:
+                                                                  //           'Add notes here',
+                                                                  //       border:
+                                                                  //           OutlineInputBorder(
+                                                                  //         borderSide:
+                                                                  //             BorderSide(),
+                                                                  //         gapPadding: 0,
+                                                                  //       ),
+                                                                  //     ),
+                                                                  //   ),
+                                                                  // ),
+                                                                  // Align(
+                                                                  //   alignment: Alignment
+                                                                  //       .topRight,
+                                                                  //   child: Padding(
+                                                                  //     padding:
+                                                                  //         const EdgeInsets
+                                                                  //                 .fromLTRB(
+                                                                  //             50,
+                                                                  //             0,
+                                                                  //             50,
+                                                                  //             10),
+                                                                  //     child: SizedBox(
+                                                                  //       width: 100,
+                                                                  //       height: 40,
+                                                                  //       child:
+                                                                  //           ElevatedButton(
+                                                                  //         style: ElevatedButton
+                                                                  //             .styleFrom(
+                                                                  //           minimumSize:
+                                                                  //               Size.zero,
+                                                                  //           padding:
+                                                                  //               EdgeInsets
+                                                                  //                   .zero,
+                                                                  //           backgroundColor:
+                                                                  //               kColorPrimary,
+                                                                  //           shape: const RoundedRectangleBorder(
+                                                                  //               borderRadius:
+                                                                  //                   BorderRadius.all(
+                                                                  //                       Radius.circular(15))),
+                                                                  //         ),
+                                                                  //         onPressed:
+                                                                  //             () {},
+                                                                  //         // icon: const Icon(Icons.attach_file_outlined, color: kColorPrimary,),
+                                                                  //         child:
+                                                                  //             const Text(
+                                                                  //           'Save',
+                                                                  //           style: TextStyle(
+                                                                  //               color: Colors
+                                                                  //                   .white),
+                                                                  //         ),
+                                                                  //       ),
+                                                                  //     ),
+                                                                  //   ),
+                                                                  // ),
+                                                                  Consumer<
+                                                                          MaterialNotifier>(
+                                                                      builder: (context,
+                                                                          materialNotifier,
+                                                                          _) {
+                                                                    if (materialNotifier
+                                                                        .materials
+                                                                        .isEmpty) {
+                                                                      return Container(
+                                                                          width:
+                                                                              600,
+                                                                          child:
+                                                                              Center(
+                                                                            child:
+                                                                                Text(
+                                                                              '(No materials added!)',
+                                                                              style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
+                                                                            ),
+                                                                          )); // Show loading indicator
+                                                                    }
+                                                                    List<
+                                                                        Map<String,
+                                                                            dynamic>> materialsdata = materialNotifier
+                                                                        .materials
+                                                                        .where((element) =>
+                                                                            element['classno'] ==
+                                                                            index.toString())
+                                                                        .toList();
+                                                                    if (materialsdata
+                                                                        .isEmpty) {
+                                                                      return Container(
+                                                                          width:
+                                                                              600,
+                                                                          child:
+                                                                              Center(
+                                                                            child:
+                                                                                Text(
+                                                                              '(No materials added!)',
+                                                                              style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
+                                                                            ),
+                                                                          )); // Show loading indicator
+                                                                    }
+                                                                    return Container(
+                                                                        width:
+                                                                            600,
+                                                                        height:
+                                                                            120,
+                                                                        padding: const EdgeInsets.fromLTRB(
+                                                                            10,
+                                                                            0,
+                                                                            10,
+                                                                            0),
+                                                                        child:
+                                                                            Row(
+                                                                          children: [
+                                                                            IconButton(
+                                                                              iconSize: 12,
+                                                                              padding: EdgeInsets.zero,
+                                                                              splashRadius: 1,
+                                                                              icon: const Icon(
+                                                                                Icons.arrow_back_ios, // Left arrow icon
+                                                                                color: Colors.blue,
+                                                                              ),
+                                                                              onPressed: () {
+                                                                                // Scroll to the left
+                                                                                updatescrollController1.animateTo(
+                                                                                  updatescrollController1.offset - 100.0, // Adjust the value as needed
+                                                                                  duration: const Duration(milliseconds: 500), // Adjust the duration as needed
+                                                                                  curve: Curves.ease,
+                                                                                );
+                                                                              },
+                                                                            ),
+                                                                            Expanded(
+                                                                              child: ListView.builder(
+                                                                                shrinkWrap: true,
+                                                                                controller: updatescrollController1, // Assign the ScrollController to the ListView
+                                                                                scrollDirection: Axis.horizontal,
+                                                                                itemCount: materialsdata.length,
+                                                                                itemBuilder: (context, index) {
+                                                                                  if (materialsdata[index]['extension'] == 'Image') {
+                                                                                    return FutureBuilder(
+                                                                                        future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                                        builder: (context, snapshot) {
+                                                                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                            return Container(
+                                                                                                height: 60,
+                                                                                                width: 60,
+                                                                                                child: const Center(
+                                                                                                    child: CircularProgressIndicator(
+                                                                                                  strokeWidth: 2,
+                                                                                                  color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                                ))); // Display a loading indicator while waiting for the file to download
+                                                                                          } else if (snapshot.hasError) {
+                                                                                            return Text('Error: ${snapshot.error}');
+                                                                                          }
+
+                                                                                          return Padding(
+                                                                                            padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                            child: Row(
+                                                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                              children: [
+                                                                                                Column(
+                                                                                                  children: [
+                                                                                                    InkWell(
+                                                                                                      onTap: () {
+                                                                                                        showDialog(
+                                                                                                            barrierDismissible: false,
+                                                                                                            context: context,
+                                                                                                            builder: (BuildContext context) {
+                                                                                                              var height = MediaQuery.of(context).size.height;
+                                                                                                              return AlertDialog(
+                                                                                                                shape: RoundedRectangleBorder(
+                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                                ),
+                                                                                                                contentPadding: EdgeInsets.zero,
+                                                                                                                content: ClipRRect(
+                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                                  child: Container(
+                                                                                                                    color: Colors.white, // Set the background color of the circular content
+
+                                                                                                                    child: Stack(
+                                                                                                                      children: <Widget>[
+                                                                                                                        SizedBox(
+                                                                                                                          height: height,
+                                                                                                                          width: 900,
+                                                                                                                          child: ViewFile(imageURL: snapshot.data.toString()),
+                                                                                                                        ),
+                                                                                                                        Positioned(
+                                                                                                                          top: 10.0,
+                                                                                                                          right: 10.0,
+                                                                                                                          child: GestureDetector(
+                                                                                                                            onTap: () {
+                                                                                                                              Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                            },
+                                                                                                                            child: const Icon(
+                                                                                                                              Icons.close,
+                                                                                                                              color: Colors.red,
+                                                                                                                              size: 20,
+                                                                                                                            ),
+                                                                                                                          ),
+                                                                                                                        ),
+                                                                                                                      ],
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              );
+                                                                                                            });
+                                                                                                      },
+                                                                                                      child: Stack(
+                                                                                                        children: <Widget>[
+                                                                                                          Container(
+                                                                                                            height: 60,
+                                                                                                            width: 60,
+                                                                                                            decoration: BoxDecoration(
+                                                                                                              borderRadius: BorderRadius.circular(10),
+                                                                                                              color: Colors.grey.shade200,
+                                                                                                            ),
+                                                                                                            child: ClipRRect(
+                                                                                                              borderRadius: BorderRadius.circular(10.0),
+                                                                                                              child: Image.network(
+                                                                                                                snapshot.data.toString(),
+                                                                                                                fit: BoxFit.cover,
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                          Positioned(
+                                                                                                            top: 0,
+                                                                                                            right: 0,
+                                                                                                            child: GestureDetector(
+                                                                                                              onTap: () async {
+                                                                                                                bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
+                                                                                                                if (result) {
+                                                                                                                  handleUpload('Deleted Successfully!', true);
+                                                                                                                } else {
+                                                                                                                  handleUpload('Deleted Successfully!', false);
+                                                                                                                }
+                                                                                                              },
+                                                                                                              child: Container(
+                                                                                                                padding: const EdgeInsets.all(2),
+                                                                                                                decoration: const BoxDecoration(
+                                                                                                                  shape: BoxShape.circle,
+                                                                                                                  color: Colors.red,
+                                                                                                                ),
+                                                                                                                child: const Icon(
+                                                                                                                  Icons.remove,
+                                                                                                                  color: Colors.white,
+                                                                                                                  size: 15,
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        ],
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                    Center(
+                                                                                                      child: Tooltip(
+                                                                                                        message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                        child: SizedBox(
+                                                                                                          height: 60,
+                                                                                                          width: 60,
+                                                                                                          child: TextButton(
+                                                                                                            onPressed: () {
+                                                                                                              fetchFileData(snapshot.data.toString());
+                                                                                                            },
+                                                                                                            child: Text(
+                                                                                                              getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                              style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    )
+                                                                                                  ],
+                                                                                                ),
+                                                                                              ],
+                                                                                            ),
+                                                                                          );
+                                                                                        });
+                                                                                  } else if (materialsdata[index]['extension'] == 'pdf') {
+                                                                                    return FutureBuilder(
+                                                                                        future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                                        builder: (context, snapshot) {
+                                                                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                            return Container(
+                                                                                                height: 60,
+                                                                                                width: 60,
+                                                                                                child: const Center(
+                                                                                                    child: CircularProgressIndicator(
+                                                                                                  strokeWidth: 2,
+                                                                                                  color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                                ))); // Display a loading indicator while waiting for the file to download
+                                                                                          } else if (snapshot.hasError) {
+                                                                                            return Text('Error: ${snapshot.error}');
+                                                                                          }
+                                                                                          return Padding(
+                                                                                            padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                            child: Row(
+                                                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                              children: [
+                                                                                                Column(
+                                                                                                  children: [
+                                                                                                    InkWell(
+                                                                                                      onTap: () {
+                                                                                                        showDialog(
+                                                                                                            barrierDismissible: false,
+                                                                                                            context: context,
+                                                                                                            builder: (BuildContext context) {
+                                                                                                              var height = MediaQuery.of(context).size.height;
+                                                                                                              return AlertDialog(
+                                                                                                                shape: RoundedRectangleBorder(
+                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                                ),
+                                                                                                                contentPadding: EdgeInsets.zero,
+                                                                                                                content: ClipRRect(
+                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                                  child: Container(
+                                                                                                                    color: Colors.white, // Set the background color of the circular content
+
+                                                                                                                    child: Stack(
+                                                                                                                      children: <Widget>[
+                                                                                                                        SizedBox(
+                                                                                                                          height: height,
+                                                                                                                          width: 900,
+                                                                                                                          child: TermPage(pdfurl: snapshot.data.toString()),
+                                                                                                                        ),
+                                                                                                                        Positioned(
+                                                                                                                          top: 10.0,
+                                                                                                                          right: 10.0,
+                                                                                                                          child: GestureDetector(
+                                                                                                                            onTap: () {
+                                                                                                                              Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                            },
+                                                                                                                            child: const Icon(
+                                                                                                                              Icons.close,
+                                                                                                                              color: Colors.red,
+                                                                                                                              size: 20,
+                                                                                                                            ),
+                                                                                                                          ),
+                                                                                                                        ),
+                                                                                                                      ],
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              );
+                                                                                                            });
+                                                                                                      },
+                                                                                                      child: Stack(children: <Widget>[
+                                                                                                        Container(
+                                                                                                          height: 60,
+                                                                                                          width: 60,
+                                                                                                          decoration: BoxDecoration(
+                                                                                                            borderRadius: BorderRadius.circular(10),
+                                                                                                            color: Colors.grey.shade200, // You can adjust the fit as needed.
+                                                                                                          ),
+                                                                                                          child: ClipRRect(
+                                                                                                            borderRadius: BorderRadius.circular(10.0),
+                                                                                                            child: const Icon(
+                                                                                                              Icons.picture_as_pdf,
+                                                                                                              size: 48,
+                                                                                                              color: Colors.red,
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                        Positioned(
+                                                                                                          top: 0,
+                                                                                                          right: 0,
+                                                                                                          child: GestureDetector(
+                                                                                                            onTap: () async {
+                                                                                                              bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
+                                                                                                              if (result) {
+                                                                                                                handleUpload('Deleted Successfully!', true);
+                                                                                                              } else {
+                                                                                                                handleUpload('Deleted Successfully!', false);
+                                                                                                              }
+                                                                                                            },
+                                                                                                            child: Container(
+                                                                                                              padding: const EdgeInsets.all(2),
+                                                                                                              decoration: const BoxDecoration(
+                                                                                                                shape: BoxShape.circle,
+                                                                                                                color: Colors.red,
+                                                                                                              ),
+                                                                                                              child: const Icon(
+                                                                                                                Icons.remove,
+                                                                                                                color: Colors.white,
+                                                                                                                size: 15,
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ]),
+                                                                                                    ),
+                                                                                                    Center(
+                                                                                                      child: Tooltip(
+                                                                                                        message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                        child: SizedBox(
+                                                                                                          height: 60,
+                                                                                                          width: 60,
+                                                                                                          child: TextButton(
+                                                                                                            onPressed: () {
+                                                                                                              fetchFileData(snapshot.data.toString());
+                                                                                                            },
+                                                                                                            child: Text(
+                                                                                                              getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                              style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    )
+                                                                                                  ],
+                                                                                                ),
+                                                                                              ],
+                                                                                            ),
+                                                                                          );
+                                                                                        });
+                                                                                  } else {
+                                                                                    return FutureBuilder(
+                                                                                        future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                                        builder: (context, snapshot) {
+                                                                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                            return Container(
+                                                                                                height: 60,
+                                                                                                width: 60,
+                                                                                                child: const Center(
+                                                                                                    child: CircularProgressIndicator(
+                                                                                                  strokeWidth: 2,
+                                                                                                  color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                                ))); // Display a loading indicator while waiting for the file to download
+                                                                                          } else if (snapshot.hasError) {
+                                                                                            return Text('Error: ${snapshot.error}');
+                                                                                          }
+                                                                                          return Padding(
+                                                                                            padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                            child: Row(
+                                                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                              children: [
+                                                                                                Column(
+                                                                                                  children: [
+                                                                                                    InkWell(
+                                                                                                      onTap: () {
+                                                                                                        showDialog(
+                                                                                                            barrierDismissible: false,
+                                                                                                            context: context,
+                                                                                                            builder: (BuildContext context) {
+                                                                                                              var height = MediaQuery.of(context).size.height;
+                                                                                                              return AlertDialog(
+                                                                                                                shape: RoundedRectangleBorder(
+                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                                ),
+                                                                                                                contentPadding: EdgeInsets.zero,
+                                                                                                                content: ClipRRect(
+                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                                  child: Container(
+                                                                                                                    color: Colors.white, // Set the background color of the circular content
+
+                                                                                                                    child: Stack(
+                                                                                                                      children: <Widget>[
+                                                                                                                        SizedBox(
+                                                                                                                          height: height,
+                                                                                                                          width: 900,
+                                                                                                                          child: ViewFile(imageURL: snapshot.data.toString()),
+                                                                                                                        ),
+                                                                                                                        Positioned(
+                                                                                                                          top: 10.0,
+                                                                                                                          right: 10.0,
+                                                                                                                          child: GestureDetector(
+                                                                                                                            onTap: () {
+                                                                                                                              Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                            },
+                                                                                                                            child: const Icon(
+                                                                                                                              Icons.close,
+                                                                                                                              color: Colors.red,
+                                                                                                                              size: 20,
+                                                                                                                            ),
+                                                                                                                          ),
+                                                                                                                        ),
+                                                                                                                      ],
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              );
+                                                                                                            });
+                                                                                                      },
+                                                                                                      child: Stack(
+                                                                                                        children: <Widget>[
+                                                                                                          Container(
+                                                                                                            height: 60,
+                                                                                                            width: 60,
+                                                                                                            decoration: BoxDecoration(
+                                                                                                              borderRadius: BorderRadius.circular(10),
+                                                                                                              color: Colors.grey.shade200, // You can adjust the fit as needed.
+                                                                                                            ),
+                                                                                                            child: ClipRRect(
+                                                                                                              borderRadius: BorderRadius.circular(10.0),
+                                                                                                              child: const Icon(
+                                                                                                                FontAwesomeIcons.fileWord,
+                                                                                                                size: 48,
+                                                                                                                color: Colors.blue,
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                          Positioned(
+                                                                                                            top: 0,
+                                                                                                            right: 0,
+                                                                                                            child: GestureDetector(
+                                                                                                              onTap: () async {
+                                                                                                                bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
+                                                                                                                if (result) {
+                                                                                                                  handleUpload('Deleted Successfully!', true);
+                                                                                                                } else {
+                                                                                                                  handleUpload('Deleted Successfully!', false);
+                                                                                                                }
+                                                                                                              },
+                                                                                                              child: Container(
+                                                                                                                padding: const EdgeInsets.all(2),
+                                                                                                                decoration: const BoxDecoration(
+                                                                                                                  shape: BoxShape.circle,
+                                                                                                                  color: Colors.red,
+                                                                                                                ),
+                                                                                                                child: const Icon(
+                                                                                                                  Icons.remove,
+                                                                                                                  color: Colors.white,
+                                                                                                                  size: 15,
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        ],
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                    Center(
+                                                                                                      child: Tooltip(
+                                                                                                        message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                        child: SizedBox(
+                                                                                                          height: 60,
+                                                                                                          width: 60,
+                                                                                                          child: TextButton(
+                                                                                                            onPressed: () {
+                                                                                                              setState(() {
+                                                                                                                fetchFileData(snapshot.data.toString());
+                                                                                                              });
+                                                                                                            },
+                                                                                                            child: Text(
+                                                                                                              getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                              style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    )
+                                                                                                  ],
+                                                                                                ),
+                                                                                              ],
+                                                                                            ),
+                                                                                          );
+                                                                                        });
+                                                                                  }
+                                                                                },
+                                                                              ),
+                                                                            ),
+                                                                            IconButton(
+                                                                              iconSize: 12,
+                                                                              padding: EdgeInsets.zero,
+                                                                              splashRadius: 1,
+                                                                              icon: const Icon(
+                                                                                Icons.arrow_forward_ios, // Right arrow icon
+                                                                                color: Colors.blue,
+                                                                              ),
+                                                                              onPressed: () {
+                                                                                // Scroll to the right
+                                                                                updatescrollController1.animateTo(
+                                                                                  updatescrollController1.offset + 100.0, // Adjust the value as needed
+                                                                                  duration: const Duration(milliseconds: 500), // Adjust the duration as needed
+                                                                                  curve: Curves.ease,
+                                                                                );
+                                                                              },
+                                                                            ),
+                                                                          ],
+                                                                        ));
+                                                                  }),
+
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                            .all(
+                                                                        16.0),
+                                                                    child: Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .start,
+                                                                      children: [
+                                                                        const Text(
+                                                                            'Class Video Meeting:'),
+                                                                        const SizedBox(
+                                                                          width:
+                                                                              10,
+                                                                        ),
+                                                                        Text(
+                                                                          '(Click the link to join the class!)',
+                                                                          style: TextStyle(
+                                                                              fontSize: 12,
+                                                                              color: Colors.blue.shade200,
+                                                                              fontStyle: FontStyle.italic),
+                                                                        ),
+                                                                      ],
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  50,
-                                                                  10,
-                                                                  50,
-                                                                  10),
-                                                          child: TextFormField(
-                                                            decoration:
-                                                                const InputDecoration(
-                                                              labelText:
-                                                                  'Add notes here',
-                                                              border:
-                                                                  OutlineInputBorder(
-                                                                borderSide:
-                                                                    BorderSide(),
-                                                                gapPadding: 0,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Align(
-                                                          alignment: Alignment
-                                                              .topRight,
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .fromLTRB(
-                                                                    50,
-                                                                    0,
-                                                                    50,
-                                                                    10),
-                                                            child: SizedBox(
-                                                              width: 100,
-                                                              height: 40,
-                                                              child:
-                                                                  ElevatedButton(
-                                                                style: ElevatedButton
-                                                                    .styleFrom(
-                                                                  minimumSize:
-                                                                      Size.zero,
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .zero,
-                                                                  backgroundColor:
-                                                                      kColorPrimary,
-                                                                  shape: const RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.all(
-                                                                              Radius.circular(15))),
-                                                                ),
-                                                                onPressed:
-                                                                    () {},
-                                                                // icon: const Icon(Icons.attach_file_outlined, color: kColorPrimary,),
-                                                                child:
-                                                                    const Text(
-                                                                  'Save',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .white),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(16.0),
-                                                          child: Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              const Text(
-                                                                  'Class Video Meeting:'),
-                                                              const SizedBox(
-                                                                width: 10,
-                                                              ),
-                                                              SizedBox(
-                                                                width: 180,
-                                                                height: 40,
-                                                                child:
-                                                                    ElevatedButton
-                                                                        .icon(
-                                                                  style: ElevatedButton
-                                                                      .styleFrom(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    shape: const RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.all(Radius.circular(15))),
+                                                                  Padding(
+                                                                    padding:
+                                                                        const EdgeInsets.fromLTRB(
+                                                                            50,
+                                                                            10,
+                                                                            50,
+                                                                            10),
+                                                                    child: Consumer<
+                                                                        List<
+                                                                            Schedule>>(builder:
+                                                                        (context,
+                                                                            scheduleListdata,
+                                                                            _) {
+                                                                      dynamic
+                                                                          data =
+                                                                          scheduleListdata;
+                                                                      ClassesData?
+                                                                          newclassdata =
+                                                                          widget
+                                                                              .enrolledClass;
+                                                                      List<Schedule> filtereddata = data
+                                                                          .where((element) =>
+                                                                              element.scheduleID ==
+                                                                              widget.enrolledClass.classid)
+                                                                          .toList();
+                                                                      filtereddata.sort((a, b) => a
+                                                                          .schedule
+                                                                          .compareTo(
+                                                                              b.schedule));
+                                                                      if (filtereddata
+                                                                              .length >
+                                                                          index) {
+                                                                        return MouseRegion(
+                                                                          cursor:
+                                                                              SystemMouseCursors.click,
+                                                                          child:
+                                                                              GestureDetector(
+                                                                            onTap:
+                                                                                () {
+                                                                              // const VideoCall videoCall = VideoCall(chatID: '123', uID: '456');
+
+                                                                              // Replace 'your_flutter_app_port' with the actual port your Flutter web app is running on
+                                                                              String url = 'http://localhost:58586/tutorsList';
+
+                                                                              // Open the URL in a new tab
+                                                                              html.window.open('/videoCall', "");
+                                                                              // html.window.open('/tutorslist', "");
+                                                                              //  const VideoCall(chatID: '', uID: '',);
+                                                                            },
+                                                                            child:
+                                                                                Text(
+                                                                              'work4ututor/${filtereddata[index].meetinglink}',
+                                                                              style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic, decoration: TextDecoration.underline),
+                                                                            ),
+                                                                          ),
+                                                                        );
+                                                                      }
+                                                                      return Text(
+                                                                        '(Link will be attached when student set class schedule!)',
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                15,
+                                                                            color:
+                                                                                Colors.blue.shade200,
+                                                                            fontStyle: FontStyle.italic),
+                                                                      );
+                                                                    }),
+                                                                    //add link here
                                                                   ),
-                                                                  onPressed:
-                                                                      () {},
-                                                                  icon:
-                                                                      const Icon(
-                                                                    Icons
-                                                                        .video_camera_back_outlined,
-                                                                    color:
-                                                                        kColorPrimary,
+                                                                  const SizedBox(
+                                                                    height: 10,
                                                                   ),
-                                                                  label:
-                                                                      const Text(
-                                                                    'Set up Class Link',
-                                                                    style: TextStyle(
-                                                                        color:
-                                                                            kColorPrimary),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  50,
-                                                                  10,
-                                                                  50,
-                                                                  10),
-                                                          child: TextFormField(
-                                                            decoration:
-                                                                const InputDecoration(
-                                                              labelText:
-                                                                  'Meeting link...',
-                                                              border:
-                                                                  OutlineInputBorder(
-                                                                borderSide:
-                                                                    BorderSide(),
-                                                                gapPadding: 0,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  50,
-                                                                  10,
-                                                                  50,
-                                                                  10),
-                                                          child: Align(
-                                                            alignment: Alignment
-                                                                .centerRight,
-                                                            child: SizedBox(
-                                                              width: 150,
-                                                              height: 40,
-                                                              child:
-                                                                  ElevatedButton(
-                                                                style: ElevatedButton
-                                                                    .styleFrom(
-                                                                  backgroundColor:
-                                                                      kColorPrimary,
-                                                                  shape: const RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.all(
-                                                                              Radius.circular(20))),
-                                                                ),
-                                                                onPressed:
-                                                                    () {},
-                                                                child: const Text(
-                                                                    'Join Class Link'),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
+                                                                ],
+                                                              )
                                                       ],
                                                     ),
                                                   ),

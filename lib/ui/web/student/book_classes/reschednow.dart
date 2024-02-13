@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../services/bookingfunctions/setscheduletime.dart';
+import '../../../../services/notificationfunctions/sendnotifications.dart';
 import '../../../../utils/themes.dart';
 import '../../admin/admin_sharedcomponents/header_text.dart';
 
@@ -201,6 +202,10 @@ class _ReSchedNowState extends State<ReSchedNow> {
                                   selectedDatesched!);
 
                               if (result.toString() == "Success") {
+                                List<String> idList = [
+                                  widget.currentschedule.scheduleID,
+                                ];
+                                addNewNotification('ReSchedule', '', idList);
                                 result = "Schedule succesfully updated!";
                                 CoolAlert.show(
                                         context: context,

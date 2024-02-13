@@ -7,6 +7,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 
+import '../provider/chatmessagedisplay.dart';
+import '../provider/classinfo_provider.dart';
 import '../provider/init_provider.dart';
 import '../ui/auth/auth.dart';
 import '../ui/web/login/login.dart';
@@ -89,6 +91,10 @@ class StudentsMenu extends HookWidget {
               onPressed: () {
                 final provider = context.read<InitProvider>();
                 provider.setMenuIndex(0);
+                final provider1 = context.read<ViewClassDisplayProvider>();
+                provider1.setViewClassinfo(false);
+                final provider2 = context.read<ChatDisplayProvider>();
+                provider2.setOpenMessage(false);
               },
               icon: const Icon(
                 Icons.home_outlined,
@@ -137,6 +143,10 @@ class StudentsMenu extends HookWidget {
               onPressed: () {
                 final provider = context.read<InitProvider>();
                 provider.setMenuIndex(1);
+                final provider1 = context.read<ViewClassDisplayProvider>();
+                provider1.setViewClassinfo(false);
+                final provider2 = context.read<ChatDisplayProvider>();
+                provider2.setOpenMessage(false);
               },
               icon: const Icon(
                 Icons.calendar_month,
@@ -185,6 +195,8 @@ class StudentsMenu extends HookWidget {
               onPressed: () {
                 final provider = context.read<InitProvider>();
                 provider.setMenuIndex(3);
+                final provider2 = context.read<ChatDisplayProvider>();
+                provider2.setOpenMessage(false);
               },
               icon: const Icon(
                 Icons.person_add,
@@ -233,6 +245,8 @@ class StudentsMenu extends HookWidget {
               onPressed: () {
                 final provider = context.read<InitProvider>();
                 provider.setMenuIndex(4);
+                final provider1 = context.read<ViewClassDisplayProvider>();
+                provider1.setViewClassinfo(false);
               },
               icon: const Icon(
                 EvaIcons.email,
@@ -246,7 +260,8 @@ class StudentsMenu extends HookWidget {
           ),
           const SizedBox(
             height: 20,
-          ),Container(
+          ),
+          Container(
             height: 50,
             width: 240,
             decoration: const BoxDecoration(
@@ -280,6 +295,10 @@ class StudentsMenu extends HookWidget {
               onPressed: () {
                 final provider = context.read<InitProvider>();
                 provider.setMenuIndex(9);
+                final provider1 = context.read<ViewClassDisplayProvider>();
+                provider1.setViewClassinfo(false);
+                final provider2 = context.read<ChatDisplayProvider>();
+                provider2.setOpenMessage(false);
               },
               icon: const Icon(
                 EvaIcons.shoppingCart,
@@ -328,6 +347,10 @@ class StudentsMenu extends HookWidget {
               onPressed: () {
                 final provider = context.read<InitProvider>();
                 provider.setMenuIndex(6);
+                final provider1 = context.read<ViewClassDisplayProvider>();
+                provider1.setViewClassinfo(false);
+                final provider2 = context.read<ChatDisplayProvider>();
+                provider2.setOpenMessage(false);
               },
               icon: const Icon(
                 Icons.settings,
@@ -376,6 +399,10 @@ class StudentsMenu extends HookWidget {
               onPressed: () {
                 final provider = context.read<InitProvider>();
                 provider.setMenuIndex(7);
+                final provider1 = context.read<ViewClassDisplayProvider>();
+                provider1.setViewClassinfo(false);
+                final provider2 = context.read<ChatDisplayProvider>();
+                provider2.setOpenMessage(false);
               },
               icon: const Icon(
                 Icons.help_outline_rounded,
@@ -421,7 +448,7 @@ class StudentsMenu extends HookWidget {
                 ),
               ),
               onPressed: () async {
-                 await _auth.signOutAnon();
+                await _auth.signOutAnon();
                 deleteAllData();
                 // ignore: use_build_context_synchronously
                 Navigator.pushReplacement(
@@ -467,7 +494,7 @@ class StudentsMenu extends HookWidget {
                           showDialog(
                               barrierDismissible: false,
                               context: context,
-                              builder: (_) => const TermPage());
+                              builder: (_) => const TermPage(pdfurl: '',));
                         }),
                   const TextSpan(text: ' / '),
                   TextSpan(
@@ -483,7 +510,7 @@ class StudentsMenu extends HookWidget {
                           showDialog(
                               barrierDismissible: false,
                               context: context,
-                              builder: (_) => const TermPage());
+                              builder: (_) => const TermPage(pdfurl: '',));
                         }),
                   const TextSpan(text: '\nCopyrights @ 2023 Work4uTutor'),
                 ],

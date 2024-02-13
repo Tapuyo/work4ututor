@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 import '../../services/services.dart';
 import '../web/tutor/calendar/setup_calendar.dart';
@@ -186,6 +187,7 @@ Future<String?> addOrUpdateTimeAvailability(
     return e.toString();
   }
 }
+
 Future<String?> addOrUpdateTimeAvailabilityWithDate(
     String uid, List<DateTimeAvailability> timeAvailability) async {
   try {
@@ -205,12 +207,17 @@ Future<String?> addOrUpdateTimeAvailabilityWithDate(
         await timeAvailableCollectionRef.add(availability.toMap());
       }
     } else {
-      // If the subcollection is not empty, check if there's data with a specific condition
-      bool dataNotFound = true; // Set this flag based on your condition
+      // Check if formatted selectedDate is already present in existingDocs
+      for (DateTimeAvailability availability in timeAvailability) {
+        // Format the selectedDate for comparison
+        DateTime formattedSelectedDate =
+            availability.selectedDate; // Convert Timestamp to DateTime
 
-      if (dataNotFound) {
-        // Add the timeAvailability to the list in this case
-        for (DateTimeAvailability availability in timeAvailability) {
+        bool selectedDateExists = existingDocs.docs.any(
+            (doc) => doc['selectedDate'].toDate() == formattedSelectedDate);
+
+        // If selectedDate doesn't exist, add it to the subcollection
+        if (!selectedDateExists) {
           await timeAvailableCollectionRef.add(availability.toMap());
         }
       }
@@ -222,6 +229,7 @@ Future<String?> addOrUpdateTimeAvailabilityWithDate(
     return e.toString();
   }
 }
+
 Future<String?> blockTimeWithDate(
     String uid, List<BlockDate> blockdates) async {
   try {
@@ -258,4 +266,3 @@ Future<String?> blockTimeWithDate(
     return e.toString();
   }
 }
-

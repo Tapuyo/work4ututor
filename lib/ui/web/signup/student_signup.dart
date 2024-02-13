@@ -641,7 +641,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage());
+                                        builder: (_) => TermPage(pdfurl: '',));
                                   });
                                 }),
                           TextSpan(text: ' and that you have read our '),
@@ -661,7 +661,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage());
+                                        builder: (_) => TermPage(pdfurl: '',));
                                   });
                                 }),
                         ],
@@ -958,7 +958,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                 showDialog(
                                     barrierDismissible: false,
                                     context: context,
-                                    builder: (_) => TermPage());
+                                    builder: (_) => TermPage(pdfurl: '',));
                               });
                             }),
                       TextSpan(text: ' and that you have read our '),
@@ -978,7 +978,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                 showDialog(
                                     barrierDismissible: false,
                                     context: context,
-                                    builder: (_) => TermPage());
+                                    builder: (_) => TermPage(pdfurl: '',));
                               });
                             }),
                     ],
@@ -1276,7 +1276,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                 showDialog(
                                     barrierDismissible: false,
                                     context: context,
-                                    builder: (_) => TermPage());
+                                    builder: (_) => TermPage(pdfurl: '',));
                               });
                             }),
                       TextSpan(text: ' and that you have read our '),
@@ -1296,7 +1296,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                 showDialog(
                                     barrierDismissible: false,
                                     context: context,
-                                    builder: (_) => TermPage());
+                                    builder: (_) => TermPage(pdfurl: '',));
                               });
                             }),
                     ],

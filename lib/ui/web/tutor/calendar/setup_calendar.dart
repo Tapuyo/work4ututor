@@ -384,7 +384,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
     );
     Duration duration1 = Duration(hours: from.hour, minutes: from.minute);
     Duration duration2 = Duration(hours: to.hour, minutes: to.minute);
-    Duration timeDifference = duration1 - duration2;
+    Duration timeDifference = duration2 - duration1;
     return timeDifference.inMinutes;
   }
 
@@ -1282,6 +1282,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                       .timeAvailableFrom,
                                                   datetimeselected
                                                       .timeAvailableTo);
+                                          print(time);
                                           if (time >= 50) {
                                             if (dateavailabledateselected
                                                 .any((timeAvailable) =>
@@ -1324,6 +1325,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                   .add(datetimeselected);
                                             }
                                           } else {
+                                            print(time);
                                             CoolAlert.show(
                                               context: context,
                                               width: 200,
@@ -1578,35 +1580,47 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                             Navigator.of(context).pop;
                                           },
                                           onConfirmBtnTap: () async {
-                                            final result =
-                                                await addOrUpdateTimeAvailability(
-                                                    widget.userinfo.userId,
-                                                    availabledateselected);
-                                            final result1 =
-                                                await addOrUpdateTimeAvailabilityWithDate(
-                                                    widget.userinfo.userId,
-                                                    dateavailabledateselected);
-                                            if (result1 == 'success') {
-                                              setState(() {
-                                                CoolAlert.show(
-                                                  context: context,
-                                                  width: 200,
-                                                  type: CoolAlertType.success,
-                                                  text:
-                                                      'Available Time/s Added!',
-                                                  autoCloseDuration:
-                                                      const Duration(
-                                                          seconds: 1),
-                                                );
-                                              });
-                                            } else {
-                                              // ignore: use_build_context_synchronously
+                                            if (availabledateselected
+                                                    .timeAvailableTo ==
+                                                '') {
                                               CoolAlert.show(
                                                 context: context,
                                                 width: 200,
                                                 type: CoolAlertType.error,
-                                                text: result.toString(),
+                                                text:
+                                                    'Please select time or click add for your selection!',
                                               );
+                                            } else {
+                                              final result =
+                                                  await addOrUpdateTimeAvailability(
+                                                      widget.userinfo.userId,
+                                                      availabledateselected);
+                                              final result1 =
+                                                  await addOrUpdateTimeAvailabilityWithDate(
+                                                      widget.userinfo.userId,
+                                                      dateavailabledateselected);
+                                              if (result1 == 'success') {
+                                                setState(() {
+                                                  CoolAlert.show(
+                                                    context: context,
+                                                    width: 200,
+                                                    type: CoolAlertType.success,
+                                                    text:
+                                                        'Available Time/s Added!',
+                                                    autoCloseDuration:
+                                                        const Duration(
+                                                            seconds: 1),
+                                                  );
+                                                });
+                                              } else {
+                                                // ignore: use_build_context_synchronously
+                                                CoolAlert.show(
+                                                  context: context,
+                                                  width: 200,
+                                                  type: CoolAlertType.error,
+                                                  text: result.toString(),
+                                                );
+                                              }
                                             }
                                           },
                                         );

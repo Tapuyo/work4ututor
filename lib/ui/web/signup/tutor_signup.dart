@@ -590,6 +590,9 @@ class _SignUpState extends State<SignUp> {
                                           text: result,
                                           confirmBtnText: 'Okay',
                                           onConfirmBtnTap: () {
+                                            tEmail.clear();
+                                            tPassword.clear();
+                                            tConPassword.clear();
                                             Navigator.pushReplacement(
                                               context,
                                               MaterialPageRoute(
@@ -649,7 +652,9 @@ class _SignUpState extends State<SignUp> {
                                       showDialog(
                                           barrierDismissible: false,
                                           context: context,
-                                          builder: (_) => TermPage());
+                                          builder: (_) => TermPage(
+                                                pdfurl: '',
+                                              ));
                                     });
                                   }),
                             TextSpan(text: ' and that you have read our '),
@@ -669,7 +674,9 @@ class _SignUpState extends State<SignUp> {
                                       showDialog(
                                           barrierDismissible: false,
                                           context: context,
-                                          builder: (_) => TermPage());
+                                          builder: (_) => TermPage(
+                                                pdfurl: '',
+                                              ));
                                     });
                                   }),
                           ],
@@ -898,6 +905,7 @@ class _SignUpState extends State<SignUp> {
                                         context: context,
                                         type: CoolAlertType.error,
                                         title: 'Oops...',
+                                        width: 200,
                                         text: result,
                                         backgroundColor: Colors.black,
                                       );
@@ -909,6 +917,7 @@ class _SignUpState extends State<SignUp> {
                                         context: context,
                                         type: CoolAlertType.success,
                                         text: result,
+                                        width: 200,
                                         confirmBtnText: 'Okay',
                                         onConfirmBtnTap: () {
                                           Navigator.pushReplacement(
@@ -966,7 +975,9 @@ class _SignUpState extends State<SignUp> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage());
+                                        builder: (_) => TermPage(
+                                              pdfurl: '',
+                                            ));
                                   });
                                 }),
                           TextSpan(text: ' and that you have read our '),
@@ -986,7 +997,9 @@ class _SignUpState extends State<SignUp> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage());
+                                        builder: (_) => TermPage(
+                                              pdfurl: '',
+                                            ));
                                   });
                                 }),
                         ],
@@ -1296,7 +1309,9 @@ class _SignUpState extends State<SignUp> {
                                   showDialog(
                                       barrierDismissible: false,
                                       context: context,
-                                      builder: (_) => TermPage());
+                                      builder: (_) => TermPage(
+                                            pdfurl: '',
+                                          ));
                                 });
                               }),
                         TextSpan(text: ' and that you have read our '),
@@ -1316,7 +1331,9 @@ class _SignUpState extends State<SignUp> {
                                   showDialog(
                                       barrierDismissible: false,
                                       context: context,
-                                      builder: (_) => TermPage());
+                                      builder: (_) => TermPage(
+                                            pdfurl: '',
+                                          ));
                                 });
                               }),
                       ],

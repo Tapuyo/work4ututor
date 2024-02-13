@@ -236,12 +236,16 @@ class ScheduleEnrolledClass {
       String timefrom = subdata['timefrom'] ?? '';
       String timeto = subdata['timeto'] ?? '';
       DateTime schedule = subdata['schedule'].toDate() ?? DateTime.now();
+      String classstatus = subdata['classstatus'] ?? '';
+      String meetinglink = subdata['meetinglink'] ?? '';
       return Schedule(
         scheduleID: scheduleID,
         session: session,
         schedule: schedule,
         timefrom: timefrom,
         timeto: timeto,
+        classstatus: classstatus,
+        meetinglink: meetinglink,
       );
     }).toList();
   }
@@ -406,6 +410,8 @@ class ScheduleEnrolledClassData {
           schedule: schedule,
           timefrom: data['timefrom'] ?? '',
           timeto: data['timeto'] ?? '',
+          classstatus:  data['classstatus'] ?? '',
+          meetinglink:  data['meetinglink'] ?? '',
         );
         finalschedule.add(tempschedinfo);
       }

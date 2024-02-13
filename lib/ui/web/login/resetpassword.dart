@@ -480,7 +480,7 @@ class _ResetViewState extends State<ResetView> {
                                         showDialog(
                                             barrierDismissible: false,
                                             context: context,
-                                            builder: (_) => TermPage());
+                                            builder: (_) => TermPage(pdfurl: '',));
                                       });
                                     }),
                               TextSpan(text: ' and that you have read our '),
@@ -500,7 +500,7 @@ class _ResetViewState extends State<ResetView> {
                                         showDialog(
                                             barrierDismissible: false,
                                             context: context,
-                                            builder: (_) => TermPage());
+                                            builder: (_) => TermPage(pdfurl: '',));
                                       });
                                     }),
                             ],
@@ -654,7 +654,7 @@ class _ResetViewState extends State<ResetView> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage());
+                                        builder: (_) => TermPage(pdfurl: '',));
                                   });
                                 }),
                           TextSpan(text: ' and that you have read our '),
@@ -674,7 +674,7 @@ class _ResetViewState extends State<ResetView> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage());
+                                        builder: (_) => TermPage(pdfurl: '',));
                                   });
                                 }),
                         ],
@@ -827,7 +827,7 @@ class _ResetViewState extends State<ResetView> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage());
+                                        builder: (_) => TermPage(pdfurl: '',));
                                   });
                                 }),
                           TextSpan(text: ' and that you have read our '),
@@ -847,7 +847,7 @@ class _ResetViewState extends State<ResetView> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage());
+                                        builder: (_) => TermPage(pdfurl: '',));
                                   });
                                 }),
                         ],

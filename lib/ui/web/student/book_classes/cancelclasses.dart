@@ -1,11 +1,15 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../services/bookingfunctions/setscheduletime.dart';
 import '../../../../services/cancelaccount.dart';
+import '../../../../services/notificationfunctions/sendnotifications.dart';
 import '../../../../utils/themes.dart';
 
 @override
-cancellclass(BuildContext context, String result) {
+cancellclass(BuildContext context, String documentId) {
   TextEditingController conreason = TextEditingController();
   TextEditingController conemail = TextEditingController();
   showDialog(
@@ -128,11 +132,58 @@ cancellclass(BuildContext context, String result) {
                                   ),
                                 ),
                                 onPressed: () async {
-                                  updateStatus(
-                                    result,
+                                 String result = await updateStatus(
+                                    documentId,
                                     'Cancelled',
                                   );
-                                  Navigator.pop(context);
+                                  
+                              if (result.toString() == "Success") {
+                                List<String> idList = [
+                                  documentId,
+                                ];
+                                addNewNotification('Cancelled Schedule', '', idList);
+                                result = "Succesfully cancelled";
+                                CoolAlert.show(
+                                        context: context,
+                                        width: 200,
+                                        type: CoolAlertType.success,
+                                        title: 'Success...',
+                                        text: result,
+                                        autoCloseDuration:
+                                            const Duration(seconds: 3))
+                                    .then(
+                                  (value) {
+                                    Navigator.of(context).pop(true);
+                                  },
+                                );
+                              } else if (result.toString().contains('completed')) {
+                                CoolAlert.show(
+                                  context: context,
+                                  type: CoolAlertType.warning,
+                                  width: 200,
+                                  title: 'Oops...',
+                                  text: result,
+                                  backgroundColor: Colors.black,
+                                );
+                              }else if (result.toString().contains('cancelled')) {
+                                CoolAlert.show(
+                                  context: context,
+                                  type: CoolAlertType.warning,
+                                  width: 200,
+                                  title: 'Oops...',
+                                  text: result,
+                                  backgroundColor: Colors.black,
+                                );
+                              } else {
+                                CoolAlert.show(
+                                  context: context,
+                                  type: CoolAlertType.error,
+                                  width: 200,
+                                  title: 'Oops...',
+                                  text: result,
+                                  backgroundColor: Colors.black,
+                                );
+                              }
                                 },
                                 child: const Text(
                                   style: TextStyle(

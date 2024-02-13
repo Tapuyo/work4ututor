@@ -26,7 +26,7 @@ rescheduleclass(BuildContext context, Schedule currentschedule) {
           width: 700,
           height: 400,
           child: Padding(
-            padding: const EdgeInsets.all(50.0),
+            padding: const EdgeInsets.fromLTRB(50.0,25.0,50.0,25.0,),
             child: Row(
               children: [
                 SizedBox(
@@ -66,7 +66,7 @@ rescheduleclass(BuildContext context, Schedule currentschedule) {
                         textAlign: TextAlign.left,
                       ),
                       const Text(
-                        "Rescheduling 4 hours before the set schedule is free of charge. The charge for rescheduling is 5% of the prize per class session.",
+                        "Rescheduling 4 hours before the set schedule is free of charge. The charge for rescheduling is 5% of the prize per class session.(Note: Check your calendar for schedule vacancy.)",
                         style: TextStyle(
                           // textStyle: Theme.of(context).textTheme.headlineMedium,
                           color: Colors.grey,

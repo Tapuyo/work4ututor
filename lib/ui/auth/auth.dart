@@ -19,9 +19,7 @@ class AuthService {
           .collection('user')
           .doc(user.uid)
           .get();
-          print('im here');
       if (snapshot.exists) {
-          print('umabot ako dito');
         UserData userData = _getUser(snapshot);
         return userData;
       }
@@ -73,10 +71,8 @@ class AuthService {
       UserCredential result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       User? user = result.user;
-      print("I am the user:$user");
       return _userFromFirebaseUser(user);
     } catch (e) {
-      print(e.toString());
       return null;
     }
   }
@@ -93,7 +89,6 @@ class AuthService {
       await DatabaseService(uid: user.uid).updateTutorData(email);
       return _userFromFirebaseUser(user);
     } catch (e) {
-      print(e.toString());
       return null;
     }
   }
@@ -112,7 +107,6 @@ class AuthService {
       await DatabaseService(uid: user.uid).updateStudentData(email);
       return _userFromFirebaseUser(user);
     } catch (e) {
-      print(e.toString());
       return e;
     }
   }
@@ -120,6 +114,5 @@ class AuthService {
   final _userinfo = Hive.box('userID');
   Future<void> adduserInfo(Map<String, dynamic> newData) async {
     await _userinfo.add(newData);
-    print('Saving Successful');
   }
 }

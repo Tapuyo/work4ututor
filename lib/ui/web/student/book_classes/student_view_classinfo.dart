@@ -13,8 +13,12 @@ import 'package:work4ututor/data_class/tutor_info_class.dart';
 import 'package:work4ututor/ui/web/student/book_classes/setschedule.dart';
 
 import '../../../../data_class/classesdataclass.dart';
+import '../../../../provider/classinfo_provider.dart';
+import '../../../../services/deletematerial.dart';
+import '../../../../services/getmaterials.dart';
 import '../../../../utils/themes.dart';
 import '../../communication.dart/videocall.dart';
+import '../../terms/termpage.dart';
 import '../../tutor/tutor_profile/view_file.dart';
 import 'package:universal_html/html.dart' as html;
 
@@ -22,14 +26,26 @@ import 'cancelclasses.dart';
 import 'rescheduleclasses.dart';
 
 class StudentViewClassInfo extends StatefulWidget {
+  final String uID;
   final ClassesData? enrolledClass;
-  const StudentViewClassInfo({super.key, required this.enrolledClass});
+  const StudentViewClassInfo(
+      {super.key, required this.enrolledClass, required this.uID});
 
   @override
   State<StudentViewClassInfo> createState() => _StudentViewClassInfoState();
 }
 
 class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
+  void initState() {
+    super.initState();
+    // Call getMaterials method here
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final materialNotifier =
+          Provider.of<MaterialNotifier>(context, listen: false);
+      materialNotifier.getMaterials(widget.enrolledClass!.classid);
+    });
+  }
+
   void downloadFile(String fileUrl, String fileName, String mimeType) {
     html.AnchorElement(href: fileUrl)
       ..target = 'blank'
@@ -37,7 +53,20 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
       ..click();
   }
 
-  Future<void> fetchFileData(String fileUrl) async {
+  Future<void> fetchFileData(String filepath) async {
+    // Reference to the file in Firebase Storage
+    Reference ref = FirebaseStorage.instance.ref(filepath);
+
+    // Get the download URL
+    String downloadURL = await ref.getDownloadURL();
+
+    // Create an anchor element (a) with the download URL
+    html.AnchorElement(href: downloadURL)
+      ..target = 'blank'
+      ..click();
+  }
+
+  Future<void> fetchFileData1(String fileUrl) async {
     try {
       final html.HttpRequest request = await html.HttpRequest.request(
         fileUrl,
@@ -186,6 +215,37 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        TextButton.icon(
+                          // <-- TextButton
+                          onPressed: () {
+                            setState(
+                              () {
+                                final provider =
+                                    context.read<ViewClassDisplayProvider>();
+                                provider.setViewClassinfo(false);
+                              },
+                            );
+                          },
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            size: 24.0,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            'Back',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     Flexible(
                       flex: 10,
                       child: ScrollConfiguration(
@@ -666,7 +726,8 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
                                                                         print(
                                                                             dateresult);
                                                                         rescheduleclass(
-                                                                            context, filteredScheduleList[index]);
+                                                                            context,
+                                                                            filteredScheduleList[index]);
                                                                       },
                                                                     )
                                                                   : TextButton(
@@ -716,6 +777,7 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
                                                                                           child: SetScheduleData(
                                                                                             data: widget.enrolledClass,
                                                                                             session: index.toString(),
+                                                                                            uID: widget.uID,
                                                                                           ),
                                                                                         ),
                                                                                         Positioned(
@@ -1031,352 +1093,439 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
                                                                   //     ),
                                                                   //   ),
                                                                   // ),
-                                                                  Container(
-                                                                      width:
-                                                                          600,
-                                                                      height:
-                                                                          100,
-                                                                      padding:
-                                                                          const EdgeInsets.fromLTRB(
-                                                                              10,
-                                                                              0,
-                                                                              10,
-                                                                              0),
-                                                                      child:
-                                                                          Row(
-                                                                        children: [
-                                                                          IconButton(
-                                                                            iconSize:
-                                                                                12,
-                                                                            padding:
-                                                                                EdgeInsets.zero,
-                                                                            splashRadius:
-                                                                                1,
-                                                                            icon:
-                                                                                const Icon(
-                                                                              Icons.arrow_back_ios, // Left arrow icon
-                                                                              color: Colors.blue,
-                                                                            ),
-                                                                            onPressed:
-                                                                                () {
-                                                                              // Scroll to the left
-                                                                              updatescrollController1.animateTo(
-                                                                                updatescrollController1.offset - 100.0, // Adjust the value as needed
-                                                                                duration: const Duration(milliseconds: 500), // Adjust the duration as needed
-                                                                                curve: Curves.ease,
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                          Expanded(
+                                                                  Consumer<
+                                                                          MaterialNotifier>(
+                                                                      builder: (context,
+                                                                          materialNotifier,
+                                                                          _) {
+                                                                    if (materialNotifier
+                                                                        .materials
+                                                                        .isEmpty) {
+                                                                      return Container(
+                                                                          width:
+                                                                              600,
+                                                                          child:  Center(
+                                                                              child:  Text(
+                                                                              '(No materials added!)',
+                                                                              style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
+                                                                            ),)); // Show loading indicator
+                                                                    }
+                                                                    List<
+                                                                        Map<String,
+                                                                            dynamic>> materialsdata = materialNotifier
+                                                                        .materials
+                                                                        .where((element) =>
+                                                                            element['classno'] ==
+                                                                            index.toString())
+                                                                        .toList();
+                                                                    if (materialsdata
+                                                                        .isEmpty) {
+                                                                      return Container(
+                                                                          width:
+                                                                              600,
+                                                                          child:
+                                                                              Center(
                                                                             child:
-                                                                                ListView.builder(
-                                                                              shrinkWrap: true,
-                                                                              controller: updatescrollController1, // Assign the ScrollController to the ListView
-                                                                              scrollDirection: Axis.horizontal,
-                                                                              itemCount: widget.enrolledClass!.tutorinfo.first.certificates.length,
-                                                                              itemBuilder: (context, index) {
-                                                                                if (widget.enrolledClass!.tutorinfo.first.certificatestype[index] == 'Image') {
-                                                                                  return Padding(
-                                                                                    padding: const EdgeInsets.only(left: 10.0, right: 10),
-                                                                                    child: Row(
-                                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                      children: [
-                                                                                        Column(
-                                                                                          children: [
-                                                                                            InkWell(
-                                                                                              onTap: () {
-                                                                                                showDialog(
-                                                                                                    barrierDismissible: false,
-                                                                                                    context: context,
-                                                                                                    builder: (BuildContext context) {
-                                                                                                      var height = MediaQuery.of(context).size.height;
-                                                                                                      return AlertDialog(
-                                                                                                        shape: RoundedRectangleBorder(
-                                                                                                          borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
-                                                                                                        ),
-                                                                                                        contentPadding: EdgeInsets.zero,
-                                                                                                        content: ClipRRect(
-                                                                                                          borderRadius: BorderRadius.circular(15.0), // Same radius as above
-                                                                                                          child: Container(
-                                                                                                            color: Colors.white, // Set the background color of the circular content
-
-                                                                                                            child: Stack(
-                                                                                                              children: <Widget>[
-                                                                                                                SizedBox(
-                                                                                                                  height: height,
-                                                                                                                  width: 900,
-                                                                                                                  child: ViewFile(imageURL: widget.enrolledClass!.tutorinfo.first.certificates[index]),
-                                                                                                                ),
-                                                                                                                Positioned(
-                                                                                                                  top: 10.0,
-                                                                                                                  right: 10.0,
-                                                                                                                  child: GestureDetector(
-                                                                                                                    onTap: () {
-                                                                                                                      Navigator.of(context).pop(false); // Close the dialog
-                                                                                                                    },
-                                                                                                                    child: const Icon(
-                                                                                                                      Icons.close,
-                                                                                                                      color: Colors.red,
-                                                                                                                      size: 20,
-                                                                                                                    ),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              ],
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                      );
-                                                                                                    });
-                                                                                                // showDialog(
-                                                                                                //     barrierDismissible:
-                                                                                                //         false,
-                                                                                                //     context:
-                                                                                                //         context,
-                                                                                                //     builder:
-                                                                                                //         (BuildContext
-                                                                                                //             context) {
-                                                                                                //       return ViewFile(
-                                                                                                //           imageURL:
-                                                                                                //               widget.tutorsinfo['certificates'][index]);
-                                                                                                //     });
-                                                                                              },
-                                                                                              child: Container(
-                                                                                                height: 60,
-                                                                                                width: 60,
-                                                                                                decoration: BoxDecoration(
-                                                                                                  borderRadius: BorderRadius.circular(10),
-                                                                                                  color: Colors.grey.shade200, // You can adjust the fit as needed.
-                                                                                                ),
-                                                                                                child: ClipRRect(
-                                                                                                  borderRadius: BorderRadius.circular(10.0),
-                                                                                                  child: Image.network(
-                                                                                                    widget.enrolledClass!.tutorinfo.first.certificates[index],
-                                                                                                    fit: BoxFit.cover, // You can adjust the fit as needed.
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ),
-                                                                                            ),
-                                                                                            Center(
-                                                                                              child: Tooltip(
-                                                                                                message: getFileNameFromUrl(widget.enrolledClass!.tutorinfo.first.certificates[index]),
-                                                                                                child: SizedBox(
-                                                                                                  height: 60,
-                                                                                                  width: 60,
-                                                                                                  child: TextButton(
-                                                                                                    onPressed: () {
-                                                                                                      setState(() {
-                                                                                                        fetchFileData(widget.enrolledClass!.tutorinfo.first.certificates[index]);
-                                                                                                      });
-                                                                                                    },
-                                                                                                    child: Text(
-                                                                                                      getFileNameFromUrl(widget.enrolledClass!.tutorinfo.first.certificates[index]),
-                                                                                                      style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
-                                                                                                    ),
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ),
-                                                                                            )
-                                                                                          ],
-                                                                                        ),
-                                                                                      ],
-                                                                                    ),
-                                                                                  );
-                                                                                } else if (widget.enrolledClass!.tutorinfo.first.certificatestype[index] == 'pdf') {
-                                                                                  return Padding(
-                                                                                    padding: const EdgeInsets.only(left: 10.0, right: 10),
-                                                                                    child: Row(
-                                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                      children: [
-                                                                                        Column(
-                                                                                          children: [
-                                                                                            InkWell(
-                                                                                              onTap: () {
-                                                                                                showDialog(
-                                                                                                    barrierDismissible: false,
-                                                                                                    context: context,
-                                                                                                    builder: (BuildContext context) {
-                                                                                                      var height = MediaQuery.of(context).size.height;
-                                                                                                      return AlertDialog(
-                                                                                                        shape: RoundedRectangleBorder(
-                                                                                                          borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
-                                                                                                        ),
-                                                                                                        contentPadding: EdgeInsets.zero,
-                                                                                                        content: ClipRRect(
-                                                                                                          borderRadius: BorderRadius.circular(15.0), // Same radius as above
-                                                                                                          child: Container(
-                                                                                                            color: Colors.white, // Set the background color of the circular content
-
-                                                                                                            child: Stack(
-                                                                                                              children: <Widget>[
-                                                                                                                SizedBox(
-                                                                                                                  height: height,
-                                                                                                                  width: 900,
-                                                                                                                  child: ViewFile(imageURL: widget.enrolledClass!.tutorinfo.first.certificates[index]),
-                                                                                                                ),
-                                                                                                                Positioned(
-                                                                                                                  top: 10.0,
-                                                                                                                  right: 10.0,
-                                                                                                                  child: GestureDetector(
-                                                                                                                    onTap: () {
-                                                                                                                      Navigator.of(context).pop(false); // Close the dialog
-                                                                                                                    },
-                                                                                                                    child: const Icon(
-                                                                                                                      Icons.close,
-                                                                                                                      color: Colors.red,
-                                                                                                                      size: 20,
-                                                                                                                    ),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              ],
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                      );
-                                                                                                    });
-                                                                                              },
-                                                                                              child: Container(
-                                                                                                height: 60,
-                                                                                                width: 60,
-                                                                                                decoration: BoxDecoration(
-                                                                                                  borderRadius: BorderRadius.circular(10),
-                                                                                                  color: Colors.grey.shade200, // You can adjust the fit as needed.
-                                                                                                ),
-                                                                                                child: ClipRRect(
-                                                                                                  borderRadius: BorderRadius.circular(10.0),
-                                                                                                  child: const Icon(
-                                                                                                    Icons.picture_as_pdf,
-                                                                                                    size: 48,
-                                                                                                    color: Colors.red,
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ),
-                                                                                            ),
-                                                                                            Center(
-                                                                                              child: TextButton(
-                                                                                                onPressed: () {},
-                                                                                                child: Text(
-                                                                                                  getFileNameFromUrl(widget.enrolledClass!.tutorinfo.first.certificates[index]),
-                                                                                                  style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
-                                                                                                ),
-                                                                                              ),
-                                                                                            )
-                                                                                          ],
-                                                                                        ),
-                                                                                      ],
-                                                                                    ),
-                                                                                  );
-                                                                                } else {
-                                                                                  return Padding(
-                                                                                    padding: const EdgeInsets.only(left: 10.0, right: 10),
-                                                                                    child: Row(
-                                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                      children: [
-                                                                                        Column(
-                                                                                          children: [
-                                                                                            InkWell(
-                                                                                              onTap: () {
-                                                                                                showDialog(
-                                                                                                    barrierDismissible: false,
-                                                                                                    context: context,
-                                                                                                    builder: (BuildContext context) {
-                                                                                                      var height = MediaQuery.of(context).size.height;
-                                                                                                      return AlertDialog(
-                                                                                                        shape: RoundedRectangleBorder(
-                                                                                                          borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
-                                                                                                        ),
-                                                                                                        contentPadding: EdgeInsets.zero,
-                                                                                                        content: ClipRRect(
-                                                                                                          borderRadius: BorderRadius.circular(15.0), // Same radius as above
-                                                                                                          child: Container(
-                                                                                                            color: Colors.white, // Set the background color of the circular content
-
-                                                                                                            child: Stack(
-                                                                                                              children: <Widget>[
-                                                                                                                SizedBox(
-                                                                                                                  height: height,
-                                                                                                                  width: 900,
-                                                                                                                  child: ViewFile(imageURL: widget.enrolledClass!.tutorinfo.first.certificates[index]),
-                                                                                                                ),
-                                                                                                                Positioned(
-                                                                                                                  top: 10.0,
-                                                                                                                  right: 10.0,
-                                                                                                                  child: GestureDetector(
-                                                                                                                    onTap: () {
-                                                                                                                      Navigator.of(context).pop(false); // Close the dialog
-                                                                                                                    },
-                                                                                                                    child: const Icon(
-                                                                                                                      Icons.close,
-                                                                                                                      color: Colors.red,
-                                                                                                                      size: 20,
-                                                                                                                    ),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              ],
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                      );
-                                                                                                    });
-                                                                                              },
-                                                                                              child: Container(
-                                                                                                height: 60,
-                                                                                                width: 60,
-                                                                                                decoration: BoxDecoration(
-                                                                                                  borderRadius: BorderRadius.circular(10),
-                                                                                                  color: Colors.grey.shade200, // You can adjust the fit as needed.
-                                                                                                ),
-                                                                                                child: ClipRRect(
-                                                                                                  borderRadius: BorderRadius.circular(10.0),
-                                                                                                  child: const Icon(
-                                                                                                    FontAwesomeIcons.fileWord,
-                                                                                                    size: 48,
-                                                                                                    color: Colors.blue,
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ),
-                                                                                            ),
-                                                                                            Center(
-                                                                                              child: TextButton(
-                                                                                                onPressed: () {},
-                                                                                                child: Text(
-                                                                                                  getFileNameFromUrl(widget.enrolledClass!.tutorinfo.first.certificates[index]),
-                                                                                                  style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
-                                                                                                ),
-                                                                                              ),
-                                                                                            )
-                                                                                          ],
-                                                                                        ),
-                                                                                      ],
-                                                                                    ),
-                                                                                  );
-                                                                                }
+                                                                                Text(
+                                                                              '(No materials added!)',
+                                                                              style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
+                                                                            ),
+                                                                          )); // Show loading indicator
+                                                                    }
+                                                                    return Container(
+                                                                        width:
+                                                                            600,
+                                                                        height:
+                                                                            120,
+                                                                        padding: const EdgeInsets.fromLTRB(
+                                                                            10,
+                                                                            0,
+                                                                            10,
+                                                                            0),
+                                                                        child:
+                                                                            Row(
+                                                                          children: [
+                                                                            IconButton(
+                                                                              iconSize: 12,
+                                                                              padding: EdgeInsets.zero,
+                                                                              splashRadius: 1,
+                                                                              icon: const Icon(
+                                                                                Icons.arrow_back_ios, // Left arrow icon
+                                                                                color: Colors.blue,
+                                                                              ),
+                                                                              onPressed: () {
+                                                                                // Scroll to the left
+                                                                                updatescrollController1.animateTo(
+                                                                                  updatescrollController1.offset - 100.0, // Adjust the value as needed
+                                                                                  duration: const Duration(milliseconds: 500), // Adjust the duration as needed
+                                                                                  curve: Curves.ease,
+                                                                                );
                                                                               },
                                                                             ),
-                                                                          ),
-                                                                          IconButton(
-                                                                            iconSize:
-                                                                                12,
-                                                                            padding:
-                                                                                EdgeInsets.zero,
-                                                                            splashRadius:
-                                                                                1,
-                                                                            icon:
-                                                                                const Icon(
-                                                                              Icons.arrow_forward_ios, // Right arrow icon
-                                                                              color: Colors.blue,
+                                                                            Expanded(
+                                                                              child: ListView.builder(
+                                                                                shrinkWrap: true,
+                                                                                controller: updatescrollController1, // Assign the ScrollController to the ListView
+                                                                                scrollDirection: Axis.horizontal,
+                                                                                itemCount: materialsdata.length,
+                                                                                itemBuilder: (context, index) {
+                                                                                  if (materialsdata[index]['extension'] == 'Image') {
+                                                                                    return FutureBuilder(
+                                                                                        future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                                        builder: (context, snapshot) {
+                                                                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                            return Container(
+                                                                                                height: 60,
+                                                                                                width: 60,
+                                                                                                child: const Center(
+                                                                                                    child: CircularProgressIndicator(
+                                                                                                  strokeWidth: 2,
+                                                                                                  color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                                ))); // Display a loading indicator while waiting for the file to download
+                                                                                          } else if (snapshot.hasError) {
+                                                                                            return Text('Error: ${snapshot.error}');
+                                                                                          }
+
+                                                                                          return Padding(
+                                                                                            padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                            child: Row(
+                                                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                              children: [
+                                                                                                Column(
+                                                                                                  children: [
+                                                                                                    InkWell(
+                                                                                                      onTap: () {
+                                                                                                        showDialog(
+                                                                                                            barrierDismissible: false,
+                                                                                                            context: context,
+                                                                                                            builder: (BuildContext context) {
+                                                                                                              var height = MediaQuery.of(context).size.height;
+                                                                                                              return AlertDialog(
+                                                                                                                shape: RoundedRectangleBorder(
+                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                                ),
+                                                                                                                contentPadding: EdgeInsets.zero,
+                                                                                                                content: ClipRRect(
+                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                                  child: Container(
+                                                                                                                    color: Colors.white, // Set the background color of the circular content
+
+                                                                                                                    child: Stack(
+                                                                                                                      children: <Widget>[
+                                                                                                                        SizedBox(
+                                                                                                                          height: height,
+                                                                                                                          width: 900,
+                                                                                                                          child: ViewFile(imageURL: snapshot.data.toString()),
+                                                                                                                        ),
+                                                                                                                        Positioned(
+                                                                                                                          top: 10.0,
+                                                                                                                          right: 10.0,
+                                                                                                                          child: GestureDetector(
+                                                                                                                            onTap: () {
+                                                                                                                              Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                            },
+                                                                                                                            child: const Icon(
+                                                                                                                              Icons.close,
+                                                                                                                              color: Colors.red,
+                                                                                                                              size: 20,
+                                                                                                                            ),
+                                                                                                                          ),
+                                                                                                                        ),
+                                                                                                                      ],
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              );
+                                                                                                            });
+                                                                                                      },
+                                                                                                      child: Container(
+                                                                                                        height: 60,
+                                                                                                        width: 60,
+                                                                                                        decoration: BoxDecoration(
+                                                                                                          borderRadius: BorderRadius.circular(10),
+                                                                                                          color: Colors.grey.shade200,
+                                                                                                        ),
+                                                                                                        child: ClipRRect(
+                                                                                                          borderRadius: BorderRadius.circular(10.0),
+                                                                                                          child: Image.network(
+                                                                                                            snapshot.data.toString(),
+                                                                                                            fit: BoxFit.cover,
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                    Center(
+                                                                                                      child: Tooltip(
+                                                                                                        message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                        child: SizedBox(
+                                                                                                          height: 60,
+                                                                                                          width: 60,
+                                                                                                          child: TextButton(
+                                                                                                            onPressed: () {
+                                                                                                              setState(() {
+                                                                                                                fetchFileData(snapshot.data.toString());
+                                                                                                              });
+                                                                                                            },
+                                                                                                            child: Text(
+                                                                                                              getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                              style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    )
+                                                                                                  ],
+                                                                                                ),
+                                                                                              ],
+                                                                                            ),
+                                                                                          );
+                                                                                        });
+                                                                                  } else if (materialsdata[index]['extension'] == 'pdf') {
+                                                                                    return FutureBuilder(
+                                                                                        future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                                        builder: (context, snapshot) {
+                                                                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                            return Container(
+                                                                                                height: 60,
+                                                                                                width: 60,
+                                                                                                child: const Center(
+                                                                                                    child: CircularProgressIndicator(
+                                                                                                  strokeWidth: 2,
+                                                                                                  color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                                ))); // Display a loading indicator while waiting for the file to download
+                                                                                          } else if (snapshot.hasError) {
+                                                                                            return Text('Error: ${snapshot.error}');
+                                                                                          }
+                                                                                          return Padding(
+                                                                                            padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                            child: Row(
+                                                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                              children: [
+                                                                                                Column(
+                                                                                                  children: [
+                                                                                                    InkWell(
+                                                                                                      onTap: () {
+                                                                                                        showDialog(
+                                                                                                            barrierDismissible: false,
+                                                                                                            context: context,
+                                                                                                            builder: (BuildContext context) {
+                                                                                                              var height = MediaQuery.of(context).size.height;
+                                                                                                              return AlertDialog(
+                                                                                                                shape: RoundedRectangleBorder(
+                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                                ),
+                                                                                                                contentPadding: EdgeInsets.zero,
+                                                                                                                content: ClipRRect(
+                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                                  child: Container(
+                                                                                                                    color: Colors.white, // Set the background color of the circular content
+
+                                                                                                                    child: Stack(
+                                                                                                                      children: <Widget>[
+                                                                                                                        SizedBox(
+                                                                                                                          height: height,
+                                                                                                                          width: 900,
+                                                                                                                          child: TermPage(pdfurl: snapshot.data.toString()),
+                                                                                                                        ),
+                                                                                                                        Positioned(
+                                                                                                                          top: 10.0,
+                                                                                                                          right: 10.0,
+                                                                                                                          child: GestureDetector(
+                                                                                                                            onTap: () {
+                                                                                                                              Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                            },
+                                                                                                                            child: const Icon(
+                                                                                                                              Icons.close,
+                                                                                                                              color: Colors.red,
+                                                                                                                              size: 20,
+                                                                                                                            ),
+                                                                                                                          ),
+                                                                                                                        ),
+                                                                                                                      ],
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              );
+                                                                                                            });
+                                                                                                      },
+                                                                                                      child: Container(
+                                                                                                        height: 60,
+                                                                                                        width: 60,
+                                                                                                        decoration: BoxDecoration(
+                                                                                                          borderRadius: BorderRadius.circular(10),
+                                                                                                          color: Colors.grey.shade200, // You can adjust the fit as needed.
+                                                                                                        ),
+                                                                                                        child: ClipRRect(
+                                                                                                          borderRadius: BorderRadius.circular(10.0),
+                                                                                                          child: const Icon(
+                                                                                                            Icons.picture_as_pdf,
+                                                                                                            size: 48,
+                                                                                                            color: Colors.red,
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                    Center(
+                                                                                                      child: Tooltip(
+                                                                                                        message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                        child: SizedBox(
+                                                                                                          height: 60,
+                                                                                                          width: 60,
+                                                                                                          child: TextButton(
+                                                                                                            onPressed: () {
+                                                                                                              setState(() {
+                                                                                                                fetchFileData(snapshot.data.toString());
+                                                                                                              });
+                                                                                                            },
+                                                                                                            child: Text(
+                                                                                                              getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                              style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    )
+                                                                                                  ],
+                                                                                                ),
+                                                                                              ],
+                                                                                            ),
+                                                                                          );
+                                                                                        });
+                                                                                  } else {
+                                                                                    return FutureBuilder(
+                                                                                        future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                                        builder: (context, snapshot) {
+                                                                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                            return Container(
+                                                                                                height: 60,
+                                                                                                width: 60,
+                                                                                                child: const Center(
+                                                                                                    child: CircularProgressIndicator(
+                                                                                                  strokeWidth: 2,
+                                                                                                  color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                                ))); // Display a loading indicator while waiting for the file to download
+                                                                                          } else if (snapshot.hasError) {
+                                                                                            return Text('Error: ${snapshot.error}');
+                                                                                          }
+                                                                                          return Padding(
+                                                                                            padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                            child: Row(
+                                                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                              children: [
+                                                                                                Column(
+                                                                                                  children: [
+                                                                                                    InkWell(
+                                                                                                      onTap: () {
+                                                                                                        showDialog(
+                                                                                                            barrierDismissible: false,
+                                                                                                            context: context,
+                                                                                                            builder: (BuildContext context) {
+                                                                                                              var height = MediaQuery.of(context).size.height;
+                                                                                                              return AlertDialog(
+                                                                                                                shape: RoundedRectangleBorder(
+                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                                ),
+                                                                                                                contentPadding: EdgeInsets.zero,
+                                                                                                                content: ClipRRect(
+                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                                  child: Container(
+                                                                                                                    color: Colors.white, // Set the background color of the circular content
+
+                                                                                                                    child: Stack(
+                                                                                                                      children: <Widget>[
+                                                                                                                        SizedBox(
+                                                                                                                          height: height,
+                                                                                                                          width: 900,
+                                                                                                                          child: ViewFile(imageURL: snapshot.data.toString()),
+                                                                                                                        ),
+                                                                                                                        Positioned(
+                                                                                                                          top: 10.0,
+                                                                                                                          right: 10.0,
+                                                                                                                          child: GestureDetector(
+                                                                                                                            onTap: () {
+                                                                                                                              Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                            },
+                                                                                                                            child: const Icon(
+                                                                                                                              Icons.close,
+                                                                                                                              color: Colors.red,
+                                                                                                                              size: 20,
+                                                                                                                            ),
+                                                                                                                          ),
+                                                                                                                        ),
+                                                                                                                      ],
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              );
+                                                                                                            });
+                                                                                                      },
+                                                                                                      child: Container(
+                                                                                                        height: 60,
+                                                                                                        width: 60,
+                                                                                                        decoration: BoxDecoration(
+                                                                                                          borderRadius: BorderRadius.circular(10),
+                                                                                                          color: Colors.grey.shade200, // You can adjust the fit as needed.
+                                                                                                        ),
+                                                                                                        child: ClipRRect(
+                                                                                                          borderRadius: BorderRadius.circular(10.0),
+                                                                                                          child: const Icon(
+                                                                                                            FontAwesomeIcons.fileWord,
+                                                                                                            size: 48,
+                                                                                                            color: Colors.blue,
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                    Center(
+                                                                                                      child: Tooltip(
+                                                                                                        message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                        child: SizedBox(
+                                                                                                          height: 60,
+                                                                                                          width: 60,
+                                                                                                          child: TextButton(
+                                                                                                            onPressed: () {
+                                                                                                              setState(() {
+                                                                                                                fetchFileData(snapshot.data.toString());
+                                                                                                              });
+                                                                                                            },
+                                                                                                            child: Text(
+                                                                                                              getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                              style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    )
+                                                                                                  ],
+                                                                                                ),
+                                                                                              ],
+                                                                                            ),
+                                                                                          );
+                                                                                        });
+                                                                                  }
+                                                                                },
+                                                                              ),
                                                                             ),
-                                                                            onPressed:
-                                                                                () {
-                                                                              // Scroll to the right
-                                                                              updatescrollController1.animateTo(
-                                                                                updatescrollController1.offset + 100.0, // Adjust the value as needed
-                                                                                duration: const Duration(milliseconds: 500), // Adjust the duration as needed
-                                                                                curve: Curves.ease,
-                                                                              );
-                                                                            },
-                                                                          ),
-                                                                        ],
-                                                                      )),
+                                                                            IconButton(
+                                                                              iconSize: 12,
+                                                                              padding: EdgeInsets.zero,
+                                                                              splashRadius: 1,
+                                                                              icon: const Icon(
+                                                                                Icons.arrow_forward_ios, // Right arrow icon
+                                                                                color: Colors.blue,
+                                                                              ),
+                                                                              onPressed: () {
+                                                                                // Scroll to the right
+                                                                                updatescrollController1.animateTo(
+                                                                                  updatescrollController1.offset + 100.0, // Adjust the value as needed
+                                                                                  duration: const Duration(milliseconds: 500), // Adjust the duration as needed
+                                                                                  curve: Curves.ease,
+                                                                                );
+                                                                              },
+                                                                            ),
+                                                                          ],
+                                                                        ));
+                                                                  }),
 
                                                                   Padding(
                                                                     padding: const EdgeInsets
@@ -1443,17 +1592,66 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
                                                                             10,
                                                                             50,
                                                                             10),
-                                                                    child: Text(
-                                                                      '(No link attached message tutor to set up class link!)',
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              15,
-                                                                          color: Colors
-                                                                              .blue
-                                                                              .shade200,
-                                                                          fontStyle:
-                                                                              FontStyle.italic),
-                                                                    ),
+                                                                    child: Consumer<
+                                                                        List<
+                                                                            Schedule>>(builder:
+                                                                        (context,
+                                                                            scheduleListdata,
+                                                                            _) {
+                                                                      dynamic
+                                                                          data =
+                                                                          scheduleListdata;
+                                                                      ClassesData?
+                                                                          newclassdata =
+                                                                          widget
+                                                                              .enrolledClass;
+                                                                      List<Schedule> filtereddata = data
+                                                                          .where((element) =>
+                                                                              element.scheduleID ==
+                                                                              widget.enrolledClass!.classid)
+                                                                          .toList();
+                                                                      filtereddata.sort((a, b) => a
+                                                                          .schedule
+                                                                          .compareTo(
+                                                                              b.schedule));
+                                                                      if (filtereddata
+                                                                              .length >
+                                                                          index) {
+                                                                        return MouseRegion(
+                                                                          cursor:
+                                                                              SystemMouseCursors.click,
+                                                                          child:
+                                                                              GestureDetector(
+                                                                            onTap:
+                                                                                () {
+                                                                              // const VideoCall videoCall = VideoCall(chatID: '123', uID: '456');
+
+                                                                              // Replace 'your_flutter_app_port' with the actual port your Flutter web app is running on
+                                                                              String url = 'http://localhost:58586/tutorsList';
+
+                                                                              // Open the URL in a new tab
+                                                                              html.window.open('/videoCall', "");
+                                                                              // html.window.open('/tutorslist', "");
+                                                                              //  const VideoCall(chatID: '', uID: '',);
+                                                                            },
+                                                                            child:
+                                                                                Text(
+                                                                              'work4ututor/${filtereddata[index].meetinglink}',
+                                                                              style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic, decoration: TextDecoration.underline),
+                                                                            ),
+                                                                          ),
+                                                                        );
+                                                                      }
+                                                                      return Text(
+                                                                        '(No link attached message tutor to set up class link!)',
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                15,
+                                                                            color:
+                                                                                Colors.blue.shade200,
+                                                                            fontStyle: FontStyle.italic),
+                                                                      );
+                                                                    }),
                                                                     //add link here
                                                                   ),
                                                                   const SizedBox(

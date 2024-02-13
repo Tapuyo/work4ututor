@@ -7,7 +7,8 @@ import 'package:work4ututor/utils/themes.dart';
 
 /// Represents Homepage for Navigation
 class TermPage extends StatefulWidget {
-  const TermPage({super.key});
+  final String pdfurl;
+  const TermPage({super.key, required this.pdfurl});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -29,7 +30,7 @@ class _TermPage extends State<TermPage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: kColorPrimary,
-        title: const HeaderText('Terms & Condition'),
+        title:  HeaderText(widget.pdfurl == '' ?'Terms & Condition' :'Tutor Certificate'),
       ),
       body: Container(
         height: height,
@@ -41,10 +42,18 @@ class _TermPage extends State<TermPage> {
                 children: [
                   SizedBox(
                     height: height - 110,
-                    child: SfPdfViewer.asset(
-                      'assets/images/Terms and Conditions Work4uTutor.pdf',
-                      initialZoomLevel: 1.5,
-                    ),
+                    child: widget.pdfurl != ''
+                        ? SfPdfViewer.network(
+                            widget.pdfurl.toString(),
+                            onDocumentLoadFailed: (details) {
+                              print(details.error);
+                            },
+                            initialZoomLevel: 1.5,
+                          )
+                        : SfPdfViewer.asset(
+                            'assets/images/Terms and Conditions Work4uTutor.pdf',
+                            initialZoomLevel: 1.5,
+                          ),
                   ),
                   //   Column(
                   //     children: [
@@ -217,45 +226,48 @@ class _TermPage extends State<TermPage> {
           ],
         ),
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop(true);
-            },
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.white,
-              backgroundColor: kColorPrimary, // Text color
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
+      floatingActionButton: Visibility(
+        visible: widget.pdfurl == '' ? true : false,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: kColorPrimary, // Text color
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              child: const Text(
+                'Accept',
+                style: TextStyle(fontSize: 16, color: Colors.white),
               ),
             ),
-            child: const Text(
-              'Accept',
-              style: TextStyle(fontSize: 16, color: Colors.white),
-            ),
-          ),
-          const SizedBox(width: 20),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
-            style: ElevatedButton.styleFrom(
-              foregroundColor: kColorPrimary,
-              backgroundColor: Colors.white, // Text color
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
+            const SizedBox(width: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: kColorPrimary,
+                backgroundColor: Colors.white, // Text color
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+              child: const Text(
+                'Decline',
+                style: TextStyle(fontSize: 16, color: kColorPrimary),
               ),
             ),
-            child: const Text(
-              'Decline',
-              style: TextStyle(fontSize: 16, color: kColorPrimary),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

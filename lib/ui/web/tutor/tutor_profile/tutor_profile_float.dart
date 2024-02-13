@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +19,10 @@ import 'package:work4ututor/ui/web/tutor/tutor_profile/viewschedule.dart';
 import '../../../../components/nav_bar.dart';
 import '../../../../data_class/subject_class.dart';
 import '../../../../data_class/tutor_info_class.dart';
+import '../../../../services/addtocart.dart';
 import '../../../../utils/themes.dart';
 import '../../admin/executive_dashboard.dart';
+import '../../terms/termpage.dart';
 import 'book_lesson.dart';
 import 'contact_teacher.dart';
 import 'view_file.dart';
@@ -84,9 +89,6 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
 
   @override
   Widget build(BuildContext context) {
-    final CollectionReference subjectCollection =
-        FirebaseFirestore.instance.collection('subjects');
-
     const Color background = Color.fromRGBO(55, 116, 135, 1);
     const Color fill = Colors.white;
     final List<Color> gradient = [
@@ -101,7 +103,8 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
     const double fillStop = (100 - fillPercent) / 100;
     const List<double> stops = [0.0, fillStop, fillStop, 1.0];
     Size size = MediaQuery.of(context).size;
-    bool selection5 = false;
+    final subjectlist = Provider.of<List<Subjects>>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
@@ -146,18 +149,19 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                       alignment: Alignment.center,
                                       child: InkWell(
                                           onTap: () {
-                                            showDialog<DateTime>(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return ViewFile(
-                                                  imageURL: profileurl,
-                                                );
-                                              },
-                                            ).then((selectedDate) {
-                                              if (selectedDate != null) {
-                                                // Do something with the selected date
-                                              }
-                                            });
+                                            // showDialog<DateTime>(
+                                            //   context: context,
+                                            //   builder: (BuildContext context) {
+                                            //     return ViewFile(
+                                            //       imageURL: widget
+                                            //           .tutorsinfo['imageID'],
+                                            //     );
+                                            //   },
+                                            // ).then((selectedDate) {
+                                            //   if (selectedDate != null) {
+                                            //     // Do something with the selected date
+                                            //   }
+                                            // });
                                           },
                                           child: Container(
                                             height: 300,
@@ -499,6 +503,11 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                                               context)
                                                                           .size
                                                                           .height;
+                                                                  var width =
+                                                                      MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width;
                                                                   return AlertDialog(
                                                                     shape:
                                                                         RoundedRectangleBorder(
@@ -526,7 +535,9 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                                             SizedBox(
                                                                               height: height,
                                                                               width: 900,
-                                                                              child: ViewFile(imageURL: widget.tutorsinfo['certificates'][index]),
+                                                                              child: TermPage(
+                                                                                pdfurl: widget.tutorsinfo['certificates'][index],
+                                                                              ),
                                                                             ),
                                                                             Positioned(
                                                                               top: 10.0,
@@ -784,19 +795,17 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                               child: Padding(
                                                 padding:
                                                     const EdgeInsets.all(8.0),
-                                                child: Flexible(
-                                                  child: Text(
-                                                    tutorteach[index]
-                                                        ['subjectname'],
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      color: selectedsuject[
-                                                                  'subjectname'] ==
-                                                              tutorteach[index][
-                                                                  'subjectname']
-                                                          ? Colors.white
-                                                          : Colors.black,
-                                                    ),
+                                                child: Text(
+                                                  tutorteach[index]
+                                                      ['subjectname'],
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: selectedsuject[
+                                                                'subjectname'] ==
+                                                            tutorteach[index]
+                                                                ['subjectname']
+                                                        ? Colors.white
+                                                        : Colors.black,
                                                   ),
                                                 ),
                                               ),
@@ -1128,8 +1137,14 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                       tutordata:
                                                           widget.tutorsinfo,
                                                       tutorteach: tutorteach,
-                                                      noofclasses:classcount,
-                                                      subject: selectedsuject,
+                                                      noofclasses: classcount ==
+                                                              '1'
+                                                          ? '2'
+                                                          : classcount == '2'
+                                                              ? '3'
+                                                              : '5',
+                                                      subject: selectedsuject[
+                                                          'subjectname'],
                                                     );
                                                   },
                                                 ).then((selectedDate) {
@@ -1173,86 +1188,68 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                       TextDecoration.none,
                                                 ),
                                               ),
-                                              onPressed: () {
-                                                showDialog(
-                                                    barrierDismissible: false,
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      var height =
-                                                          MediaQuery.of(context)
-                                                              .size
-                                                              .height;
-                                                      var width =
-                                                          MediaQuery.of(context)
-                                                              .size
-                                                              .width;
-                                                      return AlertDialog(
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                  15.0), // Adjust the radius as needed
-                                                        ),
-                                                        contentPadding:
-                                                            EdgeInsets.zero,
-                                                        content: ClipRRect(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                  15.0), // Same radius as above
-                                                          child: Container(
-                                                            color: Colors
-                                                                .white, // Set the background color of the circular content
-
-                                                            child: Stack(
-                                                              children: <
-                                                                  Widget>[
-                                                                SizedBox(
-                                                                  height:
-                                                                      height -
-                                                                          100,
-                                                                  width: width -
-                                                                      300,
-                                                                  child:
-                                                                      ViewScheduleData(
-                                                                    data: widget
-                                                                        .tutorsinfo,
-                                                                  ),
-                                                                ),
-                                                                Positioned(
-                                                                  top: 10.0,
-                                                                  right: 10.0,
-                                                                  child:
-                                                                      GestureDetector(
-                                                                    onTap: () {
-                                                                      Navigator.of(
-                                                                              context)
-                                                                          .pop(
-                                                                              false); // Close the dialog
-                                                                    },
-                                                                    child:
-                                                                        const Icon(
-                                                                      Icons
-                                                                          .close,
-                                                                      color: Colors
-                                                                          .red,
-                                                                      size: 20,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ),
+                                              onPressed: () async {
+                                                if (classcount != '' &&
+                                                    selectedsuject != {} &&
+                                                    currentprice != '0') {
+                                                  Subjects subjectid =
+                                                      subjectlist.firstWhere(
+                                                    (element) =>
+                                                        element.subjectName ==
+                                                        selectedsuject[
+                                                            'subjectname'],
+                                                  );
+                                                  bool result = await addtoCart(
+                                                      widget.studentdata,
+                                                      classcount == '1'
+                                                          ? '2'
+                                                          : classcount == '2'
+                                                              ? '3'
+                                                              : '5',
+                                                      widget
+                                                          .tutorsinfo['userId'],
+                                                      subjectid.subjectId,
+                                                      currentprice);
+                                                  if (result == true) {
+                                                    setState(() {
+                                                      CoolAlert.show(
+                                                        context: context,
+                                                        width: 200,
+                                                        type: CoolAlertType
+                                                            .success,
+                                                        title: 'Success!',
+                                                        text:
+                                                            'Class added to cart successfully.',
+                                                        autoCloseDuration:
+                                                            const Duration(
+                                                                seconds: 3),
                                                       );
-                                                    }).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
+                                                    });
+                                                  } else {
+                                                    CoolAlert.show(
+                                                      context: context,
+                                                      width: 200,
+                                                      type:
+                                                          CoolAlertType.warning,
+                                                      title: 'Oops...',
+                                                      text:
+                                                          'Error declining, try again.',
+                                                    );
                                                   }
-                                                });
+                                                }else {
+                                                    CoolAlert.show(
+                                                      context: context,
+                                                      width: 200,
+                                                      type:
+                                                          CoolAlertType.warning,
+                                                      title: 'Oops...',
+                                                      text:
+                                                          'Please select subject and classes.',
+                                                    );
+                                                  }
                                               },
                                               child: const Text(
-                                                'Book Trial',
+                                                'Add Cart',
                                                 textAlign: TextAlign.left,
                                               ),
                                             ),

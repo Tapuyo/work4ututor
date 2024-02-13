@@ -407,17 +407,18 @@ class _ContactTeacherBodyState extends State<ContactTeacherBody> {
                           type: CoolAlertType.success,
                           title: 'Inquiry Sent',
                           text: 'You can view the inquiry in the messages!',
-                          autoCloseDuration: const Duration(seconds: 1),
+                          autoCloseDuration: const Duration(seconds: 5),
                         );
+
+                        Navigator.pop(context);
                       });
                     } else {
                       CoolAlert.show(
                         context: context,
                         width: 200,
-                        type: CoolAlertType.error,
+                        type: CoolAlertType.warning,
                         title: 'Oops...',
                         text: result.toString(),
-                        backgroundColor: Colors.black,
                       );
                     }
                   } else {
@@ -437,6 +438,8 @@ class _ContactTeacherBodyState extends State<ContactTeacherBody> {
                           text: 'You can view the inquiry in the messages!',
                           autoCloseDuration: const Duration(seconds: 1),
                         );
+
+                        Navigator.pop(context);
                       });
                     } else {
                       CoolAlert.show(

@@ -6,6 +6,7 @@ class Routes {
   static const String tutorSignup = '/tutorSignup';
   static const String adminLogin = '/adminLogin';
   static const String tutorList = '/tutorList';
+    static const String videoCall = '/videoCall';
   static const String studentSignup = '/studentSignup';
   static const String deleteAccount = '/deleteAccount';
 }

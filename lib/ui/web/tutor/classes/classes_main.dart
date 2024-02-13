@@ -11,8 +11,8 @@ import 'package:provider/provider.dart';
 
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../shared_components/responsive_builder.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/standalone.dart' as tz;
+// import 'package:timezone/data/latest.dart' as tz;
+// import 'package:timezone/standalone.dart' as tz;
 import 'dart:html' as html;
 
 import '../../../../utils/themes.dart';
@@ -47,7 +47,6 @@ class _ClassesMainState extends State<ClassesMain> {
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
       updateDateTime();
     });
-    printtime();
   }
 
   @override
@@ -69,8 +68,7 @@ class _ClassesMainState extends State<ClassesMain> {
 
   prepareData() {
     final difference = daysBetween(currentDate, endDate);
-    print(difference);
-    print('difference in days');
+
     // get remaining time in second
     var result = Duration(seconds: 0);
     result = endDate.difference(currentDate);
@@ -87,33 +85,33 @@ class _ClassesMainState extends State<ClassesMain> {
     });
   }
 
-  Future<void> printtime() async {
-    List<String> getTimeZones() {
-      tz.initializeTimeZones();
-      final timeZones = tz.timeZoneDatabase.locations.keys.toList();
-      return timeZones;
-    }
+  // Future<void> printtime() async {
+  //   List<String> getTimeZones() {
+  //     tz.initializeTimeZones();
+  //     final timeZones = tz.timeZoneDatabase.locations.keys.toList();
+  //     return timeZones;
+  //   }
 
-    print(getTimeZones());
+  //   print(getTimeZones());
 
-    DateTime originalDateTime = DateTime.now();
-    tz.Location timeZone = tz.getLocation('Asia/Dubai');
-    tz.TZDateTime convertedDateTime =
-        tz.TZDateTime.from(originalDateTime, timeZone);
-    print(convertedDateTime);
+  //   DateTime originalDateTime = DateTime.now();
+  //   tz.Location timeZone = tz.getLocation('Asia/Dubai');
+  //   tz.TZDateTime convertedDateTime =
+  //       tz.TZDateTime.from(originalDateTime, timeZone);
+  //   print(convertedDateTime);
 
-    final tz.TZDateTime dubaiDateTime =
-        tz.TZDateTime.from(DateTime.now(), timeZone);
-    print('Dubai Time: $dubaiDateTime');
+  //   final tz.TZDateTime dubaiDateTime =
+  //       tz.TZDateTime.from(DateTime.now(), timeZone);
+  //   print('Dubai Time: $dubaiDateTime');
 
-    String localTimezone = await FlutterNativeTimezone.getLocalTimezone();
-    tz.Location mylocaltimezone = tz.getLocation(localTimezone);
-    print(mylocaltimezone);
+  //   String localTimezone = await FlutterNativeTimezone.getLocalTimezone();
+  //   tz.Location mylocaltimezone = tz.getLocation(localTimezone);
+  //   print(mylocaltimezone);
 
-    tz.TZDateTime convertedLocalDateTime =
-        tz.TZDateTime.from(originalDateTime, mylocaltimezone);
-    print('Local Time: $convertedLocalDateTime');
-  }
+  //   tz.TZDateTime convertedLocalDateTime =
+  //       tz.TZDateTime.from(originalDateTime, mylocaltimezone);
+  //   print('Local Time: $convertedLocalDateTime');
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -139,126 +137,126 @@ class _ClassesMainState extends State<ClassesMain> {
         child: Container(
           padding: const EdgeInsets.only(left: 10, right: 10),
           child: Column(children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(
-                  color: Colors.black45,
-                  width: .1,
-                ),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-                child: Column(
-                  children: [
-                    Row(children: [
-                      Text(
-                        'Hello $firstname, welcome to Work4uTutor!',
-                        style: const TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                    ]),
-                    Row(children: [
-                      Container(
-                        width: 200,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: kColorPrimary,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        width: 200,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: kColorPrimary,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        width: 200,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: Colors.black,
-                            width: .2,
-                          ),
-                          color: Colors.white,
-                        ),
-                      ),
-                      const Spacer(),
-                      Container(
-                        width: 70,
-                        height: 70,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: kColorLight,
-                        ),
-                        child: const Icon(
-                          FontAwesomeIcons.trophy,
-                          color: kColorPrimary,
-                          size: 35,
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      InkWell(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return const SubscriptionType();
-                            },
-                          );
-                        },
-                        child: Container(
-                            width: 180,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: kColorYellow,
-                              boxShadow: [
-                                BoxShadow(
-                                    color: kColorYellow.withOpacity(0.5),
-                                    offset: const Offset(5, 7),
-                                    blurRadius: 1.5,
-                                    spreadRadius: -2)
-                              ],
-                            ),
-                            child: const Center(
-                              child: Text(
-                                'PAY NOW',
-                                style: TextStyle(
-                                    color: kColorBlue,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            )),
-                      ),
-                    ]),
-                    Row(children: const [
-                      Text(
-                        'Account not subscribe, please subscribe to complete your profile.',
-                        style: TextStyle(color: kColorDarkRed, fontSize: 13),
-                      ),
-                    ]),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // Container(
+            //   decoration: BoxDecoration(
+            //     color: Colors.white,
+            //     border: Border.all(
+            //       color: Colors.black45,
+            //       width: .1,
+            //     ),
+            //     borderRadius: BorderRadius.circular(5),
+            //   ),
+            //   child: Padding(
+            //     padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+            //     child: Column(
+            //       children: [
+            //         Row(children: [
+            //           Text(
+            //             'Hello $firstname, welcome to Work4uTutor!',
+            //             style: const TextStyle(
+            //               fontSize: 18,
+            //             ),
+            //           ),
+            //         ]),
+            //         Row(children: [
+            //           Container(
+            //             width: 200,
+            //             height: 10,
+            //             decoration: BoxDecoration(
+            //               borderRadius: BorderRadius.circular(10),
+            //               color: kColorPrimary,
+            //             ),
+            //           ),
+            //           const SizedBox(
+            //             width: 10,
+            //           ),
+            //           Container(
+            //             width: 200,
+            //             height: 10,
+            //             decoration: BoxDecoration(
+            //               borderRadius: BorderRadius.circular(10),
+            //               color: kColorPrimary,
+            //             ),
+            //           ),
+            //           const SizedBox(
+            //             width: 10,
+            //           ),
+            //           Container(
+            //             width: 200,
+            //             height: 10,
+            //             decoration: BoxDecoration(
+            //               borderRadius: BorderRadius.circular(10),
+            //               border: Border.all(
+            //                 color: Colors.black,
+            //                 width: .2,
+            //               ),
+            //               color: Colors.white,
+            //             ),
+            //           ),
+            //           const Spacer(),
+            //           Container(
+            //             width: 70,
+            //             height: 70,
+            //             decoration: const BoxDecoration(
+            //               shape: BoxShape.circle,
+            //               color: kColorLight,
+            //             ),
+            //             child: const Icon(
+            //               FontAwesomeIcons.trophy,
+            //               color: kColorPrimary,
+            //               size: 35,
+            //             ),
+            //           ),
+            //           const SizedBox(
+            //             width: 10,
+            //           ),
+            //           InkWell(
+            //             onTap: () {
+            //               showDialog(
+            //                 context: context,
+            //                 builder: (BuildContext context) {
+            //                   return const SubscriptionType();
+            //                 },
+            //               );
+            //             },
+            //             child: Container(
+            //                 width: 180,
+            //                 height: 50,
+            //                 decoration: BoxDecoration(
+            //                   borderRadius: BorderRadius.circular(10),
+            //                   color: kColorYellow,
+            //                   boxShadow: [
+            //                     BoxShadow(
+            //                         color: kColorYellow.withOpacity(0.5),
+            //                         offset: const Offset(5, 7),
+            //                         blurRadius: 1.5,
+            //                         spreadRadius: -2)
+            //                   ],
+            //                 ),
+            //                 child: const Center(
+            //                   child: Text(
+            //                     'PAY NOW',
+            //                     style: TextStyle(
+            //                         color: kColorBlue,
+            //                         fontSize: 22,
+            //                         fontWeight: FontWeight.bold),
+            //                   ),
+            //                 )),
+            //           ),
+            //         ]),
+            //         Row(children: const [
+            //           Text(
+            //             'Account not subscribe, please subscribe to complete your profile.',
+            //             style: TextStyle(color: kColorDarkRed, fontSize: 13),
+            //           ),
+            //         ]),
+            //         const SizedBox(
+            //           height: 10,
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
             Container(
               height: 50,
               width: size.width - 310,
@@ -276,8 +274,8 @@ class _ClassesMainState extends State<ClassesMain> {
                     "DASHBOARD",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 25,
-                      fontWeight: FontWeight.normal,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const Spacer(),
@@ -638,130 +636,130 @@ class _ClassesMainState extends State<ClassesMain> {
         child: Container(
           padding: const EdgeInsets.only(left: 10, right: 10),
           child: Column(children: [
-            Card(
-              margin: const EdgeInsets.all(4),
-              elevation: 4,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  // border: Border.all(
-                  //   color: Colors.black45,
-                  //   width: .1,
-                  // ),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-                  child: Column(
-                    children: [
-                      Row(children: const [
-                        Text(
-                          'Hello Username, welcome to Work4uTutor!',
-                          style: TextStyle(
-                            fontSize: 18,
-                          ),
-                        ),
-                      ]),
-                      Row(children: [
-                        Container(
-                          width: 200,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Container(
-                          width: 200,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Container(
-                          width: 200,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Colors.black,
-                              width: .2,
-                            ),
-                            color: Colors.white,
-                          ),
-                        ),
-                        const Spacer(),
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: kColorLight,
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.trophy,
-                            color: kColorPrimary,
-                            size: 35,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return const SubscriptionType();
-                              },
-                            );
-                          },
-                          child: Container(
-                              width: 180,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: kColorYellow,
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: kColorYellow.withOpacity(0.5),
-                                      offset: const Offset(5, 7),
-                                      blurRadius: 1.5,
-                                      spreadRadius: -2)
-                                ],
-                              ),
-                              child: const Center(
-                                child: Text(
-                                  'PAY NOW',
-                                  style: TextStyle(
-                                      color: kColorBlue,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              )),
-                        ),
-                      ]),
-                      Row(children: const [
-                        Text(
-                          'Account not subscribe, please subscribe to complete your profile.',
-                          style: TextStyle(color: kColorDarkRed, fontSize: 13),
-                        ),
-                      ]),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
+            // Card(
+            //   margin: const EdgeInsets.all(4),
+            //   elevation: 4,
+            //   child: Container(
+            //     decoration: BoxDecoration(
+            //       color: Colors.white,
+            //       // border: Border.all(
+            //       //   color: Colors.black45,
+            //       //   width: .1,
+            //       // ),
+            //       borderRadius: BorderRadius.circular(5),
+            //     ),
+            //     child: Padding(
+            //       padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+            //       child: Column(
+            //         children: [
+            //           Row(children: const [
+            //             Text(
+            //               'Hello Username, welcome to Work4uTutor!',
+            //               style: TextStyle(
+            //                 fontSize: 18,
+            //               ),
+            //             ),
+            //           ]),
+            //           Row(children: [
+            //             Container(
+            //               width: 200,
+            //               height: 10,
+            //               decoration: BoxDecoration(
+            //                 borderRadius: BorderRadius.circular(10),
+            //                 color: kColorPrimary,
+            //               ),
+            //             ),
+            //             const SizedBox(
+            //               width: 10,
+            //             ),
+            //             Container(
+            //               width: 200,
+            //               height: 10,
+            //               decoration: BoxDecoration(
+            //                 borderRadius: BorderRadius.circular(10),
+            //                 color: kColorPrimary,
+            //               ),
+            //             ),
+            //             const SizedBox(
+            //               width: 10,
+            //             ),
+            //             Container(
+            //               width: 200,
+            //               height: 10,
+            //               decoration: BoxDecoration(
+            //                 borderRadius: BorderRadius.circular(10),
+            //                 border: Border.all(
+            //                   color: Colors.black,
+            //                   width: .2,
+            //                 ),
+            //                 color: Colors.white,
+            //               ),
+            //             ),
+            //             const Spacer(),
+            //             Container(
+            //               width: 70,
+            //               height: 70,
+            //               decoration: const BoxDecoration(
+            //                 shape: BoxShape.circle,
+            //                 color: kColorLight,
+            //               ),
+            //               child: const Icon(
+            //                 FontAwesomeIcons.trophy,
+            //                 color: kColorPrimary,
+            //                 size: 35,
+            //               ),
+            //             ),
+            //             const SizedBox(
+            //               width: 10,
+            //             ),
+            //             InkWell(
+            //               onTap: () {
+            //                 showDialog(
+            //                   context: context,
+            //                   builder: (BuildContext context) {
+            //                     return const SubscriptionType();
+            //                   },
+            //                 );
+            //               },
+            //               child: Container(
+            //                   width: 180,
+            //                   height: 50,
+            //                   decoration: BoxDecoration(
+            //                     borderRadius: BorderRadius.circular(10),
+            //                     color: kColorYellow,
+            //                     boxShadow: [
+            //                       BoxShadow(
+            //                           color: kColorYellow.withOpacity(0.5),
+            //                           offset: const Offset(5, 7),
+            //                           blurRadius: 1.5,
+            //                           spreadRadius: -2)
+            //                     ],
+            //                   ),
+            //                   child: const Center(
+            //                     child: Text(
+            //                       'PAY NOW',
+            //                       style: TextStyle(
+            //                           color: kColorBlue,
+            //                           fontSize: 22,
+            //                           fontWeight: FontWeight.bold),
+            //                     ),
+            //                   )),
+            //             ),
+            //           ]),
+            //           Row(children: const [
+            //             Text(
+            //               'Account not subscribe, please subscribe to complete your profile.',
+            //               style: TextStyle(color: kColorDarkRed, fontSize: 13),
+            //             ),
+            //           ]),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // const SizedBox(
+            //   height: 10,
+            // ),
             Container(
               height: 50,
               width: size.width,
@@ -779,8 +777,8 @@ class _ClassesMainState extends State<ClassesMain> {
                     "DASHBOARD",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 25,
-                      fontWeight: FontWeight.normal,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   Spacer(),
@@ -1131,129 +1129,129 @@ class _ClassesMainState extends State<ClassesMain> {
       return Container(
         padding: const EdgeInsets.only(left: 10, right: 10),
         child: Column(children: [
-          Visibility(
-            visible: tutorstatus,
-            child: Card(
-              margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
-              elevation: 4,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-                  child: Column(
-                    children: [
-                      Row(children: [
-                        Text(
-                          'Hello $firstname, welcome to Work4uTutor!',
-                          style: const TextStyle(
-                            fontSize: 18,
-                          ),
-                        ),
-                      ]),
-                      Row(children: [
-                        Container(
-                          width: 200,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Container(
-                          width: 200,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Container(
-                          width: 200,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Colors.black,
-                              width: .2,
-                            ),
-                            color: Colors.white,
-                          ),
-                        ),
-                        const Spacer(),
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: kColorLight,
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.trophy,
-                            color: kColorPrimary,
-                            size: 35,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return const SubscriptionType();
-                              },
-                            );
-                          },
-                          child: Container(
-                              width: 180,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: kColorYellow,
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: kColorYellow.withOpacity(0.5),
-                                      offset: const Offset(5, 7),
-                                      blurRadius: 1.5,
-                                      spreadRadius: -2)
-                                ],
-                              ),
-                              child: const Center(
-                                child: Text(
-                                  'PAY NOW',
-                                  style: TextStyle(
-                                      color: kColorBlue,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              )),
-                        ),
-                      ]),
-                      Row(children: const [
-                        Text(
-                          'Account not subscribe, please subscribe to complete your profile.',
-                          style: TextStyle(color: kColorDarkRed, fontSize: 13),
-                        ),
-                      ]),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
+          // Visibility(
+          //   visible: tutorstatus,
+          //   child: Card(
+          //     margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+          //     elevation: 4,
+          //     child: Container(
+          //       decoration: BoxDecoration(
+          //         color: Colors.white,
+          //         borderRadius: BorderRadius.circular(5),
+          //       ),
+          //       child: Padding(
+          //         padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+          //         child: Column(
+          //           children: [
+          //             Row(children: [
+          //               Text(
+          //                 'Hello $firstname, welcome to Work4uTutor!',
+          //                 style: const TextStyle(
+          //                   fontSize: 18,
+          //                 ),
+          //               ),
+          //             ]),
+          //             Row(children: [
+          //               Container(
+          //                 width: 200,
+          //                 height: 10,
+          //                 decoration: BoxDecoration(
+          //                   borderRadius: BorderRadius.circular(10),
+          //                   color: kColorPrimary,
+          //                 ),
+          //               ),
+          //               const SizedBox(
+          //                 width: 10,
+          //               ),
+          //               Container(
+          //                 width: 200,
+          //                 height: 10,
+          //                 decoration: BoxDecoration(
+          //                   borderRadius: BorderRadius.circular(10),
+          //                   color: kColorPrimary,
+          //                 ),
+          //               ),
+          //               const SizedBox(
+          //                 width: 10,
+          //               ),
+          //               Container(
+          //                 width: 200,
+          //                 height: 10,
+          //                 decoration: BoxDecoration(
+          //                   borderRadius: BorderRadius.circular(10),
+          //                   border: Border.all(
+          //                     color: Colors.black,
+          //                     width: .2,
+          //                   ),
+          //                   color: Colors.white,
+          //                 ),
+          //               ),
+          //               const Spacer(),
+          //               Container(
+          //                 width: 70,
+          //                 height: 70,
+          //                 decoration: const BoxDecoration(
+          //                   shape: BoxShape.circle,
+          //                   color: kColorLight,
+          //                 ),
+          //                 child: const Icon(
+          //                   FontAwesomeIcons.trophy,
+          //                   color: kColorPrimary,
+          //                   size: 35,
+          //                 ),
+          //               ),
+          //               const SizedBox(
+          //                 width: 10,
+          //               ),
+          //               InkWell(
+          //                 onTap: () {
+          //                   showDialog(
+          //                     context: context,
+          //                     builder: (BuildContext context) {
+          //                       return const SubscriptionType();
+          //                     },
+          //                   );
+          //                 },
+          //                 child: Container(
+          //                     width: 180,
+          //                     height: 50,
+          //                     decoration: BoxDecoration(
+          //                       borderRadius: BorderRadius.circular(10),
+          //                       color: kColorYellow,
+          //                       boxShadow: [
+          //                         BoxShadow(
+          //                             color: kColorYellow.withOpacity(0.5),
+          //                             offset: const Offset(5, 7),
+          //                             blurRadius: 1.5,
+          //                             spreadRadius: -2)
+          //                       ],
+          //                     ),
+          //                     child: const Center(
+          //                       child: Text(
+          //                         'PAY NOW',
+          //                         style: TextStyle(
+          //                             color: kColorBlue,
+          //                             fontSize: 22,
+          //                             fontWeight: FontWeight.bold),
+          //                       ),
+          //                     )),
+          //               ),
+          //             ]),
+          //             Row(children: const [
+          //               Text(
+          //                 'Account not subscribe, please subscribe to complete your profile.',
+          //                 style: TextStyle(color: kColorDarkRed, fontSize: 13),
+          //               ),
+          //             ]),
+          //             const SizedBox(
+          //               height: 10,
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
           Card(
             margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
             elevation: 4,
@@ -1274,8 +1272,8 @@ class _ClassesMainState extends State<ClassesMain> {
                     "DASHBOARD",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 25,
-                      fontWeight: FontWeight.normal,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const Spacer(),
@@ -1307,7 +1305,7 @@ class _ClassesMainState extends State<ClassesMain> {
                       child: Container(
                         alignment: Alignment.center,
                         width: (size.width - 350) / 3,
-                        height: tutorstatus ? 230 : 300,
+                        height: 300,
                         decoration: const BoxDecoration(
                           shape: BoxShape.rectangle,
                           borderRadius: BorderRadius.all(
@@ -1361,7 +1359,7 @@ class _ClassesMainState extends State<ClassesMain> {
                       child: Container(
                         alignment: Alignment.center,
                         width: (size.width - 350) / 3,
-                        height: tutorstatus ? 230 : 300,
+                        height: 300,
                         decoration: const BoxDecoration(
                           shape: BoxShape.rectangle,
                           borderRadius: BorderRadius.all(
@@ -1415,7 +1413,7 @@ class _ClassesMainState extends State<ClassesMain> {
                       child: Container(
                         alignment: Alignment.center,
                         width: (size.width - 350) / 3,
-                        height: tutorstatus ? 230 : 300,
+                        height: 300,
                         decoration: const BoxDecoration(
                           shape: BoxShape.rectangle,
                           borderRadius: BorderRadius.all(
@@ -1475,7 +1473,7 @@ class _ClassesMainState extends State<ClassesMain> {
                       child: Container(
                         alignment: Alignment.center,
                         width: (size.width - 350) / 3,
-                        height: tutorstatus ? 230 : 300,
+                        height: 300,
                         decoration: const BoxDecoration(
                           shape: BoxShape.rectangle,
                           borderRadius: BorderRadius.all(
@@ -1529,7 +1527,7 @@ class _ClassesMainState extends State<ClassesMain> {
                       child: Container(
                         alignment: Alignment.center,
                         width: (size.width - 350) / 3,
-                        height: tutorstatus ? 230 : 300,
+                        height: 300,
                         decoration: const BoxDecoration(
                           shape: BoxShape.rectangle,
                           borderRadius: BorderRadius.all(
@@ -1583,7 +1581,7 @@ class _ClassesMainState extends State<ClassesMain> {
                       child: Container(
                         alignment: Alignment.center,
                         width: (size.width - 350) / 3,
-                        height: tutorstatus ? 230 : 300,
+                        height: 300,
                         decoration: const BoxDecoration(
                           shape: BoxShape.rectangle,
                           borderRadius: BorderRadius.all(

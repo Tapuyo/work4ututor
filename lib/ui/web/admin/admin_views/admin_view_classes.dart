@@ -21,8 +21,7 @@ class ViewStudentClassInfo extends StatefulWidget {
   });
 
   @override
-  State<ViewStudentClassInfo> createState() =>
-      _ViewStudentClassInfoState();
+  State<ViewStudentClassInfo> createState() => _ViewStudentClassInfoState();
 }
 
 class _ViewStudentClassInfoState extends State<ViewStudentClassInfo> {
@@ -222,7 +221,7 @@ class _ViewStudentClassInfoState extends State<ViewStudentClassInfo> {
                                         const SizedBox(
                                           width: 20,
                                         ),
-                                         Text(
+                                        Text(
                                           '/${widget.data.contact}',
                                           style: const TextStyle(
                                               fontSize: 25,
@@ -236,7 +235,7 @@ class _ViewStudentClassInfoState extends State<ViewStudentClassInfo> {
                                     ),
                                     Row(
                                       children: [
-                                         Flexible(
+                                        Flexible(
                                           flex: 5,
                                           child: Text(
                                             widget.data.studentID,
@@ -451,8 +450,7 @@ class _ViewStudentClassInfoState extends State<ViewStudentClassInfo> {
                                                           //     return "${(scheduledata.session)}th session  ${DateFormat('MMMM, dd yyyy').format(scheduledata.schedule)} (Upcoming)";
                                                           //   }
                                                           // })(),
-                                                          style:
-                                                              TextStyle(
+                                                          style: TextStyle(
                                                             fontSize: 18,
                                                             fontStyle: FontStyle
                                                                 .normal,
@@ -505,7 +503,18 @@ class _ViewStudentClassInfoState extends State<ViewStudentClassInfo> {
                                                             ),
                                                           ),
                                                           onPressed: () {
-                                                            Schedule data = Schedule(scheduleID: 'scheduleID', session: 'session', schedule: DateTime.now(), timefrom: 'timefrom', timeto: 'timeto');
+                                                            Schedule data = Schedule(
+                                                                scheduleID:
+                                                                    'scheduleID',
+                                                                session:
+                                                                    'session',
+                                                                schedule:
+                                                                    DateTime
+                                                                        .now(),
+                                                                timefrom:
+                                                                    'timefrom',
+                                                                timeto:
+                                                                    'timeto', classstatus: '', meetinglink: '');
                                                             // String dateresult =
                                                             //     dueCancelDate(
                                                             //         scheduledata

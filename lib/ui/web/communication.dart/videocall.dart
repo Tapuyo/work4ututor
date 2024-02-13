@@ -5,6 +5,7 @@ import 'dart:html' as html;
 import 'dart:html';
 import 'dart:io';
 import 'dart:js' as js;
+import 'dart:math';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
@@ -17,6 +18,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -35,11 +37,11 @@ const appCertificate = "72f8f49b581f41b4a4fefa998beb484a";
 const token = "";
 const channel = "test";
 
-void main() => runApp(const MaterialApp(
-        home: VideoCall(
-      chatID: '',
-      uID: '',
-    )));
+// void main() => runApp(const MaterialApp(
+//         home: VideoCall(
+//       chatID: '',
+//       uID: '',
+//     )));
 
 class VideoCall extends StatefulWidget {
   final String uID;
@@ -79,7 +81,7 @@ class VideoCallBody extends StatefulWidget {
 }
 
 class _VideoCallBodyState extends State<VideoCallBody> {
-  int _remoteUid = 0;
+  int? _remoteUid;
   int _localUid = 0;
   bool _localUserJoined = false;
   bool _remoteUserJoined = false;
@@ -88,7 +90,10 @@ class _VideoCallBodyState extends State<VideoCallBody> {
   bool _isScreenSharing = false;
   int _speakerUid = 0;
   bool isRecording = false;
+  bool isPreview = true;
+  bool cameraInUse = false;
   bool isFullScreen = false;
+  bool isMute = false;
   bool viewChat = true;
   bool isVirtualBackGroundEnabled = false;
   bool _isEnabledVirtualBackgroundImage = false;
@@ -213,7 +218,7 @@ class _VideoCallBodyState extends State<VideoCallBody> {
   void initState() {
     super.initState();
     initAgora();
-    _startTimer();
+    // _startTimer();
     // Add an event listener to detect fullscreen change
     js.context.callMethod('addEventListener', ['keydown', handleKeyDown]);
 
@@ -245,15 +250,18 @@ class _VideoCallBodyState extends State<VideoCallBody> {
   void _toggleScreenSharing() async {
     if (_isScreenSharing) {
       // Stop local video
-      await _engine.startScreenCaptureByDisplayId(0);
       setState(() {
-        _engine.enableLocalVideo(false);
+        _engine.stopPreview();
+        _engine.disableVideo();
+        _isScreenSharing = !_isScreenSharing;
       });
+      await _engine.startScreenCaptureByDisplayId(0);
     } else {
-      // Stop screen sharing
       await _engine.stopScreenCapture();
       setState(() {
-        _engine.enableLocalVideo(true);
+        _engine.enableVideo();
+        _engine.startPreview();
+        _isScreenSharing = !_isScreenSharing;
       });
     }
   }
@@ -264,6 +272,14 @@ class _VideoCallBodyState extends State<VideoCallBody> {
 
   void unmuteAudio() {
     _engine.muteLocalAudioStream(false); // Unmute local audio
+  }
+
+  switchMicrophone() async {
+    // await _engine.muteLocalAudioStream(!openMicrophone);
+    await _engine.muteLocalAudioStream(!isMute);
+    setState(() {
+      isMute = !isMute;
+    });
   }
 
   Future<String> generateRecordingKey() async {
@@ -315,26 +331,75 @@ class _VideoCallBodyState extends State<VideoCallBody> {
 
   Future<void> startRecording() async {
     final recordingKey = await generateRecordingKey();
-    // Start recording implementation...
-    //  await _engine.videorec(0);
-    // Replace or modify this method to integrate with your recording solution
   }
 
   void stopRecording() {
     // Stop recording implementation...
-    // Replace or modify this method to integrate with your recording solution
+  }
+
+  void startMediaStream() async {
+    try {
+      final stream = await window.navigator.mediaDevices!.getUserMedia({
+        'video': true, // Set to true if you want video as well
+        'audio': true, // Set to true to enable audio
+      });
+
+      // Do something with the media stream, e.g., display video and/or audio
+      // For example, displaying video in a video element:
+      // final videoElement = VideoElement()..srcObject = stream;
+      // videoElement.style.width = '100%';
+      // videoElement.style.height = 'auto';
+      // videoElement.autoplay = true;
+      // videoElement.controls = true;
+
+      // document.body!.append(videoElement);
+    } catch (e) {
+      print("Error accessing media stream: $e");
+    }
   }
 
   Future<void> initAgora() async {
     // retrieve permissions
-    await window.navigator.getUserMedia(audio: true, video: true);
+    // startMediaStream();
+    bool response = false;
+    try {
+      await window.navigator.mediaDevices?.getUserMedia({
+        'video': true,
+        'audio': true,
+      });
+      response = true;
+      // Media devices started successfully
+    } catch (error) {
+      if (error == 'NotAllowedError' || error == 'NotReadableError') {
+        // The camera is in use by another application
+        response = false;
+        cameraInUse = true;
+        print(
+            'Could not start video source. Another application may be using the camera.');
+        // You can display a user-friendly message or take appropriate action
+      } else {
+        // Handle other errors
+        response = false;
+        cameraInUse = true;
+        print(error);
+      }
+    }
 
+    // await window.navigator.mediaDevices!.getUserMedia({
+    //   'video': true,
+    //   'audio': true,
+    // });
     //create the engine
     _engine = await RtcEngine.create(appId);
-    await _engine.enableVideo();
-    await _engine.startPreview();
-    await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
-    await _engine.setClientRole(ClientRole.Broadcaster);
+    if (response == false) {
+      await _engine.disableVideo();
+    } else {
+      await _engine.enableVideo();
+      await _engine.startPreview();
+    }
+
+    await _engine.setChannelProfile(ChannelProfile.Communication);
+    // await _engine.setClientRole(ClientRole.Broadcaster);
     _engine.setEventHandler(
       RtcEngineEventHandler(
         joinChannelSuccess: (String channel, int uid, int elapsed) {
@@ -353,7 +418,7 @@ class _VideoCallBodyState extends State<VideoCallBody> {
         userOffline: (int uid, UserOfflineReason reason) {
           print("remote user $uid left channel");
           setState(() {
-            _remoteUid = 0;
+            _remoteUid = null;
             _remoteUserJoined = false;
           });
         },
@@ -370,13 +435,51 @@ class _VideoCallBodyState extends State<VideoCallBody> {
       ),
     );
 
-    await _engine.joinChannel(token, channel, null, 0);
+    await _engine.joinChannel(token, channel, null, _localUid);
   }
 
   void _onWhiteboardPaint(DrawUpdate update) {
     setState(() {
       _points = List.of(_points)..add(update.offset);
     });
+  }
+
+  void cameraView() async {
+    if (isPreview) {
+      await window.navigator.mediaDevices!.getUserMedia({
+        'video': false,
+        'audio': true,
+      });
+      setState(() {
+        isPreview = !isPreview;
+      });
+
+      await _engine.stopPreview();
+      await _engine.disableVideo();
+    }
+    // if (cameraInUse == false) {
+    //   await window.navigator.mediaDevices!.getUserMedia({
+    //     'video': true,
+    //     'audio': true,
+    //   });
+    //   setState(() {
+    //     isPreview = !isPreview;
+    //   });
+
+    //   await _engine.stopPreview();
+    //   await _engine.disableVideo();
+    // }
+    else {
+      await window.navigator.mediaDevices!.getUserMedia({
+        'video': true,
+        'audio': true,
+      });
+      setState(() {
+        isPreview = !isPreview;
+      });
+      await _engine.enableVideo();
+      await _engine.startPreview();
+    }
   }
 
   void _onClearButtonPressed() {
@@ -477,6 +580,50 @@ class _VideoCallBodyState extends State<VideoCallBody> {
       _isEnabledVirtualBackgroundImage = !_isEnabledVirtualBackgroundImage;
     });
   }
+
+  // _startScreenShare() async {
+  //   final helper = await _engine.getScreenShareHelper(
+  //       appGroup: kIsWeb || Platform.isWindows ? null : _kDefaultAppGroup);
+  //   helper.setEventHandler(RtcEngineEventHandler(
+  //     joinChannelSuccess: (String channel, int uid, int elapsed) {
+  //       print('ScreenSharing joinChannelSuccess $channel $uid $elapsed');
+  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //         content:
+  //             Text('ScreenSharing joinChannelSuccess $channel $uid $elapsed'),
+  //       ));
+  //     },
+  //     localVideoStateChanged:
+  //         (LocalVideoStreamState localVideoState, LocalVideoStreamError error) {
+  //       print(
+  //           'ScreenSharing localVideoStateChanged $localVideoState $error');
+  //       if (error == LocalVideoStreamError.ScreenCaptureWindowClosed) {
+  //         _stopScreenShare();
+  //       }
+  //     },
+  //   ));
+
+  //   await helper.disableAudio();
+  //   await helper.enableVideo();
+  //   await helper.setChannelProfile(ChannelProfile.LiveBroadcasting);
+  //   await helper.setClientRole(ClientRole.Broadcaster);
+  //   var windowId = 0;
+  //   var random = Random();
+  //   if (!kIsWeb &&
+  //       (Platform.isWindows || Platform.isMacOS || Platform.isAndroid)) {
+  //     final windows = _engine.enumerateWindows();
+  //     if (windows.isNotEmpty) {
+  //       final index = random.nextInt(windows.length - 1);
+  //       print('ScreenSharing window with index $index');
+  //       windowId = windows[index].id;
+  //     }
+  //   }
+  //   await helper.startScreenCaptureByWindowId(windowId);
+  //   setState(() {
+  //     screenSharing = true;
+  //   });
+  //   await helper.joinChannel(
+  //       config.token, channelId, null, config.screenSharingUid);
+  // }
 
   // Create UI with local view and remote view
   @override
@@ -583,17 +730,17 @@ class _VideoCallBodyState extends State<VideoCallBody> {
                                                 ),
                                               ]),
                                           const Spacer(),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10.0),
-                                            child: Text(
-                                              _formatTime(_seconds),
-                                              style: const TextStyle(
-                                                  fontSize: 30.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: kColorPrimaryDark),
-                                            ),
-                                          ),
+                                          // Padding(
+                                          //   padding: const EdgeInsets.only(
+                                          //       left: 10.0),
+                                          //   child: Text(
+                                          //     _formatTime(_seconds),
+                                          //     style: const TextStyle(
+                                          //         fontSize: 30.0,
+                                          //         fontWeight: FontWeight.bold,
+                                          //         color: kColorPrimaryDark),
+                                          //   ),
+                                          // ),
                                         ],
                                       )),
                                 ),
@@ -627,8 +774,12 @@ class _VideoCallBodyState extends State<VideoCallBody> {
                                             190,
                                     child: Padding(
                                       padding: const EdgeInsets.all(5.0),
-                                      child: Center(
-                                        child: _remoteVideo(),
+                                      child: SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width /2,
+                                        child: Center(
+                                          child: _remoteVideo(),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -652,15 +803,6 @@ class _VideoCallBodyState extends State<VideoCallBody> {
                                             FloatingActionButton(
                                               backgroundColor: kColorPrimary,
                                               onPressed: () {
-                                                if (_isScreenSharing) {
-                                                  setState(() {
-                                                    _isScreenSharing = false;
-                                                  });
-                                                } else {
-                                                  setState(() {
-                                                    _isScreenSharing = true;
-                                                  });
-                                                }
                                                 _toggleScreenSharing();
                                               },
                                               child: Icon(_isScreenSharing
@@ -669,14 +811,35 @@ class _VideoCallBodyState extends State<VideoCallBody> {
                                             ),
                                             FloatingActionButton(
                                               backgroundColor: kColorPrimary,
-                                              onPressed: muteAudio,
-                                              child: const Icon(Icons.mic),
+                                              onPressed: () {
+                                                switchMicrophone();
+                                              },
+                                              child: isMute
+                                                  ? Icon(
+                                                      Icons.mic,
+                                                      color:
+                                                          Colors.red.shade200,
+                                                    )
+                                                  : const Icon(Icons.mic),
                                             ),
+                                            // FloatingActionButton(
+                                            //   backgroundColor: kColorPrimary,
+                                            //   onPressed: () =>
+                                            //       {_enableVirtualBackground()},
+                                            //   child: const Icon(Icons.image),
+                                            // ),
                                             FloatingActionButton(
                                               backgroundColor: kColorPrimary,
-                                              onPressed: () =>
-                                                  {_enableVirtualBackground()},
-                                              child: const Icon(Icons.image),
+                                              onPressed: () {
+                                                cameraView();
+                                              },
+                                              child: isPreview
+                                                  ? const Icon(Icons.camera)
+                                                  : Icon(
+                                                      Icons.camera,
+                                                      color:
+                                                          Colors.red.shade200,
+                                                    ),
                                             ),
                                             FloatingActionButton(
                                               backgroundColor: kColorPrimary,
@@ -778,7 +941,7 @@ class _VideoCallBodyState extends State<VideoCallBody> {
                 width: 5,
               ),
               Visibility(
-                visible: viewChat,
+                visible: false,
                 child: Expanded(
                   flex: 5,
                   child: Padding(
@@ -1152,9 +1315,11 @@ class _VideoCallBodyState extends State<VideoCallBody> {
   }
   // Display remote user's video
   Widget _remoteVideo() {
-    if (_remoteUid != 0 && _speakerUid != _remoteUid) {
+    if (_remoteUid != null && _speakerUid != _remoteUid) {
       return RtcRemoteView.SurfaceView(
-        uid: _remoteUid,
+        zOrderMediaOverlay: true,
+        zOrderOnTop: true,
+        uid: _remoteUid!,
         channelId: channel,
       );
     } else {
@@ -1175,16 +1340,20 @@ class _VideoCallBodyState extends State<VideoCallBody> {
   }
 
   Widget _localuserVideo() {
-    if (_localUserJoined) {
+    if (_localUserJoined && isPreview) {
       return const RtcLocalView.SurfaceView(
         channelId: channel,
+        zOrderMediaOverlay: true,
+        zOrderOnTop: true,
       );
-    } else if (_isScreenSharing) {
+    } else if (_localUserJoined && _isScreenSharing || isPreview == false) {
       return const Icon(
         Icons.person_2_rounded,
-        size: 20,
+        size: 60,
         color: kColorPrimary,
       );
+    } else if (_localUserJoined && cameraInUse) {
+      return const Text('Camera in Use by other media');
     } else {
       return const CircularProgressIndicator();
     }
@@ -1196,7 +1365,7 @@ class _VideoCallBodyState extends State<VideoCallBody> {
       return const RtcLocalView.SurfaceView();
     } else if (_speakerUid == _remoteUid) {
       return RtcRemoteView.SurfaceView(
-        uid: _remoteUid,
+        uid: _remoteUid!,
         channelId: channel,
       );
     } else if (_isScreenSharing) {

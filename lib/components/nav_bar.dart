@@ -2,6 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cool_alert/cool_alert.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -11,6 +12,8 @@ import 'package:work4ututor/ui/web/login/login.dart';
 import 'package:work4ututor/ui/web/signup/student_signup.dart';
 import 'package:work4ututor/ui/web/signup/tutor_signup.dart';
 
+import '../provider/chatmessagedisplay.dart';
+import '../provider/classinfo_provider.dart';
 import '../provider/init_provider.dart';
 import '../ui/auth/auth.dart';
 import '../ui/web/search_tutor/find_tutors.dart';
@@ -306,6 +309,8 @@ Widget navbarmenu(BuildContext context) {
           onPressed: () {
             final provider = context.read<InitProvider>();
             provider.setMenuIndex(0);
+              final provider2 = context.read<ChatDisplayProvider>();
+                    provider2.setOpenMessage(false);
           },
           icon: const Icon(
             Icons.home_outlined,
@@ -353,6 +358,10 @@ Widget navbarmenu(BuildContext context) {
           onPressed: () {
             final provider = context.read<InitProvider>();
             provider.setMenuIndex(1);
+            final provider1 = context.read<ViewClassDisplayProvider>();
+            provider1.setViewClassinfo(false);
+              final provider2 = context.read<ChatDisplayProvider>();
+                    provider2.setOpenMessage(false);
           },
           icon: const Icon(
             Icons.calendar_month,
@@ -367,53 +376,53 @@ Widget navbarmenu(BuildContext context) {
       const SizedBox(
         height: 20,
       ),
-      Container(
-        height: 50,
-        width: 240,
-        decoration: const BoxDecoration(
-          shape: BoxShape.rectangle,
-          color: Color.fromRGBO(1, 118, 132, 1),
-          borderRadius: BorderRadius.all(Radius.circular(25)),
-        ),
-        child: TextButton.icon(
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.only(left: 50),
-            alignment: Alignment.centerLeft,
-            foregroundColor: Colors.white,
-            disabledBackgroundColor: Colors.white,
-            backgroundColor: menuIndex != 3 ? kColorSecondary : kColorPrimary,
-            shape: RoundedRectangleBorder(
-              side: const BorderSide(
-                color: Color.fromRGBO(1, 118, 132, 1), // your color here
-                width: 1,
-              ),
-              borderRadius: BorderRadius.circular(24.0),
-            ),
-            // ignore: prefer_const_constructors
-            textStyle: TextStyle(
-              color: Colors.black,
-              fontSize: 12,
-              fontStyle: FontStyle.normal,
-              decoration: TextDecoration.none,
-            ),
-          ),
-          onPressed: () {
-            final provider = context.read<InitProvider>();
-            provider.setMenuIndex(3);
-          },
-          icon: const Icon(
-            Icons.question_answer,
-            size: 30,
-          ),
-          label: const Text(
-            'INQUIRIES',
-            style: TextStyle(fontSize: 15),
-          ),
-        ),
-      ),
-      const SizedBox(
-        height: 20,
-      ),
+      // Container(
+      //   height: 50,
+      //   width: 240,
+      //   decoration: const BoxDecoration(
+      //     shape: BoxShape.rectangle,
+      //     color: Color.fromRGBO(1, 118, 132, 1),
+      //     borderRadius: BorderRadius.all(Radius.circular(25)),
+      //   ),
+      //   child: TextButton.icon(
+      //     style: TextButton.styleFrom(
+      //       padding: const EdgeInsets.only(left: 50),
+      //       alignment: Alignment.centerLeft,
+      //       foregroundColor: Colors.white,
+      //       disabledBackgroundColor: Colors.white,
+      //       backgroundColor: menuIndex != 3 ? kColorSecondary : kColorPrimary,
+      //       shape: RoundedRectangleBorder(
+      //         side: const BorderSide(
+      //           color: Color.fromRGBO(1, 118, 132, 1), // your color here
+      //           width: 1,
+      //         ),
+      //         borderRadius: BorderRadius.circular(24.0),
+      //       ),
+      //       // ignore: prefer_const_constructors
+      //       textStyle: TextStyle(
+      //         color: Colors.black,
+      //         fontSize: 12,
+      //         fontStyle: FontStyle.normal,
+      //         decoration: TextDecoration.none,
+      //       ),
+      //     ),
+      //     onPressed: () {
+      //       final provider = context.read<InitProvider>();
+      //       provider.setMenuIndex(3);
+      //     },
+      //     icon: const Icon(
+      //       Icons.question_answer,
+      //       size: 30,
+      //     ),
+      //     label: const Text(
+      //       'INQUIRIES',
+      //       style: TextStyle(fontSize: 15),
+      //     ),
+      //   ),
+      // ),
+      // const SizedBox(
+      //   height: 20,
+      // ),
       Container(
         height: 50,
         width: 240,
@@ -447,6 +456,8 @@ Widget navbarmenu(BuildContext context) {
           onPressed: () {
             final provider = context.read<InitProvider>();
             provider.setMenuIndex(4);
+              final provider2 = context.read<ChatDisplayProvider>();
+                    provider2.setOpenMessage(false);
           },
           icon: const Icon(
             Icons.supervised_user_circle,
@@ -454,6 +465,55 @@ Widget navbarmenu(BuildContext context) {
           ),
           label: const Text(
             'STUDENTS',
+            style: TextStyle(fontSize: 15),
+          ),
+        ),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      Container(
+        height: 50,
+        width: 240,
+        decoration: const BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Color.fromRGBO(1, 118, 132, 1),
+          borderRadius: BorderRadius.all(Radius.circular(25)),
+        ),
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.only(left: 50),
+            alignment: Alignment.centerLeft,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: Colors.white,
+            backgroundColor: menuIndex != 2 ? kColorSecondary : kColorPrimary,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(
+                color: Color.fromRGBO(1, 118, 132, 1), // your color here
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(24.0),
+            ),
+            // ignore: prefer_const_constructors
+            textStyle: TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+              fontStyle: FontStyle.normal,
+              decoration: TextDecoration.none,
+            ),
+          ),
+          onPressed: () {
+            final provider = context.read<InitProvider>();
+            provider.setMenuIndex(2);
+            final provider1 = context.read<ViewClassDisplayProvider>();
+            provider1.setViewClassinfo(false);
+          },
+          icon: const Icon(
+            EvaIcons.email,
+            size: 30,
+          ),
+          label: const Text(
+            'MESSAGES',
             style: TextStyle(fontSize: 15),
           ),
         ),
@@ -494,6 +554,10 @@ Widget navbarmenu(BuildContext context) {
           onPressed: () {
             final provider = context.read<InitProvider>();
             provider.setMenuIndex(5);
+            final provider1 = context.read<ViewClassDisplayProvider>();
+            provider1.setViewClassinfo(false);
+              final provider2 = context.read<ChatDisplayProvider>();
+                    provider2.setOpenMessage(false);
           },
           icon: const Icon(
             Icons.feedback,
@@ -541,6 +605,10 @@ Widget navbarmenu(BuildContext context) {
           onPressed: () {
             final provider = context.read<InitProvider>();
             provider.setMenuIndex(6);
+            final provider1 = context.read<ViewClassDisplayProvider>();
+            provider1.setViewClassinfo(false);
+              final provider2 = context.read<ChatDisplayProvider>();
+                    provider2.setOpenMessage(false);
           },
           icon: const Icon(
             Icons.settings,
@@ -588,6 +656,10 @@ Widget navbarmenu(BuildContext context) {
           onPressed: () {
             final provider = context.read<InitProvider>();
             provider.setMenuIndex(7);
+            final provider1 = context.read<ViewClassDisplayProvider>();
+            provider1.setViewClassinfo(false);
+            final provider2 = context.read<ChatDisplayProvider>();
+                    provider2.setOpenMessage(false);
           },
           icon: const Icon(
             Icons.help_outline_rounded,
@@ -648,6 +720,8 @@ Widget navbarmenu(BuildContext context) {
                 Navigator.of(context).pop;
               },
               onConfirmBtnTap: () async {
+                final provider = context.read<ChatDisplayProvider>();
+                    provider.setOpenMessage(false);
                 await _auth.signOutAnon();
                 deleteAllData();
                 // ignore: use_build_context_synchronously
@@ -669,7 +743,7 @@ Widget navbarmenu(BuildContext context) {
         ),
       ),
       const SizedBox(
-        height: 30,
+        height: 80,
       ),
       Container(
         alignment: Alignment.center,
@@ -695,7 +769,7 @@ Widget navbarmenu(BuildContext context) {
                       showDialog(
                           barrierDismissible: false,
                           context: context,
-                          builder: (_) => const TermPage());
+                          builder: (_) => const TermPage(pdfurl: '',));
                     }),
               const TextSpan(text: ' / '),
               TextSpan(
@@ -710,7 +784,7 @@ Widget navbarmenu(BuildContext context) {
                       showDialog(
                           barrierDismissible: false,
                           context: context,
-                          builder: (_) => const TermPage());
+                          builder: (_) => const TermPage(pdfurl: '',));
                     }),
               const TextSpan(text: '\nCopyrights @ 2023 Work4uTutor'),
             ],
@@ -803,7 +877,10 @@ class FindTutorNavbar extends StatelessWidget {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const FindTutor(userid: '',)),
+                  MaterialPageRoute(
+                      builder: (context) => const FindTutor(
+                            userid: '',
+                          )),
                 );
               },
               child: const Text('FIND TUTOR'),

@@ -164,7 +164,9 @@ class _MainPageBodyPageState extends State<MainPageBody> {
   Uint8List? imageBytes;
   ImageProvider? imageProvider;
   gotoList() {
-    return const MyClasses();
+    return MyClasses(
+      uID: widget.uID,
+    );
   }
 
   String? downloadURL;
@@ -232,6 +234,7 @@ class _MainPageBodyPageState extends State<MainPageBody> {
               backgroundColor: kColorPrimary,
               elevation: 4,
               shadowColor: Colors.black,
+              automaticallyImplyLeading: false,
               title: Container(
                 padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
                 width: 240,
@@ -370,7 +373,7 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                             userid: '',
                           )
                         ] else if (menuIndex == 9) ...[
-                          const MyCart()
+                           MyCart(studentID: widget.uID,)
                         ] else ...[
                           const ClassesMain()
                         ],
@@ -415,7 +418,7 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                             userid: '',
                           )
                         ] else if (menuIndex == 9) ...[
-                          const MyCart()
+                           MyCart(studentID: widget.uID,)
                         ] else ...[
                           const ClassesMain()
                         ],
@@ -481,7 +484,7 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                                   userid: '',
                                 )
                               ] else if (menuIndex == 9) ...[
-                                const MyCart()
+                           MyCart(studentID: widget.uID,)
                               ] else ...[
                                 const ClassesMain()
                               ],

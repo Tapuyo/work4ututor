@@ -20,9 +20,14 @@ import '../../../../utils/themes.dart';
 import '../../tutor/calendar/setup_calendar.dart';
 
 class SetScheduleData extends StatefulWidget {
+  final String uID;
   final ClassesData? data;
   final String session;
-  const SetScheduleData({super.key, required this.data, required this.session});
+  const SetScheduleData(
+      {super.key,
+      required this.data,
+      required this.session,
+      required this.uID});
   @override
   State<SetScheduleData> createState() => _SetScheduleDataState();
 }
@@ -55,17 +60,20 @@ class _SetScheduleDataState extends State<SetScheduleData> {
       child: SetScheduleDataBody(
         data: widget.data,
         session: widget.session,
+        uID: widget.uID,
       ),
     );
   }
 }
 
 class SetScheduleDataBody extends StatefulWidget {
+  final String uID;
+
   final ClassesData? data;
   final String session;
 
   const SetScheduleDataBody(
-      {Key? key, required this.data, required this.session})
+      {Key? key, required this.data, required this.session, required this.uID})
       : super(key: key);
 
   @override
@@ -403,6 +411,9 @@ class _SetScheduleDataBodyState extends State<SetScheduleDataBody> {
           return SetNow(
             classID: widget.data!.classid,
             session: widget.session,
+            tutorscurrentschedule: [],
+            uID: widget.uID,
+            data: null,
           );
         });
     setState(() {
@@ -452,9 +463,12 @@ class _SetScheduleDataBodyState extends State<SetScheduleDataBody> {
     var futureclassdatatemp = await EnrolledClassFuture(
             uid: widget.data!.tutorinfo.first.userId, role: 'tutor')
         .getenrolled();
-    setState(() {
-      futureclassdata = futureclassdatatemp;
-    });
+
+    if (mounted) {
+      setState(() {
+        futureclassdata = futureclassdatatemp;
+      });
+    }
   }
 
   @override
@@ -553,6 +567,9 @@ class _SetScheduleDataBodyState extends State<SetScheduleDataBody> {
                                       return SetNow(
                                         classID: widget.data!.classid,
                                         session: widget.session,
+                                        tutorscurrentschedule: scheduleList,
+                                        uID: widget.uID,
+                                        data: widget.data,
                                       );
                                     });
                               },
@@ -996,7 +1013,7 @@ class _SetScheduleDataBodyState extends State<SetScheduleDataBody> {
                   ),
                   Text(
                     daystatus == false
-                        ? "(${(filteredSchedules.where((schedule) => schedule.type == 'class').length)} Tutors Classes today)"
+                        ? "(${(filteredSchedules.where((schedule) => schedule.type == 'class').length)} Classes today)"
                         : 'Day Off',
                     style: const TextStyle(
                       fontSize: 18,

@@ -23,21 +23,12 @@ Future<String> addNewBooking(String tutorID, String studentID, String message,
       CollectionReference notificationCollection =
           firestore.collection('notification');
 
-      // Map<String, dynamic> messageData = {
-      //   'lastMessage': '',
-      //   'messageDate': DateTime.now(),
-      //   'messageStatus': 'unread',
-      //   'studentFav': 'no',
-      //   'studentID': studentID,
-      //   'tutorFav': 'no',
-      //   'tutorID': tutorID,
-      // };
-
       Map<String, dynamic> notificationData = {
         'dateNotify': DateTime.now(),
         'notificationContent': message,
         'type': 'new class',
         'userIDs': userIds,
+        'status': 'unread',
       };
 
       Map<String, dynamic> classesData = {
@@ -51,7 +42,6 @@ Future<String> addNewBooking(String tutorID, String studentID, String message,
         'tutorID': tutorID,
       };
       await classesCollection.add(classesData);
-      // await messageParticipantsCollection.add(messageData);
       await notificationCollection.add(notificationData);
 
       await batch.commit();

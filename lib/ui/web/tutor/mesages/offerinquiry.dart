@@ -31,6 +31,12 @@ class _OfferInquiryState extends State<OfferInquiry> {
     '7',
     '8',
     '9',
+    '10',
+    '11',
+    '12',
+    '13',
+    '14',
+    '15',
   ];
   List<String> subjects = [
     'Math',
@@ -236,80 +242,43 @@ class _OfferInquiryState extends State<OfferInquiry> {
                   ),
                 ),
                 onPressed: () async {
-                  // Subjects subjectid = subjectlist.firstWhere(
-                  //   (element) =>
-                  //       element.subjectName == subjectnameController.text,
-                  // );
-                  // bool isMessageFound = messagelist.any(
-                  //   (message) =>
-                  //       message.tutorID == widget.tutordata['userId'] &&
-                  //       message.studentID == widget.studentdata,
-                  // );
-
-                  // if (isMessageFound) {
-                  //   ChatMessage uniqueId = messagelist.firstWhere(
-                  //     (message) =>
-                  //         message.tutorID == widget.tutordata['userId'] &&
-                  //         message.studentID == widget.studentdata,
-                  //   );
-
-                  String result = await sendOffer(
-                    widget.currentID,
-                    subjectnameController.text,
-                    myMessage.text,
-                    widget.messageinfo.subjectID,
-                    widget.messageinfo.noofclasses,
-                    widget.messageinfo.messageID,
-                  );
-                  if (result == 'success') {
-                    setState(() {
-                      CoolAlert.show(
-                        context: context,
-                        width: 200,
-                        type: CoolAlertType.success,
-                        title: 'Offer Sent!',
-                        autoCloseDuration: const Duration(seconds: 3),
-                      );
-                    });
-                  } else {
+                  if (subjectnameController.text.isEmpty) {
                     CoolAlert.show(
                       context: context,
                       width: 200,
-                      type: CoolAlertType.error,
+                      type: CoolAlertType.warning,
                       title: 'Oops...',
-                      text: result.toString(),
-                      backgroundColor: Colors.black,
+                      text: 'Please input price.',
                     );
+                  } else {
+                    String result = await sendOffer(
+                      widget.currentID,
+                      subjectnameController.text,
+                      myMessage.text,
+                      widget.messageinfo.subjectID,
+                      widget.messageinfo.noofclasses,
+                      widget.messageinfo.messageID,
+                    );
+                    if (result == 'success') {
+                      setState(() {
+                        CoolAlert.show(
+                          context: context,
+                          width: 200,
+                          type: CoolAlertType.success,
+                          title: 'Offer Sent!',
+                          autoCloseDuration: const Duration(seconds: 3),
+                        );
+                      });
+                    } else {
+                      CoolAlert.show(
+                        context: context,
+                        width: 200,
+                        type: CoolAlertType.warning,
+                        title: 'Oops...',
+                        text: result.toString(),
+                      );
+                    }
                   }
-                  // } else {
-                  //   String result = await sendInquiryToDatabase(
-                  //       widget.tutordata['userId'],
-                  //       widget.studentdata,
-                  //       myMessage.text,
-                  //       subjectid.subjectId,
-                  //       numberofclassController.text);
-                  //   if (result == 'success') {
-                  //     setState(() {
-                  //       CoolAlert.show(
-                  //         context: context,
-                  //         width: 200,
-                  //         type: CoolAlertType.success,
-                  //         title: 'Inquiry Sent',
-                  //         text: 'You can view the inquiry in the messages!',
-                  //         autoCloseDuration: const Duration(seconds: 1),
-                  //       );
-                  //     });
-                  //   } else {
-                  //     CoolAlert.show(
-                  //       context: context,
-                  //       width: 200,
-                  //       type: CoolAlertType.error,
-                  //       title: 'Oops...',
-                  //       text: result.toString(),
-                  //       backgroundColor: Colors.black,
-                  //     );
-                  //   }
-                  // }
                 },
                 child: const Text(
                   'Send Offer',
