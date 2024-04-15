@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:work4ututor/data_class/tutor_info_class.dart';
+import 'package:work4ututor/ui/web/student/book_classes/ratetutor.dart';
 import 'package:work4ututor/ui/web/student/book_classes/setschedule.dart';
 
 import '../../../../data_class/classesdataclass.dart';
@@ -401,6 +402,52 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
                         ),
                       ),
                     ),
+                    const Spacer(),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              showDialog<DateTime>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return RateTutor(
+                                    data: widget.enrolledClass,
+                                  );
+                                },
+                              ).then((selectedDate) {
+                                if (selectedDate != null) {
+                                  // Do something with the selected date
+                                }
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor:
+                                  Colors.orangeAccent, // Change text color here
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(Icons.star),
+                                SizedBox(width: 5),
+                                Text(
+                                  'Rate',
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),
@@ -1104,11 +1151,14 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
                                                                       return Container(
                                                                           width:
                                                                               600,
-                                                                          child:  Center(
-                                                                              child:  Text(
+                                                                          child:
+                                                                              Center(
+                                                                            child:
+                                                                                Text(
                                                                               '(No materials added!)',
                                                                               style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
-                                                                            ),)); // Show loading indicator
+                                                                            ),
+                                                                          )); // Show loading indicator
                                                                     }
                                                                     List<
                                                                         Map<String,

@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:work4ututor/ui/web/search_tutor/tutor_list.dart';
 import 'package:work4ututor/ui/web/signup/tutor_signup.dart';
@@ -69,37 +70,35 @@ class _FindTutorState extends State<FindTutor> {
   Uint8List? imageBytes;
   ImageProvider? imageProvider;
   List<String> subjectuids = [];
-Future<List<String>> getDataFromTutorSubjectTeach(List<String> subjects) async {
-  List<String> uids = [];
-  try {
-    QuerySnapshot tutorQuerySnapshot = await FirebaseFirestore.instance
-        .collection('tutor')
-        .get();
+  Future<List<String>> getDataFromTutorSubjectTeach(
+      List<String> subjects) async {
+    List<String> uids = [];
+    try {
+      QuerySnapshot tutorQuerySnapshot =
+          await FirebaseFirestore.instance.collection('tutor').get();
 
-    for (QueryDocumentSnapshot doc in tutorQuerySnapshot.docs) {
-      QuerySnapshot coursesSnapshot = await doc.reference.collection('mycourses')
-          .where('subjectname', whereIn: subjects)
-          .get();
+      for (QueryDocumentSnapshot doc in tutorQuerySnapshot.docs) {
+        QuerySnapshot coursesSnapshot = await doc.reference
+            .collection('mycourses')
+            .where('subjectname', whereIn: subjects)
+            .get();
 
-      if (coursesSnapshot.docs.isNotEmpty) {
-        // Check if any of the courses' subject names match any of the provided subjects
-        for (QueryDocumentSnapshot courseDoc in coursesSnapshot.docs) {
-          String courseSubject = courseDoc.get('subjectname');
-          if (subjects.contains(courseSubject)) {
-            uids.add(doc.get('userID'));
-            break; // Once the UID is added, no need to check other courses for this tutor
+        if (coursesSnapshot.docs.isNotEmpty) {
+          // Check if any of the courses' subject names match any of the provided subjects
+          for (QueryDocumentSnapshot courseDoc in coursesSnapshot.docs) {
+            String courseSubject = courseDoc.get('subjectname');
+            if (subjects.contains(courseSubject)) {
+              uids.add(doc.get('userID'));
+              break; // Once the UID is added, no need to check other courses for this tutor
+            }
           }
         }
       }
+    } catch (e) {
+      debugPrint(e.toString());
     }
-  } catch (e) {
-    debugPrint(e.toString());
+    return uids;
   }
-  return uids;
-}
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -136,14 +135,8 @@ Future<List<String>> getDataFromTutorSubjectTeach(List<String> subjects) async {
         shadowColor: Colors.black,
         title: InkWell(
           onTap: () {
-            Navigator.pop(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => StudentDashboardPage(
-                        uID: widget.userid.toString(),
-                        email: '',
-                      )),
-            );
+            GoRouter.of(context)
+                .go('/studentdiary/${widget.userid.toString()}');
           },
           child: Container(
             padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
@@ -206,14 +199,8 @@ Future<List<String>> getDataFromTutorSubjectTeach(List<String> subjects) async {
           ),
           InkWell(
             onTap: () {
-              Navigator.pop(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => StudentDashboardPage(
-                          uID: widget.userid.toString(),
-                          email: '',
-                        )),
-              );
+              GoRouter.of(context)
+                  .go('/studentdiary/${widget.userid.toString()}');
             },
             child: Padding(
               padding: const EdgeInsets.fromLTRB(0, 5, 10, 5),

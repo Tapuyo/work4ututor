@@ -37,14 +37,15 @@ class _ClassesMainState extends State<ClassesMain> {
   String remainingTime = "";
   Timer? _timer;
   StreamController<String> timerStream = StreamController<String>.broadcast();
-  final endDate = DateTime.now().add(Duration(days: 5)); // the date, time u set
+  final endDate =
+      DateTime.now().add(const Duration(days: 5)); // the date, time u set
   final currentDate = DateTime.now();
   @override
   void initState() {
     prepareData();
     super.initState();
     updateDateTime();
-    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       updateDateTime();
     });
   }
@@ -70,7 +71,7 @@ class _ClassesMainState extends State<ClassesMain> {
     final difference = daysBetween(currentDate, endDate);
 
     // get remaining time in second
-    var result = Duration(seconds: 0);
+    var result = const Duration(seconds: 0);
     result = endDate.difference(currentDate);
     remainingTime = result.inSeconds.toString(); // convert to second
 //    remainingTime = '10'; // change this value to test for min function
@@ -131,1510 +132,906 @@ class _ClassesMainState extends State<ClassesMain> {
       });
     }
 
-    return ResponsiveBuilder(mobileBuilder: (context, constraints) {
-      return Container(
-        width: size.width - 300,
-        child: Container(
-          padding: const EdgeInsets.only(left: 10, right: 10),
-          child: Column(children: [
-            // Container(
-            //   decoration: BoxDecoration(
-            //     color: Colors.white,
-            //     border: Border.all(
-            //       color: Colors.black45,
-            //       width: .1,
-            //     ),
-            //     borderRadius: BorderRadius.circular(5),
-            //   ),
-            //   child: Padding(
-            //     padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-            //     child: Column(
-            //       children: [
-            //         Row(children: [
-            //           Text(
-            //             'Hello $firstname, welcome to Work4uTutor!',
-            //             style: const TextStyle(
-            //               fontSize: 18,
-            //             ),
-            //           ),
-            //         ]),
-            //         Row(children: [
-            //           Container(
-            //             width: 200,
-            //             height: 10,
-            //             decoration: BoxDecoration(
-            //               borderRadius: BorderRadius.circular(10),
-            //               color: kColorPrimary,
-            //             ),
-            //           ),
-            //           const SizedBox(
-            //             width: 10,
-            //           ),
-            //           Container(
-            //             width: 200,
-            //             height: 10,
-            //             decoration: BoxDecoration(
-            //               borderRadius: BorderRadius.circular(10),
-            //               color: kColorPrimary,
-            //             ),
-            //           ),
-            //           const SizedBox(
-            //             width: 10,
-            //           ),
-            //           Container(
-            //             width: 200,
-            //             height: 10,
-            //             decoration: BoxDecoration(
-            //               borderRadius: BorderRadius.circular(10),
-            //               border: Border.all(
-            //                 color: Colors.black,
-            //                 width: .2,
-            //               ),
-            //               color: Colors.white,
-            //             ),
-            //           ),
-            //           const Spacer(),
-            //           Container(
-            //             width: 70,
-            //             height: 70,
-            //             decoration: const BoxDecoration(
-            //               shape: BoxShape.circle,
-            //               color: kColorLight,
-            //             ),
-            //             child: const Icon(
-            //               FontAwesomeIcons.trophy,
-            //               color: kColorPrimary,
-            //               size: 35,
-            //             ),
-            //           ),
-            //           const SizedBox(
-            //             width: 10,
-            //           ),
-            //           InkWell(
-            //             onTap: () {
-            //               showDialog(
-            //                 context: context,
-            //                 builder: (BuildContext context) {
-            //                   return const SubscriptionType();
-            //                 },
-            //               );
-            //             },
-            //             child: Container(
-            //                 width: 180,
-            //                 height: 50,
-            //                 decoration: BoxDecoration(
-            //                   borderRadius: BorderRadius.circular(10),
-            //                   color: kColorYellow,
-            //                   boxShadow: [
-            //                     BoxShadow(
-            //                         color: kColorYellow.withOpacity(0.5),
-            //                         offset: const Offset(5, 7),
-            //                         blurRadius: 1.5,
-            //                         spreadRadius: -2)
-            //                   ],
-            //                 ),
-            //                 child: const Center(
-            //                   child: Text(
-            //                     'PAY NOW',
-            //                     style: TextStyle(
-            //                         color: kColorBlue,
-            //                         fontSize: 22,
-            //                         fontWeight: FontWeight.bold),
-            //                   ),
-            //                 )),
-            //           ),
-            //         ]),
-            //         Row(children: const [
-            //           Text(
-            //             'Account not subscribe, please subscribe to complete your profile.',
-            //             style: TextStyle(color: kColorDarkRed, fontSize: 13),
-            //           ),
-            //         ]),
-            //         const SizedBox(
-            //           height: 10,
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // ),
-            Container(
-              height: 50,
-              width: size.width - 310,
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                color: kColorPrimary,
-                borderRadius: BorderRadius.circular(5.0),
+    return Container(
+      padding: const EdgeInsets.only(left: 10, right: 10),
+      child: Column(children: [
+        // Visibility(
+        //   visible: tutorstatus,
+        //   child: Card(
+        //     margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+        //     elevation: 4,
+        //     child: Container(
+        //       decoration: BoxDecoration(
+        //         color: Colors.white,
+        //         borderRadius: BorderRadius.circular(5),
+        //       ),
+        //       child: Padding(
+        //         padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+        //         child: Column(
+        //           children: [
+        //             Row(children: [
+        //               Text(
+        //                 'Hello $firstname, welcome to Work4uTutor!',
+        //                 style: const TextStyle(
+        //                   fontSize: 18,
+        //                 ),
+        //               ),
+        //             ]),
+        //             Row(children: [
+        //               Container(
+        //                 width: 200,
+        //                 height: 10,
+        //                 decoration: BoxDecoration(
+        //                   borderRadius: BorderRadius.circular(10),
+        //                   color: kColorPrimary,
+        //                 ),
+        //               ),
+        //               const SizedBox(
+        //                 width: 10,
+        //               ),
+        //               Container(
+        //                 width: 200,
+        //                 height: 10,
+        //                 decoration: BoxDecoration(
+        //                   borderRadius: BorderRadius.circular(10),
+        //                   color: kColorPrimary,
+        //                 ),
+        //               ),
+        //               const SizedBox(
+        //                 width: 10,
+        //               ),
+        //               Container(
+        //                 width: 200,
+        //                 height: 10,
+        //                 decoration: BoxDecoration(
+        //                   borderRadius: BorderRadius.circular(10),
+        //                   border: Border.all(
+        //                     color: Colors.black,
+        //                     width: .2,
+        //                   ),
+        //                   color: Colors.white,
+        //                 ),
+        //               ),
+        //               const Spacer(),
+        //               Container(
+        //                 width: 70,
+        //                 height: 70,
+        //                 decoration: const BoxDecoration(
+        //                   shape: BoxShape.circle,
+        //                   color: kColorLight,
+        //                 ),
+        //                 child: const Icon(
+        //                   FontAwesomeIcons.trophy,
+        //                   color: kColorPrimary,
+        //                   size: 35,
+        //                 ),
+        //               ),
+        //               const SizedBox(
+        //                 width: 10,
+        //               ),
+        //               InkWell(
+        //                 onTap: () {
+        //                   showDialog(
+        //                     context: context,
+        //                     builder: (BuildContext context) {
+        //                       return const SubscriptionType();
+        //                     },
+        //                   );
+        //                 },
+        //                 child: Container(
+        //                     width: 180,
+        //                     height: 50,
+        //                     decoration: BoxDecoration(
+        //                       borderRadius: BorderRadius.circular(10),
+        //                       color: kColorYellow,
+        //                       boxShadow: [
+        //                         BoxShadow(
+        //                             color: kColorYellow.withOpacity(0.5),
+        //                             offset: const Offset(5, 7),
+        //                             blurRadius: 1.5,
+        //                             spreadRadius: -2)
+        //                       ],
+        //                     ),
+        //                     child: const Center(
+        //                       child: Text(
+        //                         'PAY NOW',
+        //                         style: TextStyle(
+        //                             color: kColorBlue,
+        //                             fontSize: 22,
+        //                             fontWeight: FontWeight.bold),
+        //                       ),
+        //                     )),
+        //               ),
+        //             ]),
+        //             Row(children: const [
+        //               Text(
+        //                 'Account not subscribe, please subscribe to complete your profile.',
+        //                 style: TextStyle(color: kColorDarkRed, fontSize: 13),
+        //               ),
+        //             ]),
+        //             const SizedBox(
+        //               height: 10,
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
+        Card(
+          margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+          elevation: 4,
+          child: Container(
+            height: 50,
+            width: ResponsiveBuilder.isDesktop(context)
+                ? size.width - 300
+                : size.width - 30,
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment(-0.1, 0), // 0% from the top center
+                end: Alignment.centerRight, // 86% to the bottom center
+                // transform: GradientRotation(1.57), // 90 degrees rotation
+                colors: secondaryHeadercolors, // Add your desired colors here
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const Text(
-                    "DASHBOARD",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    'Local Date and Time: $currentDateTime',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                ],
-              ),
+              borderRadius: BorderRadius.circular(5.0),
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  alignment: Alignment.center,
-                  width: (size.width - 350) / 3,
-                  height: 230,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .2,
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: const [
+                Text(
+                  "Dashboard",
+                  style: TextStyle(
                     color: Colors.white,
-                  ),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFF8EF291),
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.bookOpen,
-                            color: kColorPrimary,
-                            size: 35,
-                          ),
-                        ),
-                        const Text(
-                          "0",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const Text(
-                          "Enrolled Classes",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const Spacer(),
-                Container(
-                  alignment: Alignment.center,
-                  width: (size.width - 350) / 3,
-                  height: 230,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .2,
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color.fromRGBO(255, 217, 111, 1),
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.graduationCap,
-                            color: kColorPrimary,
-                            size: 35,
-                          ),
-                        ),
-                        const Text(
-                          "0",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const Text(
-                          "Active Classes",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  alignment: Alignment.center,
-                  width: (size.width - 350) / 3,
-                  height: 230,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .2,
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: kColorLight,
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.trophy,
-                            color: kColorPrimary,
-                            size: 35,
-                          ),
-                        ),
-                        const Text(
-                          "0",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const Text(
-                          "Completed Classes",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                Spacer(),
+                // Text(
+                //   'Local Date and Time: $currentDateTime',
+                //   style: const TextStyle(
+                //     color: Colors.white,
+                //     fontSize: 18,
+                //     fontWeight: FontWeight.normal,
+                //   ),
+                // ),
               ],
             ),
-            const SizedBox(
-              height: 15,
-            ),
-            Row(
-              children: [
-                Container(
-                  alignment: Alignment.center,
-                  width: (size.width - 350) / 3,
-                  height: 230,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .2,
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFF8EF291),
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.person,
-                            color: kColorPrimary,
-                            size: 35,
-                          ),
-                        ),
-                        const Text(
-                          "0",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const Text(
-                          "Total Students",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  alignment: Alignment.center,
-                  width: (size.width - 350) / 3,
-                  height: 230,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .2,
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color.fromRGBO(255, 217, 111, 1),
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.boxOpen,
-                            color: kColorPrimary,
-                            size: 35,
-                          ),
-                        ),
-                        const Text(
-                          "0",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const Text(
-                          "Total Classes",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  alignment: Alignment.center,
-                  width: (size.width - 350) / 3,
-                  height: 230,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .2,
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: kColorLight,
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.coins,
-                            color: kColorPrimary,
-                            size: 35,
-                          ),
-                        ),
-                        const Text(
-                          "0",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const Text(
-                          "Total Earnings",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ]),
+          ),
         ),
-      );
-    }, tabletBuilder: (context, constraints) {
-      return Container(
-        width: size.width,
-        child: Container(
-          padding: const EdgeInsets.only(left: 10, right: 10),
-          child: Column(children: [
-            // Card(
-            //   margin: const EdgeInsets.all(4),
-            //   elevation: 4,
-            //   child: Container(
-            //     decoration: BoxDecoration(
-            //       color: Colors.white,
-            //       // border: Border.all(
-            //       //   color: Colors.black45,
-            //       //   width: .1,
-            //       // ),
-            //       borderRadius: BorderRadius.circular(5),
-            //     ),
-            //     child: Padding(
-            //       padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-            //       child: Column(
-            //         children: [
-            //           Row(children: const [
-            //             Text(
-            //               'Hello Username, welcome to Work4uTutor!',
-            //               style: TextStyle(
-            //                 fontSize: 18,
-            //               ),
-            //             ),
-            //           ]),
-            //           Row(children: [
-            //             Container(
-            //               width: 200,
-            //               height: 10,
-            //               decoration: BoxDecoration(
-            //                 borderRadius: BorderRadius.circular(10),
-            //                 color: kColorPrimary,
-            //               ),
-            //             ),
-            //             const SizedBox(
-            //               width: 10,
-            //             ),
-            //             Container(
-            //               width: 200,
-            //               height: 10,
-            //               decoration: BoxDecoration(
-            //                 borderRadius: BorderRadius.circular(10),
-            //                 color: kColorPrimary,
-            //               ),
-            //             ),
-            //             const SizedBox(
-            //               width: 10,
-            //             ),
-            //             Container(
-            //               width: 200,
-            //               height: 10,
-            //               decoration: BoxDecoration(
-            //                 borderRadius: BorderRadius.circular(10),
-            //                 border: Border.all(
-            //                   color: Colors.black,
-            //                   width: .2,
-            //                 ),
-            //                 color: Colors.white,
-            //               ),
-            //             ),
-            //             const Spacer(),
-            //             Container(
-            //               width: 70,
-            //               height: 70,
-            //               decoration: const BoxDecoration(
-            //                 shape: BoxShape.circle,
-            //                 color: kColorLight,
-            //               ),
-            //               child: const Icon(
-            //                 FontAwesomeIcons.trophy,
-            //                 color: kColorPrimary,
-            //                 size: 35,
-            //               ),
-            //             ),
-            //             const SizedBox(
-            //               width: 10,
-            //             ),
-            //             InkWell(
-            //               onTap: () {
-            //                 showDialog(
-            //                   context: context,
-            //                   builder: (BuildContext context) {
-            //                     return const SubscriptionType();
-            //                   },
-            //                 );
-            //               },
-            //               child: Container(
-            //                   width: 180,
-            //                   height: 50,
-            //                   decoration: BoxDecoration(
-            //                     borderRadius: BorderRadius.circular(10),
-            //                     color: kColorYellow,
-            //                     boxShadow: [
-            //                       BoxShadow(
-            //                           color: kColorYellow.withOpacity(0.5),
-            //                           offset: const Offset(5, 7),
-            //                           blurRadius: 1.5,
-            //                           spreadRadius: -2)
-            //                     ],
-            //                   ),
-            //                   child: const Center(
-            //                     child: Text(
-            //                       'PAY NOW',
-            //                       style: TextStyle(
-            //                           color: kColorBlue,
-            //                           fontSize: 22,
-            //                           fontWeight: FontWeight.bold),
-            //                     ),
-            //                   )),
-            //             ),
-            //           ]),
-            //           Row(children: const [
-            //             Text(
-            //               'Account not subscribe, please subscribe to complete your profile.',
-            //               style: TextStyle(color: kColorDarkRed, fontSize: 13),
-            //             ),
-            //           ]),
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // const SizedBox(
-            //   height: 10,
-            // ),
-            Container(
-              height: 50,
-              width: size.width,
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                color: kColorPrimary,
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
-                  Text(
-                    "DASHBOARD",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Spacer(),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  alignment: Alignment.center,
-                  width: (size.width - 50) / 3,
-                  height: 230,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .2,
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFF8EF291),
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.bookOpen,
-                            color: kColorPrimary,
-                            size: 35,
-                          ),
-                        ),
-                        const Text(
-                          "0",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const Text(
-                          "Enrolled Classes",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  alignment: Alignment.center,
-                  width: (size.width - 50) / 3,
-                  height: 230,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .2,
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color.fromRGBO(255, 217, 111, 1),
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.graduationCap,
-                            color: kColorPrimary,
-                            size: 35,
-                          ),
-                        ),
-                        const Text(
-                          "0",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const Text(
-                          "Active Classes",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  alignment: Alignment.center,
-                  width: (size.width - 50) / 3,
-                  height: 230,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .2,
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: kColorLight,
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.trophy,
-                            color: kColorPrimary,
-                            size: 35,
-                          ),
-                        ),
-                        const Text(
-                          "0",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const Text(
-                          "Completed Classes",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            Row(
-              children: [
-                Container(
-                  alignment: Alignment.center,
-                  width: (size.width - 50) / 3,
-                  height: 230,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .2,
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFF8EF291),
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.person,
-                            color: kColorPrimary,
-                            size: 35,
-                          ),
-                        ),
-                        const Text(
-                          "0",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const Text(
-                          "Total Students",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  alignment: Alignment.center,
-                  width: (size.width - 50) / 3,
-                  height: 230,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .2,
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color.fromRGBO(255, 217, 111, 1),
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.boxOpen,
-                            color: kColorPrimary,
-                            size: 35,
-                          ),
-                        ),
-                        const Text(
-                          "0",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const Text(
-                          "Total Classes",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  alignment: Alignment.center,
-                  width: (size.width - 50) / 3,
-                  height: 230,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border.all(
-                      color: Colors.black45,
-                      width: .2,
-                    ),
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(10),
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: kColorLight,
-                          ),
-                          child: const Icon(
-                            FontAwesomeIcons.coins,
-                            color: kColorPrimary,
-                            size: 35,
-                          ),
-                        ),
-                        const Text(
-                          "0",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                        const Text(
-                          "Total Earnings",
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.normal,
-                            color: kColorPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ]),
+        const SizedBox(
+          height: 10,
         ),
-      );
-    }, desktopBuilder: (context, constraints) {
-      return Container(
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        child: Column(children: [
-          // Visibility(
-          //   visible: tutorstatus,
-          //   child: Card(
-          //     margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
-          //     elevation: 4,
-          //     child: Container(
-          //       decoration: BoxDecoration(
-          //         color: Colors.white,
-          //         borderRadius: BorderRadius.circular(5),
-          //       ),
-          //       child: Padding(
-          //         padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-          //         child: Column(
-          //           children: [
-          //             Row(children: [
-          //               Text(
-          //                 'Hello $firstname, welcome to Work4uTutor!',
-          //                 style: const TextStyle(
-          //                   fontSize: 18,
-          //                 ),
-          //               ),
-          //             ]),
-          //             Row(children: [
-          //               Container(
-          //                 width: 200,
-          //                 height: 10,
-          //                 decoration: BoxDecoration(
-          //                   borderRadius: BorderRadius.circular(10),
-          //                   color: kColorPrimary,
-          //                 ),
-          //               ),
-          //               const SizedBox(
-          //                 width: 10,
-          //               ),
-          //               Container(
-          //                 width: 200,
-          //                 height: 10,
-          //                 decoration: BoxDecoration(
-          //                   borderRadius: BorderRadius.circular(10),
-          //                   color: kColorPrimary,
-          //                 ),
-          //               ),
-          //               const SizedBox(
-          //                 width: 10,
-          //               ),
-          //               Container(
-          //                 width: 200,
-          //                 height: 10,
-          //                 decoration: BoxDecoration(
-          //                   borderRadius: BorderRadius.circular(10),
-          //                   border: Border.all(
-          //                     color: Colors.black,
-          //                     width: .2,
-          //                   ),
-          //                   color: Colors.white,
-          //                 ),
-          //               ),
-          //               const Spacer(),
-          //               Container(
-          //                 width: 70,
-          //                 height: 70,
-          //                 decoration: const BoxDecoration(
-          //                   shape: BoxShape.circle,
-          //                   color: kColorLight,
-          //                 ),
-          //                 child: const Icon(
-          //                   FontAwesomeIcons.trophy,
-          //                   color: kColorPrimary,
-          //                   size: 35,
-          //                 ),
-          //               ),
-          //               const SizedBox(
-          //                 width: 10,
-          //               ),
-          //               InkWell(
-          //                 onTap: () {
-          //                   showDialog(
-          //                     context: context,
-          //                     builder: (BuildContext context) {
-          //                       return const SubscriptionType();
-          //                     },
-          //                   );
-          //                 },
-          //                 child: Container(
-          //                     width: 180,
-          //                     height: 50,
-          //                     decoration: BoxDecoration(
-          //                       borderRadius: BorderRadius.circular(10),
-          //                       color: kColorYellow,
-          //                       boxShadow: [
-          //                         BoxShadow(
-          //                             color: kColorYellow.withOpacity(0.5),
-          //                             offset: const Offset(5, 7),
-          //                             blurRadius: 1.5,
-          //                             spreadRadius: -2)
-          //                       ],
-          //                     ),
-          //                     child: const Center(
-          //                       child: Text(
-          //                         'PAY NOW',
-          //                         style: TextStyle(
-          //                             color: kColorBlue,
-          //                             fontSize: 22,
-          //                             fontWeight: FontWeight.bold),
-          //                       ),
-          //                     )),
-          //               ),
-          //             ]),
-          //             Row(children: const [
-          //               Text(
-          //                 'Account not subscribe, please subscribe to complete your profile.',
-          //                 style: TextStyle(color: kColorDarkRed, fontSize: 13),
-          //               ),
-          //             ]),
-          //             const SizedBox(
-          //               height: 10,
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          Card(
-            margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
-            elevation: 4,
-            child: Container(
-              height: 50,
-              width: size.width - 310,
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                color: kColorPrimary,
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+        ResponsiveBuilder.isMobile(context)
+            ? SingleChildScrollView(
+                child: SizedBox(
+                  width: ResponsiveBuilder.isDesktop(context)
+                      ? size.width - 300
+                      : size.width - 30,
+                  height: 1300,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Card(
+                        margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                        elevation: 4,
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: size.width - 60,
+                          height: 200,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                            color: Colors.white,
+                          ),
+                          child: Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 70,
+                                  height: 70,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0xFF8EF291),
+                                  ),
+                                  child: const Icon(
+                                    FontAwesomeIcons.bookOpen,
+                                    color: kColorPrimary,
+                                    size: 35,
+                                  ),
+                                ),
+                                const Text(
+                                  "0",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: kColorPrimary,
+                                  ),
+                                ),
+                                const Text(
+                                  "Enrolled Classes",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal,
+                                    color: kColorPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      Card(
+                        margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                        elevation: 4,
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: size.width - 60,
+                          height: 200,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                            color: Colors.white,
+                          ),
+                          child: Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 70,
+                                  height: 70,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color.fromRGBO(255, 217, 111, 1),
+                                  ),
+                                  child: const Icon(
+                                    FontAwesomeIcons.graduationCap,
+                                    color: kColorPrimary,
+                                    size: 35,
+                                  ),
+                                ),
+                                const Text(
+                                  "0",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: kColorPrimary,
+                                  ),
+                                ),
+                                const Text(
+                                  "Active Classes",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal,
+                                    color: kColorPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      Card(
+                        margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                        elevation: 4,
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: size.width - 60,
+                          height: 200,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                            color: Colors.white,
+                          ),
+                          child: Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 70,
+                                  height: 70,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: kColorLight,
+                                  ),
+                                  child: const Icon(
+                                    FontAwesomeIcons.trophy,
+                                    color: kColorPrimary,
+                                    size: 35,
+                                  ),
+                                ),
+                                const Text(
+                                  "0",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: kColorPrimary,
+                                  ),
+                                ),
+                                const Text(
+                                  "Completed Classes",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal,
+                                    color: kColorPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      Card(
+                        margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                        elevation: 4,
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: size.width - 60,
+                          height: 200,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                            color: Colors.white,
+                          ),
+                          child: Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 70,
+                                  height: 70,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0xFF8EF291),
+                                  ),
+                                  child: const Icon(
+                                    FontAwesomeIcons.person,
+                                    color: kColorPrimary,
+                                    size: 35,
+                                  ),
+                                ),
+                                const Text(
+                                  "0",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: kColorPrimary,
+                                  ),
+                                ),
+                                const Text(
+                                  "Total Students",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal,
+                                    color: kColorPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      Card(
+                        margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                        elevation: 4,
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: size.width - 60,
+                          height: 200,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                            color: Colors.white,
+                          ),
+                          child: Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 70,
+                                  height: 70,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color.fromRGBO(255, 217, 111, 1),
+                                  ),
+                                  child: const Icon(
+                                    FontAwesomeIcons.boxOpen,
+                                    color: kColorPrimary,
+                                    size: 35,
+                                  ),
+                                ),
+                                const Text(
+                                  "0",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: kColorPrimary,
+                                  ),
+                                ),
+                                const Text(
+                                  "Total Classes",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal,
+                                    color: kColorPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      Card(
+                        margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                        elevation: 4,
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: size.width - 60,
+                          height: 200,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                            color: Colors.white,
+                          ),
+                          child: Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 70,
+                                  height: 70,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: kColorLight,
+                                  ),
+                                  child: const Icon(
+                                    FontAwesomeIcons.coins,
+                                    color: kColorPrimary,
+                                    size: 35,
+                                  ),
+                                ),
+                                const Text(
+                                  "0",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: kColorPrimary,
+                                  ),
+                                ),
+                                const Text(
+                                  "Total Earnings",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal,
+                                    color: kColorPrimary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : Column(
                 children: [
-                  const Text(
-                    "DASHBOARD",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  SizedBox(
+                    width: ResponsiveBuilder.isDesktop(context)
+                        ? size.width - 300
+                        : size.width - 30,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Card(
+                          margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                          elevation: 4,
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: (ResponsiveBuilder.isDesktop(context)
+                                    ? size.width - 350
+                                    : size.width - 60) /
+                                3,
+                            height: ResponsiveBuilder.isDesktop(context)
+                                ? 300
+                                : ResponsiveBuilder.isTablet(context)
+                                    ? (size.height - 140) / 2
+                                    : (size.height - 140) / 2,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                              color: Colors.white,
+                            ),
+                            child: Center(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 70,
+                                    height: 70,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color(0xFF8EF291),
+                                    ),
+                                    child: const Icon(
+                                      FontAwesomeIcons.bookOpen,
+                                      color: kColorPrimary,
+                                      size: 35,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "0",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: kColorPrimary,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "Enrolled Classes",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.normal,
+                                      color: kColorPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        Card(
+                          margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                          elevation: 4,
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: (ResponsiveBuilder.isDesktop(context)
+                                    ? size.width - 350
+                                    : size.width - 60) /
+                                3,
+                            height: ResponsiveBuilder.isDesktop(context)
+                                ? 300
+                                : ResponsiveBuilder.isTablet(context)
+                                    ? (size.height - 140) / 2
+                                    : (size.height - 140) / 2,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                              color: Colors.white,
+                            ),
+                            child: Center(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 70,
+                                    height: 70,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color.fromRGBO(255, 217, 111, 1),
+                                    ),
+                                    child: const Icon(
+                                      FontAwesomeIcons.graduationCap,
+                                      color: kColorPrimary,
+                                      size: 35,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "0",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: kColorPrimary,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "Active Classes",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.normal,
+                                      color: kColorPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        Card(
+                          margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                          elevation: 4,
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: (ResponsiveBuilder.isDesktop(context)
+                                    ? size.width - 350
+                                    : size.width - 60) /
+                                3,
+                            height: ResponsiveBuilder.isDesktop(context)
+                                ? 300
+                                : ResponsiveBuilder.isTablet(context)
+                                    ? (size.height - 140) / 2
+                                    : (size.height - 140) / 2,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                              color: Colors.white,
+                            ),
+                            child: Center(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 70,
+                                    height: 70,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: kColorLight,
+                                    ),
+                                    child: const Icon(
+                                      FontAwesomeIcons.trophy,
+                                      color: kColorPrimary,
+                                      size: 35,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "0",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: kColorPrimary,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "Completed Classes",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.normal,
+                                      color: kColorPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const Spacer(),
-                  Text(
-                    'Local Date and Time: $currentDateTime',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal,
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  SizedBox(
+                    width: ResponsiveBuilder.isDesktop(context)
+                        ? size.width - 300
+                        : size.width - 30,
+                    child: Row(
+                      children: [
+                        Card(
+                          margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                          elevation: 4,
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: (ResponsiveBuilder.isDesktop(context)
+                                    ? size.width - 350
+                                    : size.width - 60) /
+                                3,
+                            height: ResponsiveBuilder.isDesktop(context)
+                                ? 300
+                                : ResponsiveBuilder.isTablet(context)
+                                    ? (size.height - 140) / 2
+                                    : (size.height - 140) / 2,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                              color: Colors.white,
+                            ),
+                            child: Center(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 70,
+                                    height: 70,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color(0xFF8EF291),
+                                    ),
+                                    child: const Icon(
+                                      FontAwesomeIcons.person,
+                                      color: kColorPrimary,
+                                      size: 35,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "0",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: kColorPrimary,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "Total Students",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.normal,
+                                      color: kColorPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        Card(
+                          margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                          elevation: 4,
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: (ResponsiveBuilder.isDesktop(context)
+                                    ? size.width - 350
+                                    : size.width - 60) /
+                                3,
+                            height: ResponsiveBuilder.isDesktop(context)
+                                ? 300
+                                : ResponsiveBuilder.isTablet(context)
+                                    ? (size.height - 140) / 2
+                                    : (size.height - 140) / 2,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                              color: Colors.white,
+                            ),
+                            child: Center(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 70,
+                                    height: 70,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color.fromRGBO(255, 217, 111, 1),
+                                    ),
+                                    child: const Icon(
+                                      FontAwesomeIcons.boxOpen,
+                                      color: kColorPrimary,
+                                      size: 35,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "0",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: kColorPrimary,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "Total Classes",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.normal,
+                                      color: kColorPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        Card(
+                          margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                          elevation: 4,
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: (ResponsiveBuilder.isDesktop(context)
+                                    ? size.width - 350
+                                    : size.width - 60) /
+                                3,
+                            height: ResponsiveBuilder.isDesktop(context)
+                                ? 300
+                                : ResponsiveBuilder.isTablet(context)
+                                    ? (size.height - 140) / 2
+                                    : (size.height - 140) / 2,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10),
+                              ),
+                              color: Colors.white,
+                            ),
+                            child: Center(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 70,
+                                    height: 70,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: kColorLight,
+                                    ),
+                                    child: const Icon(
+                                      FontAwesomeIcons.coins,
+                                      color: kColorPrimary,
+                                      size: 35,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "0",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: kColorPrimary,
+                                    ),
+                                  ),
+                                  const Text(
+                                    "Total Earnings",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.normal,
+                                      color: kColorPrimary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          SingleChildScrollView(
-            controller: ScrollController(),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Card(
-                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
-                      elevation: 4,
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: (size.width - 350) / 3,
-                        height: 300,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10),
-                          ),
-                          color: Colors.white,
-                        ),
-                        child: Center(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 70,
-                                height: 70,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xFF8EF291),
-                                ),
-                                child: const Icon(
-                                  FontAwesomeIcons.bookOpen,
-                                  color: kColorPrimary,
-                                  size: 35,
-                                ),
-                              ),
-                              const Text(
-                                "0",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: kColorPrimary,
-                                ),
-                              ),
-                              const Text(
-                                "Enrolled Classes",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.normal,
-                                  color: kColorPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Card(
-                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
-                      elevation: 4,
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: (size.width - 350) / 3,
-                        height: 300,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10),
-                          ),
-                          color: Colors.white,
-                        ),
-                        child: Center(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 70,
-                                height: 70,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color.fromRGBO(255, 217, 111, 1),
-                                ),
-                                child: const Icon(
-                                  FontAwesomeIcons.graduationCap,
-                                  color: kColorPrimary,
-                                  size: 35,
-                                ),
-                              ),
-                              const Text(
-                                "0",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: kColorPrimary,
-                                ),
-                              ),
-                              const Text(
-                                "Active Classes",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.normal,
-                                  color: kColorPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Card(
-                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
-                      elevation: 4,
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: (size.width - 350) / 3,
-                        height: 300,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10),
-                          ),
-                          color: Colors.white,
-                        ),
-                        child: Center(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 70,
-                                height: 70,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: kColorLight,
-                                ),
-                                child: const Icon(
-                                  FontAwesomeIcons.trophy,
-                                  color: kColorPrimary,
-                                  size: 35,
-                                ),
-                              ),
-                              const Text(
-                                "0",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: kColorPrimary,
-                                ),
-                              ),
-                              const Text(
-                                "Completed Classes",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.normal,
-                                  color: kColorPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Row(
-                  children: [
-                    Card(
-                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
-                      elevation: 4,
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: (size.width - 350) / 3,
-                        height: 300,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10),
-                          ),
-                          color: Colors.white,
-                        ),
-                        child: Center(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 70,
-                                height: 70,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xFF8EF291),
-                                ),
-                                child: const Icon(
-                                  FontAwesomeIcons.person,
-                                  color: kColorPrimary,
-                                  size: 35,
-                                ),
-                              ),
-                              const Text(
-                                "0",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: kColorPrimary,
-                                ),
-                              ),
-                              const Text(
-                                "Total Students",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.normal,
-                                  color: kColorPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Card(
-                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
-                      elevation: 4,
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: (size.width - 350) / 3,
-                        height: 300,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10),
-                          ),
-                          color: Colors.white,
-                        ),
-                        child: Center(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 70,
-                                height: 70,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color.fromRGBO(255, 217, 111, 1),
-                                ),
-                                child: const Icon(
-                                  FontAwesomeIcons.boxOpen,
-                                  color: kColorPrimary,
-                                  size: 35,
-                                ),
-                              ),
-                              const Text(
-                                "0",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: kColorPrimary,
-                                ),
-                              ),
-                              const Text(
-                                "Total Classes",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.normal,
-                                  color: kColorPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Card(
-                      margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
-                      elevation: 4,
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: (size.width - 350) / 3,
-                        height: 300,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10),
-                          ),
-                          color: Colors.white,
-                        ),
-                        child: Center(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 70,
-                                height: 70,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: kColorLight,
-                                ),
-                                child: const Icon(
-                                  FontAwesomeIcons.coins,
-                                  color: kColorPrimary,
-                                  size: 35,
-                                ),
-                              ),
-                              const Text(
-                                "0",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: kColorPrimary,
-                                ),
-                              ),
-                              const Text(
-                                "Total Earnings",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.normal,
-                                  color: kColorPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ]),
-      );
-    });
+      ]),
+    );
   }
 }

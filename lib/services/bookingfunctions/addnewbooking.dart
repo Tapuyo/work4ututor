@@ -1,6 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-Future<String> addNewBooking(String tutorID, String studentID, String message,
+class BookingResult {
+  final String status;
+  final String classId;
+
+  BookingResult(this.status, this.classId);
+}
+
+Future<BookingResult> addNewBooking(String tutorID, String studentID, String message,
     String subjectID, int numberOfClasses, List<String> userIds) async {
   try {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -41,12 +48,14 @@ Future<String> addNewBooking(String tutorID, String studentID, String message,
         'totalClasses': numberOfClasses.toString(),
         'tutorID': tutorID,
       };
-      await classesCollection.add(classesData);
+      DocumentReference classDocRef = await classesCollection.add(classesData);
+      String classDocId = classDocRef.id;
       await notificationCollection.add(notificationData);
 
       await batch.commit();
 
-      return 'success';
+      return BookingResult('success',
+          classDocId); // Return 'success' and the ID of the added document
     } else {
       WriteBatch batch = firestore.batch();
 
@@ -83,15 +92,17 @@ Future<String> addNewBooking(String tutorID, String studentID, String message,
         'totalClasses': numberOfClasses.toString(),
         'tutorID': tutorID,
       };
-      await classesCollection.add(classesData);
+      DocumentReference classDocRef = await classesCollection.add(classesData);
+      String classDocId = classDocRef.id;
       await messageParticipantsCollection.add(messageData);
       await notificationCollection.add(notificationData);
 
       await batch.commit();
 
-      return 'success';
+      return BookingResult('success',
+          classDocId); // Return 'success' and the ID of the added document
     }
   } catch (e) {
-    return 'Error: $e';
+    return BookingResult('Error: $e', '');
   }
 }

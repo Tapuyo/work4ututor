@@ -12,6 +12,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../../../../data_class/chatmessageclass.dart';
 import '../../../../data_class/subject_class.dart';
 import '../../../../services/bookingfunctions/addnewbooking.dart';
+import '../../../../services/bookingfunctions/paymenttransactions.dart';
 import '../../../../services/getmessages.dart';
 import '../../../../services/sendinquiryproccess.dart';
 import '../../../../utils/themes.dart';
@@ -22,13 +23,15 @@ class BookLesson extends StatefulWidget {
   final String studentdata;
   final dynamic tutordata;
   final List<dynamic> tutorteach;
+  final String currentprice;
   const BookLesson(
       {super.key,
       required this.studentdata,
       required this.tutordata,
       required this.tutorteach,
       required this.subject,
-      required this.noofclasses});
+      required this.noofclasses,
+      required this.currentprice});
 
   @override
   State<BookLesson> createState() => _BookLessonState();
@@ -62,6 +65,7 @@ class _BookLessonState extends State<BookLesson> {
         tutorteach: widget.tutorteach,
         noofclasses: widget.noofclasses,
         subject: widget.subject,
+        currentprice: widget.currentprice,
       ),
     );
   }
@@ -73,6 +77,8 @@ class BookLessonBody extends StatefulWidget {
   final String studentdata;
   final dynamic tutordata;
   final List<dynamic> tutorteach;
+  final String currentprice;
+
   final book;
   const BookLessonBody(
       {super.key,
@@ -81,7 +87,8 @@ class BookLessonBody extends StatefulWidget {
       required this.tutordata,
       required this.tutorteach,
       required this.subject,
-      required this.noofclasses});
+      required this.noofclasses,
+      required this.currentprice});
 
   @override
   State<BookLessonBody> createState() => _BookLessonBodyState();
@@ -200,14 +207,14 @@ class _BookLessonBodyState extends State<BookLessonBody> {
                       widget.tutordata['userId'],
                       widget.studentdata,
                     ];
-                    String result = await addNewBooking(
+                    BookingResult result = await addNewBooking(
                         widget.tutordata['userId'],
                         widget.studentdata,
                         myMessage.text,
                         subjectid.subjectId,
                         int.parse(widget.noofclasses),
                         idList);
-                    if (result == 'success') {
+                    if (result.status == 'success') {
                       setState(() {
                         CoolAlert.show(
                           context: context,
@@ -216,6 +223,13 @@ class _BookLessonBodyState extends State<BookLessonBody> {
                           title: 'Booking Added',
                           text: 'You can view the inquiry in the messages!',
                           autoCloseDuration: const Duration(seconds: 1),
+                        ).then(
+                          (value) {
+                            addTransactionInFirestore(
+                                result.classId,
+                                int.parse(widget.noofclasses),
+                                double.parse(widget.currentprice));
+                          },
                         );
                       });
                     } else {

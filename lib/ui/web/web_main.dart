@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
+import 'package:work4ututor/splash_page.dart';
+import 'package:work4ututor/ui/web/communication.dart/screensharesample.dart';
 import 'package:work4ututor/ui/web/communication.dart/videocall.dart';
 import 'admin/adminlogin.dart';
 import 'login/login.dart';
@@ -44,43 +47,57 @@ class _MainPageState extends State<WebMainPage> {
   Widget build(BuildContext context) {
     final index = _items.length;
     if (index == 0) {
-      // return const VideoCall(chatID: '', uID: '',);
+      // return const ScreenSharingWithSubProcess();
+      // return const VideoCall(chatID: '', uID: '', classId: '1',);
       // return const FindTutor(
       //   userid: 'IiIJktktGfPS6oDhI5PWJFGt8e23',
       // );
-      return const LoginPage();
+      GoRouter.of(context).go('/signin');
+      return Container();
     } else {
       debugPrint(index.toString());
       if (_items[0]['role'].toString() == 'student' &&
           _items[0]['userStatus'].toString() == 'unfinished') {
-        return StudentInfo(
-          uid: _items[0]['userID'].toString(),
-          email: _items[0]['email'].toString(),
-        );
+        GoRouter.of(context)
+            .go('/studentsignup/${_items[0]['userID'].toString()}');
+        return Container();
+        // return StudentInfo(
+        //   uid: _items[0]['userID'].toString(),
+        //   email: _items[0]['email'].toString(),
+        // );
         // return const VideoCall(chatID: '', uID: '',);
         // return const AdminLoginPage();
       } else if (_items[0]['role'].toString() == 'student' &&
           _items[0]['userStatus'].toString() == 'completed') {
-        return StudentDashboardPage(
-          uID: _items[0]['userID'].toString(),
-          email: _items[0]['email'].toString(),
-        );
+        GoRouter.of(context)
+            .go('/studentdiary/${_items[0]['userID'].toString()}');
+        return Container();
+        // return StudentDashboardPage(
+        //   uID: _items[0]['userID'].toString(),
+        //   email: _items[0]['email'].toString(),
+        // );
         // return const VideoCall(chatID: '', uID: '',);
         // return const AdminLoginPage();
       } else if (_items[0]['role'].toString() == 'tutor' &&
           _items[0]['userStatus'].toString() == 'completed') {
-        return DashboardPage(uID: _items[0]['userID'].toString());
+        // return DashboardPage(uID: _items[0]['userID'].toString());
+        GoRouter.of(context).go('/tutordesk/${_items[0]['userID'].toString()}');
+        return Container();
       } else if (_items[0]['role'].toString() == 'tutor' &&
           _items[0]['userStatus'].toString() == 'unfinished') {
-        return TutorInfo(
-          uid: _items[0]['userID'].toString(),
-          email: _items[0]['email'].toString(),
-        );
+        // return TutorInfo(
+        //   uid: _items[0]['userID'].toString(),
+        //   email: _items[0]['email'].toString(),
+        // );
+        GoRouter.of(context)
+            .go('/tutorsignup/${_items[0]['userID'].toString()}');
+        return Container();
       } else {
         // return const FindTutor(
         //   userid: 'IiIJktktGfPS6oDhI5PWJFGt8e23',
         // );
-        return const LoginPage();
+        GoRouter.of(context).go('/signin');
+        return Container();
         // return const VideoCall(chatID: '', uID: '',);
       }
     }

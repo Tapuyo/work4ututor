@@ -70,7 +70,7 @@ class _VoucherDataState extends State<VoucherData> {
         child: Text(
           'No available voucher.',
           style: TextStyle(
-              fontSize: 25, fontWeight: FontWeight.w600, color: Colors.red),
+              fontSize: 20, fontWeight: FontWeight.w600, color: Colors.red),
         ),
       );
     }

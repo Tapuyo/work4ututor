@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:work4ututor/ui/web/admin/helpers/app_helpers.dart';
 
 import '../../../../data_class/voucherclass.dart';
+import '../../../../utils/themes.dart';
 
 class CardTask extends StatelessWidget {
   const CardTask({
@@ -166,9 +167,9 @@ class _IconLabel extends StatelessWidget {
         const SizedBox(width: 5),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 12,
-            color: color.withOpacity(.8),
+            color: kColorGrey,
           ),
         )
       ],

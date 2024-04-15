@@ -7,12 +7,14 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:work4ututor/ui/web/search_tutor/find_tutors.dart';
 import 'package:work4ututor/ui/web/student/main_dashboard/students_classes.dart';
 
 import '../../../../components/students_navbar.dart';
+import '../../../../constant/constant.dart';
 import '../../../../data_class/chatmessageclass.dart';
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/studentanalyticsclass.dart';
@@ -64,6 +66,58 @@ int newmessagecount = 0;
 int newnotificationcount = 0;
 
 class _StudentDashboardPageState extends State<StudentDashboardPage> {
+  final _userinfo = Hive.box('userID');
+  List<Map<String, dynamic>> _items = [];
+  _refreshItems() {
+    final data = _userinfo.keys.map((key) {
+      final item = _userinfo.get(key);
+      return {
+        "key": key,
+        "userID": item["userID"],
+        "role": item["role"],
+        "userStatus": item["userStatus"]
+      };
+    }).toList();
+    setState(() {
+      _items = data.toList();
+    });
+  }
+
+  @override
+  void initState() {
+    _refreshItems();
+    final index = _items.length;
+    if (index == 0) {
+      GoRouter.of(context).go('/');
+    } else {
+      debugPrint(index.toString());
+      if (_items[0]['role'].toString() == 'student' &&
+          _items[0]['userStatus'].toString() == 'unfinished') {
+        GoRouter.of(context)
+            .go('/studentsignup/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'student' &&
+          _items[0]['userStatus'].toString() == 'completed' &&
+          _items[0]['userID'].toString() != widget.uID.toString()) {
+        GoRouter.of(context).go('/');
+      } else if (_items[0]['role'].toString() == 'student' &&
+          _items[0]['userStatus'].toString() == 'completed' &&
+          _items[0]['userID'].toString() == widget.uID.toString()) {
+        // GoRouter.of(context)
+        //     .go('/studentdiary/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'tutor' &&
+          _items[0]['userStatus'].toString() == 'completed') {
+        GoRouter.of(context).go('/tutordesk/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'tutor' &&
+          _items[0]['userStatus'].toString() == 'unfinished') {
+        GoRouter.of(context)
+            .go('/tutorsignup/${_items[0]['userID'].toString()}');
+      } else {
+        GoRouter.of(context).go('/');
+      }
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -191,6 +245,9 @@ class _MainPageBodyPageState extends State<MainPageBody> {
     downloadURL = await FirebaseStorage.instance.ref(path).getDownloadURL();
   }
 
+  ScrollController _scrollController = ScrollController();
+  final studentdeskkey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     final int menuIndex = context.select((InitProvider p) => p.menuIndex);
@@ -220,15 +277,8 @@ class _MainPageBodyPageState extends State<MainPageBody> {
             });
           },
           child: Scaffold(
+            key: studentdeskkey,
             backgroundColor: const Color.fromRGBO(245, 247, 248, 1),
-            drawer: ResponsiveBuilder.isDesktop(context)
-                ? null
-                : Drawer(
-                    child: SafeArea(
-                      child:
-                          SingleChildScrollView(child: _buildSidebar(context)),
-                    ),
-                  ),
             appBar: AppBar(
               toolbarHeight: 65,
               backgroundColor: kColorPrimary,
@@ -245,258 +295,375 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                 ),
               ),
               actions: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
-                  child: Badge(
-                    isLabelVisible: newnotificationcount == 0 ? false : true,
-                    alignment: AlignmentDirectional.centerEnd,
-                    label: Text(
-                      newnotificationcount.toString(),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    child: IconButton(
-                        key: _buttonKey,
-                        splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        padding: EdgeInsets.zero,
-                        icon: const Icon(
-                          EvaIcons.bell,
-                          color: Colors.white,
-                          size: 25,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _showModal = !_showModal;
-                          });
-                        }),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        fullName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        studentID,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white,
-                          fontSize: 12,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      RatingBar(
-                          initialRating: 0,
-                          direction: Axis.horizontal,
-                          allowHalfRating: true,
-                          itemCount: 5,
-                          itemSize: 16,
-                          ratingWidget: RatingWidget(
-                              full:
-                                  const Icon(Icons.star, color: Colors.orange),
-                              half: const Icon(
-                                Icons.star_half,
-                                color: Colors.orange,
+                ResponsiveBuilder.isDesktop(context)
+                    ? Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
+                            child: Badge(
+                              isLabelVisible:
+                                  newnotificationcount == 0 ? false : true,
+                              alignment: AlignmentDirectional.centerEnd,
+                              label: Text(
+                                newnotificationcount.toString(),
+                                style: const TextStyle(color: Colors.white),
                               ),
-                              empty: const Icon(
-                                Icons.star_outline,
-                                color: Colors.orange,
-                              )),
-                          onRatingUpdate: (value) {
-                            // _ratingValue = value;
-                          }),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 5, 10, 5),
-                  child: downloadURL1 == null
-                      ? const Center(child: Icon(Icons.person))
-                      : CircleAvatar(
-                          backgroundImage: NetworkImage(
-                            downloadURL1.toString(),
+                              child: IconButton(
+                                  key: _buttonKey,
+                                  splashColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  padding: EdgeInsets.zero,
+                                  icon: const Icon(
+                                    EvaIcons.bell,
+                                    color: Colors.white,
+                                    size: 25,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _showModal = !_showModal;
+                                    });
+                                  }),
+                            ),
                           ),
-                          radius: 25,
-                        ),
-                ),
+                          Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  fullName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  studentID,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                RatingBar(
+                                    initialRating: 0,
+                                    direction: Axis.horizontal,
+                                    allowHalfRating: true,
+                                    itemCount: 5,
+                                    itemSize: 16,
+                                    ratingWidget: RatingWidget(
+                                        full: const Icon(Icons.star,
+                                            color: Colors.orange),
+                                        half: const Icon(
+                                          Icons.star_half,
+                                          color: Colors.orange,
+                                        ),
+                                        empty: const Icon(
+                                          Icons.star_outline,
+                                          color: Colors.orange,
+                                        )),
+                                    onRatingUpdate: (value) {
+                                      // _ratingValue = value;
+                                    }),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 5, 10, 5),
+                            child: downloadURL1 == null
+                                ? const Center(child: Icon(Icons.person))
+                                : CircleAvatar(
+                                    backgroundImage: NetworkImage(
+                                      downloadURL1.toString(),
+                                    ),
+                                    radius: 25,
+                                  ),
+                          ),
+                        ],
+                      )
+                    : ResponsiveBuilder.isDesktop(context)
+                        ? Row(
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 10, 15, 10),
+                                child: Badge(
+                                  isLabelVisible:
+                                      newnotificationcount == 0 ? false : true,
+                                  alignment: AlignmentDirectional.centerEnd,
+                                  label: Text(
+                                    newnotificationcount.toString(),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  child: IconButton(
+                                      key: _buttonKey,
+                                      splashColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      padding: EdgeInsets.zero,
+                                      icon: const Icon(
+                                        EvaIcons.bell,
+                                        color: Colors.white,
+                                        size: 25,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _showModal = !_showModal;
+                                        });
+                                      }),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      fullName,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Text(
+                                      studentID,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    RatingBar(
+                                        initialRating: 0,
+                                        direction: Axis.horizontal,
+                                        allowHalfRating: true,
+                                        itemCount: 5,
+                                        itemSize: 16,
+                                        ratingWidget: RatingWidget(
+                                            full: const Icon(Icons.star,
+                                                color: Colors.orange),
+                                            half: const Icon(
+                                              Icons.star_half,
+                                              color: Colors.orange,
+                                            ),
+                                            empty: const Icon(
+                                              Icons.star_outline,
+                                              color: Colors.orange,
+                                            )),
+                                        onRatingUpdate: (value) {
+                                          // _ratingValue = value;
+                                        }),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 5, 10, 5),
+                                child: downloadURL1 == null
+                                    ? const Center(child: Icon(Icons.person))
+                                    : CircleAvatar(
+                                        backgroundImage: NetworkImage(
+                                          downloadURL1.toString(),
+                                        ),
+                                        radius: 25,
+                                      ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(right: kSpacing / 2),
+                                child: IconButton(
+                                  onPressed: () {
+                                    if (studentdeskkey.currentState != null) {
+                                      studentdeskkey.currentState!
+                                          .openEndDrawer();
+                                    }
+                                  },
+                                  icon: const Icon(Icons.menu),
+                                ),
+                              ),
+                            ],
+                          )
+                        : Row(
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 10, 15, 10),
+                                child: Badge(
+                                  isLabelVisible:
+                                      newnotificationcount == 0 ? false : true,
+                                  alignment: AlignmentDirectional.centerEnd,
+                                  label: Text(
+                                    newnotificationcount.toString(),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  child: IconButton(
+                                      key: _buttonKey,
+                                      splashColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      padding: EdgeInsets.zero,
+                                      icon: const Icon(
+                                        EvaIcons.bell,
+                                        color: Colors.white,
+                                        size: 25,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _showModal = !_showModal;
+                                        });
+                                      }),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      fullName,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    Text(
+                                      studentID,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    RatingBar(
+                                        initialRating: 0,
+                                        direction: Axis.horizontal,
+                                        allowHalfRating: true,
+                                        itemCount: 5,
+                                        itemSize: 16,
+                                        ratingWidget: RatingWidget(
+                                            full: const Icon(Icons.star,
+                                                color: Colors.orange),
+                                            half: const Icon(
+                                              Icons.star_half,
+                                              color: Colors.orange,
+                                            ),
+                                            empty: const Icon(
+                                              Icons.star_outline,
+                                              color: Colors.orange,
+                                            )),
+                                        onRatingUpdate: (value) {
+                                          // _ratingValue = value;
+                                        }),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(right: kSpacing / 2),
+                                child: IconButton(
+                                  onPressed: () {
+                                    if (studentdeskkey.currentState != null) {
+                                      studentdeskkey.currentState!
+                                          .openEndDrawer();
+                                    }
+                                  },
+                                  icon: const Icon(Icons.menu),
+                                ),
+                              ),
+                            ],
+                          )
               ],
             ),
             body: Padding(
               padding: const EdgeInsets.only(top: 5.0),
-              child: ResponsiveBuilder(
-                mobileBuilder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (menuIndex == 0) ...[
-                          StudentMainDashboard(
-                            email: widget.email,
-                            uid: widget.uID,
-                          )
-                        ] else if (menuIndex == 1) ...[
-                          StudentCalendar(
-                            uID: widget.uID,
-                          )
-                        ] else if (menuIndex == 2) ...[
-                          MessagePage(
-                            uID: widget.uID,
-                          )
-                        ] else if (menuIndex == 3) ...[
-                          gotoList()
-                        ] else if (menuIndex == 4) ...[
-                          MessagePage(
-                            uID: widget.uID,
-                          )
-                        ] else if (menuIndex == 5) ...[
-                          PerformancePage(
-                            uID: widget.uID,
-                          )
-                        ] else if (menuIndex == 6)
-                          ...[]
-                        else if (menuIndex == 7) ...[
-                          const HelpPage()
-                        ] else if (menuIndex == 8) ...[
-                          const FindTutor(
-                            userid: '',
-                          )
-                        ] else if (menuIndex == 9) ...[
-                           MyCart(studentID: widget.uID,)
-                        ] else ...[
-                          const ClassesMain()
-                        ],
-                      ],
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Visibility(
+                    visible: ResponsiveBuilder.isDesktop(context),
+                    child: SingleChildScrollView(
+                      controller: ScrollController(),
+                      child: StudentsMenu(),
                     ),
-                  );
-                },
-                tabletBuilder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (menuIndex == 0) ...[
-                          StudentMainDashboard(
-                            email: widget.email,
-                            uid: widget.uID,
-                          )
-                        ] else if (menuIndex == 1) ...[
-                          StudentCalendar(
-                            uID: widget.uID,
-                          )
-                        ] else if (menuIndex == 2) ...[
-                          MessagePage(
-                            uID: widget.uID,
-                          )
-                        ] else if (menuIndex == 3) ...[
-                          gotoList()
-                        ] else if (menuIndex == 4) ...[
-                          MessagePage(
-                            uID: widget.uID,
-                          )
-                        ] else if (menuIndex == 5) ...[
-                          PerformancePage(
-                            uID: widget.uID,
-                          )
-                        ] else if (menuIndex == 6)
-                          ...[]
-                        else if (menuIndex == 7) ...[
-                          const HelpPage()
-                        ] else if (menuIndex == 8) ...[
-                          const FindTutor(
-                            userid: '',
-                          )
-                        ] else if (menuIndex == 9) ...[
-                           MyCart(studentID: widget.uID,)
-                        ] else ...[
-                          const ClassesMain()
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height,
+                  ),
+                  Scrollbar(
+                    trackVisibility: true,
+                    controller: _scrollController,
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          if (menuIndex == 0) ...[
+                            StudentMainDashboard(
+                              email: widget.email,
+                              uid: widget.uID,
+                            )
+                          ] else if (menuIndex == 1) ...[
+                            StudentCalendar(
+                              uID: widget.uID,
+                            )
+                          ] else if (menuIndex == 3) ...[
+                            gotoList()
+                          ] else if (menuIndex == 4) ...[
+                            MessagePage(
+                              uID: widget.uID,
+                            )
+                          ] else if (menuIndex == 5) ...[
+                            PerformancePage(
+                              uID: widget.uID,
+                            )
+                          ] else if (menuIndex == 6) ...[
+                            StudentSettingsPage(
+                              uID: widget.uID,
+                            )
+                          ] else if (menuIndex == 7) ...[
+                            const HelpPage()
+                          ] else if (menuIndex == 8) ...[
+                            const FindTutor(
+                              userid: '',
+                            )
+                          ] else if (menuIndex == 9) ...[
+                            MyCart(
+                              studentID: widget.uID,
+                            )
+                          ] else ...[
+                            const ClassesMain()
+                          ],
                         ],
-                      ],
+                      ),
                     ),
-                  );
-                },
-                desktopBuilder: (context, constraints) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Flexible(
-                        flex: 3,
-                        child: SingleChildScrollView(
-                          controller: ScrollController(),
-                          child: Card(
-                              margin: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                              elevation: 4,
-                              child: StudentsMenu()),
-                        ),
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height,
-                      ),
-                      Flexible(
-                        flex: 13,
-                        child: SingleChildScrollView(
-                          controller: ScrollController(),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              if (menuIndex == 0) ...[
-                                StudentMainDashboard(
-                                  email: widget.email,
-                                  uid: widget.uID,
-                                )
-                              ] else if (menuIndex == 1) ...[
-                                StudentCalendar(
-                                  uID: widget.uID,
-                                )
-                              ] else if (menuIndex == 2) ...[
-                                MessagePage(
-                                  uID: widget.uID,
-                                )
-                              ] else if (menuIndex == 3) ...[
-                                gotoList()
-                              ] else if (menuIndex == 4) ...[
-                                MessagePage(
-                                  uID: widget.uID,
-                                )
-                              ] else if (menuIndex == 5) ...[
-                                PerformancePage(
-                                  uID: widget.uID,
-                                )
-                              ] else if (menuIndex == 6) ...[
-                                StudentSettingsPage(
-                                  uID: widget.uID,
-                                )
-                              ] else if (menuIndex == 7) ...[
-                                const HelpPage()
-                              ] else if (menuIndex == 8) ...[
-                                const FindTutor(
-                                  userid: '',
-                                )
-                              ] else if (menuIndex == 9) ...[
-                           MyCart(studentID: widget.uID,)
-                              ] else ...[
-                                const ClassesMain()
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
+                  ),
+                ],
               ),
             ),
+            endDrawer: ResponsiveBuilder.isDesktop(context)
+                ? null
+                : Drawer(
+                    child: Column(
+                      children: [
+                        _buildSidebar(context),
+                      ],
+                    ),
+                  ),
           ),
         ),
         if (_showModal)
@@ -574,17 +741,15 @@ class _MainPageBodyPageState extends State<MainPageBody> {
   // }
 
   Widget _buildSidebar(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-            onTap: () {
-              setState(() {
-                _showModal = false;
-              });
-            },
-            child: StudentsMenu()),
-      ],
+    Size size = MediaQuery.of(context).size;
+
+    return SizedBox(
+      height: size.height,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10.0),
+        child: SingleChildScrollView(
+            controller: ScrollController(), child: StudentsMenu()),
+      ),
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../data_class/subject_class.dart';
 import '../../../../data_class/subject_teach_pricing.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../provider/user_id_provider.dart';
@@ -16,7 +17,10 @@ import '../../../auth/database.dart';
 import '../../admin/admin_sharedcomponents/header_text.dart';
 
 class AddNewSubject extends StatefulWidget {
-  const AddNewSubject({super.key});
+  final List<SubjectTeach> tutorssubject;
+  final TutorInformation tutorinfo;
+  const AddNewSubject(
+      {super.key, required this.tutorssubject, required this.tutorinfo});
 
   @override
   State<AddNewSubject> createState() => _AddNewSubjectState();
@@ -25,18 +29,18 @@ class AddNewSubject extends StatefulWidget {
 class _AddNewSubjectState extends State<AddNewSubject> {
   List<SubjectTeach> tSubjects = [];
   String? dropdownvaluesubject;
-  var uSubjects = [
-    'Others',
-    'Math',
-    'English',
-    'Geometry',
-    'Music',
-    'Language',
-  ];
+  List<String> uSubjects = [];
+  bool containsSubject(List<SubjectTeach> tSubjects, String newValue) {
+    return tSubjects.any((subject) => subject.subjectname == newValue);
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<TutorInformation> tutorinfo =
-        Provider.of<List<TutorInformation>>(context);
+    final subjectlist = Provider.of<List<Subjects>>(context);
+    uSubjects = [
+      'Others',
+      ...subjectlist.map((subject) => subject.subjectName).toList()
+    ];
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -72,6 +76,7 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                               TextEditingController(text: subjectdata.price3);
                           TextEditingController price5Controller =
                               TextEditingController(text: subjectdata.price5);
+
                           return subjectdata.subjectname == 'Others'
                               ? Column(
                                   children: [
@@ -664,7 +669,21 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                                 price3: '',
                                 price5: '',
                                 subjectid: '');
-                            tSubjects.add(data);
+                            bool containsNewValue =
+                                containsSubject(widget.tutorssubject, newValue);
+                            if (containsNewValue) {
+                              // ignore: use_build_context_synchronously
+                              CoolAlert.show(
+                                context: context,
+                                width: 200,
+                                type: CoolAlertType.warning,
+                                title: 'Oopss..',
+                                text:
+                                    'Subject already added, select another one.',
+                              );
+                            } else {
+                              tSubjects.add(data);
+                            }
                           });
                         },
                       ),
@@ -694,7 +713,7 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                 ),
                 onPressed: () async {
                   String? result =
-                      await addSubjectTeach(tutorinfo.first.userId, tSubjects);
+                      await addSubjectTeach(widget.tutorinfo.userId, tSubjects);
                   if (result == 'success') {
                     setState(() {
                       CoolAlert.show(

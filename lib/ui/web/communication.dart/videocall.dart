@@ -1,36 +1,29 @@
+// ignore_for_file: unused_local_variable, avoid_print, unused_element, avoid_web_libraries_in_flutter
+
 import 'dart:async';
 import 'dart:convert';
-// ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
-import 'dart:html';
-import 'dart:io';
 import 'dart:js' as js;
+import 'dart:io';
 import 'dart:math';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
-import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
-import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
-import 'package:agora_rtc_engine/agora_rtc_engine_web.dart' as RtcScreenView;
+import 'package:agora_rtc_engine/rtc_local_view.dart' as rtc_local_view;
+import 'package:agora_rtc_engine/rtc_remote_view.dart' as rtc_remote_view;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:get/get.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 import 'package:work4ututor/ui/web/communication.dart/whiteboard.dart';
 
-import '../../../data_class/chatmessageclass.dart';
-import '../../../services/getmessages.dart';
 import '../../../utils/themes.dart';
 import 'package:http/http.dart' as http;
+
+const String _kDefaultAppGroup = 'io.agora';
 
 const appId = "43ccea6aa40e4f7cb6e96de7ddf0f0b3";
 const appCertificate = "72f8f49b581f41b4a4fefa998beb484a";
@@ -46,7 +39,12 @@ const channel = "test";
 class VideoCall extends StatefulWidget {
   final String uID;
   final String chatID;
-  const VideoCall({Key? key, required this.uID, required this.chatID})
+  final String classId;
+  const VideoCall(
+      {Key? key,
+      required this.uID,
+      required this.chatID,
+      required this.classId})
       : super(key: key);
 
   @override
@@ -54,37 +52,10 @@ class VideoCall extends StatefulWidget {
 }
 
 class _VideoCallState extends State<VideoCall> {
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return StreamProvider<List<MessageContent>>.value(
-      value: GetMessageConversation(chatID: widget.chatID, userID: widget.uID)
-          .getmessage,
-      catchError: (context, error) {
-        print('Error occurred: $error');
-        return [];
-      },
-      initialData: const [],
-      child: const VideoCallBody(
-          // userID: widget.uID,
-          // chatID: widget.chatID,
-          ),
-    );
-  }
-}
-
-class VideoCallBody extends StatefulWidget {
-  const VideoCallBody({Key? key}) : super(key: key);
-
-  @override
-  State<VideoCallBody> createState() => _VideoCallBodyState();
-}
-
-class _VideoCallBodyState extends State<VideoCallBody> {
-  int? _remoteUid;
-  int _localUid = 0;
-  bool _localUserJoined = false;
-  bool _remoteUserJoined = false;
+  String channelId = channel;
+  bool isJoined = false, screenSharing = false;
+  List<int> remoteUid = [];
+  List<int> videostopUid = [];
   bool _isRecording = false;
   late RtcEngine _engine;
   bool _isScreenSharing = false;
@@ -109,6 +80,8 @@ class _VideoCallBodyState extends State<VideoCallBody> {
   void dispose() {
     _timer?.cancel(); // Cancel the timer when the widget is disposed
     js.context.callMethod('removeEventListener', ['keydown', handleKeyDown]);
+    _engine.destroy();
+
     super.dispose();
   }
 
@@ -155,6 +128,133 @@ class _VideoCallBodyState extends State<VideoCallBody> {
     String secondsStr = remainingSeconds.toString().padLeft(2, '0');
 
     return '$minutesStr:$secondsStr';
+  }
+
+  _initEngine() async {
+    _engine = await RtcEngine.createWithContext(RtcEngineContext(appId));
+    _joinChannel();
+    _addListeners();
+
+    await _engine.enableVideo();
+    await _engine.startPreview();
+    await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
+    await _engine.setClientRole(ClientRole.Broadcaster);
+    _joinChannel();
+  }
+
+  _addListeners() {
+    _engine.setEventHandler(RtcEngineEventHandler(
+      warning: (warningCode) {
+        debugPrint('warning $warningCode');
+      },
+      error: (errorCode) {
+        debugPrint('error $errorCode');
+      },
+      joinChannelSuccess: (channel, uid, elapsed) {
+        debugPrint('joinChannelSuccess $channel $uid $elapsed');
+        setState(() {
+          isJoined = true;
+        });
+      },
+      userJoined: (uid, elapsed) {
+        debugPrint('userJoined  $uid $elapsed');
+        if (uid == 10) {
+          return;
+        }
+        setState(() {
+          remoteUid.add(uid);
+        });
+      },
+      userOffline: (uid, reason) {
+        debugPrint('userOffline  $uid $reason');
+        setState(() {
+          remoteUid.removeWhere((element) => element == uid);
+        });
+      },
+      leaveChannel: (stats) {
+        debugPrint('leaveChannel ${stats.toJson()}');
+        setState(() {
+          isJoined = false;
+          remoteUid.clear();
+        });
+      },
+      remoteVideoStateChanged: (uid, state, reason, elapsed) {
+        if (state == VideoRemoteState.Stopped) {
+          setState(() {
+            videostopUid.add(uid);
+          });
+        } else if (state == VideoRemoteState.Starting) {
+          setState(() {
+            videostopUid.removeWhere((element) => element == uid);
+          });
+        }
+      },
+    ));
+  }
+
+  _joinChannel() async {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      await [Permission.microphone, Permission.camera].request();
+    }
+    await _engine.joinChannel(token, channelId, null, 123456789);
+  }
+
+  _leaveChannel() async {
+    await _engine.leaveChannel();
+  }
+
+  _startScreenShare() async {
+    final helper = await _engine.getScreenShareHelper(
+        appGroup: kIsWeb || Platform.isWindows ? null : _kDefaultAppGroup);
+    helper.setEventHandler(RtcEngineEventHandler(
+      joinChannelSuccess: (String channel, int uid, int elapsed) {
+        debugPrint('ScreenSharing joinChannelSuccess $channel $uid $elapsed');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content:
+              Text('ScreenSharing joinChannelSuccess $channel $uid $elapsed'),
+        ));
+      },
+      localVideoStateChanged:
+          (LocalVideoStreamState localVideoState, LocalVideoStreamError error) {
+        debugPrint(
+            'ScreenSharing localVideoStateChanged $localVideoState $error');
+        if (error == LocalVideoStreamError.ScreenCaptureWindowClosed) {
+          _stopScreenShare();
+        }
+      },
+    ));
+
+    await helper.disableAudio();
+    await helper.enableVideo();
+    await helper.setChannelProfile(ChannelProfile.LiveBroadcasting);
+    await helper.setClientRole(ClientRole.Broadcaster);
+    var windowId = 0;
+    var random = Random();
+    if (!kIsWeb &&
+        (Platform.isWindows || Platform.isMacOS || Platform.isAndroid)) {
+      final windows = _engine.enumerateWindows();
+      if (windows.isNotEmpty) {
+        final index = random.nextInt(windows.length - 1);
+        debugPrint('ScreenSharing window with index $index');
+        windowId = windows[index].id;
+      }
+    }
+    await helper.startScreenCaptureByWindowId(windowId);
+    setState(() {
+      screenSharing = true;
+    });
+    await helper.joinChannel(token, channelId, null, 10);
+  }
+
+  _stopScreenShare() async {
+    final helper = await _engine.getScreenShareHelper();
+    await helper.destroy().then((value) {
+      setState(() {
+        screenSharing = false;
+      });
+    }).catchError((err) {
+      debugPrint('_stopScreenShare $err');
+    });
   }
 
   Future<String?> uploadFile() async {
@@ -217,7 +317,8 @@ class _VideoCallBodyState extends State<VideoCallBody> {
   @override
   void initState() {
     super.initState();
-    initAgora();
+    // initAgora();
+    _initEngine();
     // _startTimer();
     // Add an event listener to detect fullscreen change
     js.context.callMethod('addEventListener', ['keydown', handleKeyDown]);
@@ -248,22 +349,22 @@ class _VideoCallBodyState extends State<VideoCallBody> {
   }
 
   void _toggleScreenSharing() async {
-    if (_isScreenSharing) {
-      // Stop local video
-      setState(() {
-        _engine.stopPreview();
-        _engine.disableVideo();
-        _isScreenSharing = !_isScreenSharing;
-      });
-      await _engine.startScreenCaptureByDisplayId(0);
-    } else {
-      await _engine.stopScreenCapture();
-      setState(() {
-        _engine.enableVideo();
-        _engine.startPreview();
-        _isScreenSharing = !_isScreenSharing;
-      });
-    }
+    // if (_isScreenSharing) {
+    // Stop local video
+    // setState(() {
+    //   _isScreenSharing = !_isScreenSharing;
+    // });
+    // await _engine.stopPreview();
+    // await _engine.disableVideo();
+    await _engine.startScreenCaptureByDisplayId(10);
+    // } else {
+    //   await _engine.stopScreenCapture();
+    //   setState(() {
+    //     _engine.enableVideo();
+    //     _engine.startPreview();
+    //     _isScreenSharing = !_isScreenSharing;
+    //   });
+    // }
   }
 
   void muteAudio() {
@@ -339,7 +440,7 @@ class _VideoCallBodyState extends State<VideoCallBody> {
 
   void startMediaStream() async {
     try {
-      final stream = await window.navigator.mediaDevices!.getUserMedia({
+      final stream = await html.window.navigator.mediaDevices!.getUserMedia({
         'video': true, // Set to true if you want video as well
         'audio': true, // Set to true to enable audio
       });
@@ -358,85 +459,85 @@ class _VideoCallBodyState extends State<VideoCallBody> {
     }
   }
 
-  Future<void> initAgora() async {
-    // retrieve permissions
-    // startMediaStream();
-    bool response = false;
-    try {
-      await window.navigator.mediaDevices?.getUserMedia({
-        'video': true,
-        'audio': true,
-      });
-      response = true;
-      // Media devices started successfully
-    } catch (error) {
-      if (error == 'NotAllowedError' || error == 'NotReadableError') {
-        // The camera is in use by another application
-        response = false;
-        cameraInUse = true;
-        print(
-            'Could not start video source. Another application may be using the camera.');
-        // You can display a user-friendly message or take appropriate action
-      } else {
-        // Handle other errors
-        response = false;
-        cameraInUse = true;
-        print(error);
-      }
-    }
+  // Future<void> initAgora() async {
+  //   // retrieve permissions
+  //   // startMediaStream();
+  //   bool response = false;
+  //   try {
+  //     await window.navigator.mediaDevices?.getUserMedia({
+  //       'video': true,
+  //       'audio': true,
+  //     });
+  //     response = true;
+  //     // Media devices started successfully
+  //   } catch (error) {
+  //     if (error == 'NotAllowedError' || error == 'NotReadableError') {
+  //       // The camera is in use by another application
+  //       response = false;
+  //       cameraInUse = true;
+  //       print(
+  //           'Could not start video source. Another application may be using the camera.');
+  //       // You can display a user-friendly message or take appropriate action
+  //     } else {
+  //       // Handle other errors
+  //       response = false;
+  //       cameraInUse = true;
+  //       print(error);
+  //     }
+  //   }
 
-    // await window.navigator.mediaDevices!.getUserMedia({
-    //   'video': true,
-    //   'audio': true,
-    // });
-    //create the engine
-    _engine = await RtcEngine.create(appId);
-    if (response == false) {
-      await _engine.disableVideo();
-    } else {
-      await _engine.enableVideo();
-      await _engine.startPreview();
-    }
+  //   // await window.navigator.mediaDevices!.getUserMedia({
+  //   //   'video': true,
+  //   //   'audio': true,
+  //   // });
+  //   //create the engine
+  //   _engine = await RtcEngine.create(appId);
+  //   if (response == false) {
+  //     await _engine.disableVideo();
+  //   } else {
+  //     await _engine.enableVideo();
+  //     await _engine.startPreview();
+  //   }
 
-    await _engine.setChannelProfile(ChannelProfile.Communication);
-    // await _engine.setClientRole(ClientRole.Broadcaster);
-    _engine.setEventHandler(
-      RtcEngineEventHandler(
-        joinChannelSuccess: (String channel, int uid, int elapsed) {
-          print("local user $uid joined");
-          setState(() {
-            _localUserJoined = true;
-          });
-        },
-        userJoined: (int uid, int elapsed) {
-          print("remote user $uid joined");
-          setState(() {
-            _remoteUid = uid;
-            _remoteUserJoined = true;
-          });
-        },
-        userOffline: (int uid, UserOfflineReason reason) {
-          print("remote user $uid left channel");
-          setState(() {
-            _remoteUid = null;
-            _remoteUserJoined = false;
-          });
-        },
-        virtualBackgroundSourceEnabled:
-            (bool enabled, VirtualBackgroundSourceStateReason reason) {
-          print("Virtual user $enabled left channel");
-        },
-        activeSpeaker: (int uid) {
-          print("speaker user $uid left channel");
-          setState(() {
-            _speakerUid = uid;
-          });
-        },
-      ),
-    );
+  //   await _engine.setChannelProfile(ChannelProfile.Communication);
+  //   // await _engine.setClientRole(ClientRole.Broadcaster);
+  //   _engine.setEventHandler(
+  //     RtcEngineEventHandler(
+  //       joinChannelSuccess: (String channel, int uid, int elapsed) {
+  //         print("local user $uid joined");
+  //         setState(() {
+  //           _localUserJoined = true;
+  //         });
+  //       },
+  //       userJoined: (int uid, int elapsed) {
+  //         print("remote user $uid joined");
+  //         setState(() {
+  //           _remoteUid = uid;
+  //           _remoteUserJoined = true;
+  //         });
+  //       },
+  //       userOffline: (int uid, UserOfflineReason reason) {
+  //         print("remote user $uid left channel");
+  //         setState(() {
+  //           _remoteUid = null;
+  //           _remoteUserJoined = false;
+  //         });
+  //       },
+  //       virtualBackgroundSourceEnabled:
+  //           (bool enabled, VirtualBackgroundSourceStateReason reason) {
+  //         print("Virtual user $enabled left channel");
+  //       },
+  //       activeSpeaker: (int uid) {
+  //         print("speaker user $uid left channel");
+  //         setState(() {
+  //           _speakerUid = uid;
+  //         });
+  //       },
+  //     ),
+  //   );
 
-    await _engine.joinChannel(token, channel, null, _localUid);
-  }
+  //   await _engine.joinChannel(token, channel, null, _localUid);
+  // }
 
   void _onWhiteboardPaint(DrawUpdate update) {
     setState(() {
@@ -446,7 +547,7 @@ class _VideoCallBodyState extends State<VideoCallBody> {
 
   void cameraView() async {
     if (isPreview) {
-      await window.navigator.mediaDevices!.getUserMedia({
+      await html.window.navigator.mediaDevices!.getUserMedia({
         'video': false,
         'audio': true,
       });
@@ -470,7 +571,7 @@ class _VideoCallBodyState extends State<VideoCallBody> {
     //   await _engine.disableVideo();
     // }
     else {
-      await window.navigator.mediaDevices!.getUserMedia({
+      await html.window.navigator.mediaDevices!.getUserMedia({
         'video': true,
         'audio': true,
       });
@@ -628,12 +729,12 @@ class _VideoCallBodyState extends State<VideoCallBody> {
   // Create UI with local view and remote view
   @override
   Widget build(BuildContext context) {
-    final messagedata = Provider.of<List<MessageContent>>(context);
-    if (messagedata.isNotEmpty) {
-      setState(() {
-        messagedata.sort((a, b) => a.dateSent.compareTo(b.dateSent));
-      });
-    }
+    // final messagedata = Provider.of<List<MessageContent>>(context);
+    // if (messagedata.isNotEmpty) {
+    //   setState(() {
+    //     messagedata.sort((a, b) => a.dateSent.compareTo(b.dateSent));
+    //   });
+    // }
     return RawKeyboardListener(
       autofocus: true,
       focusNode: FocusNode(),
@@ -749,6 +850,7 @@ class _VideoCallBodyState extends State<VideoCallBody> {
                           ],
                         ),
                       ),
+                      // _renderVideo(),
                       Stack(
                         children: [
                           Column(
@@ -776,9 +878,19 @@ class _VideoCallBodyState extends State<VideoCallBody> {
                                       padding: const EdgeInsets.all(5.0),
                                       child: SizedBox(
                                         width:
-                                            MediaQuery.of(context).size.width /2,
+                                            MediaQuery.of(context).size.width,
                                         child: Center(
-                                          child: _remoteVideo(),
+                                          child: screenSharing
+                                              ? const Expanded(
+                                                  flex: 1,
+                                                  child: kIsWeb
+                                                      ? rtc_local_view
+                                                              .SurfaceView
+                                                          .screenShare()
+                                                      : rtc_local_view
+                                                              .TextureView
+                                                          .screenShare())
+                                              : _remoteVideo(),
                                         ),
                                       ),
                                     ),
@@ -802,10 +914,10 @@ class _VideoCallBodyState extends State<VideoCallBody> {
                                           children: [
                                             FloatingActionButton(
                                               backgroundColor: kColorPrimary,
-                                              onPressed: () {
-                                                _toggleScreenSharing();
-                                              },
-                                              child: Icon(_isScreenSharing
+                                              onPressed: screenSharing
+                                                  ? _stopScreenShare
+                                                  : _startScreenShare,
+                                              child: Icon(screenSharing
                                                   ? Icons.stop_screen_share
                                                   : Icons.screen_share),
                                             ),
@@ -910,23 +1022,85 @@ class _VideoCallBodyState extends State<VideoCallBody> {
                           ),
                           Column(
                             children: [
+                              // Padding(
+                              //   padding: const EdgeInsets.all(10.0),
+                              //   child: Align(
+                              //     alignment: Alignment.topRight,
+                              //     child: Card(
+                              //       elevation: 4,
+                              //       child: SizedBox(
+                              //         width: 160,
+                              //         height: 160,
+                              //         child: Padding(
+                              //           padding: const EdgeInsets.all(5.0),
+                              //           child: Center(
+                              //             child: _localuserVideo(),
+                              //           ),
+                              //         ),
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
                               Padding(
                                 padding: const EdgeInsets.all(10.0),
-                                child: Align(
-                                  alignment: Alignment.topRight,
-                                  child: Card(
-                                    elevation: 4,
-                                    child: SizedBox(
-                                      width: 160,
-                                      height: 160,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(5.0),
-                                        child: Center(
-                                          child: _localuserVideo(),
+                                child: Column(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.topRight,
+                                      child: Card(
+                                        elevation: 4,
+                                        child: SizedBox(
+                                          width: 160,
+                                          height: 160,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(5.0),
+                                            child: Center(
+                                              child: _localuserVideo(),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
+                                    if (screenSharing || remoteUid.contains(10))
+                                      Column(
+                                        children: List.of(remoteUid.map(
+                                          (e) {
+                                            if (e == 10) {
+                                              return const SizedBox.shrink();
+                                            } else {
+                                              return Align(
+                                                alignment: Alignment.topRight,
+                                                child: Card(
+                                                  elevation: 4,
+                                                  child: SizedBox(
+                                                    width: 160,
+                                                    height: 160,
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              5.0),
+                                                      child: kIsWeb
+                                                          ? rtc_remote_view
+                                                              .SurfaceView(
+                                                              uid: e,
+                                                              channelId:
+                                                                  channelId,
+                                                            )
+                                                          : rtc_remote_view
+                                                              .TextureView(
+                                                              uid: e,
+                                                              channelId:
+                                                                  channelId,
+                                                            ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        )),
+                                      )
+                                  ],
                                 ),
                               ),
                             ],
@@ -941,7 +1115,7 @@ class _VideoCallBodyState extends State<VideoCallBody> {
                 width: 5,
               ),
               Visibility(
-                visible: false,
+                visible: viewChat,
                 child: Expanded(
                   flex: 5,
                   child: Padding(
@@ -958,7 +1132,7 @@ class _VideoCallBodyState extends State<VideoCallBody> {
                               child: Row(
                                 children: [
                                   const Text(
-                                    'Chat with user:',
+                                    'Meeting chat',
                                     style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 20,
@@ -991,21 +1165,45 @@ class _VideoCallBodyState extends State<VideoCallBody> {
                                         .snapshots(),
                                     builder: (context, snapshot) {
                                       if (snapshot.hasError) {
+                                        return Center(
+                                            child: Text(
+                                                'Error: ${snapshot.error}'));
+                                      }
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
                                         return const Center(
                                             child: CircularProgressIndicator());
                                       }
                                       if (snapshot.data!.docs.isEmpty) {
-                                        return const Center(
-                                            child: CircularProgressIndicator());
-                                      }
+                                        return Center(
+                                            child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: const [
+                                            Icon(
+                                              Icons.message_outlined,
+                                              color: kColorPrimary,
+                                            ),
+                                            Text(
+                                              'No message found.',
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.black54),
+                                            ),
+                                          ],
+                                        ));
+                                      } else {
+                                        dynamic message = snapshot.data!.docs;
 
-                                      final message = snapshot.data!.docs;
-
-                                      return Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 5.0),
-                                        child: Card(
-                                          elevation: 4,
+                                        message.sort((a, b) {
+                                          Timestamp aTimestamp = a['name'];
+                                          Timestamp bTimestamp = b['name'];
+                                          return aTimestamp.compareTo(
+                                              bTimestamp); // Compare b to a for descending order
+                                        });
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 5.0),
                                           child: ListView.builder(
                                             controller: _scrollController,
                                             itemCount: message.length,
@@ -1196,8 +1394,8 @@ class _VideoCallBodyState extends State<VideoCallBody> {
                                               return null;
                                             },
                                           ),
-                                        ),
-                                      );
+                                        );
+                                      }
                                     },
                                   ),
                                   Align(
@@ -1251,7 +1449,9 @@ class _VideoCallBodyState extends State<VideoCallBody> {
                                                   onSubmitted: (value) {
                                                     FirebaseFirestore.instance
                                                         .collection('files')
-                                                        .add({
+                                                        .doc(
+                                                            '1') // Set the document ID to classID
+                                                        .set({
                                                       'name': DateTime.now(),
                                                       'downloadUrl':
                                                           messageContent.text,
@@ -1315,13 +1515,72 @@ class _VideoCallBodyState extends State<VideoCallBody> {
   }
   // Display remote user's video
   Widget _remoteVideo() {
-    if (_remoteUid != null && _speakerUid != _remoteUid) {
-      return RtcRemoteView.SurfaceView(
-        zOrderMediaOverlay: true,
-        zOrderOnTop: true,
-        uid: _remoteUid!,
-        channelId: channel,
-      );
+    if (remoteUid.isNotEmpty && _speakerUid != remoteUid) {
+      return kIsWeb
+          ? remoteUid.contains(10)
+              ? const Expanded(
+                  flex: 1,
+                  child: kIsWeb
+                      ? rtc_remote_view.SurfaceView(
+                          zOrderMediaOverlay: true,
+                          zOrderOnTop: true,
+                          uid: 10,
+                          channelId: channel,
+                        )
+                      : rtc_remote_view.TextureView(
+                          uid: 10,
+                          channelId: channel,
+                        ))
+              : videostopUid.contains(remoteUid.first)
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.person_2_rounded,
+                          size: 80,
+                          color: kColorPrimary,
+                        ),
+                        Text(remoteUid.first.toString()),
+                      ],
+                    )
+                  : rtc_remote_view.SurfaceView(
+                      zOrderMediaOverlay: true,
+                      zOrderOnTop: true,
+                      uid: remoteUid.first,
+                      channelId: channel,
+                    )
+          : remoteUid.contains(10)
+              ? const Expanded(
+                  flex: 1,
+                  child: kIsWeb
+                      ? rtc_remote_view.SurfaceView(
+                          zOrderMediaOverlay: true,
+                          zOrderOnTop: true,
+                          uid: 10,
+                          channelId: channel,
+                        )
+                      : rtc_remote_view.TextureView(
+                          uid: 10,
+                          channelId: channel,
+                        ))
+              : videostopUid.contains(remoteUid.first)
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.person_2_rounded,
+                          size: 80,
+                          color: kColorPrimary,
+                        ),
+                        Text(remoteUid.first.toString()),
+                      ],
+                    )
+                  : rtc_remote_view.TextureView(
+                      uid: remoteUid.first,
+                      channelId: channel,
+                    );
     } else {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1339,20 +1598,79 @@ class _VideoCallBodyState extends State<VideoCallBody> {
     }
   }
 
+  _renderVideo() {
+    return Expanded(
+        child: Stack(
+      children: [
+        Row(
+          children: [
+            const Expanded(
+                flex: 1,
+                child: kIsWeb
+                    ? rtc_local_view.SurfaceView()
+                    : rtc_local_view.TextureView()),
+            if (screenSharing)
+              const Expanded(
+                  flex: 1,
+                  child: kIsWeb
+                      ? rtc_local_view.SurfaceView.screenShare()
+                      : rtc_local_view.TextureView.screenShare()),
+          ],
+        ),
+        Align(
+          alignment: Alignment.topLeft,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: List.of(remoteUid.map(
+                (e) => SizedBox(
+                  width: 120,
+                  height: 120,
+                  child: kIsWeb
+                      ? rtc_remote_view.SurfaceView(
+                          uid: e,
+                          channelId: channelId,
+                        )
+                      : rtc_remote_view.TextureView(
+                          uid: e,
+                          channelId: channelId,
+                        ),
+                ),
+              )),
+            ),
+          ),
+        )
+      ],
+    ));
+  }
+
   Widget _localuserVideo() {
-    if (_localUserJoined && isPreview) {
-      return const RtcLocalView.SurfaceView(
-        channelId: channel,
-        zOrderMediaOverlay: true,
-        zOrderOnTop: true,
+    if (isJoined && isPreview) {
+      return const Expanded(
+        flex: 1,
+        child: kIsWeb
+            ? rtc_local_view.SurfaceView(
+                channelId: channel,
+                zOrderMediaOverlay: true,
+                zOrderOnTop: true,
+              )
+            : rtc_local_view.TextureView(
+                channelId: channel,
+              ),
       );
-    } else if (_localUserJoined && _isScreenSharing || isPreview == false) {
+    } else if (isJoined && isPreview == false) {
       return const Icon(
         Icons.person_2_rounded,
         size: 60,
         color: kColorPrimary,
       );
-    } else if (_localUserJoined && cameraInUse) {
+    } else if (isJoined && isPreview == false) {
+      return const Icon(
+        Icons.person_2_rounded,
+        size: 60,
+        color: kColorPrimary,
+      );
+    } else if (isJoined && cameraInUse) {
       return const Text('Camera in Use by other media');
     } else {
       return const CircularProgressIndicator();
@@ -1360,20 +1678,20 @@ class _VideoCallBodyState extends State<VideoCallBody> {
   }
 
   // This method builds the container for displaying the speaker video.
-  Widget _buildSpeakerVideo() {
-    if (_speakerUid == _localUid) {
-      return const RtcLocalView.SurfaceView();
-    } else if (_speakerUid == _remoteUid) {
-      return RtcRemoteView.SurfaceView(
-        uid: _remoteUid!,
-        channelId: channel,
-      );
-    } else if (_isScreenSharing) {
-      return const RtcLocalView.SurfaceView();
-    } else {
-      return Container();
-    }
-  }
+  // Widget _buildSpeakerVideo() {
+  //   if (_speakerUid == _localUid) {
+  //     return const rtc_local_view.SurfaceView();
+  //   } else if (_speakerUid == _remoteUid) {
+  //     return rtc_remote_view.SurfaceView(
+  //       uid: _remoteUid!,
+  //       channelId: channel,
+  //     );
+  //   } else if (_isScreenSharing) {
+  //     return const rtc_local_view.SurfaceView();
+  //   } else {
+  //     return Container();
+  //   }
+  // }
 }
 
 class WhiteboardPainter extends CustomPainter {

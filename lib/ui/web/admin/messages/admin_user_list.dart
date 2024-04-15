@@ -251,7 +251,7 @@ class _AdminUserListState extends State<AdminUserList> {
                           final provider = context.read<ChatDisplayProvider>();
                           provider.setOpenMessage(true);
                           setState(() {
-                            updatemessagestatusInfo(messagelist[index].chatID);
+                            updatemessagestatusInfo(true,messagelist[index].chatID, 'read');
                             chatID = messagelist[index].chatID;
                           });
                         },

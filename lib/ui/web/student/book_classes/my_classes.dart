@@ -285,7 +285,7 @@ class _MyClassesState extends State<MyClasses> {
 
     Size size = MediaQuery.of(context).size;
 
-    return Padding(
+    return Container(
       padding: const EdgeInsets.only(left: 10, right: 10),
       child: Column(
         children: <Widget>[
@@ -345,8 +345,11 @@ class _MyClassesState extends State<MyClasses> {
                         ),
                       ),
                       onPressed: () {
+                        html.window.open(
+                            '/#/studentdiary/${widget.uID.toString()}/tutors',
+                            '_blank');
                         // html.window.open('/tutorslist', "");
-                        js.context.callMethod('open', ['/tutorList', '_blank']);
+                        // js.context.callMethod('open', ['/tutorList', '_blank']);
                       },
                       icon: const Icon(
                         Icons.book_outlined,
@@ -368,300 +371,298 @@ class _MyClassesState extends State<MyClasses> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Flexible(
-                    flex: 12,
-                    child: Container(
-                      width: size.width - 310,
-                      height: 50,
-                      child: Card(
-                        elevation: 5.0,
-                        child: Row(
-                          children: [
-                            // Visibility(
-                            //   visible: open == true ? true : false,
-                            //   child: TextButton.icon(
-                            //     // <-- TextButton
-                            //     onPressed: () {
-                            //       setState(
-                            //         () {
-                            //           final provider = context
-                            //               .read<ViewClassDisplayProvider>();
-                            //           provider.setViewClassinfo(false);
-                            //         },
-                            //       );
-                            //     },
-                            //     icon: const Icon(
-                            //       Icons.arrow_back,
-                            //       size: 24.0,
-                            //       color: Colors.black,
-                            //     ),
-                            //     label: const Text(
-                            //       'Back',
-                            //       style: TextStyle(
-                            //         color: Colors.black,
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Visibility(
-                              visible: open == false ? true : false,
-                              child: const Padding(
-                                padding: EdgeInsets.all(5.0),
-                                child: Text(
-                                  "Date Enrolled:",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Visibility(
-                              visible: open == false ? true : false,
-                              child: Container(
-                                padding: const EdgeInsets.all(5),
-                                width: 185,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(
-                                    color: Colors.black45,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                child: Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 150,
-                                      child: Text(
-                                        _tempfromselectedDate == null
-                                            ? 'From'
-                                            : DateFormat.yMMMMd()
-                                                .format(_tempfromselectedDate!),
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ),
-                                    InkWell(
-                                      onTap: () {
-                                        _pickDateDialog();
-                                      },
-                                      child: const Icon(
-                                        Icons.calendar_month,
-                                        size: 20,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Visibility(
-                              visible: open == false ? true : false,
-                              child: Container(
-                                padding: const EdgeInsets.all(5),
-                                width: 185,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(
-                                    color: Colors.black45,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(5),
-                                ),
-                                child: Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 150,
-                                      child: Text(
-                                        _temptoselectedDate == null
-                                            ? 'To'
-                                            : DateFormat.yMMMMd()
-                                                .format(_temptoselectedDate!),
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ),
-                                    InkWell(
-                                      onTap: () {
-                                        _topickDateDialog();
-                                      },
-                                      child: const Icon(
-                                        Icons.calendar_month,
-                                        size: 20,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 30,
-                            ),
-                            Visibility(
-                              visible: open == false ? true : false,
-                              child: const Padding(
-                                padding: EdgeInsets.all(5.0),
-                                child: Text(
-                                  "Status:",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Visibility(
-                              visible: open == false ? true : false,
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.only(left: 5, right: 5),
-                                width: 150,
-                                height: 32,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.black45,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: Colors.white,
-                                ),
-                                child: DropdownButton<String>(
-                                  elevation: 10,
-                                  value: tempstatusValue,
-                                  onChanged: (statValue) {
-                                    setState(() {
-                                      tempstatusValue = statValue!;
-                                    });
-                                  },
-                                  underline: Container(),
-                                  items: <String>[
-                                    'All',
-                                    'Completed',
-                                    'Ongoing',
-                                    'Pending',
-                                    'Cancelled',
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value1) {
-                                    return DropdownMenuItem<String>(
-                                      value: value1,
-                                      child: Container(
-                                        width: 110,
-                                        child: Text(
-                                          value1,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 30,
-                            ),
-                            Visibility(
-                              visible: open == false ? true : false,
-                              child: const Padding(
-                                padding: EdgeInsets.all(5.0),
-                                child: Text(
-                                  "Subject:",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Visibility(
-                              visible: open == false ? true : false,
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.only(left: 5, right: 5),
-                                width: 150,
-                                height: 32,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.black45,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: Colors.white,
-                                ),
-                                child: DropdownButton<String>(
-                                  elevation: 10,
-                                  value: tempdropdownValue,
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      tempdropdownValue = newValue!;
-                                    });
-                                  },
-                                  underline: Container(),
-                                  items: subjectnames
-                                      .map<DropdownMenuItem<String>>(
-                                          (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Container(
-                                        width: 110,
-                                        child: Text(
-                                          value,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Visibility(
-                              visible: open == false ? true : false,
-                              child: SizedBox(
-                                width: 100,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: kColorPrimary,
-                                    shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5))),
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _toselectedDate = _temptoselectedDate;
-                                      _fromselectedDate = _tempfromselectedDate;
-                                      statusValue = tempstatusValue;
-                                      List<SubjectClass> filteredSubjects =
-                                          enrolledlist
-                                              .expand((classesData) => classesData
-                                                  .subjectinfo
-                                                  .where((subject) => subject
-                                                      .subjectName
-                                                      .contains(
-                                                          tempdropdownValue)))
-                                              .toList();
-
-                                      subjectID = filteredSubjects.isNotEmpty
-                                          ? filteredSubjects.first.subjectID
-                                              .toString()
-                                          : tempdropdownValue;
-                                    });
-                                  },
-                                  child: const Text('Search'),
-                                ),
-                              ),
-                            ),
-                            const Spacer(),
-                          ],
+                Container(
+                  width: size.width - 310,
+                  height: 50,
+                  child: Card(
+                    elevation: 5.0,
+                    child: Row(
+                      children: [
+                        // Visibility(
+                        //   visible: open == true ? true : false,
+                        //   child: TextButton.icon(
+                        //     // <-- TextButton
+                        //     onPressed: () {
+                        //       setState(
+                        //         () {
+                        //           final provider = context
+                        //               .read<ViewClassDisplayProvider>();
+                        //           provider.setViewClassinfo(false);
+                        //         },
+                        //       );
+                        //     },
+                        //     icon: const Icon(
+                        //       Icons.arrow_back,
+                        //       size: 24.0,
+                        //       color: Colors.black,
+                        //     ),
+                        //     label: const Text(
+                        //       'Back',
+                        //       style: TextStyle(
+                        //         color: Colors.black,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                        const SizedBox(
+                          width: 10,
                         ),
-                      ),
-                    ))
+                        Visibility(
+                          visible: open == false ? true : false,
+                          child: const Padding(
+                            padding: EdgeInsets.all(5.0),
+                            child: Text(
+                              "Date Enrolled:",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: open == false ? true : false,
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            width: 185,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(
+                                color: Colors.black45,
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 150,
+                                  child: Text(
+                                    _tempfromselectedDate == null
+                                        ? 'From'
+                                        : DateFormat.yMMMMd()
+                                            .format(_tempfromselectedDate!),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    _pickDateDialog();
+                                  },
+                                  child: const Icon(
+                                    Icons.calendar_month,
+                                    size: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Visibility(
+                          visible: open == false ? true : false,
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            width: 185,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(
+                                color: Colors.black45,
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 150,
+                                  child: Text(
+                                    _temptoselectedDate == null
+                                        ? 'To'
+                                        : DateFormat.yMMMMd()
+                                            .format(_temptoselectedDate!),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    _topickDateDialog();
+                                  },
+                                  child: const Icon(
+                                    Icons.calendar_month,
+                                    size: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 30,
+                        ),
+                        Visibility(
+                          visible: open == false ? true : false,
+                          child: const Padding(
+                            padding: EdgeInsets.all(5.0),
+                            child: Text(
+                              "Status:",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: open == false ? true : false,
+                          child: Container(
+                            padding:
+                                const EdgeInsets.only(left: 5, right: 5),
+                            width: 150,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.black45,
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(5),
+                              color: Colors.white,
+                            ),
+                            child: DropdownButton<String>(
+                              elevation: 10,
+                              value: tempstatusValue,
+                              onChanged: (statValue) {
+                                setState(() {
+                                  tempstatusValue = statValue!;
+                                });
+                              },
+                              underline: Container(),
+                              items: <String>[
+                                'All',
+                                'Completed',
+                                'Ongoing',
+                                'Pending',
+                                'Cancelled',
+                              ].map<DropdownMenuItem<String>>(
+                                  (String value1) {
+                                return DropdownMenuItem<String>(
+                                  value: value1,
+                                  child: Container(
+                                    width: 110,
+                                    child: Text(
+                                      value1,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 30,
+                        ),
+                        Visibility(
+                          visible: open == false ? true : false,
+                          child: const Padding(
+                            padding: EdgeInsets.all(5.0),
+                            child: Text(
+                              "Subject:",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: open == false ? true : false,
+                          child: Container(
+                            padding:
+                                const EdgeInsets.only(left: 5, right: 5),
+                            width: 150,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.black45,
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(5),
+                              color: Colors.white,
+                            ),
+                            child: DropdownButton<String>(
+                              elevation: 10,
+                              value: tempdropdownValue,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  tempdropdownValue = newValue!;
+                                });
+                              },
+                              underline: Container(),
+                              items: subjectnames
+                                  .map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Container(
+                                    width: 110,
+                                    child: Text(
+                                      value,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Visibility(
+                          visible: open == false ? true : false,
+                          child: SizedBox(
+                            width: 100,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: kColorPrimary,
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(5))),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _toselectedDate = _temptoselectedDate;
+                                  _fromselectedDate = _tempfromselectedDate;
+                                  statusValue = tempstatusValue;
+                                  List<SubjectClass> filteredSubjects =
+                                      enrolledlist
+                                          .expand((classesData) => classesData
+                                              .subjectinfo
+                                              .where((subject) => subject
+                                                  .subjectName
+                                                  .contains(
+                                                      tempdropdownValue)))
+                                          .toList();
+
+                                  subjectID = filteredSubjects.isNotEmpty
+                                      ? filteredSubjects.first.subjectID
+                                          .toString()
+                                      : tempdropdownValue;
+                                });
+                              },
+                              child: const Text('Search'),
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
           ),
@@ -672,11 +673,22 @@ class _MyClassesState extends State<MyClasses> {
                 ? Container(
                     width: size.width - 320,
                     height: size.height - 80,
-                    child: const Center(
-                        child: CircularProgressIndicator(
-                      strokeWidth: 6,
-                      color: Color.fromRGBO(1, 118, 132, 1),
-                    )))
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(
+                          Icons.list,
+                          size: 50,
+                          color: kColorPrimary,
+                        ),
+                        Text(
+                          'No data found!',
+                          style:
+                              TextStyle(color: kCalendarColorB, fontSize: 18),
+                        ),
+                      ],
+                    ))
                 : enrolledlist.isEmpty
                     ? Container(
                         width: size.width - 320,
@@ -685,7 +697,11 @@ class _MyClassesState extends State<MyClasses> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
-                            Icon(Icons.list, size: 50, color: kColorPrimary,),
+                            Icon(
+                              Icons.list,
+                              size: 50,
+                              color: kColorPrimary,
+                            ),
                             Text(
                               'No data found!',
                               style: TextStyle(

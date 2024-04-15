@@ -62,12 +62,12 @@ class RouteGenerator {
                   userid: _getUserData(),
                 ));
 
-      case Routes.videoCall:
-        return CupertinoPageRoute(
-            builder: (_) => const VideoCall(
-                  chatID: '',
-                  uID: '',
-                ));
+      // case Routes.videoCall:
+      //   return CupertinoPageRoute(
+      //       builder: (_) => const VideoCall(
+      //             chatID: '',
+      //             uID: '', classId: '',
+      //           ));
 
       default:
         return _errorRoute();

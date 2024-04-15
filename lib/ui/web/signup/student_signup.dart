@@ -3,6 +3,8 @@
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
 import 'package:work4ututor/ui/web/signup/student_information_signup.dart';
 import 'package:work4ututor/ui/web/signup/tutor_signup.dart';
 
@@ -36,6 +38,52 @@ final scafoldKey = GlobalKey<ScaffoldState>();
 final AuthService _auth = AuthService();
 
 class _StudentSignupState extends State<StudentSignup> {
+    final _userinfo = Hive.box('userID');
+  List<Map<String, dynamic>> _items = [];
+  _refreshItems() {
+    final data = _userinfo.keys.map((key) {
+      final item = _userinfo.get(key);
+      return {
+        "key": key,
+        "userID": item["userID"],
+        "role": item["role"],
+        "userStatus": item["userStatus"]
+      };
+    }).toList();
+    setState(() {
+      _items = data.toList();
+    });
+  }
+  @override
+  void initState() {
+    _refreshItems();
+     final index = _items.length;
+      if (index == 0) {
+        // GoRouter.of(context).go('/');
+      } else {
+        debugPrint(index.toString());
+        if (_items[0]['role'].toString() == 'student' &&
+            _items[0]['userStatus'].toString() == 'unfinished') {
+          GoRouter.of(context)
+              .go('/studentsignup/${_items[0]['userID'].toString()}');
+        } else if (_items[0]['role'].toString() == 'student' &&
+            _items[0]['userStatus'].toString() == 'completed') {
+          GoRouter.of(context)
+              .go('/studentdiary/${_items[0]['userID'].toString()}');
+        } else if (_items[0]['role'].toString() == 'tutor' &&
+            _items[0]['userStatus'].toString() == 'completed') {
+          GoRouter.of(context)
+              .go('/tutordesk/${_items[0]['userID'].toString()}');
+        } else if (_items[0]['role'].toString() == 'tutor' &&
+            _items[0]['userStatus'].toString() == 'unfinished') {
+          GoRouter.of(context)
+              .go('/tutorsignup/${_items[0]['userID'].toString()}');
+        } else {
+          GoRouter.of(context).go('/');
+        }
+      }
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -82,11 +130,7 @@ class _StudentSignupState extends State<StudentSignup> {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const StudentSignup()),
-                        );
+                        GoRouter.of(context).go('/account/student');
                       },
                       child: const Text('BECOME A STUDENT'),
                     ),
@@ -117,11 +161,7 @@ class _StudentSignupState extends State<StudentSignup> {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const TutorSignup()),
-                        );
+                        GoRouter.of(context).go('/account/tutor');
                       },
                       child: const Text('BECOME A TUTOR'),
                     ),
@@ -152,11 +192,9 @@ class _StudentSignupState extends State<StudentSignup> {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const LoginPage()),
-                        );
+                        {
+                          GoRouter.of(context).go('/');
+                        }
                       },
                       child: const Text('LOG IN'),
                     ),
@@ -641,7 +679,9 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage(pdfurl: '',));
+                                        builder: (_) => TermPage(
+                                              pdfurl: '',
+                                            ));
                                   });
                                 }),
                           TextSpan(text: ' and that you have read our '),
@@ -661,7 +701,9 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage(pdfurl: '',));
+                                        builder: (_) => TermPage(
+                                              pdfurl: '',
+                                            ));
                                   });
                                 }),
                         ],
@@ -958,7 +1000,9 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                 showDialog(
                                     barrierDismissible: false,
                                     context: context,
-                                    builder: (_) => TermPage(pdfurl: '',));
+                                    builder: (_) => TermPage(
+                                          pdfurl: '',
+                                        ));
                               });
                             }),
                       TextSpan(text: ' and that you have read our '),
@@ -978,7 +1022,9 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                 showDialog(
                                     barrierDismissible: false,
                                     context: context,
-                                    builder: (_) => TermPage(pdfurl: '',));
+                                    builder: (_) => TermPage(
+                                          pdfurl: '',
+                                        ));
                               });
                             }),
                     ],
@@ -1209,6 +1255,7 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                     context: context,
                                     type: CoolAlertType.error,
                                     title: 'Oops...',
+                                    width: 200,
                                     text: result,
                                     backgroundColor: Colors.black,
                                   );
@@ -1219,18 +1266,15 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                   setState(() {
                                     CoolAlert.show(
                                       context: context,
+                                      width: 200,
                                       type: CoolAlertType.success,
                                       text: resultdata,
                                       autoCloseDuration:
                                           const Duration(seconds: 1),
-                                    ).then((value) => Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => StudentInfo(
-                                                    uid: result.uid,
-                                                    email: result.email,
-                                                  )),
-                                        ));
+                                    ).then((value) {
+                                      GoRouter.of(context).go(
+                                          '/studentsignup/${result.uid.toString()}');
+                                    });
                                   });
                                 }
                               });
@@ -1276,7 +1320,9 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                 showDialog(
                                     barrierDismissible: false,
                                     context: context,
-                                    builder: (_) => TermPage(pdfurl: '',));
+                                    builder: (_) => TermPage(
+                                          pdfurl: '',
+                                        ));
                               });
                             }),
                       TextSpan(text: ' and that you have read our '),
@@ -1296,7 +1342,9 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                 showDialog(
                                     barrierDismissible: false,
                                     context: context,
-                                    builder: (_) => TermPage(pdfurl: '',));
+                                    builder: (_) => TermPage(
+                                          pdfurl: '',
+                                        ));
                               });
                             }),
                     ],

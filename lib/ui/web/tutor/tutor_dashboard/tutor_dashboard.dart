@@ -6,10 +6,13 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:work4ututor/data_class/subject_teach_pricing.dart';
 
 import '../../../../components/nav_bar.dart';
+import '../../../../constant/constant.dart';
 import '../../../../data_class/chatmessageclass.dart';
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/studentanalyticsclass.dart';
@@ -55,11 +58,63 @@ bool _showModal = false;
 GlobalKey _buttonKey = GlobalKey();
 int newmessagecount = 0;
 int newnotificationcount = 0;
+ScrollController _scrollController = ScrollController();
 
 class _DashboardPageState extends State<DashboardPage> {
+  final _userinfo = Hive.box('userID');
+  List<Map<String, dynamic>> _items = [];
+  _refreshItems() {
+    final data = _userinfo.keys.map((key) {
+      final item = _userinfo.get(key);
+      return {
+        "key": key,
+        "userID": item["userID"],
+        "role": item["role"],
+        "userStatus": item["userStatus"]
+      };
+    }).toList();
+    setState(() {
+      _items = data.toList();
+    });
+  }
+
+  @override
+  void initState() {
+    _refreshItems();
+    final index = _items.length;
+    if (index == 0) {
+      GoRouter.of(context).go('/');
+    } else {
+      debugPrint(index.toString());
+      if (_items[0]['role'].toString() == 'student' &&
+          _items[0]['userStatus'].toString() == 'unfinished') {
+        GoRouter.of(context)
+            .go('/studentsignup/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'student' &&
+          _items[0]['userStatus'].toString() == 'completed') {
+        GoRouter.of(context)
+            .go('/studentdiary/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'tutor' &&
+          _items[0]['userStatus'].toString() == 'completed' &&
+          _items[0]['userID'].toString() != widget.uID.toString()) {
+        GoRouter.of(context).go('/');
+      } else if (_items[0]['role'].toString() == 'tutor' &&
+          _items[0]['userStatus'].toString() == 'completed' &&
+          _items[0]['userID'].toString() == widget.uID.toString()) {
+        // GoRouter.of(context).go('/tutordesk/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'tutor' &&
+          _items[0]['userStatus'].toString() == 'unfinished') {
+        GoRouter.of(context)
+            .go('/tutorsignup/${_items[0]['userID'].toString()}');
+      } else {
+        GoRouter.of(context).go('/');
+      }
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return MultiProvider(
       providers: [
         StreamProvider<List<ChatMessage>>.value(
@@ -112,7 +167,7 @@ class _DashboardPageState extends State<DashboardPage> {
           },
           initialData: const [],
         ),
-         StreamProvider<List<ScheduleData>>.value(
+        StreamProvider<List<ScheduleData>>.value(
           value: ScheduleEnrolledClassData(
             uid: widget.uID,
             role: 'student',
@@ -187,6 +242,7 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
     debugPrint(downloadURL.toString());
   }
 
+  final tutordeskKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     final int menuIndex = context.select((InitProvider p) => p.menuIndex);
@@ -217,15 +273,8 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
               });
             },
             child: Scaffold(
+              key: tutordeskKey,
               backgroundColor: const Color.fromRGBO(245, 247, 248, 1),
-              drawer: ResponsiveBuilder.isDesktop(context)
-                  ? null
-                  : Drawer(
-                      child: SafeArea(
-                        child: SingleChildScrollView(
-                            child: _buildSidebar(context)),
-                      ),
-                    ),
               appBar: AppBar(
                 toolbarHeight: 65,
                 backgroundColor: kColorPrimary,
@@ -266,202 +315,342 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                   //         }),
                   //   ),
                   // ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
-                    child: Badge(
-                      isLabelVisible: newnotificationcount == 0 ? false : true,
-                      alignment: AlignmentDirectional.centerEnd,
-                      label: Text(
-                        newnotificationcount.toString(),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      child: IconButton(
-                          key: _buttonKey,
-                          splashColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          padding: EdgeInsets.zero,
-                          icon: const Icon(
-                            EvaIcons.bell,
-                            color: Colors.white,
-                            size: 25,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _showModal = !_showModal;
-                            });
-                          }),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(2.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          fullName,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.normal,
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          tutorID,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.normal,
-                            color: Colors.white,
-                            fontSize: 12,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        RatingBar(
-                            initialRating: 0,
-                            direction: Axis.horizontal,
-                            allowHalfRating: true,
-                            itemCount: 5,
-                            itemSize: 16,
-                            ratingWidget: RatingWidget(
-                                full: const Icon(Icons.star,
-                                    color: Colors.orange),
-                                half: const Icon(
-                                  Icons.star_half,
-                                  color: Colors.orange,
+
+                  ResponsiveBuilder.isDesktop(context)
+                      ? Row(
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.fromLTRB(10, 10, 15, 10),
+                              child: Badge(
+                                isLabelVisible:
+                                    newnotificationcount == 0 ? false : true,
+                                alignment: AlignmentDirectional.centerEnd,
+                                label: Text(
+                                  newnotificationcount.toString(),
+                                  style: const TextStyle(color: Colors.white),
                                 ),
-                                empty: const Icon(
-                                  Icons.star_outline,
-                                  color: Colors.orange,
-                                )),
-                            onRatingUpdate: (value) {
-                              // _ratingValue = value;
-                            }),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 5, 10, 5),
-                    child: downloadURL1 == null
-                        ? const Center(child: CircularProgressIndicator())
-                        : CircleAvatar(
-                            backgroundImage: NetworkImage(
-                              downloadURL1.toString(),
+                                child: IconButton(
+                                    key: _buttonKey,
+                                    splashColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    padding: EdgeInsets.zero,
+                                    icon: const Icon(
+                                      EvaIcons.bell,
+                                      color: Colors.white,
+                                      size: 25,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _showModal = !_showModal;
+                                      });
+                                    }),
+                              ),
                             ),
-                            radius: 25,
-                          ),
-                  ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    fullName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    tutorID,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  RatingBar(
+                                      ignoreGestures: true,
+                                      initialRating: 0,
+                                      direction: Axis.horizontal,
+                                      allowHalfRating: true,
+                                      itemCount: 5,
+                                      itemSize: 16,
+                                      ratingWidget: RatingWidget(
+                                          full: const Icon(Icons.star,
+                                              color: Colors.orange),
+                                          half: const Icon(
+                                            Icons.star_half,
+                                            color: Colors.orange,
+                                          ),
+                                          empty: const Icon(
+                                            Icons.star_outline,
+                                            color: Colors.orange,
+                                          )),
+                                      onRatingUpdate: (value) {
+                                        // _ratingValue = value;
+                                      }),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(0, 5, 10, 5),
+                              child: downloadURL1 == null
+                                  ? const Center(
+                                      child: CircularProgressIndicator())
+                                  : CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        downloadURL1.toString(),
+                                      ),
+                                      radius: 25,
+                                    ),
+                            ),
+                          ],
+                        )
+                      : ResponsiveBuilder.isTablet(context)
+                          ? Row(
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(10, 10, 15, 10),
+                                  child: Badge(
+                                    isLabelVisible: newnotificationcount == 0
+                                        ? false
+                                        : true,
+                                    alignment: AlignmentDirectional.centerEnd,
+                                    label: Text(
+                                      newnotificationcount.toString(),
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                    child: IconButton(
+                                        key: _buttonKey,
+                                        splashColor: Colors.transparent,
+                                        highlightColor: Colors.transparent,
+                                        padding: EdgeInsets.zero,
+                                        icon: const Icon(
+                                          EvaIcons.bell,
+                                          color: Colors.white,
+                                          size: 25,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            _showModal = !_showModal;
+                                          });
+                                        }),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        fullName,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        tutorID,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      RatingBar(
+                                          initialRating: 0,
+                                          direction: Axis.horizontal,
+                                          allowHalfRating: true,
+                                          itemCount: 5,
+                                          itemSize: 16,
+                                          ratingWidget: RatingWidget(
+                                              full: const Icon(Icons.star,
+                                                  color: Colors.orange),
+                                              half: const Icon(
+                                                Icons.star_half,
+                                                color: Colors.orange,
+                                              ),
+                                              empty: const Icon(
+                                                Icons.star_outline,
+                                                color: Colors.orange,
+                                              )),
+                                          onRatingUpdate: (value) {
+                                            // _ratingValue = value;
+                                          }),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 5, 10, 5),
+                                  child: downloadURL1 == null
+                                      ? const Center(
+                                          child: CircularProgressIndicator())
+                                      : CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                            downloadURL1.toString(),
+                                          ),
+                                          radius: 25,
+                                        ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: kSpacing / 2),
+                                  child: IconButton(
+                                    onPressed: () {
+                                      if (tutordeskKey.currentState != null) {
+                                        tutordeskKey.currentState!
+                                            .openEndDrawer();
+                                      }
+                                    },
+                                    icon: const Icon(Icons.menu),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(10, 10, 15, 10),
+                                  child: Badge(
+                                    isLabelVisible: newnotificationcount == 0
+                                        ? false
+                                        : true,
+                                    alignment: AlignmentDirectional.centerEnd,
+                                    label: Text(
+                                      newnotificationcount.toString(),
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                    child: IconButton(
+                                        key: _buttonKey,
+                                        splashColor: Colors.transparent,
+                                        highlightColor: Colors.transparent,
+                                        padding: EdgeInsets.zero,
+                                        icon: const Icon(
+                                          EvaIcons.bell,
+                                          color: Colors.white,
+                                          size: 25,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            _showModal = !_showModal;
+                                          });
+                                        }),
+                                  ),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 5, 10, 5),
+                                  child: downloadURL1 == null
+                                      ? const Center(
+                                          child: CircularProgressIndicator())
+                                      : CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                            downloadURL1.toString(),
+                                          ),
+                                          radius: 25,
+                                        ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: kSpacing / 2),
+                                  child: IconButton(
+                                    onPressed: () {
+                                      if (tutordeskKey.currentState != null) {
+                                        tutordeskKey.currentState!
+                                            .openEndDrawer();
+                                      }
+                                    },
+                                    icon: const Icon(Icons.menu),
+                                  ),
+                                ),
+                              ],
+                            ),
                 ],
               ),
               body: Padding(
                 padding: const EdgeInsets.only(top: 5.0),
-                child: ResponsiveBuilder(
-                  mobileBuilder: (context, constraints) {
-                    return SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          // _buildTaskContent(
-                          //   onPressedMenu: () => controller.openDrawer(),
-                          // ),
-                          // _buildCalendarContent(),
-                        ],
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Visibility(
+                      visible: ResponsiveBuilder.isDesktop(context),
+                      child: SingleChildScrollView(
+                        controller: ScrollController(),
+                        child: navbarmenu(context, widget.uID),
                       ),
-                    );
-                  },
-                  tabletBuilder: (context, constraints) {
-                    return Column(
-                      children: [
-                        if (menuIndex == 0) ...[
-                          const ClassesMain()
-                        ] else if (menuIndex == 1) ...[
-                          TableBasicsExample1(
-                            uID: widget.uID,
-                          )
-                        ] else if (menuIndex == 2) ...[
-                          MessagePage(
-                            uID: widget.uID,
-                          )
-                        ] 
-                        // else if (menuIndex == 3) ...[
-                        //   ClassInquiry(widget.uID)
-                        // ] 
-                        else if (menuIndex == 4) ...[
-                          const StudentsEnrolled()
-                        ] else if (menuIndex == 5) ...[
-                          PerformancePage(
-                            uID: widget.uID,
-                          )
-                        ] else if (menuIndex == 6) ...[
-                          const SettingsPage()
-                        ] else if (menuIndex == 7) ...[
-                          const HelpPage()
-                        ] else ...[
-                          const ClassesMain()
-                        ],
-                      ],
-                    );
-                  },
-                  desktopBuilder: (context, constraints) {
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Flexible(
-                          flex: constraints.maxWidth > 1350 ? 3 : 4,
-                          child: SingleChildScrollView(
-                            controller: ScrollController(),
-                            child: Card(
-                                margin: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                                elevation: 4,
-                                child: navbarmenu(context)),
-                          ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height,
+                    ),
+                    Scrollbar(
+                      trackVisibility: true,
+                      controller: _scrollController,
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
+                        child: Column(
+                          children: [
+                            if (menuIndex == 0) ...[
+                              const ClassesMain()
+                            ] else if (menuIndex == 1) ...[
+                              TableBasicsExample1(
+                                uID: widget.uID,
+                              )
+                            ] else if (menuIndex == 2) ...[
+                              MessagePage(
+                                uID: widget.uID,
+                              )
+                            ]
+                            // else if (menuIndex == 3) ...[
+                            //   ClassInquiry(widget.uID)
+                            // ]
+                            else if (menuIndex == 4) ...[
+                              const StudentsEnrolled()
+                            ] else if (menuIndex == 5) ...[
+                              PerformancePage(
+                                uID: widget.uID,
+                              )
+                            ] else if (menuIndex == 6) ...[
+                              SettingsPage(
+                                uID: widget.uID,
+                              )
+                            ] else if (menuIndex == 7) ...[
+                              const HelpPage()
+                            ] else ...[
+                              const ClassesMain()
+                            ],
+                          ],
                         ),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height,
-                        ),
-                        Flexible(
-                          flex: 13,
-                          child: SingleChildScrollView(
-                            controller: ScrollController(),
-                            child: Column(
-                              children: [
-                                if (menuIndex == 0) ...[
-                                  const ClassesMain()
-                                ] else if (menuIndex == 1) ...[
-                                  TableBasicsExample1(
-                                    uID: widget.uID,
-                                  )
-                                ] else if (menuIndex == 2) ...[
-                                  MessagePage(
-                                    uID: widget.uID,
-                                  )
-                                ] 
-                                // else if (menuIndex == 3) ...[
-                                //   ClassInquiry(widget.uID)
-                                // ] 
-                                else if (menuIndex == 4) ...[
-                                  const StudentsEnrolled()
-                                ] else if (menuIndex == 5) ...[
-                                  PerformancePage(
-                                    uID: widget.uID,
-                                  )
-                                ] else if (menuIndex == 6) ...[
-                                  const SettingsPage()
-                                ] else if (menuIndex == 7) ...[
-                                  const HelpPage()
-                                ] else ...[
-                                  const ClassesMain()
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                      ),
+                    ),
+                  ],
                 ),
               ),
+              endDrawer: ResponsiveBuilder.isDesktop(context)
+                  ? null
+                  : Drawer(
+                      child: Column(
+                        children: [
+                          _buildSidebar(context),
+                        ],
+                      ),
+                    ),
             ),
           ),
           if (_showModal)
@@ -539,11 +728,19 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
   }
 
   Widget _buildSidebar(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        navbarmenu(context),
-      ],
+    Size size = MediaQuery.of(context).size;
+
+    return SizedBox(
+      height: size.height,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10.0),
+        child: SingleChildScrollView(
+            controller: ScrollController(),
+            child: navbarmenu(
+              context,
+              widget.uID,
+            )),
+      ),
     );
   }
 

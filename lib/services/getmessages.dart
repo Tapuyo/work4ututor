@@ -22,7 +22,7 @@ class GetMessageList {
       ChatMessage(
         chatID: snapshot.id,
         lastmessage: data['lastmessage'] ?? '',
-        messageStatus: data['messageStatus'] ?? '',
+        messageStatus: data['messageStatus'] ?? [],
         studentFav: data['studentFav'] ?? '',
         studentID: data['studentID'] ?? '',
         tutorFav: data['tutorFav'] ?? '',
@@ -100,18 +100,28 @@ sendmessage(String messageContent, messageID, userID) async {
 }
 
 Future<void> updatemessagestatusInfo(
-  String messageID,
-) async {
-  debugPrint(messageID);
+    bool isTutor, String messageID, String count) async {
   try {
-    await FirebaseFirestore.instance
-        .collection('messageparticipants')
-        .doc(messageID)
-        .set({
-      "messageStatus": 'read',
-    }, SetOptions(merge: true));
-    debugPrint('Update Successful');
+    if (isTutor) {
+      await FirebaseFirestore.instance
+          .collection('messageparticipants')
+          .doc(messageID)
+          .update({
+        "messageDate": DateTime.now(),
+        "messageStatus.tutorRead": count,
+      });
+    } else {
+      await FirebaseFirestore.instance
+          .collection('messageparticipants')
+          .doc(messageID)
+          .update({
+        "messageDate": DateTime.now(),
+        "messageStatus.studentRead": count,
+      });
+    }
+
+    debugPrint('Read');
   } catch (error) {
-    debugPrint('Update Failed: $error');
+    debugPrint('Error: $error');
   }
 }

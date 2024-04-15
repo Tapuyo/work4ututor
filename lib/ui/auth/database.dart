@@ -162,6 +162,65 @@ Future<String?> deleteDayOffDates(String uid) async {
   }
 }
 
+Future<String?> deleteDayOff(String uid, String dayOffDate) async {
+  try {
+    final DocumentReference docRef =
+        FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
+    final DocumentSnapshot doc = await docRef.get();
+
+    if (doc.exists) {
+      List<String>? dayOffs = List<String>.from(doc['dayoffs']);
+
+      // Check if the dayOffDate exists in the list
+      if (dayOffs != null && dayOffs.contains(dayOffDate)) {
+        dayOffs.remove(dayOffDate);
+
+        await docRef.update({
+          'dayoffs': dayOffs,
+        });
+
+        return 'success';
+      } else {
+        return 'Day off date not found in the list';
+      }
+    } else {
+      return 'Document does not exist';
+    }
+  } catch (e) {
+    return e.toString();
+  }
+}
+Future<String?> deleteDateOff(String uid, String dayOffDate) async {
+  try {
+    final DocumentReference docRef =
+        FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
+    final DocumentSnapshot doc = await docRef.get();
+
+    if (doc.exists) {
+      List<String>? dateOffs = List<String>.from(doc['dateoffselected']);
+
+      // Check if the dayOffDate exists in the list
+      print(dayOffDate);
+      if (dateOffs != null && dateOffs.contains(dayOffDate)) {
+        dateOffs.remove(dayOffDate);
+
+        await docRef.update({
+          'dateoffselected': dateOffs,
+        });
+
+        return 'success';
+      } else {
+        return 'Day off date not found in the list';
+      }
+    } else {
+      return 'Document does not exist';
+    }
+  } catch (e) {
+    return e.toString();
+  }
+}
+
+
 Future<String?> addOrUpdateTimeAvailability(
     String uid, TimeAvailability timeAvailability) async {
   try {
@@ -187,6 +246,31 @@ Future<String?> addOrUpdateTimeAvailability(
     return e.toString();
   }
 }
+Future<String?> deleteTimeAvailability(String uid, TimeAvailability timeAvailability) async {
+  try {
+    final DocumentReference docRef =
+        FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
+
+    final CollectionReference timeCollectionRef =
+        docRef.collection('timeavailable');
+
+    QuerySnapshot querySnapshot = await timeCollectionRef
+        .where('timeAvailableFrom', isEqualTo: timeAvailability.timeAvailableFrom)
+        .where('timeAvailableTo', isEqualTo: timeAvailability.timeAvailableTo)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      // Document with the provided BlockDate fields exists, so delete it
+      await querySnapshot.docs.first.reference.delete();
+      return 'success';
+    } else {
+      return ' not found';
+    }
+  } catch (e) {
+    return e.toString();
+  }
+}
+
 
 Future<String?> addOrUpdateTimeAvailabilityWithDate(
     String uid, List<DateTimeAvailability> timeAvailability) async {
@@ -194,24 +278,19 @@ Future<String?> addOrUpdateTimeAvailabilityWithDate(
     final DocumentReference docRef =
         FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
 
-    // Create a reference to the "timeavailable" subcollection
     final CollectionReference timeAvailableCollectionRef =
         docRef.collection('timedateavailable');
 
-    // Get existing documents within the "timeavailable" subcollection
     QuerySnapshot existingDocs = await timeAvailableCollectionRef.get();
 
     if (existingDocs.docs.isEmpty) {
-      // If the subcollection is empty, add the timeAvailability to it
       for (DateTimeAvailability availability in timeAvailability) {
         await timeAvailableCollectionRef.add(availability.toMap());
       }
     } else {
-      // Check if formatted selectedDate is already present in existingDocs
       for (DateTimeAvailability availability in timeAvailability) {
-        // Format the selectedDate for comparison
         DateTime formattedSelectedDate =
-            availability.selectedDate; // Convert Timestamp to DateTime
+            availability.selectedDate; 
 
         bool selectedDateExists = existingDocs.docs.any(
             (doc) => doc['selectedDate'].toDate() == formattedSelectedDate);
@@ -230,33 +309,75 @@ Future<String?> addOrUpdateTimeAvailabilityWithDate(
   }
 }
 
-Future<String?> blockTimeWithDate(
-    String uid, List<BlockDate> blockdates) async {
+Future<String?> deleteDateAvailability(String uid, DateTimeAvailability timeAvailability) async {
   try {
     final DocumentReference docRef =
         FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
 
-    // Create a reference to the "timeavailable" subcollection
+    final CollectionReference timeCollectionRef =
+        docRef.collection('timedateavailable');
+
+    QuerySnapshot querySnapshot = await timeCollectionRef
+        .where('selectedDate', isEqualTo: timeAvailability.selectedDate)
+        .where('timeAvailableFrom', isEqualTo: timeAvailability.timeAvailableFrom)
+        .where('timeAvailableTo', isEqualTo: timeAvailability.timeAvailableTo)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      // Document with the provided BlockDate fields exists, so delete it
+      await querySnapshot.docs.first.reference.delete();
+      return 'success';
+    } else {
+      return ' not found';
+    }
+  } catch (e) {
+    return e.toString();
+  }
+}
+Future<String?> deleteAllTimeData(String uid) async {
+  try {
+    final DocumentReference docRef =
+        FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
+
+    // Delete 'blockdatetime' subcollection
+    await deleteSubcollection(docRef, 'timeavailable');
+
+    // Delete another subcollection (replace 'otherSubcollection' with the actual subcollection name)
+    await deleteSubcollection(docRef, 'timedateavailable');
+
+    return 'success';
+  } catch (e) {
+    print('Error deleting data: $e');
+    return e.toString();
+  }
+}
+
+Future<void> deleteSubcollection(DocumentReference docRef, String subcollectionPath) async {
+  final CollectionReference subcollectionRef = docRef.collection(subcollectionPath);
+
+  // Delete all documents inside the subcollection
+  QuerySnapshot querySnapshot = await subcollectionRef.get();
+  querySnapshot.docs.forEach((doc) async {
+    await doc.reference.delete();
+  });
+}
+Future<String?> blockTimeWithDate(String uid, BlockDate blockDate) async {
+  try {
+    final DocumentReference docRef =
+        FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
+
     final CollectionReference blockCollectionRef =
         docRef.collection('blockdatetime');
 
-    // Get existing documents within the "timeavailable" subcollection
     QuerySnapshot existingDocs = await blockCollectionRef.get();
 
     if (existingDocs.docs.isEmpty) {
-      // If the subcollection is empty, add the timeAvailability to it
-      for (BlockDate blocks in blockdates) {
-        await blockCollectionRef.add(blocks.toMap());
-      }
+      await blockCollectionRef.add(blockDate.toMap());
     } else {
-      // If the subcollection is not empty, check if there's data with a specific condition
-      bool dataNotFound = true; // Set this flag based on your condition
+      bool dataNotFound = true;
 
       if (dataNotFound) {
-        // Add the timeAvailability to the list in this case
-        for (BlockDate blocks in blockdates) {
-          await blockCollectionRef.add(blocks.toMap());
-        }
+        await blockCollectionRef.add(blockDate.toMap());
       }
     }
 
@@ -266,3 +387,81 @@ Future<String?> blockTimeWithDate(
     return e.toString();
   }
 }
+Future<String?> deleteBlockDate(String uid, BlockDate blockDate) async {
+  try {
+    final DocumentReference docRef =
+        FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
+
+    final CollectionReference blockCollectionRef =
+        docRef.collection('blockdatetime');
+
+    QuerySnapshot querySnapshot = await blockCollectionRef
+        .where('blockDate', isEqualTo: blockDate.blockDate)
+        .where('timeFrom', isEqualTo: blockDate.timeFrom)
+        .where('timeTo', isEqualTo: blockDate.timeTo)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      // Document with the provided BlockDate fields exists, so delete it
+      await querySnapshot.docs.first.reference.delete();
+      return 'success';
+    } else {
+      return 'Block date not found';
+    }
+  } catch (e) {
+    print('Error deleting block date: $e');
+    return e.toString();
+  }
+}
+Future<String?> deleteAllBlockDates(String uid) async {
+  try {
+    final DocumentReference docRef =
+        FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
+
+    final CollectionReference blockCollectionRef =
+        docRef.collection('blockdatetime');
+
+    // Delete all documents inside the 'blockdatetime' collection
+    await blockCollectionRef.get().then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        doc.reference.delete();
+      });
+    });
+
+    return 'success';
+  } catch (e) {
+    print('Error deleting block dates: $e');
+    return e.toString();
+  }
+}
+// Future<String?> blockTimeWithDate(
+//     String uid, List<BlockDate> blockdates) async {
+//   try {
+//     final DocumentReference docRef =
+//         FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
+
+//     final CollectionReference blockCollectionRef =
+//         docRef.collection('blockdatetime');
+
+//     QuerySnapshot existingDocs = await blockCollectionRef.get();
+
+//     if (existingDocs.docs.isEmpty) {
+//       for (BlockDate blocks in blockdates) {
+//         await blockCollectionRef.add(blocks.toMap());
+//       }
+//     } else {
+//       bool dataNotFound = true;
+
+//       if (dataNotFound) {
+//         for (BlockDate blocks in blockdates) {
+//           await blockCollectionRef.add(blocks.toMap());
+//         }
+//       }
+//     }
+
+//     return 'success';
+//   } catch (e) {
+//     print('Error adding/updating subcollection: $e');
+//     return e.toString();
+//   }
+// }

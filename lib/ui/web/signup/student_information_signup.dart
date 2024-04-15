@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:country_pickers/country_pickers.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
@@ -1784,12 +1785,9 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                       (value) async {
                                         _auth.signOutAnon();
                                         deleteAllData();
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const LoginPage()),
-                                        );
+                                        {
+                                          GoRouter.of(context).go('/}');
+                                        }
                                       },
                                     );
                                   }
@@ -2037,13 +2035,9 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                             text: 'Sign up succesfully!',
                                             autoCloseDuration:
                                                 const Duration(seconds: 1),
-                                          ).then((value) =>
-                                              Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const LoginPage()),
-                                              ));
+                                          ).then((value) {
+                                            GoRouter.of(context).go('/');
+                                          });
                                         });
                                       },
                                     );

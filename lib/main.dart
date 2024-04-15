@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:work4ututor/data_class/studentsEnrolledclass.dart';
 import 'package:work4ututor/provider/displaystarred.dart';
 import 'package:work4ututor/provider/init_provider.dart';
+import 'package:work4ututor/provider/performacefilter.dart';
 import 'package:work4ututor/provider/schedulenotifier.dart';
 import 'package:work4ututor/provider/search_provider.dart';
 import 'package:work4ututor/provider/update_tutor_provider.dart';
@@ -21,9 +23,14 @@ import 'package:work4ututor/services/addpreftutor.dart';
 import 'package:work4ututor/services/getcart.dart';
 import 'package:work4ututor/services/getcountries.dart';
 import 'package:work4ututor/services/getlanguages.dart';
+import 'package:work4ututor/services/getmyrating.dart';
 import 'package:work4ututor/services/getstudentinfo.dart';
 import 'package:work4ututor/services/services.dart';
 import 'package:work4ututor/services/subjectServices.dart';
+import 'package:work4ututor/splash_page.dart';
+import 'package:work4ututor/ui/web/login/resetpassword.dart';
+import 'package:work4ututor/ui/web/search_tutor/find_tutors.dart';
+import 'package:work4ututor/ui/web/signup/tutor_information_signup.dart';
 
 import 'constant/constant.dart';
 import 'data_class/helpclass.dart';
@@ -37,10 +44,15 @@ import 'provider/classinfo_provider.dart';
 import 'provider/inquirydisplay_provider.dart';
 import 'provider/studet_info_provider.dart';
 import 'provider/tutor_reviews_provider.dart';
-import 'routes/route_generator.dart';
 import 'services/gethelpcategory.dart';
 import 'services/getmaterials.dart';
-import 'ui/web/admin/executive_dashboard.dart';
+import 'ui/web/communication.dart/videocall.dart';
+import 'ui/web/login/login.dart';
+import 'ui/web/signup/student_information_signup.dart';
+import 'ui/web/signup/student_signup.dart';
+import 'ui/web/signup/tutor_signup.dart';
+import 'ui/web/student/main_dashboard/student_dashboard.dart';
+import 'ui/web/tutor/tutor_dashboard/tutor_dashboard.dart';
 import 'ui/web/web_main.dart';
 
 // Future<void> setup() async {
@@ -66,19 +78,29 @@ Future<void> setupFlutterNotifications() async {
 }
 
 void main() async {
-  // setup();
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
-    usePathUrlStrategy();
-    await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey: firebaseApiKey,
-        appId: firebaseAppId,
-        messagingSenderId: firebaseMessagingSenderId,
-        projectId: firebaseProjectId,
-        storageBucket: storageBucket,
-      ),
-    );
+    if (runas == 'dev') {
+      await Firebase.initializeApp(
+        options: FirebaseOptions(
+          apiKey: firebaseConfig['apiKey'].toString(),
+          appId: firebaseConfig['appId'].toString(),
+          messagingSenderId: firebaseConfig['messagingSenderId'].toString(),
+          projectId: firebaseConfig['projectId'].toString(),
+          storageBucket: firebaseConfig['storageBucket'].toString(),
+        ),
+      );
+    } else {
+      await Firebase.initializeApp(
+        options: const FirebaseOptions(
+          apiKey: firebaseApiKey,
+          appId: firebaseAppId,
+          messagingSenderId: firebaseMessagingSenderId,
+          projectId: firebaseProjectId,
+          storageBucket: storageBucket,
+        ),
+      );
+    }
   } else {
     await Firebase.initializeApp();
   }
@@ -107,6 +129,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => ScheduleListNotifier()),
       ChangeNotifierProvider(create: (_) => StarMessagesNotifier()),
       ChangeNotifierProvider(create: (_) => StarDisplayProvider()),
+      ChangeNotifierProvider(create: (_) => RatingNotifier()),
       StreamProvider<List<TutorInformation>>.value(
         value: DatabaseService(uid: '').tutorlist,
         initialData: const [],
@@ -134,6 +157,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => UserIDProvider()),
       ChangeNotifierProvider(create: (_) => InquiryDisplayProvider()),
       ChangeNotifierProvider(create: (_) => ChatDisplayProvider()),
+      ChangeNotifierProvider(create: (_) => GotMessageProvider()),
       ChangeNotifierProvider(create: (_) => ViewClassDisplayProvider()),
       ChangeNotifierProvider(create: (_) => ClassesInquiryProvider()),
       ChangeNotifierProvider(create: (_) => IndividualReviewProvider()),
@@ -141,20 +165,130 @@ void main() async {
       ChangeNotifierProvider(create: (_) => PreferredTutorsNotifier()),
       ChangeNotifierProvider(create: (_) => MaterialNotifier()),
       ChangeNotifierProvider(create: (_) => CartNotifier()),
+      ChangeNotifierProvider(create: (_) => FilterPerformanceProvider()),
     ],
     child: const MyApp(),
   ));
 }
+
+/// The route configuration.
+final GoRouter _router = GoRouter(
+  routes: <RouteBase>[
+    GoRoute(
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) {
+        return const LoginPage();
+      },
+      routes: <RouteBase>[
+        GoRoute(
+          path: 'account/student', // Define route with parameters
+          builder: (context, state) {
+            // Retrieve parameters
+            return const StudentSignup();
+          },
+        ),
+        GoRoute(
+          path: 'account/tutor', // Define route with parameters
+          builder: (context, state) {
+            // Retrieve parameters
+            return const TutorSignup();
+          },
+        ),
+        GoRoute(
+          path: 'account/reset', // Define route with parameters
+          builder: (context, state) {
+            // Retrieve parameters
+            return const ResetPage();
+          },
+        ),
+        GoRoute(
+          path: 'tutorsignup/:uid', // Define route with parameters
+          builder: (context, state) {
+            final Map<String, String> params =
+                state.pathParameters; // Retrieve parameters
+            return TutorInfo(
+              uid: params['uid'] ?? '',
+              email: params['email'] ?? '',
+            );
+          },
+        ),
+        GoRoute(
+          path: 'studentsignup/:uid', // Define route with parameters
+          builder: (context, state) {
+            final Map<String, String> params =
+                state.pathParameters; // Retrieve parameters
+            return StudentInfo(
+              uid: params['uid'] ?? '',
+              email: params['email'] ?? '',
+            );
+          },
+        ),
+        GoRoute(
+          path: 'studentdiary/:uid', // Define route with parameters
+          builder: (context, state) {
+            final Map<String, String> params =
+                state.pathParameters; // Retrieve parameters
+            return StudentDashboardPage(
+              uID: params['uid'] ?? '',
+              email: params['email'] ?? '',
+            );
+          },
+        ),
+        GoRoute(
+          path: 'studentdiary/:uid/tutors', // Define route with parameters
+          builder: (
+            context,
+            state,
+          ) {
+            final Map<String, String> params =
+                state.pathParameters; // Retrieve parameters
+            return FindTutor(
+              userid: params['uid'] ?? '',
+            );
+          },
+        ),
+        GoRoute(
+          path: 'tutordesk/:uid', // Define route with parameters
+          builder: (context, state) {
+            final Map<String, String> params =
+                state.pathParameters; // Retrieve parameters
+            return DashboardPage(
+              uID: params['uid'] ?? '',
+            );
+          },
+        ),
+        GoRoute(
+          path: 'videocall/:uid&:cId&:chatId', // Define route with parameters
+          builder: (context, state) {
+            final Map<String, String> params =
+                state.pathParameters; // Retrieve parameters
+            return VideoCall(
+              uID: params['uid'] ?? '',
+              chatID: '',
+              classId: '',
+            );
+          },
+        ),
+        GoRoute(
+          path: 'webmain', // Define route with parameters
+          builder: (context, state) {
+            // Retrieve parameters
+            return const WebMainPage();
+          },
+        ),
+      ],
+    ),
+  ],
+);
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Work4uTutor',
-      initialRoute: Routes.splash,
-      onGenerateRoute: RouteGenerator.generateRoute,
+    return MaterialApp.router(
+      title: 'Work4ututor',
+      routerConfig: _router,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: "Nunito",

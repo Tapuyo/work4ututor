@@ -16,6 +16,7 @@ import 'package:http/http.dart' as http;
 
 import '../../../../services/getstudentinfo.dart';
 import '../../../../services/update_tutorinformations_services.dart';
+import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
 
 class UpdateTutor extends StatefulWidget {
@@ -35,6 +36,8 @@ class UpdateTutor extends StatefulWidget {
 }
 
 class UpdateTutorState extends State<UpdateTutor> {
+  int? selectedindex;
+
   Map<String, dynamic> tutorInformationToJson(TutorInformation tutorData) {
     return {
       // Add other properties as needed
@@ -213,6 +216,8 @@ class UpdateTutorState extends State<UpdateTutor> {
   }
 
   String? data;
+  ScrollController updatescrollController1 = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     profilelink = widget.tutordata.imageID;
@@ -233,12 +238,18 @@ class UpdateTutorState extends State<UpdateTutor> {
         tutorInformationToJson(widget.tutordata);
     Size size = MediaQuery.of(context).size;
     return Card(
-      margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
-      elevation: 5,
+      margin: EdgeInsets.zero,
+      elevation: 4,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10.0), // Adjust the radius as needed
+          topRight: Radius.circular(10.0), // Adjust the radius as needed
+        ),
+      ),
       child: Container(
         alignment: Alignment.topCenter,
-        width: size.width - 320,
-        height: size.height - 75,
+        width: size.width - 290,
+        height: size.height - 140,
         child: ScrollConfiguration(
           behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
           child: SingleChildScrollView(
@@ -246,130 +257,161 @@ class UpdateTutorState extends State<UpdateTutor> {
             child: Column(
               children: [
                 Container(
-                  width: size.width - 320,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    gradient: LinearGradient(
-                      colors: gradient,
-                      stops: stops,
-                      end: Alignment.bottomCenter,
-                      begin: Alignment.topCenter,
-                    ),
-                  ),
+                  width: ResponsiveBuilder.isDesktop(context)
+                      ? size.width - 290
+                      : size.width,
+                  height: ResponsiveBuilder.isMobile(context) ? 200 : 250,
+                  decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          ...secondaryHeadercolors,
+                          ...[Colors.white, Colors.white],
+                        ],
+                        stops: stops,
+                        end: Alignment.bottomCenter,
+                        begin: Alignment.topCenter,
+                      ),
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15))),
                   child: Align(
-                    alignment: Alignment.topLeft,
+                    alignment: Alignment.center,
                     child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 250.0, right: 20, top: 20),
+                      padding: model == false
+                          ? ResponsiveBuilder.isDesktop(context)
+                              ? const EdgeInsets.only(
+                                  left: 250, top: 20, right: 20)
+                              : ResponsiveBuilder.isTablet(context)
+                                  ? const EdgeInsets.only(
+                                      left: 100, top: 20, right: 20)
+                                  : const EdgeInsets.only(
+                                      left: 10, top: 20, right: 10)
+                          : ResponsiveBuilder.isDesktop(context)
+                              ? const EdgeInsets.only(
+                                  left: 20, top: 20, right: 20)
+                              : ResponsiveBuilder.isTablet(context)
+                                  ? const EdgeInsets.only(
+                                      left: 20, top: 20, right: 20)
+                                  : const EdgeInsets.only(
+                                      left: 10, top: 20, right: 10),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: model
+                            ? MainAxisAlignment.center
+                            : MainAxisAlignment.start,
                         children: [
-                          Stack(children: [
-                            Container(
-                              height: 250,
-                              width: 250,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors
-                                    .transparent, // You can adjust the fit as needed.
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            width: 700,
+                            child: Stack(children: [
+                              Container(
+                                height: 250,
+                                width: 250,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors
+                                      .transparent, // You can adjust the fit as needed.
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  child: filename.isEmpty
+                                      ? Image.network(
+                                          profilelink,
+                                          fit: BoxFit
+                                              .cover, // You can adjust the fit as needed.
+                                        )
+                                      : Image.memory(
+                                          selectedImage,
+                                          fit: BoxFit
+                                              .cover, // You can adjust the fit as needed.
+                                        ),
+                                ),
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10.0),
-                                child: filename.isEmpty
-                                    ? Image.network(
-                                        profilelink,
-                                        fit: BoxFit
-                                            .cover, // You can adjust the fit as needed.
-                                      )
-                                    : Image.memory(
-                                        selectedImage,
-                                        fit: BoxFit
-                                            .cover, // You can adjust the fit as needed.
-                                      ),
-                              ),
-                            ),
-                            Visibility(
-                              visible: model,
-                              child: Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: SizedBox(
-                                    width: 250,
-                                    height: 40,
-                                    child: ElevatedButton.icon(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.white60,
-                                        shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.only(
-                                                bottomLeft: Radius.circular(10),
-                                                bottomRight:
-                                                    Radius.circular(10))),
-                                      ),
-                                      onPressed: () {
-                                        selectImage();
-                                        bool areListsEqual = listEquals(
-                                          newlanguages,
-                                          (tutorDataMap['language']
-                                                  as List<dynamic>)
-                                              .cast<dynamic>(),
-                                        );
-                                        if (filename != '' ||
-                                            tutorfirstname.text !=
-                                                tutorDataMap['firstName'] ||
-                                            tutorlastname.text !=
-                                                tutorDataMap['lastname'] ||
-                                            tutormiddleName.text !=
-                                                tutorDataMap['middleName'] ||
-                                            birthdate !=
-                                                DateTime.parse(tutorDataMap[
-                                                    'birthdate']) ||
-                                            newage !=
-                                                int.parse(
-                                                    tutorDataMap['age']) ||
-                                            country.text !=
-                                                tutorDataMap['country'] ||
-                                            city.text != tutorDataMap['city'] ||
-                                            birthcountry.text !=
-                                                tutorDataMap['birthPlace'] ||
-                                            birthcity.text !=
-                                                tutorDataMap['birthCity'] ||
-                                            timezone.text !=
-                                                tutorDataMap['timezone'] ||
-                                            contactnumber.text !=
-                                                tutorDataMap['contact'] ||
-                                            selectedDate !=
-                                                DateTime.parse(tutorDataMap[
-                                                    'birthdate']) ||
-                                            areListsEqual == false) {
-                                          setState(() {
-                                            allowUpdate = true;
-                                          });
-                                        } else {
-                                          setState(() {
-                                            allowUpdate = false;
-                                          });
-                                        }
-                                      },
-                                      label: const Text(
-                                        '',
-                                        style: TextStyle(color: kColorPrimary),
-                                      ),
-                                      icon: const Icon(
-                                        Icons.camera_alt_outlined,
-                                        size: 30,
-                                        color: kColorPrimary,
+                              Visibility(
+                                visible: model,
+                                child: Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: SizedBox(
+                                      width: 250,
+                                      height: 40,
+                                      child: ElevatedButton.icon(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.white60,
+                                          shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.only(
+                                                  bottomLeft:
+                                                      Radius.circular(10),
+                                                  bottomRight:
+                                                      Radius.circular(10))),
+                                        ),
+                                        onPressed: () {
+                                          selectImage();
+                                          bool areListsEqual = listEquals(
+                                            newlanguages,
+                                            (tutorDataMap['language']
+                                                    as List<dynamic>)
+                                                .cast<dynamic>(),
+                                          );
+                                          if (filename != '' ||
+                                              tutorfirstname.text !=
+                                                  tutorDataMap['firstName'] ||
+                                              tutorlastname.text !=
+                                                  tutorDataMap['lastname'] ||
+                                              tutormiddleName.text !=
+                                                  tutorDataMap['middleName'] ||
+                                              birthdate !=
+                                                  DateTime.parse(tutorDataMap[
+                                                      'birthdate']) ||
+                                              newage !=
+                                                  int.parse(
+                                                      tutorDataMap['age']) ||
+                                              country.text !=
+                                                  tutorDataMap['country'] ||
+                                              city.text !=
+                                                  tutorDataMap['city'] ||
+                                              birthcountry.text !=
+                                                  tutorDataMap['birthPlace'] ||
+                                              birthcity.text !=
+                                                  tutorDataMap['birthCity'] ||
+                                              timezone.text !=
+                                                  tutorDataMap['timezone'] ||
+                                              contactnumber.text !=
+                                                  tutorDataMap['contact'] ||
+                                              selectedDate !=
+                                                  DateTime.parse(tutorDataMap[
+                                                      'birthdate']) ||
+                                              areListsEqual == false) {
+                                            setState(() {
+                                              allowUpdate = true;
+                                            });
+                                          } else {
+                                            setState(() {
+                                              allowUpdate = false;
+                                            });
+                                          }
+                                        },
+                                        label: const Text(
+                                          '',
+                                          style:
+                                              TextStyle(color: kColorPrimary),
+                                        ),
+                                        icon: const Icon(
+                                          Icons.camera_alt_outlined,
+                                          size: 30,
+                                          color: kColorPrimary,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            )
-                          ]),
-                          const Spacer(),
+                              )
+                            ]),
+                          ),
+                          Visibility(
+                              visible: model == false, child: const Spacer()),
                           Visibility(
                             visible: model == false,
                             child: TextButton.icon(
@@ -380,13 +422,13 @@ class UpdateTutorState extends State<UpdateTutor> {
                               icon: const Icon(
                                 Icons.edit_document,
                                 color:
-                                    Colors.white, // Set the icon color to white
+                                    kColorPrimaryDark, // Set the icon color to white
                               ),
                               label: const Text(
                                 'Edit',
                                 style: TextStyle(
-                                  color: Colors
-                                      .white, // Set the text color to white
+                                  color:
+                                      kColorPrimaryDark, // Set the text color to white
                                 ),
                               ),
                             ),
@@ -397,1244 +439,172 @@ class UpdateTutorState extends State<UpdateTutor> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 250.0, bottom: 10),
-                  child: Align(
+                  padding: ResponsiveBuilder.isDesktop(context)
+                      ? const EdgeInsets.only(left: 250, top: 20, right: 20)
+                      : ResponsiveBuilder.isTablet(context)
+                          ? const EdgeInsets.only(left: 100, top: 20, right: 20)
+                          : const EdgeInsets.only(left: 10, top: 20, right: 10),
+                  child: const Align(
                     alignment: Alignment.centerLeft,
-                    child: SizedBox(
-                      width: 680,
-                      child: Divider(
-                        color: Colors.grey.shade500,
-                        thickness: 1.0, // Adjust the thickness of the line
-                      ),
-                    ),
+                    child: SizedBox(),
                   ),
                 ),
                 model
                     ? Container(
                         alignment: Alignment.center,
                         width: size.width - 320,
-                        padding: const EdgeInsets.only(left: 250, right: 200),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 220,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 5, 10, 5),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            55, 116, 135, 1),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          'First Name',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 220,
-                                      height: 45,
-                                      child: Align(
-                                        alignment: Alignment.center,
-                                        child: TextFormField(
-                                          enabled: false,
-                                          controller: tutorfirstname,
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5.0),
-                                            ),
-                                            fillColor: Colors.grey.shade300,
-                                            hintText: 'Firstname',
-                                            hintStyle: const TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: 15),
-                                          ),
-                                          // validator: (val) => val!.isEmpty
-                                          //     ? 'Enter a firstname'
-                                          //     : null,
-                                          onChanged: (value) {
-                                            bool areListsEqual = listEquals(
-                                              newlanguages,
-                                              (tutorDataMap['language']
-                                                      as List<dynamic>)
-                                                  .cast<dynamic>(),
-                                            );
-                                            if (filename != '' ||
-                                                tutorfirstname.text !=
-                                                    tutorDataMap['firstName'] ||
-                                                tutorlastname.text !=
-                                                    tutorDataMap['lastname'] ||
-                                                tutormiddleName.text !=
-                                                    tutorDataMap[
-                                                        'middleName'] ||
-                                                birthdate !=
-                                                    DateTime.parse(tutorDataMap[
-                                                        'birthdate']) ||
-                                                newage !=
-                                                    int.parse(
-                                                        tutorDataMap['age']) ||
-                                                country.text !=
-                                                    tutorDataMap['country'] ||
-                                                city.text !=
-                                                    tutorDataMap['city'] ||
-                                                birthcountry.text !=
-                                                    tutorDataMap[
-                                                        'birthPlace'] ||
-                                                birthcity.text !=
-                                                    tutorDataMap['birthCity'] ||
-                                                timezone.text !=
-                                                    tutorDataMap['timezone'] ||
-                                                contactnumber.text !=
-                                                    tutorDataMap['contact'] ||
-                                                selectedDate !=
-                                                    DateTime.parse(tutorDataMap[
-                                                        'birthdate']) ||
-                                                areListsEqual == false) {
-                                              setState(() {
-                                                allowUpdate = true;
-                                              });
-                                            } else {
-                                              setState(() {
-                                                allowUpdate = false;
-                                              });
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 220,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 5, 10, 5),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            55, 116, 135, 1),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          'Middle Name',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 220,
-                                      height: 45,
-                                      child: Align(
-                                        alignment: Alignment.center,
-                                        child: TextFormField(
-                                          enabled: false,
-
-                                          controller: tutormiddleName,
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5.0),
-                                            ),
-                                            fillColor: Colors.grey,
-                                            hintText: '(Optional)',
-                                            hintStyle: const TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: 15),
-                                          ),
-                                          // validator: (val) => val!.isEmpty
-                                          //     ? 'Enter a middlename'
-                                          //     : null,
-                                          onChanged: (value) {
-                                            bool areListsEqual = listEquals(
-                                              newlanguages,
-                                              (tutorDataMap['language']
-                                                      as List<dynamic>)
-                                                  .cast<dynamic>(),
-                                            );
-                                            if (filename != '' ||
-                                                tutorfirstname.text !=
-                                                    tutorDataMap['firstName'] ||
-                                                tutorlastname.text !=
-                                                    tutorDataMap['lastname'] ||
-                                                tutormiddleName.text !=
-                                                    tutorDataMap[
-                                                        'middleName'] ||
-                                                birthdate !=
-                                                    DateTime.parse(tutorDataMap[
-                                                        'birthdate']) ||
-                                                newage !=
-                                                    int.parse(
-                                                        tutorDataMap['age']) ||
-                                                country.text !=
-                                                    tutorDataMap['country'] ||
-                                                city.text !=
-                                                    tutorDataMap['city'] ||
-                                                birthcountry.text !=
-                                                    tutorDataMap[
-                                                        'birthPlace'] ||
-                                                birthcity.text !=
-                                                    tutorDataMap['birthCity'] ||
-                                                timezone.text !=
-                                                    tutorDataMap['timezone'] ||
-                                                contactnumber.text !=
-                                                    tutorDataMap['contact'] ||
-                                                selectedDate !=
-                                                    DateTime.parse(tutorDataMap[
-                                                        'birthdate']) ||
-                                                areListsEqual == false) {
-                                              setState(() {
-                                                allowUpdate = true;
-                                              });
-                                            } else {
-                                              setState(() {
-                                                allowUpdate = false;
-                                              });
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 220,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 5, 10, 5),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            55, 116, 135, 1),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          'Last Name',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 220,
-                                      height: 45,
-                                      child: Align(
-                                        alignment: Alignment.center,
-                                        child: TextFormField(
-                                          controller: tutorlastname,
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(5.0),
-                                            ),
-                                            fillColor: Colors.grey,
-                                            hintText: 'Lastname',
-                                            hintStyle: const TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: 15),
-                                          ),
-                                          onChanged: (value) {
-                                            bool areListsEqual = listEquals(
-                                              newlanguages,
-                                              (tutorDataMap['language']
-                                                      as List<dynamic>)
-                                                  .cast<dynamic>(),
-                                            );
-                                            if (filename != '' ||
-                                                tutorfirstname.text !=
-                                                    tutorDataMap['firstName'] ||
-                                                tutorlastname.text !=
-                                                    tutorDataMap['lastname'] ||
-                                                tutormiddleName.text !=
-                                                    tutorDataMap[
-                                                        'middleName'] ||
-                                                birthdate !=
-                                                    DateTime.parse(tutorDataMap[
-                                                        'birthdate']) ||
-                                                newage !=
-                                                    int.parse(
-                                                        tutorDataMap['age']) ||
-                                                country.text !=
-                                                    tutorDataMap['country'] ||
-                                                city.text !=
-                                                    tutorDataMap['city'] ||
-                                                birthcountry.text !=
-                                                    tutorDataMap[
-                                                        'birthPlace'] ||
-                                                birthcity.text !=
-                                                    tutorDataMap['birthCity'] ||
-                                                timezone.text !=
-                                                    tutorDataMap['timezone'] ||
-                                                contactnumber.text !=
-                                                    tutorDataMap['contact'] ||
-                                                selectedDate !=
-                                                    DateTime.parse(tutorDataMap[
-                                                        'birthdate']) ||
-                                                areListsEqual == false) {
-                                              setState(() {
-                                                allowUpdate = true;
-                                              });
-                                            } else {
-                                              setState(() {
-                                                allowUpdate = false;
-                                              });
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 400,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 5, 10, 5),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            55, 116, 135, 1),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          'Date of Birth',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 400,
-                                      height: 45,
-                                      padding:
-                                          const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                                      decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(5)),
-                                          color: Colors.white,
-                                          border: Border.all(
-                                              color: Colors.grey, width: 1)),
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                            DateFormat("MMMM dd, yyyy")
-                                                .format(birthdate),
-                                            style: const TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.black),
-                                          ),
-                                          const Spacer(),
-                                          IconButton(
-                                            tooltip: 'Select Date',
-                                            hoverColor: Colors.transparent,
-                                            icon: const Icon(
-                                              EvaIcons.calendarOutline,
-                                              color: Colors.blue,
-                                              size: 25,
-                                            ),
-                                            onPressed: () {
-                                              _selectDate();
-                                              bool areListsEqual = listEquals(
-                                                newlanguages,
-                                                (tutorDataMap['language']
-                                                        as List<dynamic>)
-                                                    .cast<dynamic>(),
-                                              );
-                                              if (filename != '' ||
-                                                  tutorfirstname.text !=
-                                                      tutorDataMap[
-                                                          'firstName'] ||
-                                                  tutorlastname.text !=
-                                                      tutorDataMap[
-                                                          'lastname'] ||
-                                                  tutormiddleName.text !=
-                                                      tutorDataMap[
-                                                          'middleName'] ||
-                                                  birthdate !=
-                                                      DateTime.parse(
-                                                          tutorDataMap[
-                                                              'birthdate']) ||
-                                                  newage !=
-                                                      int.parse(tutorDataMap[
-                                                          'age']) ||
-                                                  country.text !=
-                                                      tutorDataMap['country'] ||
-                                                  city.text !=
-                                                      tutorDataMap['city'] ||
-                                                  birthcountry.text !=
-                                                      tutorDataMap[
-                                                          'birthPlace'] ||
-                                                  birthcity.text !=
-                                                      tutorDataMap[
-                                                          'birthCity'] ||
-                                                  timezone.text !=
-                                                      tutorDataMap[
-                                                          'timezone'] ||
-                                                  contactnumber.text !=
-                                                      tutorDataMap['contact'] ||
-                                                  selectedDate !=
-                                                      DateTime.parse(
-                                                          tutorDataMap[
-                                                              'birthdate']) ||
-                                                  areListsEqual == false) {
-                                                setState(() {
-                                                  allowUpdate = true;
-                                                });
-                                              } else {
-                                                setState(() {
-                                                  allowUpdate = false;
-                                                });
-                                              }
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 270,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 5, 10, 5),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            55, 116, 135, 1),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          'Age',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 270,
-                                      height: 45,
-                                      padding:
-                                          const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                                      decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(5)),
-                                          color: Colors.white,
-                                          border: Border.all(
-                                              color: Colors.grey, width: 1)),
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                            newage.toString(),
-                                            style: const TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.black),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            Row(
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 370,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 5, 10, 5),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            55, 116, 135, 1),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          'Country of Residence',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 370,
-                                      height: 45,
-                                      child: TypeAheadFormField<String>(
-                                        textFieldConfiguration:
-                                            TextFieldConfiguration(
-                                          controller: country,
-                                          decoration: const InputDecoration(
-                                            hintText: 'Select a Country',
-                                            hintStyle:
-                                                TextStyle(color: Colors.grey),
-                                            border: OutlineInputBorder(),
-                                            suffixIcon:
-                                                Icon(Icons.arrow_drop_down),
-                                          ),
-                                        ),
-                                        suggestionsCallback: (String pattern) {
-                                          return widget.countryNames.where(
-                                              (country) => country
-                                                  .toLowerCase()
-                                                  .contains(
-                                                      pattern.toLowerCase()));
-                                        },
-                                        itemBuilder:
-                                            (context, String suggestion) {
-                                          return ListTile(
-                                            title: Text(suggestion),
-                                          );
-                                        },
-                                        onSuggestionSelected:
-                                            (String suggestion) {
-                                          country.text = suggestion;
-                                          bool areListsEqual = listEquals(
-                                            newlanguages,
-                                            (tutorDataMap['language']
-                                                    as List<dynamic>)
-                                                .cast<dynamic>(),
-                                          );
-                                          if (filename != '' ||
-                                              tutorfirstname.text !=
-                                                  tutorDataMap['firstName'] ||
-                                              tutorlastname.text !=
-                                                  tutorDataMap['lastname'] ||
-                                              tutormiddleName.text !=
-                                                  tutorDataMap['middleName'] ||
-                                              birthdate !=
-                                                  DateTime.parse(tutorDataMap[
-                                                      'birthdate']) ||
-                                              newage !=
-                                                  int.parse(
-                                                      tutorDataMap['age']) ||
-                                              country.text !=
-                                                  tutorDataMap['country'] ||
-                                              city.text !=
-                                                  tutorDataMap['city'] ||
-                                              birthcountry.text !=
-                                                  tutorDataMap['birthPlace'] ||
-                                              birthcity.text !=
-                                                  tutorDataMap['birthCity'] ||
-                                              timezone.text !=
-                                                  tutorDataMap['timezone'] ||
-                                              contactnumber.text !=
-                                                  tutorDataMap['contact'] ||
-                                              selectedDate !=
-                                                  DateTime.parse(tutorDataMap[
-                                                      'birthdate']) ||
-                                              areListsEqual == false) {
-                                            setState(() {
-                                              allowUpdate = true;
-                                            });
-                                          } else {
-                                            setState(() {
-                                              allowUpdate = false;
-                                            });
-                                          }
-                                        },
-                                      ),
-                                      // country.name
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 300,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 5, 10, 5),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            55, 116, 135, 1),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          'City of Residence',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 300,
-                                      height: 45,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 0, 10, 0),
-                                      decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(5)),
-                                          color: Colors.white,
-                                          border: Border.all(
-                                              color: Colors.grey, width: 1)),
-                                      child: TextFormField(
-                                        controller: city,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          fillColor: Colors.grey,
-                                          hintText: 'City',
-                                          hintStyle: TextStyle(
-                                              color: Colors.grey, fontSize: 15),
-                                        ),
-                                        onChanged: (value) {
-                                          bool areListsEqual = listEquals(
-                                            newlanguages,
-                                            (tutorDataMap['language']
-                                                    as List<dynamic>)
-                                                .cast<dynamic>(),
-                                          );
-                                          if (filename != '' ||
-                                              tutorfirstname.text !=
-                                                  tutorDataMap['firstName'] ||
-                                              tutorlastname.text !=
-                                                  tutorDataMap['lastname'] ||
-                                              tutormiddleName.text !=
-                                                  tutorDataMap['middleName'] ||
-                                              birthdate !=
-                                                  DateTime.parse(tutorDataMap[
-                                                      'birthdate']) ||
-                                              newage !=
-                                                  int.parse(
-                                                      tutorDataMap['age']) ||
-                                              country.text !=
-                                                  tutorDataMap['country'] ||
-                                              city.text !=
-                                                  tutorDataMap['city'] ||
-                                              birthcountry.text !=
-                                                  tutorDataMap['birthPlace'] ||
-                                              birthcity.text !=
-                                                  tutorDataMap['birthCity'] ||
-                                              timezone.text !=
-                                                  tutorDataMap['timezone'] ||
-                                              contactnumber.text !=
-                                                  tutorDataMap['contact'] ||
-                                              selectedDate !=
-                                                  DateTime.parse(tutorDataMap[
-                                                      'birthdate']) ||
-                                              areListsEqual == false) {
-                                            setState(() {
-                                              allowUpdate = true;
-                                            });
-                                          } else {
-                                            setState(() {
-                                              allowUpdate = false;
-                                            });
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            Row(
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 370,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 5, 10, 5),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            55, 116, 135, 1),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          'Country of Birth',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 370,
-                                      height: 45,
-
-                                      child: TypeAheadFormField<String>(
-                                        textFieldConfiguration:
-                                            TextFieldConfiguration(
-                                          controller: birthcountry,
-                                          decoration: const InputDecoration(
-                                            hintText: 'Select a Country',
-                                            hintStyle:
-                                                TextStyle(color: Colors.grey),
-                                            border: OutlineInputBorder(),
-                                            suffixIcon:
-                                                Icon(Icons.arrow_drop_down),
-                                          ),
-                                        ),
-                                        suggestionsCallback: (String pattern) {
-                                          return widget.countryNames.where(
-                                              (country) => country
-                                                  .toLowerCase()
-                                                  .contains(
-                                                      pattern.toLowerCase()));
-                                        },
-                                        itemBuilder:
-                                            (context, String suggestion) {
-                                          return ListTile(
-                                            title: Text(suggestion),
-                                          );
-                                        },
-                                        onSuggestionSelected:
-                                            (String suggestion) {
-                                          birthcountry.text = suggestion;
-                                          bool areListsEqual = listEquals(
-                                            newlanguages,
-                                            (tutorDataMap['language']
-                                                    as List<dynamic>)
-                                                .cast<dynamic>(),
-                                          );
-                                          if (filename != '' ||
-                                              tutorfirstname.text !=
-                                                  tutorDataMap['firstName'] ||
-                                              tutorlastname.text !=
-                                                  tutorDataMap['lastname'] ||
-                                              tutormiddleName.text !=
-                                                  tutorDataMap['middleName'] ||
-                                              birthdate !=
-                                                  DateTime.parse(tutorDataMap[
-                                                      'birthdate']) ||
-                                              newage !=
-                                                  int.parse(
-                                                      tutorDataMap['age']) ||
-                                              country.text !=
-                                                  tutorDataMap['country'] ||
-                                              city.text !=
-                                                  tutorDataMap['city'] ||
-                                              birthcountry.text !=
-                                                  tutorDataMap['birthPlace'] ||
-                                              birthcity.text !=
-                                                  tutorDataMap['birthCity'] ||
-                                              timezone.text !=
-                                                  tutorDataMap['timezone'] ||
-                                              contactnumber.text !=
-                                                  tutorDataMap['contact'] ||
-                                              selectedDate !=
-                                                  DateTime.parse(tutorDataMap[
-                                                      'birthdate']) ||
-                                              areListsEqual == false) {
-                                            setState(() {
-                                              allowUpdate = true;
-                                            });
-                                          } else {
-                                            setState(() {
-                                              allowUpdate = false;
-                                            });
-                                          }
-                                        },
-                                      ),
-                                      // country.name
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 300,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 5, 10, 5),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            55, 116, 135, 1),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          'City of Birth',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 300,
-                                      height: 45,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 0, 10, 0),
-                                      decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(5)),
-                                          color: Colors.white,
-                                          border: Border.all(
-                                              color: Colors.grey, width: 1)),
-                                      child: TextFormField(
-                                        controller: birthcity,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          fillColor: Colors.grey,
-                                          hintText: 'City',
-                                          hintStyle: TextStyle(
-                                              color: Colors.grey, fontSize: 15),
-                                        ),
-                                        onChanged: (value) {
-                                          bool areListsEqual = listEquals(
-                                            newlanguages,
-                                            (tutorDataMap['language']
-                                                    as List<dynamic>)
-                                                .cast<dynamic>(),
-                                          );
-                                          if (filename != '' ||
-                                              tutorfirstname.text !=
-                                                  tutorDataMap['firstName'] ||
-                                              tutorlastname.text !=
-                                                  tutorDataMap['lastname'] ||
-                                              tutormiddleName.text !=
-                                                  tutorDataMap['middleName'] ||
-                                              birthdate !=
-                                                  DateTime.parse(tutorDataMap[
-                                                      'birthdate']) ||
-                                              newage !=
-                                                  int.parse(
-                                                      tutorDataMap['age']) ||
-                                              country.text !=
-                                                  tutorDataMap['country'] ||
-                                              city.text !=
-                                                  tutorDataMap['city'] ||
-                                              birthcountry.text !=
-                                                  tutorDataMap['birthPlace'] ||
-                                              birthcity.text !=
-                                                  tutorDataMap['birthCity'] ||
-                                              timezone.text !=
-                                                  tutorDataMap['timezone'] ||
-                                              contactnumber.text !=
-                                                  tutorDataMap['contact'] ||
-                                              selectedDate !=
-                                                  DateTime.parse(tutorDataMap[
-                                                      'birthdate']) ||
-                                              areListsEqual == false) {
-                                            setState(() {
-                                              allowUpdate = true;
-                                            });
-                                          } else {
-                                            setState(() {
-                                              allowUpdate = false;
-                                            });
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            Row(children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                        padding: ResponsiveBuilder.isDesktop(context)
+                            ? const EdgeInsets.only(
+                                left: 20, top: 20, right: 20)
+                            : ResponsiveBuilder.isTablet(context)
+                                ? const EdgeInsets.only(
+                                    left: 20, top: 20, right: 20)
+                                : const EdgeInsets.only(
+                                    left: 10, top: 20, right: 10),
+                        child: Container(
+                          alignment: Alignment.centerLeft,
+                          width: 700,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
                                 children: [
-                                  Container(
-                                    width: 370,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          const Color.fromRGBO(55, 116, 135, 1),
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    child: const Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        'Timezone',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 370,
-                                    height: 45,
-                                    child: TypeAheadFormField<String>(
-                                      textFieldConfiguration:
-                                          TextFieldConfiguration(
-                                        controller: timezone,
-                                        decoration: const InputDecoration(
-                                          hintText: 'Select your Timezone',
-                                          hintStyle:
-                                              TextStyle(color: Colors.grey),
-                                          border: OutlineInputBorder(),
-                                          suffixIcon:
-                                              Icon(Icons.arrow_drop_down),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 220,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0, 5, 10, 5),
+                                        decoration: BoxDecoration(
+                                          // color: const Color.fromRGBO(
+                                          //     55, 116, 135, 1),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        child: const Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            'First Name',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: kColorLight),
+                                          ),
                                         ),
                                       ),
-                                      suggestionsCallback: (String pattern) {
-                                        return timezonesList.where((timezone) =>
-                                            timezone.toLowerCase().contains(
-                                                pattern.toLowerCase()));
-                                      },
-                                      itemBuilder:
-                                          (context, String suggestion) {
-                                        return ListTile(
-                                          title: Text(suggestion),
-                                        );
-                                      },
-                                      onSuggestionSelected:
-                                          (String suggestion) {
-                                        setState(() {
-                                          timezone.text = suggestion;
-                                          bool areListsEqual = listEquals(
-                                            newlanguages,
-                                            (tutorDataMap['language']
-                                                    as List<dynamic>)
-                                                .cast<dynamic>(),
-                                          );
-                                          if (filename != '' ||
-                                              tutorfirstname.text !=
-                                                  tutorDataMap['firstName'] ||
-                                              tutorlastname.text !=
-                                                  tutorDataMap['lastname'] ||
-                                              tutormiddleName.text !=
-                                                  tutorDataMap['middleName'] ||
-                                              birthdate !=
-                                                  DateTime.parse(tutorDataMap[
-                                                      'birthdate']) ||
-                                              newage !=
-                                                  int.parse(
-                                                      tutorDataMap['age']) ||
-                                              country.text !=
-                                                  tutorDataMap['country'] ||
-                                              city.text !=
-                                                  tutorDataMap['city'] ||
-                                              birthcountry.text !=
-                                                  tutorDataMap['birthPlace'] ||
-                                              birthcity.text !=
-                                                  tutorDataMap['birthCity'] ||
-                                              timezone.text !=
-                                                  tutorDataMap['timezone'] ||
-                                              contactnumber.text !=
-                                                  tutorDataMap['contact'] ||
-                                              selectedDate !=
-                                                  DateTime.parse(tutorDataMap[
-                                                      'birthdate']) ||
-                                              areListsEqual == false) {
-                                            setState(() {
-                                              allowUpdate = true;
-                                            });
-                                          } else {
-                                            setState(() {
-                                              allowUpdate = false;
-                                            });
-                                          }
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: 300,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          const Color.fromRGBO(55, 116, 135, 1),
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    child: const Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        'Contact Number',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 300,
-                                    height: 45,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                    decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(5)),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: Colors.grey, width: 1)),
-                                    child: TextFormField(
-                                      controller: contactnumber,
-                                      decoration: const InputDecoration(
-                                        border: InputBorder.none,
-                                        fillColor: Colors.grey,
-                                        hintText: 'Contact Number',
-                                        hintStyle: TextStyle(
-                                            color: Colors.grey, fontSize: 15),
-                                      ),
-                                      onChanged: (value) {
-                                        bool areListsEqual = listEquals(
-                                          newlanguages,
-                                          (tutorDataMap['language']
-                                                  as List<dynamic>)
-                                              .cast<dynamic>(),
-                                        );
-                                        if (filename != '' ||
-                                            tutorfirstname.text !=
-                                                tutorDataMap['firstName'] ||
-                                            tutorlastname.text !=
-                                                tutorDataMap['lastname'] ||
-                                            tutormiddleName.text !=
-                                                tutorDataMap['middleName'] ||
-                                            birthdate !=
-                                                DateTime.parse(tutorDataMap[
-                                                    'birthdate']) ||
-                                            newage !=
-                                                int.parse(
-                                                    tutorDataMap['age']) ||
-                                            country.text !=
-                                                tutorDataMap['country'] ||
-                                            city.text != tutorDataMap['city'] ||
-                                            birthcountry.text !=
-                                                tutorDataMap['birthPlace'] ||
-                                            birthcity.text !=
-                                                tutorDataMap['birthCity'] ||
-                                            timezone.text !=
-                                                tutorDataMap['timezone'] ||
-                                            contactnumber.text !=
-                                                tutorDataMap['contact'] ||
-                                            selectedDate !=
-                                                DateTime.parse(tutorDataMap[
-                                                    'birthdate']) ||
-                                            areListsEqual == false) {
-                                          setState(() {
-                                            allowUpdate = true;
-                                          });
-                                        } else {
-                                          setState(() {
-                                            allowUpdate = false;
-                                          });
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ]),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            Row(
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 680,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 5, 10, 5),
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            55, 116, 135, 1),
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: const Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          'Languages',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.white),
+                                      Card(
+                                        margin: EdgeInsets.zero,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 10.0, bottom: 10.0),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 400,
-                                            height: 45,
-                                            padding: const EdgeInsets.fromLTRB(
-                                                10, 0, 10, 0),
-                                            child: ListView.builder(
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                itemCount: newlanguages.length,
-                                                itemBuilder: (context, index) {
-                                                  String datalanguage =
-                                                      newlanguages[index];
-                                                  Color color = vibrantColors[
-                                                      index %
-                                                          vibrantColors
-                                                              .length]; // Cycle through colors
-
-                                                  return Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 10.0,
-                                                            right: 10),
-                                                    child: Container(
-                                                      padding: const EdgeInsets
-                                                          .fromLTRB(5, 0, 5, 0),
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            const BorderRadius
-                                                                    .all(
-                                                                Radius.circular(
-                                                                    15)),
-                                                        color: color,
-                                                      ),
-                                                      child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .spaceBetween,
-                                                          children: [
-                                                            Text(datalanguage),
-                                                            IconButton(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .zero,
-                                                              visualDensity:
-                                                                  const VisualDensity(
-                                                                      horizontal:
-                                                                          -4,
-                                                                      vertical:
-                                                                          -4),
-                                                              icon: const Icon(Icons
-                                                                  .delete_outline_outlined),
-                                                              color: Colors.red,
-                                                              iconSize: 15,
-                                                              onPressed: () {
-                                                                setState(() {
-                                                                  newlanguages
-                                                                      .removeAt(
-                                                                          index);
-                                                                });
-                                                              },
-                                                            ),
-                                                          ]),
-                                                    ),
-                                                  );
-                                                }),
-                                          ),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          SizedBox(
-                                            width: 270,
-                                            height: 45,
-                                            child: TypeAheadFormField<
-                                                LanguageData>(
-                                              // Specify LanguageData as the generic type
-                                              textFieldConfiguration:
-                                                  const TextFieldConfiguration(
-                                                decoration: InputDecoration(
-                                                  hintText: 'Add Language',
-                                                  border: OutlineInputBorder(),
-                                                  suffixIcon: Icon(
-                                                      Icons.arrow_drop_down),
+                                        elevation: 5,
+                                        child: SizedBox(
+                                          width: 220,
+                                          height: 45,
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: TextFormField(
+                                              enabled: false,
+                                              controller: tutorfirstname,
+                                              decoration: InputDecoration(
+                                                filled: true,
+                                                fillColor: Colors.white,
+                                                hintText: 'Firstname',
+                                                hintStyle: const TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 15),
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                        horizontal: 10),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0), // Rounded border
+                                                  borderSide: BorderSide
+                                                      .none, // No outline border
                                                 ),
                                               ),
-                                              suggestionsCallback:
-                                                  (pattern) async {
-                                                final suggestions = widget.names
-                                                    .where((language) =>
-                                                        language
-                                                            .languageNamesStream
-                                                            .toLowerCase()
-                                                            .contains(pattern
-                                                                .toLowerCase()))
-                                                    .toList(); // Return a list of LanguageData objects
-                                                return suggestions;
+                                              style: const TextStyle(
+                                                  color: kColorGrey),
+                                              onChanged: (value) {
+                                                // Your onChanged logic here
                                               },
-                                              itemBuilder:
-                                                  (context, suggestions) {
-                                                return ListTile(
-                                                  title: Text(suggestions
-                                                      .languageNamesStream), // Access the language name
-                                                );
-                                              },
-                                              onSuggestionSelected:
-                                                  (suggestion) {
-                                                if (newlanguages.contains(
-                                                    suggestion
-                                                        .languageNamesStream)) {
-                                                  null;
-                                                } else {
-                                                  setState(() {
-                                                    newlanguages.add(suggestion
-                                                        .languageNamesStream
-                                                        .toString()); // Add the LanguageData object to tlanguages
-                                                  });
-                                                }
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 220,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0, 5, 10, 5),
+                                        decoration: BoxDecoration(
+                                          // color: const Color.fromRGBO(
+                                          //     55, 116, 135, 1),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        child: const Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            'Middle Name',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: kColorLight),
+                                          ),
+                                        ),
+                                      ),
+                                      Card(
+                                        margin: EdgeInsets.zero,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        elevation: 5,
+                                        child: SizedBox(
+                                          width: 220,
+                                          height: 45,
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: TextFormField(
+                                              enabled: false,
+
+                                              controller: tutormiddleName,
+                                              decoration: InputDecoration(
+                                                fillColor: Colors.grey,
+                                                hintText: '(Optional)',
+                                                hintStyle: const TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 15),
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                        horizontal: 10),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0), // Rounded border
+                                                  borderSide: BorderSide
+                                                      .none, // No outline border
+                                                ),
+                                              ),
+                                              style: const TextStyle(
+                                                  color: kColorGrey),
+                                              // validator: (val) => val!.isEmpty
+                                              //     ? 'Enter a middlename'
+                                              //     : null,
+                                              onChanged: (value) {
                                                 bool areListsEqual = listEquals(
                                                   newlanguages,
                                                   (tutorDataMap['language']
@@ -1691,202 +661,1634 @@ class UpdateTutorState extends State<UpdateTutor> {
                                               },
                                             ),
                                           ),
-                                        ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 220,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0, 5, 10, 5),
+                                        decoration: BoxDecoration(
+                                          // color: const Color.fromRGBO(
+                                          //     55, 116, 135, 1),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        child: const Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            'Last Name',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: kColorLight),
+                                          ),
+                                        ),
+                                      ),
+                                      Card(
+                                        margin: EdgeInsets.zero,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        elevation: 5,
+                                        child: SizedBox(
+                                          width: 220,
+                                          height: 45,
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: TextFormField(
+                                              enabled: false,
+                                              controller: tutorlastname,
+                                              decoration: InputDecoration(
+                                                fillColor: Colors.grey,
+                                                hintText: 'Lastname',
+                                                hintStyle: const TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 15),
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                        horizontal: 10),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0), // Rounded border
+                                                  borderSide: BorderSide
+                                                      .none, // No outline border
+                                                ),
+                                              ),
+                                              style: const TextStyle(
+                                                  color: kColorGrey),
+                                              onChanged: (value) {
+                                                bool areListsEqual = listEquals(
+                                                  newlanguages,
+                                                  (tutorDataMap['language']
+                                                          as List<dynamic>)
+                                                      .cast<dynamic>(),
+                                                );
+                                                if (filename != '' ||
+                                                    tutorfirstname.text !=
+                                                        tutorDataMap[
+                                                            'firstName'] ||
+                                                    tutorlastname.text !=
+                                                        tutorDataMap[
+                                                            'lastname'] ||
+                                                    tutormiddleName.text !=
+                                                        tutorDataMap[
+                                                            'middleName'] ||
+                                                    birthdate !=
+                                                        DateTime.parse(
+                                                            tutorDataMap[
+                                                                'birthdate']) ||
+                                                    newage !=
+                                                        int.parse(tutorDataMap[
+                                                            'age']) ||
+                                                    country.text !=
+                                                        tutorDataMap[
+                                                            'country'] ||
+                                                    city.text !=
+                                                        tutorDataMap['city'] ||
+                                                    birthcountry.text !=
+                                                        tutorDataMap[
+                                                            'birthPlace'] ||
+                                                    birthcity.text !=
+                                                        tutorDataMap[
+                                                            'birthCity'] ||
+                                                    timezone.text !=
+                                                        tutorDataMap[
+                                                            'timezone'] ||
+                                                    contactnumber.text !=
+                                                        tutorDataMap[
+                                                            'contact'] ||
+                                                    selectedDate !=
+                                                        DateTime.parse(
+                                                            tutorDataMap[
+                                                                'birthdate']) ||
+                                                    areListsEqual == false) {
+                                                  setState(() {
+                                                    allowUpdate = true;
+                                                  });
+                                                } else {
+                                                  setState(() {
+                                                    allowUpdate = false;
+                                                  });
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 400,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0, 5, 10, 5),
+                                        decoration: BoxDecoration(
+                                          // color: const Color.fromRGBO(
+                                          //     55, 116, 135, 1),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        child: const Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            'Date of Birth',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: kColorLight),
+                                          ),
+                                        ),
+                                      ),
+                                      Card(
+                                        margin: EdgeInsets.zero,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        elevation: 5,
+                                        child: Container(
+                                          width: 400,
+                                          height: 45,
+                                          padding: const EdgeInsets.fromLTRB(
+                                              5, 0, 5, 5),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                DateFormat("MMMM dd, yyyy")
+                                                    .format(birthdate),
+                                                style: const TextStyle(
+                                                    fontSize: 15,
+                                                    color: kColorGrey),
+                                              ),
+                                              const Spacer(),
+                                              const IconButton(
+                                                tooltip: 'Select Date',
+                                                hoverColor: Colors.transparent,
+                                                icon: Icon(
+                                                  EvaIcons.calendarOutline,
+                                                  color: kColorPrimary,
+                                                  size: 25,
+                                                ),
+                                                onPressed: null,
+                                                // onPressed: () {
+                                                //   _selectDate();
+                                                //   bool areListsEqual = listEquals(
+                                                //     newlanguages,
+                                                //     (tutorDataMap['language']
+                                                //             as List<dynamic>)
+                                                //         .cast<dynamic>(),
+                                                //   );
+                                                //   if (filename != '' ||
+                                                //       tutorfirstname.text !=
+                                                //           tutorDataMap[
+                                                //               'firstName'] ||
+                                                //       tutorlastname.text !=
+                                                //           tutorDataMap[
+                                                //               'lastname'] ||
+                                                //       tutormiddleName.text !=
+                                                //           tutorDataMap[
+                                                //               'middleName'] ||
+                                                //       birthdate !=
+                                                //           DateTime.parse(
+                                                //               tutorDataMap[
+                                                //                   'birthdate']) ||
+                                                //       newage !=
+                                                //           int.parse(tutorDataMap[
+                                                //               'age']) ||
+                                                //       country.text !=
+                                                //           tutorDataMap[
+                                                //               'country'] ||
+                                                //       city.text !=
+                                                //           tutorDataMap['city'] ||
+                                                //       birthcountry.text !=
+                                                //           tutorDataMap[
+                                                //               'birthPlace'] ||
+                                                //       birthcity.text !=
+                                                //           tutorDataMap[
+                                                //               'birthCity'] ||
+                                                //       timezone.text !=
+                                                //           tutorDataMap[
+                                                //               'timezone'] ||
+                                                //       contactnumber.text !=
+                                                //           tutorDataMap[
+                                                //               'contact'] ||
+                                                //       selectedDate !=
+                                                //           DateTime.parse(
+                                                //               tutorDataMap[
+                                                //                   'birthdate']) ||
+                                                //       areListsEqual == false) {
+                                                //     setState(() {
+                                                //       allowUpdate = true;
+                                                //     });
+                                                //   } else {
+                                                //     setState(() {
+                                                //       allowUpdate = false;
+                                                //     });
+                                                //   }
+                                                // },
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 270,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0, 5, 10, 5),
+                                        decoration: BoxDecoration(
+                                          // color: const Color.fromRGBO(
+                                          //     55, 116, 135, 1),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        child: const Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            'Age',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: kColorLight),
+                                          ),
+                                        ),
+                                      ),
+                                      Card(
+                                        margin: EdgeInsets.zero,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        elevation: 5,
+                                        child: Container(
+                                          width: 100,
+                                          height: 45,
+                                          padding: const EdgeInsets.fromLTRB(
+                                              5, 0, 5, 5),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                newage.toString(),
+                                                style: const TextStyle(
+                                                    fontSize: 15,
+                                                    color: kColorGrey),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              Row(
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 370,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0, 5, 10, 5),
+                                        decoration: BoxDecoration(
+                                          // color: const Color.fromRGBO(
+                                          //     55, 116, 135, 1),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        child: const Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            'Country of Birth',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: kColorLight),
+                                          ),
+                                        ),
+                                      ),
+                                      Card(
+                                        margin: EdgeInsets.zero,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        elevation: 5,
+                                        child: SizedBox(
+                                          width: 370,
+                                          height: 45,
+
+                                          child: TypeAheadFormField<String>(
+                                            enabled: false,
+                                            textFieldConfiguration:
+                                                TextFieldConfiguration(
+                                              enabled: false,
+                                              style: const TextStyle(
+                                                  color: kColorGrey),
+                                              controller: birthcountry,
+                                              decoration: InputDecoration(
+                                                hintText: 'Select a Country',
+                                                hintStyle: const TextStyle(
+                                                    color: Colors.grey),
+                                                labelStyle: const TextStyle(
+                                                    color: Colors.grey),
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                        horizontal: 10),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0), // Rounded border
+                                                  borderSide: BorderSide
+                                                      .none, // No outline border
+                                                ),
+                                                suffixIcon: const Icon(
+                                                    Icons.arrow_drop_down),
+                                              ),
+                                            ),
+                                            suggestionsCallback:
+                                                (String pattern) {
+                                              return widget.countryNames.where(
+                                                  (country) => country
+                                                      .toLowerCase()
+                                                      .contains(pattern
+                                                          .toLowerCase()));
+                                            },
+                                            itemBuilder:
+                                                (context, String suggestion) {
+                                              return ListTile(
+                                                title: Text(suggestion),
+                                              );
+                                            },
+                                            onSuggestionSelected:
+                                                (String suggestion) {
+                                              birthcountry.text = suggestion;
+                                              bool areListsEqual = listEquals(
+                                                newlanguages,
+                                                (tutorDataMap['language']
+                                                        as List<dynamic>)
+                                                    .cast<dynamic>(),
+                                              );
+                                              if (filename != '' ||
+                                                  tutorfirstname.text !=
+                                                      tutorDataMap[
+                                                          'firstName'] ||
+                                                  tutorlastname.text !=
+                                                      tutorDataMap[
+                                                          'lastname'] ||
+                                                  tutormiddleName.text !=
+                                                      tutorDataMap[
+                                                          'middleName'] ||
+                                                  birthdate !=
+                                                      DateTime.parse(
+                                                          tutorDataMap[
+                                                              'birthdate']) ||
+                                                  newage !=
+                                                      int.parse(tutorDataMap[
+                                                          'age']) ||
+                                                  country.text !=
+                                                      tutorDataMap['country'] ||
+                                                  city.text !=
+                                                      tutorDataMap['city'] ||
+                                                  birthcountry.text !=
+                                                      tutorDataMap[
+                                                          'birthPlace'] ||
+                                                  birthcity.text !=
+                                                      tutorDataMap[
+                                                          'birthCity'] ||
+                                                  timezone.text !=
+                                                      tutorDataMap[
+                                                          'timezone'] ||
+                                                  contactnumber.text !=
+                                                      tutorDataMap['contact'] ||
+                                                  selectedDate !=
+                                                      DateTime.parse(
+                                                          tutorDataMap[
+                                                              'birthdate']) ||
+                                                  areListsEqual == false) {
+                                                setState(() {
+                                                  allowUpdate = true;
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  allowUpdate = false;
+                                                });
+                                              }
+                                            },
+                                          ),
+                                          // country.name
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  // const SizedBox(
+                                  //   width: 10,
+                                  // ),
+                                  // Column(
+                                  //   crossAxisAlignment: CrossAxisAlignment.start,
+                                  //   children: [
+                                  //     Container(
+                                  //       width: 300,
+                                  //       padding: const EdgeInsets.fromLTRB(
+                                  //           10, 5, 10, 5),
+                                  //       decoration: BoxDecoration(
+                                  //         // color: const Color.fromRGBO(
+                                  //         //     55, 116, 135, 1),
+                                  //         borderRadius: BorderRadius.circular(5),
+                                  //       ),
+                                  //       child: const Align(
+                                  //         alignment: Alignment.centerLeft,
+                                  //         child: Text(
+                                  //           'City of Birth',
+                                  //           style: TextStyle(
+                                  //               fontWeight: FontWeight.w600,
+                                  //               color: kColorLight),
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //     Card(
+                                  //       margin: EdgeInsets.zero,
+                                  //       shape: RoundedRectangleBorder(
+                                  //         borderRadius: BorderRadius.circular(10),
+                                  //       ),
+                                  //       elevation: 5,
+                                  //       child: Container(
+                                  //         width: 300,
+                                  //         height: 45,
+                                  //         child: TextFormField(
+                                  //           controller: birthcity,
+                                  //           decoration: InputDecoration(
+                                  //             fillColor: Colors.grey,
+                                  //             hintText: 'City',
+                                  //             hintStyle: const TextStyle(
+                                  //                 color: Colors.grey,
+                                  //                 fontSize: 15),
+                                  //             contentPadding:
+                                  //                 const EdgeInsets.symmetric(
+                                  //                     vertical: 12,
+                                  //                     horizontal: 10),
+                                  //             border: OutlineInputBorder(
+                                  //               borderRadius:
+                                  //                   BorderRadius.circular(
+                                  //                       10.0), // Rounded border
+                                  //               borderSide: BorderSide
+                                  //                   .none, // No outline border
+                                  //             ),
+                                  //           ),
+                                  //           style: const TextStyle(
+                                  //               color: kColorGrey),
+                                  //           onChanged: (value) {
+                                  //             bool areListsEqual = listEquals(
+                                  //               newlanguages,
+                                  //               (tutorDataMap['language']
+                                  //                       as List<dynamic>)
+                                  //                   .cast<dynamic>(),
+                                  //             );
+                                  //             if (filename != '' ||
+                                  //                 tutorfirstname.text !=
+                                  //                     tutorDataMap['firstName'] ||
+                                  //                 tutorlastname.text !=
+                                  //                     tutorDataMap['lastname'] ||
+                                  //                 tutormiddleName.text !=
+                                  //                     tutorDataMap[
+                                  //                         'middleName'] ||
+                                  //                 birthdate !=
+                                  //                     DateTime.parse(tutorDataMap[
+                                  //                         'birthdate']) ||
+                                  //                 newage !=
+                                  //                     int.parse(
+                                  //                         tutorDataMap['age']) ||
+                                  //                 country.text !=
+                                  //                     tutorDataMap['country'] ||
+                                  //                 city.text !=
+                                  //                     tutorDataMap['city'] ||
+                                  //                 birthcountry.text !=
+                                  //                     tutorDataMap[
+                                  //                         'birthPlace'] ||
+                                  //                 birthcity.text !=
+                                  //                     tutorDataMap['birthCity'] ||
+                                  //                 timezone.text !=
+                                  //                     tutorDataMap['timezone'] ||
+                                  //                 contactnumber.text !=
+                                  //                     tutorDataMap['contact'] ||
+                                  //                 selectedDate !=
+                                  //                     DateTime.parse(tutorDataMap[
+                                  //                         'birthdate']) ||
+                                  //                 areListsEqual == false) {
+                                  //               setState(() {
+                                  //                 allowUpdate = true;
+                                  //               });
+                                  //             } else {
+                                  //               setState(() {
+                                  //                 allowUpdate = false;
+                                  //               });
+                                  //             }
+                                  //           },
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              Row(
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 370,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0, 5, 10, 5),
+                                        decoration: BoxDecoration(
+                                          // color: const Color.fromRGBO(
+                                          //     55, 116, 135, 1),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        child: const Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            'Country of Residence',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: kColorLight),
+                                          ),
+                                        ),
+                                      ),
+                                      Card(
+                                        margin: EdgeInsets.zero,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        elevation: 5,
+                                        child: SizedBox(
+                                          width: 370,
+                                          height: 45,
+                                          child: TypeAheadFormField<String>(
+                                            enabled: false,
+                                            textFieldConfiguration:
+                                                TextFieldConfiguration(
+                                              style: const TextStyle(
+                                                  color: kColorGrey),
+                                              controller: country,
+                                              decoration: InputDecoration(
+                                                hintText: 'Select a Country',
+                                                hintStyle: const TextStyle(
+                                                    color: Colors.grey),
+                                                labelStyle: const TextStyle(
+                                                    color: Colors.grey),
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                        horizontal: 10),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0), // Rounded border
+                                                  borderSide: BorderSide
+                                                      .none, // No outline border
+                                                ),
+                                                suffixIcon: const Icon(
+                                                    Icons.arrow_drop_down),
+                                              ),
+                                            ),
+                                            suggestionsCallback:
+                                                (String pattern) {
+                                              return widget.countryNames.where(
+                                                  (country) => country
+                                                      .toLowerCase()
+                                                      .contains(pattern
+                                                          .toLowerCase()));
+                                            },
+                                            itemBuilder:
+                                                (context, String suggestion) {
+                                              return ListTile(
+                                                title: Text(suggestion),
+                                              );
+                                            },
+                                            onSuggestionSelected:
+                                                (String suggestion) {
+                                              country.text = suggestion;
+                                              bool areListsEqual = listEquals(
+                                                newlanguages,
+                                                (tutorDataMap['language']
+                                                        as List<dynamic>)
+                                                    .cast<dynamic>(),
+                                              );
+                                              if (filename != '' ||
+                                                  tutorfirstname.text !=
+                                                      tutorDataMap[
+                                                          'firstName'] ||
+                                                  tutorlastname.text !=
+                                                      tutorDataMap[
+                                                          'lastname'] ||
+                                                  tutormiddleName.text !=
+                                                      tutorDataMap[
+                                                          'middleName'] ||
+                                                  birthdate !=
+                                                      DateTime.parse(
+                                                          tutorDataMap[
+                                                              'birthdate']) ||
+                                                  newage !=
+                                                      int.parse(tutorDataMap[
+                                                          'age']) ||
+                                                  country.text !=
+                                                      tutorDataMap['country'] ||
+                                                  city.text !=
+                                                      tutorDataMap['city'] ||
+                                                  birthcountry.text !=
+                                                      tutorDataMap[
+                                                          'birthPlace'] ||
+                                                  birthcity.text !=
+                                                      tutorDataMap[
+                                                          'birthCity'] ||
+                                                  timezone.text !=
+                                                      tutorDataMap[
+                                                          'timezone'] ||
+                                                  contactnumber.text !=
+                                                      tutorDataMap['contact'] ||
+                                                  selectedDate !=
+                                                      DateTime.parse(
+                                                          tutorDataMap[
+                                                              'birthdate']) ||
+                                                  areListsEqual == false) {
+                                                setState(() {
+                                                  allowUpdate = true;
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  allowUpdate = false;
+                                                });
+                                              }
+                                            },
+                                          ),
+                                          // country.name
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 300,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0, 5, 10, 5),
+                                        decoration: BoxDecoration(
+                                          // color: const Color.fromRGBO(
+                                          //     55, 116, 135, 1),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        child: const Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            'City of Residence',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                color: kColorLight),
+                                          ),
+                                        ),
+                                      ),
+                                      Card(
+                                        margin: EdgeInsets.zero,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        elevation: 5,
+                                        child: Container(
+                                          width: 300,
+                                          height: 45,
+                                          child: TextFormField(
+                                            controller: city,
+                                            decoration: InputDecoration(
+                                              fillColor: Colors.grey,
+                                              hintText: 'City',
+                                              hintStyle: const TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 15),
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 12,
+                                                      horizontal: 10),
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        10.0), // Rounded border
+                                                borderSide: BorderSide
+                                                    .none, // No outline border
+                                              ),
+                                            ),
+                                            style: const TextStyle(
+                                                color: kColorGrey),
+                                            onChanged: (value) {
+                                              bool areListsEqual = listEquals(
+                                                newlanguages,
+                                                (tutorDataMap['language']
+                                                        as List<dynamic>)
+                                                    .cast<dynamic>(),
+                                              );
+                                              if (filename != '' ||
+                                                  tutorfirstname.text !=
+                                                      tutorDataMap[
+                                                          'firstName'] ||
+                                                  tutorlastname.text !=
+                                                      tutorDataMap[
+                                                          'lastname'] ||
+                                                  tutormiddleName.text !=
+                                                      tutorDataMap[
+                                                          'middleName'] ||
+                                                  birthdate !=
+                                                      DateTime.parse(
+                                                          tutorDataMap[
+                                                              'birthdate']) ||
+                                                  newage !=
+                                                      int.parse(tutorDataMap[
+                                                          'age']) ||
+                                                  country.text !=
+                                                      tutorDataMap['country'] ||
+                                                  city.text !=
+                                                      tutorDataMap['city'] ||
+                                                  birthcountry.text !=
+                                                      tutorDataMap[
+                                                          'birthPlace'] ||
+                                                  birthcity.text !=
+                                                      tutorDataMap[
+                                                          'birthCity'] ||
+                                                  timezone.text !=
+                                                      tutorDataMap[
+                                                          'timezone'] ||
+                                                  contactnumber.text !=
+                                                      tutorDataMap['contact'] ||
+                                                  selectedDate !=
+                                                      DateTime.parse(
+                                                          tutorDataMap[
+                                                              'birthdate']) ||
+                                                  areListsEqual == false) {
+                                                setState(() {
+                                                  allowUpdate = true;
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  allowUpdate = false;
+                                                });
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              Row(children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 370,
+                                      padding: const EdgeInsets.fromLTRB(
+                                          0, 5, 10, 5),
+                                      decoration: BoxDecoration(
+                                        // color:
+                                        //     const Color.fromRGBO(55, 116, 135, 1),
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: const Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          'Timezone',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: kColorLight),
+                                        ),
+                                      ),
+                                    ),
+                                    Card(
+                                      margin: EdgeInsets.zero,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      elevation: 5,
+                                      child: SizedBox(
+                                        width: 370,
+                                        height: 45,
+                                        child: TypeAheadFormField<String>(
+                                          textFieldConfiguration:
+                                              TextFieldConfiguration(
+                                            style: const TextStyle(
+                                                color: kColorGrey),
+                                            controller: timezone,
+                                            decoration: InputDecoration(
+                                              hintText: 'Select your Timezone',
+                                              hintStyle: const TextStyle(
+                                                  color: Colors.grey),
+                                              labelStyle: const TextStyle(
+                                                  color: Colors.grey),
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 12,
+                                                      horizontal: 10),
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        10.0), // Rounded border
+                                                borderSide: BorderSide
+                                                    .none, // No outline border
+                                              ),
+                                              suffixIcon: const Icon(
+                                                  Icons.arrow_drop_down),
+                                            ),
+                                          ),
+                                          suggestionsCallback:
+                                              (String pattern) {
+                                            return timezonesList.where(
+                                                (timezone) => timezone
+                                                    .toLowerCase()
+                                                    .contains(
+                                                        pattern.toLowerCase()));
+                                          },
+                                          itemBuilder:
+                                              (context, String suggestion) {
+                                            return ListTile(
+                                              title: Text(
+                                                suggestion,
+                                                style: const TextStyle(
+                                                    color: kColorGrey),
+                                              ),
+                                            );
+                                          },
+                                          onSuggestionSelected:
+                                              (String suggestion) {
+                                            setState(() {
+                                              timezone.text = suggestion;
+                                              bool areListsEqual = listEquals(
+                                                newlanguages,
+                                                (tutorDataMap['language']
+                                                        as List<dynamic>)
+                                                    .cast<dynamic>(),
+                                              );
+                                              if (filename != '' ||
+                                                  tutorfirstname.text !=
+                                                      tutorDataMap[
+                                                          'firstName'] ||
+                                                  tutorlastname.text !=
+                                                      tutorDataMap[
+                                                          'lastname'] ||
+                                                  tutormiddleName.text !=
+                                                      tutorDataMap[
+                                                          'middleName'] ||
+                                                  birthdate !=
+                                                      DateTime.parse(
+                                                          tutorDataMap[
+                                                              'birthdate']) ||
+                                                  newage !=
+                                                      int.parse(tutorDataMap[
+                                                          'age']) ||
+                                                  country.text !=
+                                                      tutorDataMap['country'] ||
+                                                  city.text !=
+                                                      tutorDataMap['city'] ||
+                                                  birthcountry.text !=
+                                                      tutorDataMap[
+                                                          'birthPlace'] ||
+                                                  birthcity.text !=
+                                                      tutorDataMap[
+                                                          'birthCity'] ||
+                                                  timezone.text !=
+                                                      tutorDataMap[
+                                                          'timezone'] ||
+                                                  contactnumber.text !=
+                                                      tutorDataMap['contact'] ||
+                                                  selectedDate !=
+                                                      DateTime.parse(
+                                                          tutorDataMap[
+                                                              'birthdate']) ||
+                                                  areListsEqual == false) {
+                                                setState(() {
+                                                  allowUpdate = true;
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  allowUpdate = false;
+                                                });
+                                              }
+                                            });
+                                          },
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: SizedBox(
-                                    width: 130,
-                                    height: 40,
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: kColorPrimary,
-                                        shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(20))),
-                                      ),
-                                      onPressed: allowUpdate == false
-                                          ? null
-                                          : () async {
-                                              CoolAlert.show(
-                                                  context: context,
-                                                  width: 200,
-                                                  barrierDismissible: false,
-                                                  type: CoolAlertType.loading,
-                                                  text:
-                                                      'Updating your data....');
-                                              if (filename != '') {
-                                                data = await uploadTutorProfile(
-                                                  tutorDataMap['userId'],
-                                                  selectedImage,
-                                                  filename,
-                                                );
-                                              }
-
-                                              String? result =
-                                                  await updatePersonalTutorInformation(
-                                                      tutorDataMap['userId'],
-                                                      country.text,
-                                                      birthcountry.text,
-                                                      birthcity.text,
-                                                      city.text,
-                                                      tutorfirstname.text,
-                                                      tutormiddleName.text,
-                                                      tutorlastname.text,
-                                                      newlanguages,
-                                                      tutorDataMap['userId'],
-                                                      contactnumber.text,
-                                                      newage.toString(),
-                                                      birthdate.toString(),
-                                                      timezone.text,
-                                                      data == null ||
-                                                              data!.isEmpty
-                                                          ? ''
-                                                          : data!);
-                                              if (result == 'success') {
-                                                setState(() {
-                                                  CoolAlert.show(
-                                                    context: context,
-                                                    width: 200,
-                                                    type: CoolAlertType.success,
-                                                    text: 'Update Successful!',
-                                                    autoCloseDuration:
-                                                        const Duration(
-                                                            seconds: 1),
-                                                  ).then(
-                                                    (value) {
-                                                      filename = '';
-                                                      selectedImage =
-                                                          Uint8List(0);
-                                                      final provider = context
-                                                          .read<MyModel>();
-                                                      provider.updateBoolValue(
-                                                          false);
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                  );
-                                                });
-                                              } else {
-                                                filename = '';
-                                                // ignore: use_build_context_synchronously
-                                                CoolAlert.show(
-                                                  context: context,
-                                                  width: 200,
-                                                  type: CoolAlertType.error,
-                                                  text: result.toString(),
-                                                );
-                                              }
-                                            },
-                                      child: const Text('Update'),
-                                    ),
-                                  ),
-                                ),
                                 const SizedBox(
                                   width: 10,
                                 ),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: SizedBox(
-                                    width: 130,
-                                    height: 40,
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.white,
-                                        shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(20))),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 300,
+                                      padding: const EdgeInsets.fromLTRB(
+                                          0, 5, 10, 5),
+                                      decoration: BoxDecoration(
+                                        // color:
+                                        //     const Color.fromRGBO(55, 116, 135, 1),
+                                        borderRadius: BorderRadius.circular(5),
                                       ),
-                                      onPressed: () {
-                                        bool areListsEqual = listEquals(
-                                          newlanguages,
-                                          (tutorDataMap['language']
-                                                  as List<dynamic>)
-                                              .cast<dynamic>(),
-                                        );
-                                        if (filename != '' ||
-                                            tutorfirstname.text !=
-                                                tutorDataMap['firstName'] ||
-                                            tutorlastname.text !=
-                                                tutorDataMap['lastname'] ||
-                                            tutormiddleName.text !=
-                                                tutorDataMap['middleName'] ||
-                                            birthdate !=
-                                                DateTime.parse(tutorDataMap[
-                                                    'birthdate']) ||
-                                            newage !=
-                                                int.parse(
-                                                    tutorDataMap['age']) ||
-                                            country.text !=
-                                                tutorDataMap['country'] ||
-                                            city.text != tutorDataMap['city'] ||
-                                            birthcountry.text !=
-                                                tutorDataMap['birthPlace'] ||
-                                            birthcity.text !=
-                                                tutorDataMap['birthCity'] ||
-                                            timezone.text !=
-                                                tutorDataMap['timezone'] ||
-                                            contactnumber.text !=
-                                                tutorDataMap['contact'] ||
-                                            selectedDate !=
-                                                DateTime.parse(tutorDataMap[
-                                                    'birthdate']) ||
-                                            areListsEqual == false) {
-                                          CoolAlert.show(
-                                            context: context,
-                                            barrierDismissible: false,
-                                            width: 200,
-                                            type: CoolAlertType.confirm,
-                                            text: 'You want to cancel update?',
-                                            confirmBtnText: 'Proceed',
-                                            confirmBtnColor: Colors.greenAccent,
-                                            cancelBtnText: 'Go back',
-                                            showCancelBtn: true,
-                                            cancelBtnTextStyle: const TextStyle(
-                                                color: Colors.red),
-                                            onCancelBtnTap: () {
-                                              Navigator.of(context).pop;
-                                            },
-                                            onConfirmBtnTap: () {
-                                              filename = '';
-                                              initializeWidget();
-                                              final provider =
-                                                  context.read<MyModel>();
-                                              provider.updateBoolValue(false);
-                                            },
-                                          );
-                                        } else {
-                                          filename = '';
-                                          initializeWidget();
-                                          final provider =
-                                              context.read<MyModel>();
-                                          provider.updateBoolValue(false);
-                                        }
-                                      },
-                                      child: const Text(
-                                        'Cancel',
-                                        style: TextStyle(color: kColorPrimary),
+                                      child: const Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          'Contact Number',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: kColorLight),
+                                        ),
+                                      ),
+                                    ),
+                                    Card(
+                                      margin: EdgeInsets.zero,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      elevation: 5,
+                                      child: SizedBox(
+                                        width: 300,
+                                        height: 45,
+                                        child: TextFormField(
+                                          controller: contactnumber,
+                                          decoration: InputDecoration(
+                                            fillColor: Colors.grey,
+                                            hintText: 'Contact Number',
+                                            hintStyle: const TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 15),
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 12,
+                                                    horizontal: 10),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      10.0), // Rounded border
+                                              borderSide: BorderSide
+                                                  .none, // No outline border
+                                            ),
+                                          ),
+                                          style: const TextStyle(
+                                              color: kColorGrey),
+                                          onChanged: (value) {
+                                            bool areListsEqual = listEquals(
+                                              newlanguages,
+                                              (tutorDataMap['language']
+                                                      as List<dynamic>)
+                                                  .cast<dynamic>(),
+                                            );
+                                            if (filename != '' ||
+                                                tutorfirstname.text !=
+                                                    tutorDataMap['firstName'] ||
+                                                tutorlastname.text !=
+                                                    tutorDataMap['lastname'] ||
+                                                tutormiddleName.text !=
+                                                    tutorDataMap[
+                                                        'middleName'] ||
+                                                birthdate !=
+                                                    DateTime.parse(tutorDataMap[
+                                                        'birthdate']) ||
+                                                newage !=
+                                                    int.parse(
+                                                        tutorDataMap['age']) ||
+                                                country.text !=
+                                                    tutorDataMap['country'] ||
+                                                city.text !=
+                                                    tutorDataMap['city'] ||
+                                                birthcountry.text !=
+                                                    tutorDataMap[
+                                                        'birthPlace'] ||
+                                                birthcity.text !=
+                                                    tutorDataMap['birthCity'] ||
+                                                timezone.text !=
+                                                    tutorDataMap['timezone'] ||
+                                                contactnumber.text !=
+                                                    tutorDataMap['contact'] ||
+                                                selectedDate !=
+                                                    DateTime.parse(tutorDataMap[
+                                                        'birthdate']) ||
+                                                areListsEqual == false) {
+                                              setState(() {
+                                                allowUpdate = true;
+                                              });
+                                            } else {
+                                              setState(() {
+                                                allowUpdate = false;
+                                              });
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ]),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: 680,
+                                    padding:
+                                        const EdgeInsets.fromLTRB(0, 5, 10, 5),
+                                    decoration: BoxDecoration(
+                                      // color: const Color.fromRGBO(
+                                      //     55, 116, 135, 1),
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: const Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        'Languages',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: kColorLight),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                          ],
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Card(
+                                        margin: EdgeInsets.zero,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        elevation: 5,
+                                        child: SizedBox(
+                                          width: 270,
+                                          height: 45,
+                                          child:
+                                              TypeAheadFormField<LanguageData>(
+                                            // Specify LanguageData as the generic type
+                                            textFieldConfiguration:
+                                                TextFieldConfiguration(
+                                              decoration: InputDecoration(
+                                                hintText: 'Add Language',
+                                                labelStyle: const TextStyle(
+                                                    color: Colors.grey),
+                                                contentPadding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 12,
+                                                        horizontal: 10),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0), // Rounded border
+                                                  borderSide: BorderSide
+                                                      .none, // No outline border
+                                                ),
+                                                suffixIcon: const Icon(
+                                                    Icons.arrow_drop_down),
+                                              ),
+                                            ),
+                                            suggestionsCallback:
+                                                (pattern) async {
+                                              final suggestions = widget.names
+                                                  .where((language) => language
+                                                      .languageNamesStream
+                                                      .toLowerCase()
+                                                      .contains(pattern
+                                                          .toLowerCase()))
+                                                  .toList(); // Return a list of LanguageData objects
+                                              return suggestions;
+                                            },
+                                            itemBuilder:
+                                                (context, suggestions) {
+                                              return ListTile(
+                                                title: Text(suggestions
+                                                    .languageNamesStream), // Access the language name
+                                              );
+                                            },
+                                            onSuggestionSelected: (suggestion) {
+                                              if (newlanguages.contains(
+                                                  suggestion
+                                                      .languageNamesStream)) {
+                                                null;
+                                              } else {
+                                                setState(() {
+                                                  newlanguages.add(suggestion
+                                                      .languageNamesStream
+                                                      .toString()); // Add the LanguageData object to tlanguages
+                                                });
+                                              }
+                                              bool areListsEqual = listEquals(
+                                                newlanguages,
+                                                (tutorDataMap['language']
+                                                        as List<dynamic>)
+                                                    .cast<dynamic>(),
+                                              );
+                                              if (filename != '' ||
+                                                  tutorfirstname.text !=
+                                                      tutorDataMap[
+                                                          'firstName'] ||
+                                                  tutorlastname.text !=
+                                                      tutorDataMap[
+                                                          'lastname'] ||
+                                                  tutormiddleName.text !=
+                                                      tutorDataMap[
+                                                          'middleName'] ||
+                                                  birthdate !=
+                                                      DateTime.parse(
+                                                          tutorDataMap[
+                                                              'birthdate']) ||
+                                                  newage !=
+                                                      int.parse(tutorDataMap[
+                                                          'age']) ||
+                                                  country.text !=
+                                                      tutorDataMap['country'] ||
+                                                  city.text !=
+                                                      tutorDataMap['city'] ||
+                                                  birthcountry.text !=
+                                                      tutorDataMap[
+                                                          'birthPlace'] ||
+                                                  birthcity.text !=
+                                                      tutorDataMap[
+                                                          'birthCity'] ||
+                                                  timezone.text !=
+                                                      tutorDataMap[
+                                                          'timezone'] ||
+                                                  contactnumber.text !=
+                                                      tutorDataMap['contact'] ||
+                                                  selectedDate !=
+                                                      DateTime.parse(
+                                                          tutorDataMap[
+                                                              'birthdate']) ||
+                                                  areListsEqual == false) {
+                                                setState(() {
+                                                  allowUpdate = true;
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  allowUpdate = false;
+                                                });
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Tooltip(
+                                        message: 'Remove Language',
+                                        child: IconButton(
+                                          padding: EdgeInsets.zero,
+                                          visualDensity: const VisualDensity(
+                                              horizontal: -4, vertical: -4),
+                                          icon: const Icon(
+                                              Icons.delete_outline_outlined),
+                                          color: kCalendarColorB,
+                                          iconSize: 30,
+                                          onPressed: selectedindex == null
+                                              ? null
+                                              : () {
+                                                  setState(() {
+                                                    newlanguages.removeAt(
+                                                        selectedindex!);
+                                                  });
+                                                },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 10.0, bottom: 10.0),
+                                    child: SizedBox(
+                                      height: 50,
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          IconButton(
+                                            iconSize: 12,
+                                            padding: EdgeInsets.zero,
+                                            splashRadius: 1,
+                                            icon: const Icon(
+                                              Icons
+                                                  .arrow_back_ios, // Left arrow icon
+                                              color: kColorPrimary,
+                                            ),
+                                            onPressed: () {
+                                              // Scroll to the left
+                                              updatescrollController1.animateTo(
+                                                updatescrollController1.offset -
+                                                    100.0, // Adjust the value as needed
+                                                duration: const Duration(
+                                                    milliseconds:
+                                                        500), // Adjust the duration as needed
+                                                curve: Curves.ease,
+                                              );
+                                            },
+                                          ),
+                                          Container(
+                                            width: 550,
+                                            height: 45,
+                                            padding: const EdgeInsets.fromLTRB(
+                                                10, 0, 10, 0),
+                                            child: ListView.builder(
+                                                controller:
+                                                    updatescrollController1,
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                itemCount: newlanguages.length,
+                                                itemBuilder: (context, index) {
+                                                  bool isIndexEven =
+                                                      index % 2 == 0;
+
+                                                  String datalanguage =
+                                                      newlanguages[index];
+                                                  Color color = vibrantColors[
+                                                      index %
+                                                          vibrantColors
+                                                              .length]; // Cycle through colors
+
+                                                  return Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10.0,
+                                                            right: 10),
+                                                    child: Card(
+                                                      margin: EdgeInsets.zero,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                      ),
+                                                      elevation: 5,
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                5, 0, 5, 0),
+                                                        decoration: selectedindex ==
+                                                                index
+                                                            ? const BoxDecoration(
+                                                                boxShadow: [
+                                                                  BoxShadow(
+                                                                      color: Colors
+                                                                          .black12,
+                                                                      offset:
+                                                                          Offset(
+                                                                              0,
+                                                                              4),
+                                                                      blurRadius:
+                                                                          5.0)
+                                                                ],
+                                                                gradient:
+                                                                    LinearGradient(
+                                                                  begin: Alignment
+                                                                      .centerLeft,
+                                                                  end: Alignment
+                                                                      .centerRight,
+                                                                  stops: [
+                                                                    0.0,
+                                                                    1.0
+                                                                  ],
+                                                                  colors:
+                                                                      buttonFocuscolors,
+                                                                ),
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            15)),
+                                                              )
+                                                            : const BoxDecoration(
+                                                                boxShadow: [
+                                                                    BoxShadow(
+                                                                        color: Colors
+                                                                            .black12,
+                                                                        offset: Offset(
+                                                                            0,
+                                                                            4),
+                                                                        blurRadius:
+                                                                            5.0)
+                                                                  ],
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            15)),
+                                                                color: Colors
+                                                                    .white),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                      .symmetric(
+                                                                  horizontal:
+                                                                      5),
+                                                          child: InkWell(
+                                                            onTap: () {
+                                                              setState(() {
+                                                                selectedindex ==
+                                                                        index
+                                                                    ? selectedindex =
+                                                                        null
+                                                                    : selectedindex =
+                                                                        index;
+                                                              });
+                                                            },
+                                                            child: Center(
+                                                              child: Text(
+                                                                datalanguage,
+                                                                style: TextStyle(
+                                                                    color: selectedindex ==
+                                                                            index
+                                                                        ? Colors
+                                                                            .white
+                                                                        : kColorGrey),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                }),
+                                          ),
+                                          IconButton(
+                                            iconSize: 12,
+                                            padding: EdgeInsets.zero,
+                                            splashRadius: 1,
+                                            icon: const Icon(
+                                              Icons
+                                                  .arrow_forward_ios, // Right arrow icon
+                                              color: kColorPrimary,
+                                            ),
+                                            onPressed: () {
+                                              // Scroll to the right
+                                              updatescrollController1.animateTo(
+                                                updatescrollController1.offset +
+                                                    100.0, // Adjust the value as needed
+                                                duration: const Duration(
+                                                    milliseconds:
+                                                        500), // Adjust the duration as needed
+                                                curve: Curves.ease,
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: SizedBox(
+                                      width: 100,
+                                      height: 40,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.white,
+                                            shape: const RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(20))),
+                                            elevation: 0),
+                                        onPressed: () async {
+                                          if (allowUpdate == false) {
+                                          } else {
+                                            CoolAlert.show(
+                                                context: context,
+                                                width: 200,
+                                                barrierDismissible: false,
+                                                type: CoolAlertType.loading,
+                                                text: 'Updating your data....');
+                                            if (filename != '') {
+                                              data = await uploadTutorProfile(
+                                                tutorDataMap['userId'],
+                                                selectedImage,
+                                                filename,
+                                              );
+                                            }
+
+                                            String? result =
+                                                await updatePersonalTutorInformation(
+                                                    tutorDataMap['userId'],
+                                                    country.text,
+                                                    birthcountry.text,
+                                                    birthcity.text,
+                                                    city.text,
+                                                    tutorfirstname.text,
+                                                    tutormiddleName.text,
+                                                    tutorlastname.text,
+                                                    newlanguages,
+                                                    tutorDataMap['userId'],
+                                                    contactnumber.text,
+                                                    newage.toString(),
+                                                    birthdate.toString(),
+                                                    timezone.text,
+                                                    data == null ||
+                                                            data!.isEmpty
+                                                        ? ''
+                                                        : data!);
+                                            if (result == 'success') {
+                                              setState(() {
+                                                CoolAlert.show(
+                                                  context: context,
+                                                  width: 200,
+                                                  type: CoolAlertType.success,
+                                                  text: 'Update Successful!',
+                                                  autoCloseDuration:
+                                                      const Duration(
+                                                          seconds: 1),
+                                                ).then(
+                                                  (value) {
+                                                    filename = '';
+                                                    selectedImage =
+                                                        Uint8List(0);
+                                                    final provider =
+                                                        context.read<MyModel>();
+                                                    provider
+                                                        .updateBoolValue(false);
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                );
+                                              });
+                                            } else {
+                                              filename = '';
+                                              // ignore: use_build_context_synchronously
+                                              CoolAlert.show(
+                                                context: context,
+                                                width: 200,
+                                                type: CoolAlertType.error,
+                                                text: result.toString(),
+                                              );
+                                            }
+
+                                            allowUpdate = false;
+                                          }
+                                        },
+                                        child: const Text(
+                                          'Update',
+                                          style: TextStyle(
+                                              color: kColorPrimary,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: SizedBox(
+                                      width: 100,
+                                      height: 40,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.white,
+                                            shape: const RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(20))),
+                                            elevation: 0),
+                                        onPressed: () {
+                                          bool areListsEqual = listEquals(
+                                            newlanguages,
+                                            (tutorDataMap['language']
+                                                    as List<dynamic>)
+                                                .cast<dynamic>(),
+                                          );
+                                          if (filename != '' ||
+                                              tutorfirstname.text !=
+                                                  tutorDataMap['firstName'] ||
+                                              tutorlastname.text !=
+                                                  tutorDataMap['lastname'] ||
+                                              tutormiddleName.text !=
+                                                  tutorDataMap['middleName'] ||
+                                              birthdate !=
+                                                  DateTime.parse(tutorDataMap[
+                                                      'birthdate']) ||
+                                              newage !=
+                                                  int.parse(
+                                                      tutorDataMap['age']) ||
+                                              country.text !=
+                                                  tutorDataMap['country'] ||
+                                              city.text !=
+                                                  tutorDataMap['city'] ||
+                                              birthcountry.text !=
+                                                  tutorDataMap['birthPlace'] ||
+                                              birthcity.text !=
+                                                  tutorDataMap['birthCity'] ||
+                                              timezone.text !=
+                                                  tutorDataMap['timezone'] ||
+                                              contactnumber.text !=
+                                                  tutorDataMap['contact'] ||
+                                              selectedDate !=
+                                                  DateTime.parse(tutorDataMap[
+                                                      'birthdate']) ||
+                                              areListsEqual == false) {
+                                            CoolAlert.show(
+                                              context: context,
+                                              barrierDismissible: false,
+                                              width: 200,
+                                              type: CoolAlertType.confirm,
+                                              text:
+                                                  'You want to cancel update?',
+                                              confirmBtnText: 'Proceed',
+                                              confirmBtnColor:
+                                                  Colors.greenAccent,
+                                              cancelBtnText: 'Go back',
+                                              showCancelBtn: true,
+                                              cancelBtnTextStyle:
+                                                  const TextStyle(
+                                                      color: Colors.red),
+                                              onCancelBtnTap: () {
+                                                Navigator.of(context).pop;
+                                              },
+                                              onConfirmBtnTap: () {
+                                                filename = '';
+                                                initializeWidget();
+                                                final provider =
+                                                    context.read<MyModel>();
+                                                provider.updateBoolValue(false);
+                                              },
+                                            );
+                                          } else {
+                                            filename = '';
+                                            initializeWidget();
+                                            final provider =
+                                                context.read<MyModel>();
+                                            provider.updateBoolValue(false);
+                                          }
+                                        },
+                                        child: const Text(
+                                          'Cancel',
+                                          style: TextStyle(
+                                              color: kCalendarColorB,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                            ],
+                          ),
                         ),
                       )
                     : viewinfo(widget.tutordata)
@@ -1902,8 +2304,14 @@ class UpdateTutorState extends State<UpdateTutor> {
     Size size = MediaQuery.of(context).size;
     return Container(
       alignment: Alignment.centerLeft,
-      width: size.width - 320,
-      padding: const EdgeInsets.only(left: 250, right: 200),
+      width: ResponsiveBuilder.isDesktop(context)
+          ? size.width - 320
+          : size.width - 30,
+      padding: ResponsiveBuilder.isDesktop(context)
+          ? const EdgeInsets.only(left: 250, right: 20)
+          : ResponsiveBuilder.isTablet(context)
+              ? const EdgeInsets.only(left: 100, right: 20)
+              : const EdgeInsets.only(left: 10, right: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -1913,14 +2321,19 @@ class UpdateTutorState extends State<UpdateTutor> {
               children: <TextSpan>[
                 const TextSpan(
                   text: 'Name:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: kColorGrey),
                 ),
                 const TextSpan(text: '     '),
                 TextSpan(
                   text:
                       '${data.firstName}${data.middleName == '' ? ' ${data.lastname}' : ' ${data.middleName} ${data.lastname}'}',
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w400),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: kColorGrey),
                 ),
               ],
             ),
@@ -1930,32 +2343,42 @@ class UpdateTutorState extends State<UpdateTutor> {
             },
           ),
           const SizedBox(
-            height: 10,
+            height: 12,
           ),
           SelectableText.rich(
             TextSpan(
               children: <TextSpan>[
                 const TextSpan(
                   text: 'Birthdate:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: kColorGrey),
                 ),
                 const TextSpan(text: '     '),
                 TextSpan(
                   text: DateFormat("MMMM dd, yyyy")
                       .format(DateTime.parse(data.birthdate)),
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w400),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: kColorGrey),
                 ),
                 const TextSpan(text: '     '),
                 const TextSpan(
                   text: 'Age:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: kColorGrey),
                 ),
                 const TextSpan(text: '     '),
                 TextSpan(
                   text: data.age,
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w400),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: kColorGrey),
                 ),
               ],
             ),
@@ -1965,43 +2388,26 @@ class UpdateTutorState extends State<UpdateTutor> {
             },
           ),
           const SizedBox(
-            height: 10,
-          ),
-          SelectableText.rich(
-            TextSpan(
-              children: <TextSpan>[
-                const TextSpan(
-                  text: 'Country of Residence:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const TextSpan(text: '     '),
-                TextSpan(
-                  text: '${data.city}, ${data.country}',
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w400),
-                ),
-              ],
-            ),
-            textAlign: TextAlign.center,
-            onTap: () {
-              // Add any onTap behavior if needed
-            },
-          ),
-          const SizedBox(
-            height: 10,
+            height: 12,
           ),
           SelectableText.rich(
             TextSpan(
               children: <TextSpan>[
                 const TextSpan(
                   text: 'Country of Birth:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: kColorGrey),
                 ),
                 const TextSpan(text: '     '),
                 TextSpan(
-                  text: '${data.birthCity}, ${data.birthPlace}',
+                  text: data.birthPlace,
+                  //  text: '${data.birthCity}, ${data.birthPlace}',
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w400),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: kColorGrey),
                 ),
               ],
             ),
@@ -2011,20 +2417,53 @@ class UpdateTutorState extends State<UpdateTutor> {
             },
           ),
           const SizedBox(
-            height: 10,
+            height: 12,
+          ),
+          SelectableText.rich(
+            TextSpan(
+              children: <TextSpan>[
+                const TextSpan(
+                  text: 'Country of Residence:',
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: kColorGrey),
+                ),
+                const TextSpan(text: '     '),
+                TextSpan(
+                  text: '${data.city}, ${data.country}',
+                  style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: kColorGrey),
+                ),
+              ],
+            ),
+            textAlign: TextAlign.center,
+            onTap: () {
+              // Add any onTap behavior if needed
+            },
+          ),
+          const SizedBox(
+            height: 12,
           ),
           SelectableText.rich(
             TextSpan(
               children: <TextSpan>[
                 const TextSpan(
                   text: 'Timezone:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: kColorGrey),
                 ),
                 const TextSpan(text: '     '),
                 TextSpan(
                   text: data.timezone,
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w400),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: kColorGrey),
                 ),
               ],
             ),
@@ -2034,20 +2473,25 @@ class UpdateTutorState extends State<UpdateTutor> {
             },
           ),
           const SizedBox(
-            height: 10,
+            height: 12,
           ),
           SelectableText.rich(
             TextSpan(
               children: <TextSpan>[
                 const TextSpan(
                   text: 'Contact:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: kColorGrey),
                 ),
                 const TextSpan(text: '     '),
                 TextSpan(
                   text: data.contact,
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w400),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: kColorGrey),
                 ),
               ],
             ),
@@ -2057,20 +2501,25 @@ class UpdateTutorState extends State<UpdateTutor> {
             },
           ),
           const SizedBox(
-            height: 10,
+            height: 12,
           ),
           SelectableText.rich(
             TextSpan(
               children: <TextSpan>[
                 const TextSpan(
                   text: 'Languages:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: kColorGrey),
                 ),
                 const TextSpan(text: '     '),
                 TextSpan(
-                  text: data.language.join(','),
+                  text: data.language.join(', '),
                   style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w400),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: kColorGrey),
                 ),
               ],
             ),

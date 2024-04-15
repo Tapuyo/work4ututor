@@ -1,7 +1,7 @@
 class ChatMessage {
   String chatID;
   String lastmessage;
-  String messageStatus;
+  Map messageStatus;
   String studentFav;
   String studentID;
   String tutorFav;

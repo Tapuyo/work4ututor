@@ -20,6 +20,7 @@ import '../../../../components/nav_bar.dart';
 import '../../../../data_class/subject_class.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../services/addtocart.dart';
+import '../../../../services/getmyrating.dart';
 import '../../../../utils/themes.dart';
 import '../../admin/executive_dashboard.dart';
 import '../../terms/termpage.dart';
@@ -87,6 +88,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
     getDataFromTutorSubjectTeach(widget.tutorsinfo['userId']);
   }
 
+  final RatingNotifier ratingNotifier = RatingNotifier();
   @override
   Widget build(BuildContext context) {
     const Color background = Color.fromRGBO(55, 116, 135, 1);
@@ -1145,6 +1147,8 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                               : '5',
                                                       subject: selectedsuject[
                                                           'subjectname'],
+                                                      currentprice:
+                                                          currentprice,
                                                     );
                                                   },
                                                 ).then((selectedDate) {
@@ -1236,17 +1240,16 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                           'Error declining, try again.',
                                                     );
                                                   }
-                                                }else {
-                                                    CoolAlert.show(
-                                                      context: context,
-                                                      width: 200,
-                                                      type:
-                                                          CoolAlertType.warning,
-                                                      title: 'Oops...',
-                                                      text:
-                                                          'Please select subject and classes.',
-                                                    );
-                                                  }
+                                                } else {
+                                                  CoolAlert.show(
+                                                    context: context,
+                                                    width: 200,
+                                                    type: CoolAlertType.warning,
+                                                    title: 'Oops...',
+                                                    text:
+                                                        'Please select subject and classes.',
+                                                  );
+                                                }
                                               },
                                               child: const Text(
                                                 'Add Cart',
@@ -1650,92 +1653,188 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                             height: 10,
                                           ),
                                           Center(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: const [
-                                                Icon(
-                                                  Icons.announcement_outlined,
-                                                  color: background,
-                                                  size: 80,
-                                                ),
-                                                Text(
-                                                  "No Reviews",
-                                                  textAlign: TextAlign.left,
-                                                  style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: background),
-                                                ),
-                                              ],
-                                            ),
+                                            child: FutureBuilder<
+                                                    List<
+                                                        Map<String, dynamic>>?>(
+                                                future: ratingNotifier
+                                                    .getRating(widget
+                                                        .tutorsinfo['userId']),
+                                                builder: (BuildContext context,
+                                                    AsyncSnapshot<
+                                                            List<
+                                                                Map<String,
+                                                                    dynamic>>?>
+                                                        snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return SizedBox(
+                                                        height:
+                                                            (size.height / 2) -
+                                                                200,
+                                                        width: size.width - 320,
+                                                        child: const Center(
+                                                          child: SizedBox(
+                                                              width: 40,
+                                                              height: 40,
+                                                              child:
+                                                                  CircularProgressIndicator()),
+                                                        ));
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return Text(
+                                                        'Error: ${snapshot.error}');
+                                                  }
+                                                  final List<
+                                                          Map<String, dynamic>>?
+                                                      reviewdata =
+                                                      snapshot.data;
+                                                  return reviewdata!.isNotEmpty
+                                                      ? ListView.builder(
+                                                          shrinkWrap: true,
+                                                          itemCount:
+                                                              reviewdata.length,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            final reviews =
+                                                                reviewdata[
+                                                                    index];
+                                                            // chartdata.add(ChartData(reviewdata[index]
+                                                            //                 ['datereview'].toString(), reviewdata[index]
+                                                            //                 ['totalRating']));
+                                                            return SizedBox(
+                                                              child: Column(
+                                                                children: [
+                                                                  Row(
+                                                                    children: [
+                                                                      CircleAvatar(
+                                                                        radius:
+                                                                            20.0,
+                                                                        backgroundColor:
+                                                                            Colors.transparent,
+                                                                        child: Image
+                                                                            .asset(
+                                                                          'assets/images/login.png',
+                                                                          width:
+                                                                              300.0,
+                                                                          height:
+                                                                              100.0,
+                                                                          fit: BoxFit
+                                                                              .contain,
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width:
+                                                                            10,
+                                                                      ),
+                                                                      Text(
+                                                                        reviewdata[index]
+                                                                            [
+                                                                            'studentName'],
+                                                                        style:
+                                                                            const TextStyle(
+                                                                          fontSize:
+                                                                              18,
+                                                                          fontWeight:
+                                                                              FontWeight.w800,
+                                                                        ),
+                                                                      ),
+                                                                      const Spacer(),
+                                                                      RatingBar(
+                                                                          initialRating: reviewdata[index]
+                                                                              [
+                                                                              'totalRating'],
+                                                                          minRating:
+                                                                              0,
+                                                                          maxRating:
+                                                                              5,
+                                                                          direction: Axis
+                                                                              .horizontal,
+                                                                          allowHalfRating:
+                                                                              true,
+                                                                          itemCount:
+                                                                              5,
+                                                                          itemSize:
+                                                                              20,
+                                                                          ratingWidget: RatingWidget(
+                                                                              full: const Icon(Icons.star, color: Colors.orange),
+                                                                              half: const Icon(
+                                                                                Icons.star_half,
+                                                                                color: Colors.orange,
+                                                                              ),
+                                                                              empty: const Icon(
+                                                                                Icons.star_outline,
+                                                                                color: Colors.orange,
+                                                                              )),
+                                                                          onRatingUpdate: (value) {
+                                                                            // _ratingValue = value;
+                                                                          }),
+                                                                    ],
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    height: 10,
+                                                                  ),
+                                                                  Align(
+                                                                    alignment:
+                                                                        Alignment
+                                                                            .centerLeft,
+                                                                    child: Text(
+                                                                      reviewdata[
+                                                                              index]
+                                                                          [
+                                                                          'review'],
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .justify,
+                                                                      // maxLines: 2,
+                                                                      // overflow: TextOverflow.ellipsis,
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight.normal,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(
+                                                                    height: 10,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            );
+                                                          })
+                                                      : Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          children: const [
+                                                            Icon(
+                                                              Icons
+                                                                  .announcement_outlined,
+                                                              color: background,
+                                                              size: 80,
+                                                            ),
+                                                            Text(
+                                                              "No Reviews",
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .left,
+                                                              style: TextStyle(
+                                                                  fontSize: 18,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  color:
+                                                                      background),
+                                                            ),
+                                                          ],
+                                                        );
+                                                }),
                                           ),
-                                          // SizedBox(
-                                          //   child: Row(
-                                          //     children: [
-                                          //       CircleAvatar(
-                                          //         radius: 20.0,
-                                          //         backgroundColor:
-                                          //             Colors.transparent,
-                                          //         child: Image.asset(
-                                          //           'assets/images/login.png',
-                                          //           width: 300.0,
-                                          //           height: 100.0,
-                                          //           fit: BoxFit.contain,
-                                          //         ),
-                                          //       ),
-                                          //       const SizedBox(
-                                          //         width: 10,
-                                          //       ),
-                                          //       const Text(
-                                          //         "Melvin Jhon",
-                                          //         style: TextStyle(
-                                          //           fontSize: 18,
-                                          //           fontWeight: FontWeight.w800,
-                                          //         ),
-                                          //       ),
-                                          //       const Spacer(),
-                                          //       RatingBar(
-                                          //           initialRating: 4.5,
-                                          //           minRating: 0,
-                                          //           maxRating: 5,
-                                          //           direction: Axis.horizontal,
-                                          //           allowHalfRating: true,
-                                          //           itemCount: 5,
-                                          //           itemSize: 20,
-                                          //           ratingWidget: RatingWidget(
-                                          //               full: const Icon(
-                                          //                   Icons.star,
-                                          //                   color:
-                                          //                       Colors.orange),
-                                          //               half: const Icon(
-                                          //                 Icons.star_half,
-                                          //                 color: Colors.orange,
-                                          //               ),
-                                          //               empty: const Icon(
-                                          //                 Icons.star_outline,
-                                          //                 color: Colors.orange,
-                                          //               )),
-                                          //           onRatingUpdate: (value) {
-                                          //             // _ratingValue = value;
-                                          //           }),
-                                          //     ],
-                                          //   ),
-                                          // ),
-                                          // const SizedBox(
-                                          //   height: 10,
-                                          // ),
-                                          // const Text(
-                                          //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-                                          //   textAlign: TextAlign.justify,
-                                          //   style: TextStyle(
-                                          //     fontSize: 15,
-                                          //     fontWeight: FontWeight.normal,
-                                          //   ),
-                                          // ),
                                         ],
                                       )
                                     ]),

@@ -17,6 +17,7 @@ import '../../../../provider/classinfo_provider.dart';
 import '../../../../services/addmaterial.dart';
 import '../../../../services/deletematerial.dart';
 import '../../../../services/getmaterials.dart';
+import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
 import '../../student/book_classes/cancelclasses.dart';
 import '../../student/book_classes/rescheduleclasses.dart';
@@ -207,10 +208,10 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
   @override
   Widget build(BuildContext context) {
     bool selection5 = false;
-    const Color background = Color.fromRGBO(55, 116, 135, 1);
+    const Color background = Color(0xFF377487);
     const Color fill = Colors.white;
     final List<Color> gradient = [
-      background,
+      ...secondaryHeadercolors,
       background,
       fill,
       fill,
@@ -225,46 +226,46 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
     // _updateResponse();
     List<ClassesMaterials> materials = widget.enrolledClass.materials;
     materials.sort((a, b) => a.session.compareTo(b.session));
-    return Padding(
-      padding: const EdgeInsets.only(left: 10, right: 10),
-      child: Container(
-        alignment: Alignment.topCenter,
-        // decoration: BoxDecoration(
-        //   gradient: LinearGradient(
-        //     colors: gradient,
-        //     stops: stops,
-        //     end: Alignment.bottomCenter,
-        //     begin: Alignment.topCenter,
-        //   ),
-        // ),
-        width: size.width - 320,
-        height: size.height + 900,
-        child: SingleChildScrollView(
-          controller: ScrollController(),
-          child: Column(
-            children: [
-              Container(
-                width: size.width - 320,
-                height: 300,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: gradient,
-                    stops: stops,
-                    end: Alignment.bottomCenter,
-                    begin: Alignment.topCenter,
-                  ),
+    return Container(
+      padding: EdgeInsets.zero,
+      alignment: Alignment.centerLeft,
+      width:
+          ResponsiveBuilder.isDesktop(context) ? size.width - 290 : size.width,
+      margin: EdgeInsets.zero,
+      child: SingleChildScrollView(
+        controller: ScrollController(),
+        child: Column(
+          children: [
+            Container(
+              width: ResponsiveBuilder.isDesktop(context)
+                  ? size.width - 300
+                  : size.width,
+              height: ResponsiveBuilder.isMobile(context) ? 200 : 300,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    ...secondaryHeadercolors,
+                    ...[Colors.white, Colors.white],
+                  ],
+                  stops: stops,
+                  end: Alignment.bottomCenter,
+                  begin: Alignment.topCenter,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        TextButton.icon(
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Tooltip(
+                        message: 'Back',
+                        child: IconButton(
                           // <-- TextButton
                           onPressed: () {
                             setState(
@@ -275,1776 +276,3302 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                               },
                             );
                           },
-                          icon: const Icon(
-                            Icons.arrow_back,
-                            size: 24.0,
+                          icon: Icon(
+                            Icons.arrow_back_ios_new_outlined,
+                            size:
+                                ResponsiveBuilder.isMobile(context) ? 10 : 20.0,
                             color: Colors.white,
                           ),
-                          label: const Text(
-                            'Back',
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Flexible(
-                      flex: 10,
-                      child: ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(context)
-                            .copyWith(scrollbars: false),
-                        child: SingleChildScrollView(
-                          controller: ScrollController(),
-                          child: Align(
-                            alignment: Alignment.topRight,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 10.0, right: 10),
-                                  child: Align(
-                                    alignment: Alignment.topRight,
-                                    child: InkWell(
-                                        onTap: () {
-                                          showDialog<DateTime>(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return ViewFile(
-                                                imageURL: downloadURL1,
-                                              );
-                                            },
-                                          ).then((selectedDate) {
-                                            if (selectedDate != null) {
-                                              // Do something with the selected date
-                                            }
-                                          });
-                                        },
-                                        child: Container(
-                                          height: 250,
-                                          width: 250,
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              color: Colors.white,
-                                              image: DecorationImage(
-                                                  image: NetworkImage(
-                                                    widget
-                                                        .enrolledClass
-                                                        .studentinfo
-                                                        .first
-                                                        .profilelink
-                                                        .toString(),
-                                                  ),
-                                                  fit: BoxFit.cover)),
-                                          //         child: const Icon(
-                                          //   Icons.person,
-                                          //   color: Colors.grey,
-                                          //   size: 100,
-                                          // ),
-                                        )),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                         
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 50,
-                      height: MediaQuery.of(context).size.height,
-                      // child: const VerticalDivider(
-                      //   thickness: 1,
-                      // ),
-                    ),
-                    Flexible(
-                      flex: 20,
-                      child: ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(context)
-                            .copyWith(scrollbars: false),
-                        child: SingleChildScrollView(
-                          controller: ScrollController(),
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 30.0),
-                            child: Align(
-                              alignment: Alignment.topLeft,
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      '${(widget.enrolledClass.studentinfo.first.studentFirstname)}${(widget.enrolledClass.studentinfo.first.studentMiddlename == 'N/A' ? '' : ' ${(widget.enrolledClass.studentinfo.first.studentMiddlename)}')} ${(widget.enrolledClass.studentinfo.first.studentLastname)}, 18',
-                                      style: const TextStyle(
-                                          fontSize: 30,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Flexible(
-                                          flex: 5,
-                                          child: Text(
-                                            (widget.enrolledClass.studentinfo
-                                                .first.country),
-                                            style: const TextStyle(
-                                                fontSize: 25,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                        ),
-                                        // SizedBox(
-                                        //   width: 20,
-                                        // ),
-                                        // Text(
-                                        //   'Contact #: +123456789',
-                                        //   style: TextStyle(
-                                        //       fontSize: 25,
-                                        //       color: Colors.white,
-                                        //       fontWeight: FontWeight.w500),
-                                        // ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Flexible(
-                                          flex: 5,
-                                          child: Text(
-                                            (widget.enrolledClass.subjectinfo
-                                                .first.subjectName),
-                                            style: const TextStyle(
-                                                fontSize: 25,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w500,
-                                                fontStyle: FontStyle.italic),
-                                          ),
-                                        ),
-                                        // SizedBox(
-                                        //   width: 20,
-                                        // ),
-                                        // Text(
-                                        //   'Email: email@yahoo.com',
-                                        //   style: TextStyle(
-                                        //       fontSize: 25,
-                                        //       color: Colors.white,
-                                        //       fontWeight: FontWeight.w500),
-                                        // ),
-                                      ],
-                                    ),
-                                  ]),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                height: 680,
-                padding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    ],
+                  ),
+                  SizedBox(
+                    width: ResponsiveBuilder.isDesktop(context) ? 100 : 0,
+                    height: MediaQuery.of(context).size.height,
+                  ),
+                  Column(
                     children: [
+                      const SizedBox(
+                        height: 30,
+                      ),
                       Flexible(
-                        flex: 20,
+                        flex: 10,
                         child: ScrollConfiguration(
                           behavior: ScrollConfiguration.of(context)
                               .copyWith(scrollbars: false),
                           child: SingleChildScrollView(
                             controller: ScrollController(),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 150,
-                                      height: 50,
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              viewClassState == true
-                                                  ? Colors.white
-                                                  : kColorPrimary,
-                                          disabledForegroundColor:
-                                              Colors.blueGrey,
-                                          disabledBackgroundColor:
-                                              Colors.blueGrey,
-                                          shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(5))),
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            viewClassState = false;
-                                          });
-                                        },
-                                        child: Text(
-                                          'Class Info',
-                                          style: TextStyle(
-                                              color: viewClassState == true
-                                                  ? Colors.black
-                                                  : Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 150,
-                                      height: 50,
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              viewClassState == false
-                                                  ? Colors.white
-                                                  : kColorPrimary,
-                                          shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(5))),
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            viewClassState = true;
-                                          });
-                                        },
-                                        child: Text(
-                                          'Materials',
-                                          style: TextStyle(
-                                              color: viewClassState == false
-                                                  ? Colors.black
-                                                  : Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                  child: Divider(color: Colors.grey),
-                                ),
-                                viewClassState == false
-                                    ? Column(
-                                        children: [
-                                          Container(
-                                            height: 40,
-                                            padding: const EdgeInsets.fromLTRB(
-                                                10, 0, 10, 0),
-                                            decoration: const BoxDecoration(
-                                                color: kColorPrimary),
-                                            child: const Align(
-                                              alignment: Alignment.centerLeft,
-                                              child: Text(
-                                                'About Class',
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            height: 5,
-                                          ),
-                                          Text.rich(
-                                            TextSpan(
-                                              children: [
-                                                const TextSpan(
-                                                  text:
-                                                      "You are enrolled in a ",
-                                                  style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontStyle: FontStyle.normal,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text:
-                                                      "${widget.enrolledClass.totalClasses} sessions ",
-                                                  style: const TextStyle(
-                                                    fontSize: 18,
-                                                    fontStyle: FontStyle.normal,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text:
-                                                      "of ${widget.enrolledClass.subjectinfo.first.subjectName}.",
-                                                  style: const TextStyle(
-                                                      fontSize: 18,
-                                                      fontStyle:
-                                                          FontStyle.normal,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                const TextSpan(
-                                                  text:
-                                                      " 50 minutes per class session.\nSchedule:",
-                                                  style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontStyle: FontStyle.normal,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            textAlign: TextAlign.justify,
-                                          ),
-                                          const SizedBox(
-                                            height: 5,
-                                          ),
-                                          Consumer<List<Schedule>>(builder:
-                                              (context, scheduleListdata, _) {
-                                            dynamic data = scheduleListdata;
-                                            ClassesData? newclassdata =
-                                                widget.enrolledClass;
-                                            return Container(
-                                              width: 600,
-                                              // height: 30 * 3,
-                                              child: ListView.builder(
-                                                  physics:
-                                                      const NeverScrollableScrollPhysics(),
-                                                  shrinkWrap: true,
-                                                  itemCount: int.tryParse(
-                                                      newclassdata
-                                                          .totalClasses),
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    Schedule? temp;
-                                                    List<Schedule>
-                                                        filteredScheduleList =
-                                                        data
-                                                            .where((element) =>
-                                                                element
-                                                                    .scheduleID ==
-                                                                widget
-                                                                    .enrolledClass
-                                                                    .classid)
-                                                            .toList();
-                                                    filteredScheduleList.sort(
-                                                        (a, b) => a.schedule
-                                                            .compareTo(
-                                                                b.schedule));
-                                                    final scheduledata =
-                                                        filteredScheduleList
-                                                                    .length >
-                                                                index
-                                                            ? filteredScheduleList[
-                                                                index]
-                                                            : null;
-                                                    return Visibility(
-                                                      visible: true,
-                                                      child: Row(
-                                                        children: [
-                                                          filteredScheduleList
-                                                                  .isEmpty
-                                                              ? Text(
-                                                                  (() {
-                                                                    if (filteredScheduleList
-                                                                            .isEmpty &&
-                                                                        index ==
-                                                                            0) {
-                                                                      return "${(index + 1)}st session (Unschedule)";
-                                                                    } else if (filteredScheduleList
-                                                                            .isEmpty &&
-                                                                        index ==
-                                                                            1) {
-                                                                      return "${(index + 1)}nd session (Unschedule)";
-                                                                    } else if (filteredScheduleList
-                                                                            .isEmpty &&
-                                                                        index ==
-                                                                            2) {
-                                                                      return "${(index + 1)}rd session (Unschedule)";
-                                                                    } else {
-                                                                      return "${(index + 1)}th session (Unschedule)";
-                                                                    }
-                                                                  })(),
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        18,
-                                                                    fontStyle:
-                                                                        FontStyle
-                                                                            .normal,
-                                                                  ),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .justify,
-                                                                )
-                                                              : Text(
-                                                                  (() {
-                                                                    if (filteredScheduleList
-                                                                            .length >
-                                                                        index) {
-                                                                      if (index ==
-                                                                          0) {
-                                                                        return "${(index + 1)}st session  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
-                                                                      } else if (index ==
-                                                                          1) {
-                                                                        return "${(index + 1)}nd session  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
-                                                                      } else if (index ==
-                                                                          2) {
-                                                                        return "${(index + 1)}rd session  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
-                                                                      } else {
-                                                                        return "${(index + 1)}th session  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
-                                                                      }
-                                                                    } else {
-                                                                      if (index ==
-                                                                          0) {
-                                                                        return "${(index + 1)}st session (Unschedule)";
-                                                                      } else if (index ==
-                                                                          1) {
-                                                                        return "${(index + 1)}nd session (Unschedule)";
-                                                                      } else if (index ==
-                                                                          2) {
-                                                                        return "${(index + 1)}rd session (Unschedule)";
-                                                                      } else {
-                                                                        return "${(index + 1)}th session (Unschedule)";
-                                                                      }
-                                                                    }
-                                                                  })(),
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        18,
-                                                                    fontStyle:
-                                                                        FontStyle
-                                                                            .normal,
-                                                                  ),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .justify,
-                                                                ),
-                                                          const Spacer(),
-                                                          newclassdata.status ==
-                                                                  'Cancelled'
-                                                              ? const Center(
-                                                                  child: Text(
-                                                                    'Cancelled Class',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      color:
-                                                                          kCalendarColorB,
-                                                                      fontSize:
-                                                                          18,
-                                                                      fontStyle:
-                                                                          FontStyle
-                                                                              .normal,
-                                                                    ),
-                                                                  ),
-                                                                )
-                                                              : filteredScheduleList
-                                                                          .length >
-                                                                      index
-                                                                  ? TextButton(
-                                                                      child:
-                                                                          const Text(
-                                                                        "Reschedule",
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Colors.blue,
-                                                                          fontSize:
-                                                                              18,
-                                                                          fontStyle:
-                                                                              FontStyle.normal,
-                                                                        ),
-                                                                      ),
-                                                                      onPressed:
-                                                                          () {
-                                                                        String
-                                                                            dateresult =
-                                                                            dueCancelDate(scheduledata!.schedule);
-
-                                                                        rescheduleclass(
-                                                                            context,
-                                                                            filteredScheduleList[index]);
-                                                                      },
-                                                                    )
-                                                                  :
-                                                                  // TextButton(
-                                                                  //     child:
-                                                                  //         Text(
-                                                                  //       "Set Schedule",
-                                                                  //       style:
-                                                                  //           TextStyle(
-                                                                  //         color: Colors
-                                                                  //             .green
-                                                                  //             .shade400,
-                                                                  //         fontSize:
-                                                                  //             18,
-                                                                  //         fontStyle:
-                                                                  //             FontStyle.normal,
-                                                                  //       ),
-                                                                  //     ),
-                                                                  //     onPressed:
-                                                                  //         () {
-                                                                  //       TutorInformation data = widget
-                                                                  //           .enrolledClass.tutorinfo
-                                                                  //           .first;
-                                                                  //       showDialog(
-                                                                  //           barrierDismissible:
-                                                                  //               false,
-                                                                  //           context:
-                                                                  //               context,
-                                                                  //           builder:
-                                                                  //               (BuildContext context) {
-                                                                  //             var height = MediaQuery.of(context).size.height;
-                                                                  //             var width = MediaQuery.of(context).size.width;
-                                                                  //             return AlertDialog(
-                                                                  //               shape: RoundedRectangleBorder(
-                                                                  //                 borderRadius: BorderRadius.circular(15.0),
-                                                                  //               ),
-                                                                  //               contentPadding: EdgeInsets.zero,
-                                                                  //               content: ClipRRect(
-                                                                  //                 borderRadius: BorderRadius.circular(15.0),
-                                                                  //                 child: Container(
-                                                                  //                   color: Colors.white,
-                                                                  //                   child: Stack(
-                                                                  //                     children: <Widget>[
-                                                                  //                       SizedBox(
-                                                                  //                         height: height - 100,
-                                                                  //                         width: width - 300,
-                                                                  //                         child: SetScheduleData(
-                                                                  //                           data: widget.enrolledClass,
-                                                                  //                           session: index.toString(),
-                                                                  //                           uID: widget.uID,
-                                                                  //                         ),
-                                                                  //                       ),
-                                                                  //                       Positioned(
-                                                                  //                         top: 10.0,
-                                                                  //                         right: 10.0,
-                                                                  //                         child: GestureDetector(
-                                                                  //                           onTap: () {
-                                                                  //                             Navigator.of(context).pop(false); // Close the dialog
-                                                                  //                           },
-                                                                  //                           child: const Icon(
-                                                                  //                             Icons.close,
-                                                                  //                             color: Colors.red,
-                                                                  //                             size: 20,
-                                                                  //                           ),
-                                                                  //                         ),
-                                                                  //                       ),
-                                                                  //                     ],
-                                                                  //                   ),
-                                                                  //                 ),
-                                                                  //               ),
-                                                                  //             );
-                                                                  //           }).then((selectedDate) {});
-                                                                  //     },
-                                                                  //   )
-                                                                  Container(),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  }),
-                                            );
-                                          }),
-                                          // const SizedBox(
-                                          //   height: 10,
-                                          // ),
-                                          // Container(
-                                          //   height: 40,
-                                          //   padding: const EdgeInsets.fromLTRB(
-                                          //       10, 0, 10, 0),
-                                          //   decoration: const BoxDecoration(
-                                          //       color: kColorPrimary),
-                                          //   child: const Align(
-                                          //     alignment: Alignment.centerLeft,
-                                          //     child: Text(
-                                          //       'Class Grade',
-                                          //       style: TextStyle(
-                                          //           fontSize: 18,
-                                          //           fontWeight: FontWeight.bold,
-                                          //           color: Colors.white),
-                                          //     ),
-                                          //   ),
-                                          // ),
-                                          // const SizedBox(
-                                          //   height: 10,
-                                          // ),
-                                          // const Align(
-                                          //   alignment: Alignment.centerLeft,
-                                          //   child: SizedBox(
-                                          //     height: 50,
-                                          //     child: TextField(
-                                          //       textAlignVertical:
-                                          //           TextAlignVertical.top,
-                                          //       maxLines: null,
-                                          //       expands: true,
-                                          //       decoration: InputDecoration(
-                                          //         border: OutlineInputBorder(),
-                                          //         hintText: 'eg. 100',
-                                          //       ),
-                                          //     ),
-                                          //   ),
-                                          // ),
-                                          // const SizedBox(
-                                          //   height: 10,
-                                          // ),
-                                          // Container(
-                                          //   height: 40,
-                                          //   padding: const EdgeInsets.fromLTRB(
-                                          //       10, 0, 10, 0),
-                                          //   decoration: const BoxDecoration(
-                                          //       color: kColorPrimary),
-                                          //   child: const Align(
-                                          //     alignment: Alignment.centerLeft,
-                                          //     child: Text(
-                                          //       'Write down your comment',
-                                          //       style: TextStyle(
-                                          //           fontSize: 18,
-                                          //           fontWeight: FontWeight.bold,
-                                          //           color: Colors.white),
-                                          //     ),
-                                          //   ),
-                                          // ),
-                                          // const SizedBox(
-                                          //   height: 10,
-                                          // ),
-                                          // const SizedBox(
-                                          //   height: 200,
-                                          //   child: TextField(
-                                          //     textAlignVertical:
-                                          //         TextAlignVertical.top,
-                                          //     maxLines: null,
-                                          //     expands: true,
-                                          //     decoration: InputDecoration(
-                                          //       border: OutlineInputBorder(),
-                                          //       hintText:
-                                          //           'Enter your comment....',
-                                          //     ),
-                                          //   ),
-                                          // ),
-                                          // const SizedBox(
-                                          //   height: 10,
-                                          // ),
-                                          // Align(
-                                          //   alignment: Alignment.centerRight,
-                                          //   child: SizedBox(
-                                          //     width: 130,
-                                          //     height: 40,
-                                          //     child: ElevatedButton(
-                                          //       style: ElevatedButton.styleFrom(
-                                          //         backgroundColor:
-                                          //             kColorPrimary,
-                                          //         shape:
-                                          //             const RoundedRectangleBorder(
-                                          //                 borderRadius:
-                                          //                     BorderRadius.all(
-                                          //                         Radius
-                                          //                             .circular(
-                                          //                                 20))),
-                                          //       ),
-                                          //       onPressed: () {},
-                                          //       child: const Text('SAVE'),
-                                          //     ),
-                                          //   ),
-                                          // ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                        ],
-                                      )
-                                    : Column(
-                                        children: [
-                                          Container(
-                                            width: 600,
-                                            child: ListView.builder(
-                                              shrinkWrap: true,
-                                              itemCount: int.tryParse(widget
-                                                  .enrolledClass.totalClasses),
-                                              itemBuilder: (context, index) {
-                                                final selectedmaterials =
-                                                    materials.length > index
-                                                        ? materials[index]
-                                                        : null;
-
-                                                return Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          bottom: 10.0),
-                                                  child: Card(
-                                                    child: ExpansionTile(
-                                                      title: Text(
-                                                        (() {
-                                                          if (materials
-                                                              .isNotEmpty) {
-                                                            if (materials
-                                                                    .length >
-                                                                index) {
-                                                              if (selectedmaterials!
-                                                                      .session ==
-                                                                  '1') {
-                                                                return "${(selectedmaterials.session)}st session materials.";
-                                                              } else if (selectedmaterials
-                                                                      .session ==
-                                                                  '2') {
-                                                                return "${(selectedmaterials.session)}nd session materials";
-                                                              } else if (selectedmaterials
-                                                                      .session ==
-                                                                  '3') {
-                                                                return "${(selectedmaterials.session)}rd session materials";
-                                                              } else if (int.tryParse(
-                                                                      selectedmaterials
-                                                                          .session)! >
-                                                                  3) {
-                                                                return "${(selectedmaterials.session)}th session materials";
-                                                              } else {
-                                                                return "${(index + 1)}th session materials";
-                                                              }
-                                                            } else {
-                                                              if (index == 0) {
-                                                                return "${(index + 1)}st session materials";
-                                                              } else if (index ==
-                                                                  1) {
-                                                                return "${(index + 1)}nd session materials";
-                                                              } else if (index ==
-                                                                  2) {
-                                                                return "${(index + 1)}rd session materials";
-                                                              } else {
-                                                                return "${(index + 1)}th session materials";
-                                                              }
-                                                            }
-                                                          } else {
-                                                            if (index == 0) {
-                                                              return "${(index + 1)}st session materials.";
-                                                            } else if (index ==
-                                                                1) {
-                                                              return "${(index + 1)}nd session materials";
-                                                            } else if (index ==
-                                                                2) {
-                                                              return "${(index + 1)}rd session materials";
-                                                            } else {
-                                                              return "${(index + 1)}th session materials";
-                                                            }
-                                                          }
-                                                        })(),
-                                                      ),
-                                                      children: <Widget>[
-                                                        widget.enrolledClass
-                                                                    .status ==
-                                                                'Cancelled'
-                                                            ? const Text(
-                                                                'Cancelled Class',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        20,
-                                                                    color:
-                                                                        kCalendarColorB),
-                                                              )
-                                                            : Column(
-                                                                children: [
-                                                                  Padding(
-                                                                    padding: const EdgeInsets
-                                                                            .all(
-                                                                        16.0),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .start,
-                                                                      children: [
-                                                                        const Text(
-                                                                            'Files:'),
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              10,
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width:
-                                                                              160,
-                                                                          height:
-                                                                              40,
-                                                                          child:
-                                                                              ElevatedButton.icon(
-                                                                            style:
-                                                                                ElevatedButton.styleFrom(
-                                                                              backgroundColor: Colors.white,
-                                                                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
-                                                                            ),
-                                                                            onPressed:
-                                                                                () {
-                                                                              selectImage(widget.enrolledClass.classid, index.toString());
-                                                                            },
-                                                                            icon:
-                                                                                const Icon(
-                                                                              Icons.attach_file_outlined,
-                                                                              color: kColorPrimary,
-                                                                            ),
-                                                                            label:
-                                                                                const Text(
-                                                                              'Add Files',
-                                                                              style: TextStyle(color: kColorPrimary),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              5,
-                                                                        ),
-                                                                        // Visibility(
-                                                                        //   visible: progressupload == 0 || progressupload == 100
-                                                                        //       ? false
-                                                                        //       : true,
-                                                                        //   child:
-                                                                        //       SizedBox(
-                                                                        //     width: 50,
-                                                                        //     height: 5,
-                                                                        //     child: LinearProgressIndicator(
-                                                                        //       key: progressKey,
-                                                                        //       value: double.parse(progressupload.toString()),
-                                                                        //     ),
-                                                                        //   ),
-                                                                        // )
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                  // Padding(
-                                                                  //   padding:
-                                                                  //       const EdgeInsets
-                                                                  //               .fromLTRB(
-                                                                  //           50,
-                                                                  //           10,
-                                                                  //           50,
-                                                                  //           10),
-                                                                  //   child: TextFormField(
-                                                                  //     decoration:
-                                                                  //         const InputDecoration(
-                                                                  //       labelText:
-                                                                  //           'Add notes here',
-                                                                  //       border:
-                                                                  //           OutlineInputBorder(
-                                                                  //         borderSide:
-                                                                  //             BorderSide(),
-                                                                  //         gapPadding: 0,
-                                                                  //       ),
-                                                                  //     ),
-                                                                  //   ),
-                                                                  // ),
-                                                                  // Align(
-                                                                  //   alignment: Alignment
-                                                                  //       .topRight,
-                                                                  //   child: Padding(
-                                                                  //     padding:
-                                                                  //         const EdgeInsets
-                                                                  //                 .fromLTRB(
-                                                                  //             50,
-                                                                  //             0,
-                                                                  //             50,
-                                                                  //             10),
-                                                                  //     child: SizedBox(
-                                                                  //       width: 100,
-                                                                  //       height: 40,
-                                                                  //       child:
-                                                                  //           ElevatedButton(
-                                                                  //         style: ElevatedButton
-                                                                  //             .styleFrom(
-                                                                  //           minimumSize:
-                                                                  //               Size.zero,
-                                                                  //           padding:
-                                                                  //               EdgeInsets
-                                                                  //                   .zero,
-                                                                  //           backgroundColor:
-                                                                  //               kColorPrimary,
-                                                                  //           shape: const RoundedRectangleBorder(
-                                                                  //               borderRadius:
-                                                                  //                   BorderRadius.all(
-                                                                  //                       Radius.circular(15))),
-                                                                  //         ),
-                                                                  //         onPressed:
-                                                                  //             () {},
-                                                                  //         // icon: const Icon(Icons.attach_file_outlined, color: kColorPrimary,),
-                                                                  //         child:
-                                                                  //             const Text(
-                                                                  //           'Save',
-                                                                  //           style: TextStyle(
-                                                                  //               color: Colors
-                                                                  //                   .white),
-                                                                  //         ),
-                                                                  //       ),
-                                                                  //     ),
-                                                                  //   ),
-                                                                  // ),
-                                                                  Consumer<
-                                                                          MaterialNotifier>(
-                                                                      builder: (context,
-                                                                          materialNotifier,
-                                                                          _) {
-                                                                    if (materialNotifier
-                                                                        .materials
-                                                                        .isEmpty) {
-                                                                      return Container(
-                                                                          width:
-                                                                              600,
-                                                                          child:
-                                                                              Center(
-                                                                            child:
-                                                                                Text(
-                                                                              '(No materials added!)',
-                                                                              style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
-                                                                            ),
-                                                                          )); // Show loading indicator
-                                                                    }
-                                                                    List<
-                                                                        Map<String,
-                                                                            dynamic>> materialsdata = materialNotifier
-                                                                        .materials
-                                                                        .where((element) =>
-                                                                            element['classno'] ==
-                                                                            index.toString())
-                                                                        .toList();
-                                                                    if (materialsdata
-                                                                        .isEmpty) {
-                                                                      return Container(
-                                                                          width:
-                                                                              600,
-                                                                          child:
-                                                                              Center(
-                                                                            child:
-                                                                                Text(
-                                                                              '(No materials added!)',
-                                                                              style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
-                                                                            ),
-                                                                          )); // Show loading indicator
-                                                                    }
-                                                                    return Container(
-                                                                        width:
-                                                                            600,
-                                                                        height:
-                                                                            120,
-                                                                        padding: const EdgeInsets.fromLTRB(
-                                                                            10,
-                                                                            0,
-                                                                            10,
-                                                                            0),
-                                                                        child:
-                                                                            Row(
-                                                                          children: [
-                                                                            IconButton(
-                                                                              iconSize: 12,
-                                                                              padding: EdgeInsets.zero,
-                                                                              splashRadius: 1,
-                                                                              icon: const Icon(
-                                                                                Icons.arrow_back_ios, // Left arrow icon
-                                                                                color: Colors.blue,
-                                                                              ),
-                                                                              onPressed: () {
-                                                                                // Scroll to the left
-                                                                                updatescrollController1.animateTo(
-                                                                                  updatescrollController1.offset - 100.0, // Adjust the value as needed
-                                                                                  duration: const Duration(milliseconds: 500), // Adjust the duration as needed
-                                                                                  curve: Curves.ease,
-                                                                                );
-                                                                              },
-                                                                            ),
-                                                                            Expanded(
-                                                                              child: ListView.builder(
-                                                                                shrinkWrap: true,
-                                                                                controller: updatescrollController1, // Assign the ScrollController to the ListView
-                                                                                scrollDirection: Axis.horizontal,
-                                                                                itemCount: materialsdata.length,
-                                                                                itemBuilder: (context, index) {
-                                                                                  if (materialsdata[index]['extension'] == 'Image') {
-                                                                                    return FutureBuilder(
-                                                                                        future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
-                                                                                        builder: (context, snapshot) {
-                                                                                          if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                            return Container(
-                                                                                                height: 60,
-                                                                                                width: 60,
-                                                                                                child: const Center(
-                                                                                                    child: CircularProgressIndicator(
-                                                                                                  strokeWidth: 2,
-                                                                                                  color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                                ))); // Display a loading indicator while waiting for the file to download
-                                                                                          } else if (snapshot.hasError) {
-                                                                                            return Text('Error: ${snapshot.error}');
-                                                                                          }
-
-                                                                                          return Padding(
-                                                                                            padding: const EdgeInsets.only(left: 10.0, right: 10),
-                                                                                            child: Row(
-                                                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                              children: [
-                                                                                                Column(
-                                                                                                  children: [
-                                                                                                    InkWell(
-                                                                                                      onTap: () {
-                                                                                                        showDialog(
-                                                                                                            barrierDismissible: false,
-                                                                                                            context: context,
-                                                                                                            builder: (BuildContext context) {
-                                                                                                              var height = MediaQuery.of(context).size.height;
-                                                                                                              return AlertDialog(
-                                                                                                                shape: RoundedRectangleBorder(
-                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
-                                                                                                                ),
-                                                                                                                contentPadding: EdgeInsets.zero,
-                                                                                                                content: ClipRRect(
-                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Same radius as above
-                                                                                                                  child: Container(
-                                                                                                                    color: Colors.white, // Set the background color of the circular content
-
-                                                                                                                    child: Stack(
-                                                                                                                      children: <Widget>[
-                                                                                                                        SizedBox(
-                                                                                                                          height: height,
-                                                                                                                          width: 900,
-                                                                                                                          child: ViewFile(imageURL: snapshot.data.toString()),
-                                                                                                                        ),
-                                                                                                                        Positioned(
-                                                                                                                          top: 10.0,
-                                                                                                                          right: 10.0,
-                                                                                                                          child: GestureDetector(
-                                                                                                                            onTap: () {
-                                                                                                                              Navigator.of(context).pop(false); // Close the dialog
-                                                                                                                            },
-                                                                                                                            child: const Icon(
-                                                                                                                              Icons.close,
-                                                                                                                              color: Colors.red,
-                                                                                                                              size: 20,
-                                                                                                                            ),
-                                                                                                                          ),
-                                                                                                                        ),
-                                                                                                                      ],
-                                                                                                                    ),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              );
-                                                                                                            });
-                                                                                                      },
-                                                                                                      child: Stack(
-                                                                                                        children: <Widget>[
-                                                                                                          Container(
-                                                                                                            height: 60,
-                                                                                                            width: 60,
-                                                                                                            decoration: BoxDecoration(
-                                                                                                              borderRadius: BorderRadius.circular(10),
-                                                                                                              color: Colors.grey.shade200,
-                                                                                                            ),
-                                                                                                            child: ClipRRect(
-                                                                                                              borderRadius: BorderRadius.circular(10.0),
-                                                                                                              child: Image.network(
-                                                                                                                snapshot.data.toString(),
-                                                                                                                fit: BoxFit.cover,
-                                                                                                              ),
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                          Positioned(
-                                                                                                            top: 0,
-                                                                                                            right: 0,
-                                                                                                            child: GestureDetector(
-                                                                                                              onTap: () async {
-                                                                                                                bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
-                                                                                                                if (result) {
-                                                                                                                  handleUpload('Deleted Successfully!', true);
-                                                                                                                } else {
-                                                                                                                  handleUpload('Deleted Successfully!', false);
-                                                                                                                }
-                                                                                                              },
-                                                                                                              child: Container(
-                                                                                                                padding: const EdgeInsets.all(2),
-                                                                                                                decoration: const BoxDecoration(
-                                                                                                                  shape: BoxShape.circle,
-                                                                                                                  color: Colors.red,
-                                                                                                                ),
-                                                                                                                child: const Icon(
-                                                                                                                  Icons.remove,
-                                                                                                                  color: Colors.white,
-                                                                                                                  size: 15,
-                                                                                                                ),
-                                                                                                              ),
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                        ],
-                                                                                                      ),
-                                                                                                    ),
-                                                                                                    Center(
-                                                                                                      child: Tooltip(
-                                                                                                        message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                        child: SizedBox(
-                                                                                                          height: 60,
-                                                                                                          width: 60,
-                                                                                                          child: TextButton(
-                                                                                                            onPressed: () {
-                                                                                                              fetchFileData(snapshot.data.toString());
-                                                                                                            },
-                                                                                                            child: Text(
-                                                                                                              getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                              style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                      ),
-                                                                                                    )
-                                                                                                  ],
-                                                                                                ),
-                                                                                              ],
-                                                                                            ),
-                                                                                          );
-                                                                                        });
-                                                                                  } else if (materialsdata[index]['extension'] == 'pdf') {
-                                                                                    return FutureBuilder(
-                                                                                        future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
-                                                                                        builder: (context, snapshot) {
-                                                                                          if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                            return Container(
-                                                                                                height: 60,
-                                                                                                width: 60,
-                                                                                                child: const Center(
-                                                                                                    child: CircularProgressIndicator(
-                                                                                                  strokeWidth: 2,
-                                                                                                  color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                                ))); // Display a loading indicator while waiting for the file to download
-                                                                                          } else if (snapshot.hasError) {
-                                                                                            return Text('Error: ${snapshot.error}');
-                                                                                          }
-                                                                                          return Padding(
-                                                                                            padding: const EdgeInsets.only(left: 10.0, right: 10),
-                                                                                            child: Row(
-                                                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                              children: [
-                                                                                                Column(
-                                                                                                  children: [
-                                                                                                    InkWell(
-                                                                                                      onTap: () {
-                                                                                                        showDialog(
-                                                                                                            barrierDismissible: false,
-                                                                                                            context: context,
-                                                                                                            builder: (BuildContext context) {
-                                                                                                              var height = MediaQuery.of(context).size.height;
-                                                                                                              return AlertDialog(
-                                                                                                                shape: RoundedRectangleBorder(
-                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
-                                                                                                                ),
-                                                                                                                contentPadding: EdgeInsets.zero,
-                                                                                                                content: ClipRRect(
-                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Same radius as above
-                                                                                                                  child: Container(
-                                                                                                                    color: Colors.white, // Set the background color of the circular content
-
-                                                                                                                    child: Stack(
-                                                                                                                      children: <Widget>[
-                                                                                                                        SizedBox(
-                                                                                                                          height: height,
-                                                                                                                          width: 900,
-                                                                                                                          child: TermPage(pdfurl: snapshot.data.toString()),
-                                                                                                                        ),
-                                                                                                                        Positioned(
-                                                                                                                          top: 10.0,
-                                                                                                                          right: 10.0,
-                                                                                                                          child: GestureDetector(
-                                                                                                                            onTap: () {
-                                                                                                                              Navigator.of(context).pop(false); // Close the dialog
-                                                                                                                            },
-                                                                                                                            child: const Icon(
-                                                                                                                              Icons.close,
-                                                                                                                              color: Colors.red,
-                                                                                                                              size: 20,
-                                                                                                                            ),
-                                                                                                                          ),
-                                                                                                                        ),
-                                                                                                                      ],
-                                                                                                                    ),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              );
-                                                                                                            });
-                                                                                                      },
-                                                                                                      child: Stack(children: <Widget>[
-                                                                                                        Container(
-                                                                                                          height: 60,
-                                                                                                          width: 60,
-                                                                                                          decoration: BoxDecoration(
-                                                                                                            borderRadius: BorderRadius.circular(10),
-                                                                                                            color: Colors.grey.shade200, // You can adjust the fit as needed.
-                                                                                                          ),
-                                                                                                          child: ClipRRect(
-                                                                                                            borderRadius: BorderRadius.circular(10.0),
-                                                                                                            child: const Icon(
-                                                                                                              Icons.picture_as_pdf,
-                                                                                                              size: 48,
-                                                                                                              color: Colors.red,
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                        Positioned(
-                                                                                                          top: 0,
-                                                                                                          right: 0,
-                                                                                                          child: GestureDetector(
-                                                                                                            onTap: () async {
-                                                                                                              bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
-                                                                                                              if (result) {
-                                                                                                                handleUpload('Deleted Successfully!', true);
-                                                                                                              } else {
-                                                                                                                handleUpload('Deleted Successfully!', false);
-                                                                                                              }
-                                                                                                            },
-                                                                                                            child: Container(
-                                                                                                              padding: const EdgeInsets.all(2),
-                                                                                                              decoration: const BoxDecoration(
-                                                                                                                shape: BoxShape.circle,
-                                                                                                                color: Colors.red,
-                                                                                                              ),
-                                                                                                              child: const Icon(
-                                                                                                                Icons.remove,
-                                                                                                                color: Colors.white,
-                                                                                                                size: 15,
-                                                                                                              ),
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                      ]),
-                                                                                                    ),
-                                                                                                    Center(
-                                                                                                      child: Tooltip(
-                                                                                                        message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                        child: SizedBox(
-                                                                                                          height: 60,
-                                                                                                          width: 60,
-                                                                                                          child: TextButton(
-                                                                                                            onPressed: () {
-                                                                                                              fetchFileData(snapshot.data.toString());
-                                                                                                            },
-                                                                                                            child: Text(
-                                                                                                              getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                              style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                      ),
-                                                                                                    )
-                                                                                                  ],
-                                                                                                ),
-                                                                                              ],
-                                                                                            ),
-                                                                                          );
-                                                                                        });
-                                                                                  } else {
-                                                                                    return FutureBuilder(
-                                                                                        future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
-                                                                                        builder: (context, snapshot) {
-                                                                                          if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                            return Container(
-                                                                                                height: 60,
-                                                                                                width: 60,
-                                                                                                child: const Center(
-                                                                                                    child: CircularProgressIndicator(
-                                                                                                  strokeWidth: 2,
-                                                                                                  color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                                ))); // Display a loading indicator while waiting for the file to download
-                                                                                          } else if (snapshot.hasError) {
-                                                                                            return Text('Error: ${snapshot.error}');
-                                                                                          }
-                                                                                          return Padding(
-                                                                                            padding: const EdgeInsets.only(left: 10.0, right: 10),
-                                                                                            child: Row(
-                                                                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                              children: [
-                                                                                                Column(
-                                                                                                  children: [
-                                                                                                    InkWell(
-                                                                                                      onTap: () {
-                                                                                                        showDialog(
-                                                                                                            barrierDismissible: false,
-                                                                                                            context: context,
-                                                                                                            builder: (BuildContext context) {
-                                                                                                              var height = MediaQuery.of(context).size.height;
-                                                                                                              return AlertDialog(
-                                                                                                                shape: RoundedRectangleBorder(
-                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
-                                                                                                                ),
-                                                                                                                contentPadding: EdgeInsets.zero,
-                                                                                                                content: ClipRRect(
-                                                                                                                  borderRadius: BorderRadius.circular(15.0), // Same radius as above
-                                                                                                                  child: Container(
-                                                                                                                    color: Colors.white, // Set the background color of the circular content
-
-                                                                                                                    child: Stack(
-                                                                                                                      children: <Widget>[
-                                                                                                                        SizedBox(
-                                                                                                                          height: height,
-                                                                                                                          width: 900,
-                                                                                                                          child: ViewFile(imageURL: snapshot.data.toString()),
-                                                                                                                        ),
-                                                                                                                        Positioned(
-                                                                                                                          top: 10.0,
-                                                                                                                          right: 10.0,
-                                                                                                                          child: GestureDetector(
-                                                                                                                            onTap: () {
-                                                                                                                              Navigator.of(context).pop(false); // Close the dialog
-                                                                                                                            },
-                                                                                                                            child: const Icon(
-                                                                                                                              Icons.close,
-                                                                                                                              color: Colors.red,
-                                                                                                                              size: 20,
-                                                                                                                            ),
-                                                                                                                          ),
-                                                                                                                        ),
-                                                                                                                      ],
-                                                                                                                    ),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              );
-                                                                                                            });
-                                                                                                      },
-                                                                                                      child: Stack(
-                                                                                                        children: <Widget>[
-                                                                                                          Container(
-                                                                                                            height: 60,
-                                                                                                            width: 60,
-                                                                                                            decoration: BoxDecoration(
-                                                                                                              borderRadius: BorderRadius.circular(10),
-                                                                                                              color: Colors.grey.shade200, // You can adjust the fit as needed.
-                                                                                                            ),
-                                                                                                            child: ClipRRect(
-                                                                                                              borderRadius: BorderRadius.circular(10.0),
-                                                                                                              child: const Icon(
-                                                                                                                FontAwesomeIcons.fileWord,
-                                                                                                                size: 48,
-                                                                                                                color: Colors.blue,
-                                                                                                              ),
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                          Positioned(
-                                                                                                            top: 0,
-                                                                                                            right: 0,
-                                                                                                            child: GestureDetector(
-                                                                                                              onTap: () async {
-                                                                                                                bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
-                                                                                                                if (result) {
-                                                                                                                  handleUpload('Deleted Successfully!', true);
-                                                                                                                } else {
-                                                                                                                  handleUpload('Deleted Successfully!', false);
-                                                                                                                }
-                                                                                                              },
-                                                                                                              child: Container(
-                                                                                                                padding: const EdgeInsets.all(2),
-                                                                                                                decoration: const BoxDecoration(
-                                                                                                                  shape: BoxShape.circle,
-                                                                                                                  color: Colors.red,
-                                                                                                                ),
-                                                                                                                child: const Icon(
-                                                                                                                  Icons.remove,
-                                                                                                                  color: Colors.white,
-                                                                                                                  size: 15,
-                                                                                                                ),
-                                                                                                              ),
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                        ],
-                                                                                                      ),
-                                                                                                    ),
-                                                                                                    Center(
-                                                                                                      child: Tooltip(
-                                                                                                        message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                        child: SizedBox(
-                                                                                                          height: 60,
-                                                                                                          width: 60,
-                                                                                                          child: TextButton(
-                                                                                                            onPressed: () {
-                                                                                                              setState(() {
-                                                                                                                fetchFileData(snapshot.data.toString());
-                                                                                                              });
-                                                                                                            },
-                                                                                                            child: Text(
-                                                                                                              getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                              style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                      ),
-                                                                                                    )
-                                                                                                  ],
-                                                                                                ),
-                                                                                              ],
-                                                                                            ),
-                                                                                          );
-                                                                                        });
-                                                                                  }
-                                                                                },
-                                                                              ),
-                                                                            ),
-                                                                            IconButton(
-                                                                              iconSize: 12,
-                                                                              padding: EdgeInsets.zero,
-                                                                              splashRadius: 1,
-                                                                              icon: const Icon(
-                                                                                Icons.arrow_forward_ios, // Right arrow icon
-                                                                                color: Colors.blue,
-                                                                              ),
-                                                                              onPressed: () {
-                                                                                // Scroll to the right
-                                                                                updatescrollController1.animateTo(
-                                                                                  updatescrollController1.offset + 100.0, // Adjust the value as needed
-                                                                                  duration: const Duration(milliseconds: 500), // Adjust the duration as needed
-                                                                                  curve: Curves.ease,
-                                                                                );
-                                                                              },
-                                                                            ),
-                                                                          ],
-                                                                        ));
-                                                                  }),
-
-                                                                  Padding(
-                                                                    padding: const EdgeInsets
-                                                                            .all(
-                                                                        16.0),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .start,
-                                                                      children: [
-                                                                        const Text(
-                                                                            'Class Video Meeting:'),
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              10,
-                                                                        ),
-                                                                        Text(
-                                                                          '(Click the link to join the class!)',
-                                                                          style: TextStyle(
-                                                                              fontSize: 12,
-                                                                              color: Colors.blue.shade200,
-                                                                              fontStyle: FontStyle.italic),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding:
-                                                                        const EdgeInsets.fromLTRB(
-                                                                            50,
-                                                                            10,
-                                                                            50,
-                                                                            10),
-                                                                    child: Consumer<
-                                                                        List<
-                                                                            Schedule>>(builder:
-                                                                        (context,
-                                                                            scheduleListdata,
-                                                                            _) {
-                                                                      dynamic
-                                                                          data =
-                                                                          scheduleListdata;
-                                                                      ClassesData?
-                                                                          newclassdata =
-                                                                          widget
-                                                                              .enrolledClass;
-                                                                      List<Schedule> filtereddata = data
-                                                                          .where((element) =>
-                                                                              element.scheduleID ==
-                                                                              widget.enrolledClass.classid)
-                                                                          .toList();
-                                                                      filtereddata.sort((a, b) => a
-                                                                          .schedule
-                                                                          .compareTo(
-                                                                              b.schedule));
-                                                                      if (filtereddata
-                                                                              .length >
-                                                                          index) {
-                                                                        return MouseRegion(
-                                                                          cursor:
-                                                                              SystemMouseCursors.click,
-                                                                          child:
-                                                                              GestureDetector(
-                                                                            onTap:
-                                                                                () {
-                                                                              // const VideoCall videoCall = VideoCall(chatID: '123', uID: '456');
-
-                                                                              // Replace 'your_flutter_app_port' with the actual port your Flutter web app is running on
-                                                                              String url = 'http://localhost:58586/tutorsList';
-
-                                                                              // Open the URL in a new tab
-                                                                              html.window.open('/videoCall', "");
-                                                                              // html.window.open('/tutorslist', "");
-                                                                              //  const VideoCall(chatID: '', uID: '',);
-                                                                            },
-                                                                            child:
-                                                                                Text(
-                                                                              'work4ututor/${filtereddata[index].meetinglink}',
-                                                                              style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic, decoration: TextDecoration.underline),
-                                                                            ),
-                                                                          ),
-                                                                        );
-                                                                      }
-                                                                      return Text(
-                                                                        '(Link will be attached when student set class schedule!)',
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                15,
-                                                                            color:
-                                                                                Colors.blue.shade200,
-                                                                            fontStyle: FontStyle.italic),
-                                                                      );
-                                                                    }),
-                                                                    //add link here
-                                                                  ),
-                                                                  const SizedBox(
-                                                                    height: 10,
-                                                                  ),
-                                                                ],
-                                                              )
-                                                      ],
-                                                    ),
-                                                  ),
+                            child: Align(
+                              alignment: Alignment.topRight,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  ClipRect(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 10.0, right: 10),
+                                      child: Align(
+                                        alignment: Alignment.topRight,
+                                        child: InkWell(
+                                          onTap: () {
+                                            showDialog<DateTime>(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return ViewFile(
+                                                  imageURL: downloadURL1,
                                                 );
                                               },
-                                            ),
+                                            ).then((selectedDate) {
+                                              if (selectedDate != null) {
+                                                // Do something with the selected date
+                                              }
+                                            });
+                                          },
+                                          child: Container(
+                                            height: ResponsiveBuilder.isMobile(
+                                                    context)
+                                                ? 150
+                                                : 250,
+                                            width: ResponsiveBuilder.isMobile(
+                                                    context)
+                                                ? 150
+                                                : 250,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.white,
+                                                image: DecorationImage(
+                                                    image: NetworkImage(
+                                                      widget
+                                                          .enrolledClass
+                                                          .studentinfo
+                                                          .first
+                                                          .profilelink
+                                                          .toString(),
+                                                    ),
+                                                    fit: BoxFit.fill)),
                                           ),
-                                        ],
-                                      )
-                              ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        width: 40,
-                        // child: VerticalDivider(),
-                      ),
-                      Flexible(
-                          flex: 13,
-                          child: Column(
-                            children: [
-                              Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      10.0), //<-- SEE HERE
-                                ),
-                                elevation: 1,
-                                child: Container(
-                                  width: 380,
-                                  height: 300,
-                                  padding: const EdgeInsets.all(0.0),
-                                  decoration: BoxDecoration(
-                                      color: Colors.grey.shade200,
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(10))),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                    ],
+                  ),
+                  SizedBox(
+                    width: ResponsiveBuilder.isDesktop(context) ? 50 : 10,
+                    height: MediaQuery.of(context).size.height,
+                  ),
+                  Flexible(
+                    flex: 20,
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context)
+                          .copyWith(scrollbars: false),
+                      child: SingleChildScrollView(
+                        controller: ScrollController(),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 40.0),
+                          child: Align(
+                            alignment: Alignment.topLeft,
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    '${(widget.enrolledClass.studentinfo.first.studentFirstname)}${(widget.enrolledClass.studentinfo.first.studentMiddlename == 'N/A' ? '' : ' ${(widget.enrolledClass.studentinfo.first.studentMiddlename)}')} ${(widget.enrolledClass.studentinfo.first.studentLastname)}, 18',
+                                    style: TextStyle(
+                                        fontSize:
+                                            ResponsiveBuilder.isMobile(context)
+                                                ? 20
+                                                : 30,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        overflow: TextOverflow.ellipsis),
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Row(
                                     children: [
-                                      const Padding(
-                                        padding: EdgeInsets.all(10.0),
-                                        child: Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                              'Class Session',
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                              ),
-                                            )),
-                                      ),
-                                      Container(
-                                        width: 380,
-                                        alignment: Alignment.center,
-                                        padding: const EdgeInsets.fromLTRB(
-                                            30, 10, 30, 10),
-                                        decoration: BoxDecoration(
-                                            color: Colors.grey.shade200),
-                                        child: ListView.builder(
-                                          shrinkWrap: true,
-                                          itemCount: widget
-                                              .enrolledClass.schedule.length,
-                                          itemBuilder: (context, index) {
-                                            final classCount = widget
-                                                .enrolledClass.schedule[index];
-                                            return Container(
-                                              alignment: Alignment.center,
-                                              padding:
-                                                  const EdgeInsets.all(5.0),
-                                              child: Row(
-                                                children: [
-                                                  Text(
-                                                    (() {
-                                                      if (classCount.session ==
-                                                          '1') {
-                                                        return "${(classCount.session)}st Class Session";
-                                                      } else if (classCount
-                                                              .session ==
-                                                          '2') {
-                                                        return "${(classCount.session)}nd Class Session";
-                                                      } else if (classCount
-                                                              .session ==
-                                                          '3') {
-                                                        return "${(classCount.session)}rd Class Session";
-                                                      } else {
-                                                        return "${(classCount.session)}th Class Session";
-                                                      }
-                                                    })(),
-                                                  ),
-                                                  const Spacer(),
-                                                  SizedBox(
-                                                    width: 170,
-                                                    height: 40,
-                                                    child: ElevatedButton(
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        backgroundColor:
-                                                            Colors.white,
-                                                        shape: const RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            15))),
-                                                      ),
-                                                      onPressed: () {},
-                                                      child: const Text(
-                                                        'Complete Session',
-                                                        style: TextStyle(
-                                                            color:
-                                                                kColorPrimary),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Card(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                              10.0), //<-- SEE HERE
-                                        ),
-                                        elevation: 1,
-                                        child: Container(
-                                          width: 380,
-                                          height: 65,
-                                          alignment: Alignment.center,
-                                          // padding:
-                                          // const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                                          decoration: const BoxDecoration(
+                                      Flexible(
+                                        flex: 5,
+                                        child: Text(
+                                          (widget.enrolledClass.studentinfo
+                                              .first.country),
+                                          style: TextStyle(
+                                              fontSize:
+                                                  ResponsiveBuilder.isMobile(
+                                                          context)
+                                                      ? 15
+                                                      : 25,
                                               color: Colors.white,
-                                              borderRadius: BorderRadius.only(
-                                                  bottomLeft:
-                                                      Radius.circular(10),
-                                                  bottomRight:
-                                                      Radius.circular(10))),
-                                          child: Center(
-                                            child: Row(
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                      // SizedBox(
+                                      //   width: 20,
+                                      // ),
+                                      // Text(
+                                      //   'Contact #: +123456789',
+                                      //   style: TextStyle(
+                                      //       fontSize: 25,
+                                      //       color: Colors.white,
+                                      //       fontWeight: FontWeight.w500),
+                                      // ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Flexible(
+                                        flex: 5,
+                                        child: Text(
+                                          (widget.enrolledClass.subjectinfo
+                                              .first.subjectName),
+                                          style: TextStyle(
+                                              fontSize:
+                                                  ResponsiveBuilder.isMobile(
+                                                          context)
+                                                      ? 15
+                                                      : 25,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                              fontStyle: FontStyle.italic),
+                                        ),
+                                      ),
+                                      // SizedBox(
+                                      //   width: 20,
+                                      // ),
+                                      // Text(
+                                      //   'Email: email@yahoo.com',
+                                      //   style: TextStyle(
+                                      //       fontSize: 25,
+                                      //       color: Colors.white,
+                                      //       fontWeight: FontWeight.w500),
+                                      // ),
+                                    ],
+                                  ),
+                                ]),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              height: size.width >= 822 ? 450 : 790,
+              padding: ResponsiveBuilder.isMobile(context)
+                  ? const EdgeInsets.fromLTRB(25, 0, 25, 0)
+                  : const EdgeInsets.fromLTRB(50, 0, 50, 0),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: size.width >= 822
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            flex: 20,
+                            child: DefaultTabController(
+                              length: 2,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    height: 50,
+                                    child: TabBar(
+                                      indicator: BoxDecoration(
+                                        boxShadow: const [
+                                          BoxShadow(
+                                              color: Colors.black26,
+                                              offset: Offset(0, 4),
+                                              blurRadius: 5.0)
+                                        ],
+                                        gradient: const LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          stops: [0.0, 1.0],
+                                          colors: buttonFocuscolors,
+                                        ),
+                                        color: Colors.deepPurple.shade300,
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      indicatorColor: kColorPrimary,
+                                      tabs: const [
+                                        Tab(
+                                          icon: Icon(
+                                              Icons.insert_drive_file_outlined),
+                                          text: 'Class Info',
+                                          iconMargin:
+                                              EdgeInsets.only(bottom: 3),
+                                        ),
+                                        Tab(
+                                          icon: Icon(Icons.list_alt_outlined),
+                                          text: 'Materials',
+                                          iconMargin:
+                                              EdgeInsets.only(bottom: 3),
+                                        ),
+                                      ],
+                                      unselectedLabelColor: Colors.grey,
+                                      labelStyle: const TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                      labelColor: Colors.white,
+                                    ),
+                                  ),
+                                  Flexible(
+                                    flex: 20,
+                                    child: TabBarView(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 8.0,
+                                          ),
+                                          child: SingleChildScrollView(
+                                            controller: ScrollController(),
+                                            child: Column(
                                               mainAxisAlignment:
-                                                  MainAxisAlignment.center,
+                                                  MainAxisAlignment.start,
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: const [
-                                                Icon(EvaIcons.clockOutline),
-                                                SizedBox(
-                                                  width: 5,
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const SizedBox(
+                                                  height: 10,
                                                 ),
-                                                Text(
-                                                  '50 minutes per class session',
-                                                  textAlign: TextAlign.justify,
-                                                )
+                                                Text.rich(
+                                                  TextSpan(
+                                                    children: [
+                                                      const TextSpan(
+                                                        text:
+                                                            "You are enrolled in ",
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontStyle:
+                                                              FontStyle.normal,
+                                                          color: kColorGrey,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text:
+                                                            "${widget.enrolledClass.totalClasses} classes ",
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontStyle:
+                                                              FontStyle.normal,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: kColorGrey,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text:
+                                                            "of ${widget.enrolledClass.subjectinfo.first.subjectName}.",
+                                                        style: const TextStyle(
+                                                          fontSize: 16,
+                                                          fontStyle:
+                                                              FontStyle.normal,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: kColorGrey,
+                                                        ),
+                                                      ),
+                                                      const TextSpan(
+                                                        text:
+                                                            "\nEach class lasts ",
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontStyle:
+                                                              FontStyle.normal,
+                                                          color: kColorGrey,
+                                                        ),
+                                                      ),
+                                                      const TextSpan(
+                                                        text: "50 minutes",
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontStyle:
+                                                              FontStyle.normal,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: kColorGrey,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  textAlign: TextAlign.left,
+                                                ),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                const Text(
+                                                  "Schedule:",
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontStyle: FontStyle.normal,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    color: kColorGrey,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Consumer<List<Schedule>>(
+                                                    builder: (context,
+                                                        scheduleListdata, _) {
+                                                  dynamic data =
+                                                      scheduleListdata;
+                                                  ClassesData? newclassdata =
+                                                      widget.enrolledClass;
+                                                  return Container(
+                                                    width: 600,
+                                                    // height: 30 * 3,
+                                                    child: ListView.builder(
+                                                        physics:
+                                                            const NeverScrollableScrollPhysics(),
+                                                        shrinkWrap: true,
+                                                        itemCount: int.tryParse(
+                                                            newclassdata
+                                                                .totalClasses),
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          Schedule? temp;
+                                                          List<Schedule>
+                                                              filteredScheduleList =
+                                                              data
+                                                                  .where((element) =>
+                                                                      element
+                                                                          .scheduleID ==
+                                                                      widget
+                                                                          .enrolledClass
+                                                                          .classid)
+                                                                  .toList();
+                                                          filteredScheduleList
+                                                              .sort((a, b) => a
+                                                                  .schedule
+                                                                  .compareTo(b
+                                                                      .schedule));
+                                                          final scheduledata =
+                                                              filteredScheduleList
+                                                                          .length >
+                                                                      index
+                                                                  ? filteredScheduleList[
+                                                                      index]
+                                                                  : null;
+                                                          return Visibility(
+                                                            visible: true,
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(5.0),
+                                                              child: Row(
+                                                                children: [
+                                                                  filteredScheduleList
+                                                                          .isEmpty
+                                                                      ? Text(
+                                                                          (() {
+                                                                            if (filteredScheduleList.isEmpty &&
+                                                                                index == 0) {
+                                                                              return "${(index + 1)}st class (Unschedule)";
+                                                                            } else if (filteredScheduleList.isEmpty && index == 1) {
+                                                                              return "${(index + 1)}nd class (Unschedule)";
+                                                                            } else if (filteredScheduleList.isEmpty && index == 2) {
+                                                                              return "${(index + 1)}rd class (Unschedule)";
+                                                                            } else {
+                                                                              return "${(index + 1)}th class (Unschedule)";
+                                                                            }
+                                                                          })(),
+                                                                          style:
+                                                                              const TextStyle(
+                                                                            fontSize:
+                                                                                16,
+                                                                            fontStyle:
+                                                                                FontStyle.normal,
+                                                                            color:
+                                                                                kColorGrey,
+                                                                          ),
+                                                                          textAlign:
+                                                                              TextAlign.justify,
+                                                                        )
+                                                                      : Text(
+                                                                          (() {
+                                                                            if (filteredScheduleList.length >
+                                                                                index) {
+                                                                              if (index == 0) {
+                                                                                return "${(index + 1)}st class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                              } else if (index == 1) {
+                                                                                return "${(index + 1)}nd class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                              } else if (index == 2) {
+                                                                                return "${(index + 1)}rd class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                              } else {
+                                                                                return "${(index + 1)}th class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                              }
+                                                                            } else {
+                                                                              if (index == 0) {
+                                                                                return "${(index + 1)}st class (Unschedule)";
+                                                                              } else if (index == 1) {
+                                                                                return "${(index + 1)}nd class (Unschedule)";
+                                                                              } else if (index == 2) {
+                                                                                return "${(index + 1)}rd class (Unschedule)";
+                                                                              } else {
+                                                                                return "${(index + 1)}th class (Unschedule)";
+                                                                              }
+                                                                            }
+                                                                          })(),
+                                                                          style:
+                                                                              const TextStyle(
+                                                                            color:
+                                                                                kColorGrey,
+                                                                            fontSize:
+                                                                                16,
+                                                                            fontStyle:
+                                                                                FontStyle.normal,
+                                                                          ),
+                                                                          textAlign:
+                                                                              TextAlign.justify,
+                                                                        ),
+                                                                  const Spacer(),
+                                                                  newclassdata.status ==
+                                                                          'Cancelled'
+                                                                      ? const Center(
+                                                                          child:
+                                                                              Text(
+                                                                            'Cancelled Class',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              color: kCalendarColorB,
+                                                                              fontSize: 18,
+                                                                              fontStyle: FontStyle.normal,
+                                                                            ),
+                                                                          ),
+                                                                        )
+                                                                      : filteredScheduleList.length >
+                                                                              index
+                                                                          ? TextButton(
+                                                                              child: const Text(
+                                                                                "Reschedule",
+                                                                                style: TextStyle(
+                                                                                  color: kColorPrimary,
+                                                                                  fontSize: 16,
+                                                                                  fontStyle: FontStyle.normal,
+                                                                                ),
+                                                                              ),
+                                                                              onPressed: () {
+                                                                                String dateresult = dueCancelDate(scheduledata!.schedule);
+
+                                                                                rescheduleclass(context, filteredScheduleList[index]);
+                                                                              },
+                                                                            )
+                                                                          :
+                                                                          // TextButton(
+                                                                          //     child:
+                                                                          //         Text(
+                                                                          //       "Set Schedule",
+                                                                          //       style:
+                                                                          //           TextStyle(
+                                                                          //         color: Colors
+                                                                          //             .green
+                                                                          //             .shade400,
+                                                                          //         fontSize:
+                                                                          //             18,
+                                                                          //         fontStyle:
+                                                                          //             FontStyle.normal,
+                                                                          //       ),
+                                                                          //     ),
+                                                                          //     onPressed:
+                                                                          //         () {
+                                                                          //       TutorInformation data = widget
+                                                                          //           .enrolledClass.tutorinfo
+                                                                          //           .first;
+                                                                          //       showDialog(
+                                                                          //           barrierDismissible:
+                                                                          //               false,
+                                                                          //           context:
+                                                                          //               context,
+                                                                          //           builder:
+                                                                          //               (BuildContext context) {
+                                                                          //             var height = MediaQuery.of(context).size.height;
+                                                                          //             var width = MediaQuery.of(context).size.width;
+                                                                          //             return AlertDialog(
+                                                                          //               shape: RoundedRectangleBorder(
+                                                                          //                 borderRadius: BorderRadius.circular(15.0),
+                                                                          //               ),
+                                                                          //               contentPadding: EdgeInsets.zero,
+                                                                          //               content: ClipRRect(
+                                                                          //                 borderRadius: BorderRadius.circular(15.0),
+                                                                          //                 child: Container(
+                                                                          //                   color: Colors.white,
+                                                                          //                   child: Stack(
+                                                                          //                     children: <Widget>[
+                                                                          //                       SizedBox(
+                                                                          //                         height: height - 100,
+                                                                          //                         width: width - 300,
+                                                                          //                         child: SetScheduleData(
+                                                                          //                           data: widget.enrolledClass,
+                                                                          //                           session: index.toString(),
+                                                                          //                           uID: widget.uID,
+                                                                          //                         ),
+                                                                          //                       ),
+                                                                          //                       Positioned(
+                                                                          //                         top: 10.0,
+                                                                          //                         right: 10.0,
+                                                                          //                         child: GestureDetector(
+                                                                          //                           onTap: () {
+                                                                          //                             Navigator.of(context).pop(false); // Close the dialog
+                                                                          //                           },
+                                                                          //                           child: const Icon(
+                                                                          //                             Icons.close,
+                                                                          //                             color: Colors.red,
+                                                                          //                             size: 20,
+                                                                          //                           ),
+                                                                          //                         ),
+                                                                          //                       ),
+                                                                          //                     ],
+                                                                          //                   ),
+                                                                          //                 ),
+                                                                          //               ),
+                                                                          //             );
+                                                                          //           }).then((selectedDate) {});
+                                                                          //     },
+                                                                          //   )
+                                                                          Container(),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          );
+                                                        }),
+                                                  );
+                                                }),
+                                                // const SizedBox(
+                                                //   height: 10,
+                                                // ),
+                                                // Container(
+                                                //   height: 40,
+                                                //   padding: const EdgeInsets.fromLTRB(
+                                                //       10, 0, 10, 0),
+                                                //   decoration: const BoxDecoration(
+                                                //       color: kColorPrimary),
+                                                //   child: const Align(
+                                                //     alignment: Alignment.centerLeft,
+                                                //     child: Text(
+                                                //       'Class Grade',
+                                                //       style: TextStyle(
+                                                //           fontSize: 18,
+                                                //           fontWeight: FontWeight.bold,
+                                                //           color: Colors.white),
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                                // const SizedBox(
+                                                //   height: 10,
+                                                // ),
+                                                // const Align(
+                                                //   alignment: Alignment.centerLeft,
+                                                //   child: SizedBox(
+                                                //     height: 50,
+                                                //     child: TextField(
+                                                //       textAlignVertical:
+                                                //           TextAlignVertical.top,
+                                                //       maxLines: null,
+                                                //       expands: true,
+                                                //       decoration: InputDecoration(
+                                                //         border: OutlineInputBorder(),
+                                                //         hintText: 'eg. 100',
+                                                //       ),
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                                // const SizedBox(
+                                                //   height: 10,
+                                                // ),
+                                                // Container(
+                                                //   height: 40,
+                                                //   padding: const EdgeInsets.fromLTRB(
+                                                //       10, 0, 10, 0),
+                                                //   decoration: const BoxDecoration(
+                                                //       color: kColorPrimary),
+                                                //   child: const Align(
+                                                //     alignment: Alignment.centerLeft,
+                                                //     child: Text(
+                                                //       'Write down your comment',
+                                                //       style: TextStyle(
+                                                //           fontSize: 18,
+                                                //           fontWeight: FontWeight.bold,
+                                                //           color: Colors.white),
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                                // const SizedBox(
+                                                //   height: 10,
+                                                // ),
+                                                // const SizedBox(
+                                                //   height: 200,
+                                                //   child: TextField(
+                                                //     textAlignVertical:
+                                                //         TextAlignVertical.top,
+                                                //     maxLines: null,
+                                                //     expands: true,
+                                                //     decoration: InputDecoration(
+                                                //       border: OutlineInputBorder(),
+                                                //       hintText:
+                                                //           'Enter your comment....',
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                                // const SizedBox(
+                                                //   height: 10,
+                                                // ),
+                                                // Align(
+                                                //   alignment: Alignment.centerRight,
+                                                //   child: SizedBox(
+                                                //     width: 130,
+                                                //     height: 40,
+                                                //     child: ElevatedButton(
+                                                //       style: ElevatedButton.styleFrom(
+                                                //         backgroundColor:
+                                                //             kColorPrimary,
+                                                //         shape:
+                                                //             const RoundedRectangleBorder(
+                                                //                 borderRadius:
+                                                //                     BorderRadius.all(
+                                                //                         Radius
+                                                //                             .circular(
+                                                //                                 20))),
+                                                //       ),
+                                                //       onPressed: () {},
+                                                //       child: const Text('SAVE'),
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
                                               ],
                                             ),
                                           ),
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      10.0), //<-- SEE HERE
-                                ),
-                                child: Container(
-                                  width: 380,
-                                  height: 100,
-                                  alignment: Alignment.center,
-                                  // padding:
-                                  // const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      border: Border.all(
-                                        color: Colors.grey,
-                                        width: .1,
-                                      ),
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(10))),
-                                  child: Column(
-                                    children: [
-                                      const Padding(
-                                        padding:
-                                            EdgeInsets.fromLTRB(5, 0, 5, 0),
-                                        child: Align(
-                                            alignment: Alignment.topLeft,
-                                            child: Text(
-                                              'A class by',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                              ),
-                                            )),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            50, 5, 50, 5),
-                                        child: ListTile(
-                                          leading: const CircleAvatar(
-                                            backgroundColor: Colors.black12,
-                                            child: Icon(
-                                              Icons.person,
-                                              color: Colors.grey,
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 8.0,
+                                          ),
+                                          child: SingleChildScrollView(
+                                            controller: ScrollController(),
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  width: 600,
+                                                  child: ListView.builder(
+                                                    shrinkWrap: true,
+                                                    itemCount: int.tryParse(
+                                                        widget.enrolledClass
+                                                            .totalClasses),
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      final selectedmaterials =
+                                                          materials.length >
+                                                                  index
+                                                              ? materials[index]
+                                                              : null;
+
+                                                      return Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                bottom: 10.0),
+                                                        child: Card(
+                                                          child: ExpansionTile(
+                                                            title: Text(
+                                                              (() {
+                                                                if (materials
+                                                                    .isNotEmpty) {
+                                                                  if (materials
+                                                                          .length >
+                                                                      index) {
+                                                                    if (selectedmaterials!
+                                                                            .session ==
+                                                                        '1') {
+                                                                      return "${(selectedmaterials.session)}st session materials.";
+                                                                    } else if (selectedmaterials
+                                                                            .session ==
+                                                                        '2') {
+                                                                      return "${(selectedmaterials.session)}nd session materials";
+                                                                    } else if (selectedmaterials
+                                                                            .session ==
+                                                                        '3') {
+                                                                      return "${(selectedmaterials.session)}rd session materials";
+                                                                    } else if (int.tryParse(
+                                                                            selectedmaterials.session)! >
+                                                                        3) {
+                                                                      return "${(selectedmaterials.session)}th session materials";
+                                                                    } else {
+                                                                      return "${(index + 1)}th session materials";
+                                                                    }
+                                                                  } else {
+                                                                    if (index ==
+                                                                        0) {
+                                                                      return "${(index + 1)}st session materials";
+                                                                    } else if (index ==
+                                                                        1) {
+                                                                      return "${(index + 1)}nd session materials";
+                                                                    } else if (index ==
+                                                                        2) {
+                                                                      return "${(index + 1)}rd session materials";
+                                                                    } else {
+                                                                      return "${(index + 1)}th session materials";
+                                                                    }
+                                                                  }
+                                                                } else {
+                                                                  if (index ==
+                                                                      0) {
+                                                                    return "${(index + 1)}st session materials.";
+                                                                  } else if (index ==
+                                                                      1) {
+                                                                    return "${(index + 1)}nd session materials";
+                                                                  } else if (index ==
+                                                                      2) {
+                                                                    return "${(index + 1)}rd session materials";
+                                                                  } else {
+                                                                    return "${(index + 1)}th session materials";
+                                                                  }
+                                                                }
+                                                              })(),
+                                                              style:
+                                                                  const TextStyle(
+                                                                color:
+                                                                    kColorGrey,
+                                                              ),
+                                                            ),
+                                                            children: <Widget>[
+                                                              widget.enrolledClass
+                                                                          .status ==
+                                                                      'Cancelled'
+                                                                  ? const Text(
+                                                                      'Cancelled Class',
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              20,
+                                                                          color:
+                                                                              kCalendarColorB),
+                                                                    )
+                                                                  : Column(
+                                                                      children: [
+                                                                        Padding(
+                                                                          padding:
+                                                                              const EdgeInsets.all(16.0),
+                                                                          child:
+                                                                              Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.start,
+                                                                            children: [
+                                                                              const Text('Files:'),
+                                                                              const SizedBox(
+                                                                                width: 10,
+                                                                              ),
+                                                                              SizedBox(
+                                                                                width: ResponsiveBuilder.isMobile(context) ? 140 : 160,
+                                                                                height: 40,
+                                                                                child: ElevatedButton.icon(
+                                                                                  style: ElevatedButton.styleFrom(
+                                                                                    backgroundColor: Colors.white,
+                                                                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+                                                                                  ),
+                                                                                  onPressed: () {
+                                                                                    selectImage(widget.enrolledClass.classid, index.toString());
+                                                                                  },
+                                                                                  icon: const Icon(
+                                                                                    Icons.attach_file_outlined,
+                                                                                    color: kColorPrimary,
+                                                                                  ),
+                                                                                  label: const Text(
+                                                                                    'Add Files',
+                                                                                    style: TextStyle(color: kColorPrimary,
+                                                                                    overflow: TextOverflow.ellipsis),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              const SizedBox(
+                                                                                width: 5,
+                                                                              ),
+                                                                              // Visibility(
+                                                                              //   visible: progressupload == 0 || progressupload == 100
+                                                                              //       ? false
+                                                                              //       : true,
+                                                                              //   child:
+                                                                              //       SizedBox(
+                                                                              //     width: 50,
+                                                                              //     height: 5,
+                                                                              //     child: LinearProgressIndicator(
+                                                                              //       key: progressKey,
+                                                                              //       value: double.parse(progressupload.toString()),
+                                                                              //     ),
+                                                                              //   ),
+                                                                              // )
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        // Padding(
+                                                                        //   padding:
+                                                                        //       const EdgeInsets
+                                                                        //               .fromLTRB(
+                                                                        //           50,
+                                                                        //           10,
+                                                                        //           50,
+                                                                        //           10),
+                                                                        //   child: TextFormField(
+                                                                        //     decoration:
+                                                                        //         const InputDecoration(
+                                                                        //       labelText:
+                                                                        //           'Add notes here',
+                                                                        //       border:
+                                                                        //           OutlineInputBorder(
+                                                                        //         borderSide:
+                                                                        //             BorderSide(),
+                                                                        //         gapPadding: 0,
+                                                                        //       ),
+                                                                        //     ),
+                                                                        //   ),
+                                                                        // ),
+                                                                        // Align(
+                                                                        //   alignment: Alignment
+                                                                        //       .topRight,
+                                                                        //   child: Padding(
+                                                                        //     padding:
+                                                                        //         const EdgeInsets
+                                                                        //                 .fromLTRB(
+                                                                        //             50,
+                                                                        //             0,
+                                                                        //             50,
+                                                                        //             10),
+                                                                        //     child: SizedBox(
+                                                                        //       width: 100,
+                                                                        //       height: 40,
+                                                                        //       child:
+                                                                        //           ElevatedButton(
+                                                                        //         style: ElevatedButton
+                                                                        //             .styleFrom(
+                                                                        //           minimumSize:
+                                                                        //               Size.zero,
+                                                                        //           padding:
+                                                                        //               EdgeInsets
+                                                                        //                   .zero,
+                                                                        //           backgroundColor:
+                                                                        //               kColorPrimary,
+                                                                        //           shape: const RoundedRectangleBorder(
+                                                                        //               borderRadius:
+                                                                        //                   BorderRadius.all(
+                                                                        //                       Radius.circular(15))),
+                                                                        //         ),
+                                                                        //         onPressed:
+                                                                        //             () {},
+                                                                        //         // icon: const Icon(Icons.attach_file_outlined, color: kColorPrimary,),
+                                                                        //         child:
+                                                                        //             const Text(
+                                                                        //           'Save',
+                                                                        //           style: TextStyle(
+                                                                        //               color: Colors
+                                                                        //                   .white),
+                                                                        //         ),
+                                                                        //       ),
+                                                                        //     ),
+                                                                        //   ),
+                                                                        // ),
+                                                                        Consumer<MaterialNotifier>(builder: (context,
+                                                                            materialNotifier,
+                                                                            _) {
+                                                                          if (materialNotifier
+                                                                              .materials
+                                                                              .isEmpty) {
+                                                                            return Container(
+                                                                                width: 600,
+                                                                                child: Center(
+                                                                                  child: Text(
+                                                                                    '(No materials added!)',
+                                                                                    style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
+                                                                                  ),
+                                                                                )); // Show loading indicator
+                                                                          }
+                                                                          List<Map<String, dynamic>>
+                                                                              materialsdata =
+                                                                              materialNotifier.materials.where((element) => element['classno'] == index.toString()).toList();
+                                                                          if (materialsdata
+                                                                              .isEmpty) {
+                                                                            return Container(
+                                                                                width: 600,
+                                                                                child: Center(
+                                                                                  child: Text(
+                                                                                    '(No materials added!)',
+                                                                                    style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
+                                                                                  ),
+                                                                                )); // Show loading indicator
+                                                                          }
+                                                                          return Container(
+                                                                              width: 600,
+                                                                              height: 120,
+                                                                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                                                              child: Row(
+                                                                                children: [
+                                                                                  IconButton(
+                                                                                    iconSize: 12,
+                                                                                    padding: EdgeInsets.zero,
+                                                                                    splashRadius: 1,
+                                                                                    icon: const Icon(
+                                                                                      Icons.arrow_back_ios, // Left arrow icon
+                                                                                      color: Colors.blue,
+                                                                                    ),
+                                                                                    onPressed: () {
+                                                                                      // Scroll to the left
+                                                                                      updatescrollController1.animateTo(
+                                                                                        updatescrollController1.offset - 100.0, // Adjust the value as needed
+                                                                                        duration: const Duration(milliseconds: 500), // Adjust the duration as needed
+                                                                                        curve: Curves.ease,
+                                                                                      );
+                                                                                    },
+                                                                                  ),
+                                                                                  Expanded(
+                                                                                    child: ListView.builder(
+                                                                                      shrinkWrap: true,
+                                                                                      controller: updatescrollController1, // Assign the ScrollController to the ListView
+                                                                                      scrollDirection: Axis.horizontal,
+                                                                                      itemCount: materialsdata.length,
+                                                                                      itemBuilder: (context, index) {
+                                                                                        if (materialsdata[index]['extension'] == 'Image') {
+                                                                                          return FutureBuilder(
+                                                                                              future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                                              builder: (context, snapshot) {
+                                                                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                                  return Container(
+                                                                                                      height: 60,
+                                                                                                      width: 60,
+                                                                                                      child: const Center(
+                                                                                                          child: CircularProgressIndicator(
+                                                                                                        strokeWidth: 2,
+                                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                                                                } else if (snapshot.hasError) {
+                                                                                                  return Text('Error: ${snapshot.error}');
+                                                                                                }
+
+                                                                                                return Padding(
+                                                                                                  padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                                  child: Row(
+                                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                                    children: [
+                                                                                                      Column(
+                                                                                                        children: [
+                                                                                                          InkWell(
+                                                                                                            onTap: () {
+                                                                                                              showDialog(
+                                                                                                                  barrierDismissible: false,
+                                                                                                                  context: context,
+                                                                                                                  builder: (BuildContext context) {
+                                                                                                                    var height = MediaQuery.of(context).size.height;
+                                                                                                                    return AlertDialog(
+                                                                                                                      shape: RoundedRectangleBorder(
+                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                                      ),
+                                                                                                                      contentPadding: EdgeInsets.zero,
+                                                                                                                      content: ClipRRect(
+                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                                        child: Container(
+                                                                                                                          color: Colors.white, // Set the background color of the circular content
+
+                                                                                                                          child: Stack(
+                                                                                                                            children: <Widget>[
+                                                                                                                              SizedBox(
+                                                                                                                                height: height,
+                                                                                                                                width: 900,
+                                                                                                                                child: ViewFile(imageURL: snapshot.data.toString()),
+                                                                                                                              ),
+                                                                                                                              Positioned(
+                                                                                                                                top: 10.0,
+                                                                                                                                right: 10.0,
+                                                                                                                                child: GestureDetector(
+                                                                                                                                  onTap: () {
+                                                                                                                                    Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                                  },
+                                                                                                                                  child: const Icon(
+                                                                                                                                    Icons.close,
+                                                                                                                                    color: Colors.red,
+                                                                                                                                    size: 20,
+                                                                                                                                  ),
+                                                                                                                                ),
+                                                                                                                              ),
+                                                                                                                            ],
+                                                                                                                          ),
+                                                                                                                        ),
+                                                                                                                      ),
+                                                                                                                    );
+                                                                                                                  });
+                                                                                                            },
+                                                                                                            child: Stack(
+                                                                                                              children: <Widget>[
+                                                                                                                Container(
+                                                                                                                  height: 60,
+                                                                                                                  width: 60,
+                                                                                                                  decoration: BoxDecoration(
+                                                                                                                    borderRadius: BorderRadius.circular(10),
+                                                                                                                    color: Colors.grey.shade200,
+                                                                                                                  ),
+                                                                                                                  child: ClipRRect(
+                                                                                                                    borderRadius: BorderRadius.circular(10.0),
+                                                                                                                    child: Image.network(
+                                                                                                                      snapshot.data.toString(),
+                                                                                                                      fit: BoxFit.cover,
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                                Positioned(
+                                                                                                                  top: 0,
+                                                                                                                  right: 0,
+                                                                                                                  child: GestureDetector(
+                                                                                                                    onTap: () async {
+                                                                                                                      bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
+                                                                                                                      if (result) {
+                                                                                                                        handleUpload('Deleted Successfully!', true);
+                                                                                                                      } else {
+                                                                                                                        handleUpload('Deleted Successfully!', false);
+                                                                                                                      }
+                                                                                                                    },
+                                                                                                                    child: Container(
+                                                                                                                      padding: const EdgeInsets.all(2),
+                                                                                                                      decoration: const BoxDecoration(
+                                                                                                                        shape: BoxShape.circle,
+                                                                                                                        color: Colors.red,
+                                                                                                                      ),
+                                                                                                                      child: const Icon(
+                                                                                                                        Icons.remove,
+                                                                                                                        color: Colors.white,
+                                                                                                                        size: 15,
+                                                                                                                      ),
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ],
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                          Center(
+                                                                                                            child: Tooltip(
+                                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                              child: SizedBox(
+                                                                                                                height: 60,
+                                                                                                                width: 60,
+                                                                                                                child: TextButton(
+                                                                                                                  onPressed: () {
+                                                                                                                    fetchFileData(snapshot.data.toString());
+                                                                                                                  },
+                                                                                                                  child: Text(
+                                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          )
+                                                                                                        ],
+                                                                                                      ),
+                                                                                                    ],
+                                                                                                  ),
+                                                                                                );
+                                                                                              });
+                                                                                        } else if (materialsdata[index]['extension'] == 'pdf') {
+                                                                                          return FutureBuilder(
+                                                                                              future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                                              builder: (context, snapshot) {
+                                                                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                                  return Container(
+                                                                                                      height: 60,
+                                                                                                      width: 60,
+                                                                                                      child: const Center(
+                                                                                                          child: CircularProgressIndicator(
+                                                                                                        strokeWidth: 2,
+                                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                                                                } else if (snapshot.hasError) {
+                                                                                                  return Text('Error: ${snapshot.error}');
+                                                                                                }
+                                                                                                return Padding(
+                                                                                                  padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                                  child: Row(
+                                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                                    children: [
+                                                                                                      Column(
+                                                                                                        children: [
+                                                                                                          InkWell(
+                                                                                                            onTap: () {
+                                                                                                              showDialog(
+                                                                                                                  barrierDismissible: false,
+                                                                                                                  context: context,
+                                                                                                                  builder: (BuildContext context) {
+                                                                                                                    var height = MediaQuery.of(context).size.height;
+                                                                                                                    return AlertDialog(
+                                                                                                                      shape: RoundedRectangleBorder(
+                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                                      ),
+                                                                                                                      contentPadding: EdgeInsets.zero,
+                                                                                                                      content: ClipRRect(
+                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                                        child: Container(
+                                                                                                                          color: Colors.white, // Set the background color of the circular content
+
+                                                                                                                          child: Stack(
+                                                                                                                            children: <Widget>[
+                                                                                                                              SizedBox(
+                                                                                                                                height: height,
+                                                                                                                                width: 900,
+                                                                                                                                child: TermPage(pdfurl: snapshot.data.toString()),
+                                                                                                                              ),
+                                                                                                                              Positioned(
+                                                                                                                                top: 10.0,
+                                                                                                                                right: 10.0,
+                                                                                                                                child: GestureDetector(
+                                                                                                                                  onTap: () {
+                                                                                                                                    Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                                  },
+                                                                                                                                  child: const Icon(
+                                                                                                                                    Icons.close,
+                                                                                                                                    color: Colors.red,
+                                                                                                                                    size: 20,
+                                                                                                                                  ),
+                                                                                                                                ),
+                                                                                                                              ),
+                                                                                                                            ],
+                                                                                                                          ),
+                                                                                                                        ),
+                                                                                                                      ),
+                                                                                                                    );
+                                                                                                                  });
+                                                                                                            },
+                                                                                                            child: Stack(children: <Widget>[
+                                                                                                              Container(
+                                                                                                                height: 60,
+                                                                                                                width: 60,
+                                                                                                                decoration: BoxDecoration(
+                                                                                                                  borderRadius: BorderRadius.circular(10),
+                                                                                                                  color: Colors.grey.shade200, // You can adjust the fit as needed.
+                                                                                                                ),
+                                                                                                                child: ClipRRect(
+                                                                                                                  borderRadius: BorderRadius.circular(10.0),
+                                                                                                                  child: const Icon(
+                                                                                                                    Icons.picture_as_pdf,
+                                                                                                                    size: 48,
+                                                                                                                    color: Colors.red,
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                              Positioned(
+                                                                                                                top: 0,
+                                                                                                                right: 0,
+                                                                                                                child: GestureDetector(
+                                                                                                                  onTap: () async {
+                                                                                                                    bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
+                                                                                                                    if (result) {
+                                                                                                                      handleUpload('Deleted Successfully!', true);
+                                                                                                                    } else {
+                                                                                                                      handleUpload('Deleted Successfully!', false);
+                                                                                                                    }
+                                                                                                                  },
+                                                                                                                  child: Container(
+                                                                                                                    padding: const EdgeInsets.all(2),
+                                                                                                                    decoration: const BoxDecoration(
+                                                                                                                      shape: BoxShape.circle,
+                                                                                                                      color: Colors.red,
+                                                                                                                    ),
+                                                                                                                    child: const Icon(
+                                                                                                                      Icons.remove,
+                                                                                                                      color: Colors.white,
+                                                                                                                      size: 15,
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ]),
+                                                                                                          ),
+                                                                                                          Center(
+                                                                                                            child: Tooltip(
+                                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                              child: SizedBox(
+                                                                                                                height: 60,
+                                                                                                                width: 60,
+                                                                                                                child: TextButton(
+                                                                                                                  onPressed: () {
+                                                                                                                    fetchFileData(snapshot.data.toString());
+                                                                                                                  },
+                                                                                                                  child: Text(
+                                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          )
+                                                                                                        ],
+                                                                                                      ),
+                                                                                                    ],
+                                                                                                  ),
+                                                                                                );
+                                                                                              });
+                                                                                        } else {
+                                                                                          return FutureBuilder(
+                                                                                              future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                                              builder: (context, snapshot) {
+                                                                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                                  return Container(
+                                                                                                      height: 60,
+                                                                                                      width: 60,
+                                                                                                      child: const Center(
+                                                                                                          child: CircularProgressIndicator(
+                                                                                                        strokeWidth: 2,
+                                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                                                                } else if (snapshot.hasError) {
+                                                                                                  return Text('Error: ${snapshot.error}');
+                                                                                                }
+                                                                                                return Padding(
+                                                                                                  padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                                  child: Row(
+                                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                                    children: [
+                                                                                                      Column(
+                                                                                                        children: [
+                                                                                                          InkWell(
+                                                                                                            onTap: () {
+                                                                                                              showDialog(
+                                                                                                                  barrierDismissible: false,
+                                                                                                                  context: context,
+                                                                                                                  builder: (BuildContext context) {
+                                                                                                                    var height = MediaQuery.of(context).size.height;
+                                                                                                                    return AlertDialog(
+                                                                                                                      shape: RoundedRectangleBorder(
+                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                                      ),
+                                                                                                                      contentPadding: EdgeInsets.zero,
+                                                                                                                      content: ClipRRect(
+                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                                        child: Container(
+                                                                                                                          color: Colors.white, // Set the background color of the circular content
+
+                                                                                                                          child: Stack(
+                                                                                                                            children: <Widget>[
+                                                                                                                              SizedBox(
+                                                                                                                                height: height,
+                                                                                                                                width: 900,
+                                                                                                                                child: ViewFile(imageURL: snapshot.data.toString()),
+                                                                                                                              ),
+                                                                                                                              Positioned(
+                                                                                                                                top: 10.0,
+                                                                                                                                right: 10.0,
+                                                                                                                                child: GestureDetector(
+                                                                                                                                  onTap: () {
+                                                                                                                                    Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                                  },
+                                                                                                                                  child: const Icon(
+                                                                                                                                    Icons.close,
+                                                                                                                                    color: Colors.red,
+                                                                                                                                    size: 20,
+                                                                                                                                  ),
+                                                                                                                                ),
+                                                                                                                              ),
+                                                                                                                            ],
+                                                                                                                          ),
+                                                                                                                        ),
+                                                                                                                      ),
+                                                                                                                    );
+                                                                                                                  });
+                                                                                                            },
+                                                                                                            child: Stack(
+                                                                                                              children: <Widget>[
+                                                                                                                Container(
+                                                                                                                  height: 60,
+                                                                                                                  width: 60,
+                                                                                                                  decoration: BoxDecoration(
+                                                                                                                    borderRadius: BorderRadius.circular(10),
+                                                                                                                    color: Colors.grey.shade200, // You can adjust the fit as needed.
+                                                                                                                  ),
+                                                                                                                  child: ClipRRect(
+                                                                                                                    borderRadius: BorderRadius.circular(10.0),
+                                                                                                                    child: const Icon(
+                                                                                                                      FontAwesomeIcons.fileWord,
+                                                                                                                      size: 48,
+                                                                                                                      color: Colors.blue,
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                                Positioned(
+                                                                                                                  top: 0,
+                                                                                                                  right: 0,
+                                                                                                                  child: GestureDetector(
+                                                                                                                    onTap: () async {
+                                                                                                                      bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
+                                                                                                                      if (result) {
+                                                                                                                        handleUpload('Deleted Successfully!', true);
+                                                                                                                      } else {
+                                                                                                                        handleUpload('Deleted Successfully!', false);
+                                                                                                                      }
+                                                                                                                    },
+                                                                                                                    child: Container(
+                                                                                                                      padding: const EdgeInsets.all(2),
+                                                                                                                      decoration: const BoxDecoration(
+                                                                                                                        shape: BoxShape.circle,
+                                                                                                                        color: Colors.red,
+                                                                                                                      ),
+                                                                                                                      child: const Icon(
+                                                                                                                        Icons.remove,
+                                                                                                                        color: Colors.white,
+                                                                                                                        size: 15,
+                                                                                                                      ),
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ],
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                          Center(
+                                                                                                            child: Tooltip(
+                                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                              child: SizedBox(
+                                                                                                                height: 60,
+                                                                                                                width: 60,
+                                                                                                                child: TextButton(
+                                                                                                                  onPressed: () {
+                                                                                                                    setState(() {
+                                                                                                                      fetchFileData(snapshot.data.toString());
+                                                                                                                    });
+                                                                                                                  },
+                                                                                                                  child: Text(
+                                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          )
+                                                                                                        ],
+                                                                                                      ),
+                                                                                                    ],
+                                                                                                  ),
+                                                                                                );
+                                                                                              });
+                                                                                        }
+                                                                                      },
+                                                                                    ),
+                                                                                  ),
+                                                                                  IconButton(
+                                                                                    iconSize: 12,
+                                                                                    padding: EdgeInsets.zero,
+                                                                                    splashRadius: 1,
+                                                                                    icon: const Icon(
+                                                                                      Icons.arrow_forward_ios, // Right arrow icon
+                                                                                      color: Colors.blue,
+                                                                                    ),
+                                                                                    onPressed: () {
+                                                                                      // Scroll to the right
+                                                                                      updatescrollController1.animateTo(
+                                                                                        updatescrollController1.offset + 100.0, // Adjust the value as needed
+                                                                                        duration: const Duration(milliseconds: 500), // Adjust the duration as needed
+                                                                                        curve: Curves.ease,
+                                                                                      );
+                                                                                    },
+                                                                                  ),
+                                                                                ],
+                                                                              ));
+                                                                        }),
+
+                                                                        Padding(
+                                                                          padding:
+                                                                              const EdgeInsets.all(16.0),
+                                                                          child:
+                                                                              Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.start,
+                                                                            children: [
+                                                                              const Text('Class Video Meeting:'),
+                                                                              const SizedBox(
+                                                                                width: 10,
+                                                                              ),
+                                                                              Text(
+                                                                                '(Click the link to join the class!)',
+                                                                                style: TextStyle(fontSize: 12, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        Padding(
+                                                                          padding: const EdgeInsets.fromLTRB(
+                                                                              50,
+                                                                              10,
+                                                                              50,
+                                                                              10),
+                                                                          child: Consumer<List<Schedule>>(builder: (context,
+                                                                              scheduleListdata,
+                                                                              _) {
+                                                                            dynamic
+                                                                                data =
+                                                                                scheduleListdata;
+                                                                            ClassesData?
+                                                                                newclassdata =
+                                                                                widget.enrolledClass;
+                                                                            List<Schedule>
+                                                                                filtereddata =
+                                                                                data.where((element) => element.scheduleID == widget.enrolledClass.classid).toList();
+                                                                            filtereddata.sort((a, b) =>
+                                                                                a.schedule.compareTo(b.schedule));
+                                                                            if (filtereddata.length >
+                                                                                index) {
+                                                                              return MouseRegion(
+                                                                                cursor: SystemMouseCursors.click,
+                                                                                child: GestureDetector(
+                                                                                  onTap: () {
+                                                                                    // const VideoCall videoCall = VideoCall(chatID: '123', uID: '456');
+
+                                                                                    // Replace 'your_flutter_app_port' with the actual port your Flutter web app is running on
+                                                                                    String url = 'http://localhost:58586/tutorsList';
+
+                                                                                    // Open the URL in a new tab
+                                                                                    html.window.open('/videoCall', "");
+                                                                                    // html.window.open('/tutorslist', "");
+                                                                                    //  const VideoCall(chatID: '', uID: '',);
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    'work4ututor/${filtereddata[index].meetinglink}',
+                                                                                    style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic, decoration: TextDecoration.underline),
+                                                                                  ),
+                                                                                ),
+                                                                              );
+                                                                            }
+                                                                            return Text(
+                                                                              '(Link will be attached when student set class schedule!)',
+                                                                              style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
+                                                                            );
+                                                                          }),
+                                                                          //add link here
+                                                                        ),
+                                                                        const SizedBox(
+                                                                          height:
+                                                                              10,
+                                                                        ),
+                                                                      ],
+                                                                    )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          title: Text(
-                                            '${(widget.enrolledClass.tutorinfo.first.firstName)}${(widget.enrolledClass.tutorinfo.first.middleName == 'N/A' ? '' : ' ${(widget.enrolledClass.tutorinfo.first.middleName)}')} ${(widget.enrolledClass.tutorinfo.first.lastname)}, 28',
-                                            style: const TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          subtitle: Text(
-                                              (widget.enrolledClass.subjectinfo
-                                                  .first.subjectName),
-                                              style: const TextStyle(
-                                                  color: Colors.black)),
-                                          onTap: () {
-                                            // Navigate to user profile page
-                                            // Navigator.pushNamed(context, '/profile',
-                                            //     arguments: {'username': users[index]['name']});
-                                            //  final provider =
-                                            //           context.read<ChatDisplayProvider>();
-                                            //       provider.setOpenMessage(true);
-                                          },
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 40,
+                            // child: VerticalDivider(),
+                          ),
+                          Flexible(
+                              flex: 13,
+                              child: SingleChildScrollView(
+                                controller: ScrollController(),
+                                child: Column(
+                                  children: [
+                                    Card(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            10.0), //<-- SEE HERE
+                                      ),
+                                      elevation: 1,
+                                      child: Container(
+                                        width: 380,
+                                        height: 300,
+                                        padding: const EdgeInsets.all(0.0),
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey.shade200,
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(10))),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Padding(
+                                              padding: EdgeInsets.all(10.0),
+                                              child: Align(
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  child: Text(
+                                                    'Class Session',
+                                                    style: TextStyle(
+                                                        fontSize: 16,
+                                                        color: kColorGrey),
+                                                  )),
+                                            ),
+                                            Container(
+                                              alignment: Alignment.center,
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      15, 10, 15, 10),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.grey.shade200),
+                                              child: ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount: widget.enrolledClass
+                                                    .schedule.length,
+                                                itemBuilder: (context, index) {
+                                                  final classCount = widget
+                                                      .enrolledClass
+                                                      .schedule[index];
+                                                  return Container(
+                                                    alignment: Alignment.center,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            5.0),
+                                                    child: Row(
+                                                      children: [
+                                                        Tooltip(
+                                                          message: (classCount
+                                                                      .session ==
+                                                                  '1')
+                                                              ? "${(classCount.session)}st Class Session"
+                                                              : (classCount
+                                                                          .session ==
+                                                                      '2')
+                                                                  ? "${(classCount.session)}nd Class Session"
+                                                                  : (classCount
+                                                                              .session ==
+                                                                          '3')
+                                                                      ? "${(classCount.session)}rd Class Session"
+                                                                      : "${(classCount.session)}th Class Session",
+                                                          child: Text(
+                                                            (() {
+                                                              if (classCount
+                                                                      .session ==
+                                                                  '1') {
+                                                                return "${(classCount.session)}st Class";
+                                                              } else if (classCount
+                                                                      .session ==
+                                                                  '2') {
+                                                                return "${(classCount.session)}nd Class";
+                                                              } else if (classCount
+                                                                      .session ==
+                                                                  '3') {
+                                                                return "${(classCount.session)}rd Class";
+                                                              } else {
+                                                                return "${(classCount.session)}th Class";
+                                                              }
+                                                            })(),
+                                                            style: const TextStyle(
+                                                                color:
+                                                                    kColorGrey),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .fade,
+                                                          ),
+                                                        ),
+                                                        const Spacer(),
+                                                        SizedBox(
+                                                          height: 40,
+                                                          child: ElevatedButton(
+                                                            style:
+                                                                ElevatedButton
+                                                                    .styleFrom(
+                                                              backgroundColor:
+                                                                  Colors.white,
+                                                              shape: const RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius.all(
+                                                                          Radius.circular(
+                                                                              15))),
+                                                            ),
+                                                            onPressed: () {},
+                                                            child: const Text(
+                                                              'Complete Session',
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color:
+                                                                      kColorPrimary),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                            const Spacer(),
+                                            Card(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        10.0), //<-- SEE HERE
+                                              ),
+                                              elevation: 1,
+                                              child: Container(
+                                                width: 380,
+                                                height: 65,
+                                                alignment: Alignment.center,
+                                                // padding:
+                                                // const EdgeInsets.fromLTRB(30, 10, 30, 10),
+                                                decoration: const BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                            bottomLeft: Radius
+                                                                .circular(10),
+                                                            bottomRight:
+                                                                Radius.circular(
+                                                                    10))),
+                                                child: Center(
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: const [
+                                                      Icon(
+                                                        EvaIcons.clockOutline,
+                                                        color: kColorGrey,
+                                                      ),
+                                                      SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Text(
+                                                        '50 minutes per class session',
+                                                        style: TextStyle(
+                                                            color: kColorGrey),
+                                                        textAlign:
+                                                            TextAlign.justify,
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                          ],
                                         ),
                                       ),
-                                      // Row(
-                                      //   mainAxisAlignment: MainAxisAlignment.center,
-                                      //   children: const [
-                                      //     Icon(EvaIcons.clockOutline),
-                                      //     Text('50 minutes per class session')
-                                      //   ],
-                                      // ),
-                                    ],
-                                  ),
+                                    ),
+                                    // const SizedBox(
+                                    //   height: 10,
+                                    // ),
+                                    // Card(
+                                    //   shape: RoundedRectangleBorder(
+                                    //     borderRadius: BorderRadius.circular(
+                                    //         10.0), //<-- SEE HERE
+                                    //   ),
+                                    //   child: Container(
+                                    //     width: 380,
+                                    //     height: 100,
+                                    //     alignment: Alignment.center,
+                                    //     // padding:
+                                    //     // const EdgeInsets.fromLTRB(30, 10, 30, 10),
+                                    //     decoration: BoxDecoration(
+                                    //         color: Colors.white,
+                                    //         border: Border.all(
+                                    //           color: Colors.grey,
+                                    //           width: .1,
+                                    //         ),
+                                    //         borderRadius: const BorderRadius.all(
+                                    //             Radius.circular(10))),
+                                    //     child: Column(
+                                    //       children: [
+                                    //         const Padding(
+                                    //           padding:
+                                    //               EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                    //           child: Align(
+                                    //               alignment: Alignment.topLeft,
+                                    //               child: Text(
+                                    //                 'A class by',
+                                    //                 style: TextStyle(
+                                    //                   fontSize: 16,
+                                    //                 ),
+                                    //               )),
+                                    //         ),
+                                    //         Padding(
+                                    //           padding: const EdgeInsets.fromLTRB(
+                                    //               50, 5, 50, 5),
+                                    //           child: ListTile(
+                                    //             leading: const CircleAvatar(
+                                    //               backgroundColor: Colors.black12,
+                                    //               child: Icon(
+                                    //                 Icons.person,
+                                    //                 color: Colors.grey,
+                                    //               ),
+                                    //             ),
+                                    //             title: Text(
+                                    //               '${(widget.enrolledClass.tutorinfo.first.firstName)}${(widget.enrolledClass.tutorinfo.first.middleName == 'N/A' ? '' : ' ${(widget.enrolledClass.tutorinfo.first.middleName)}')} ${(widget.enrolledClass.tutorinfo.first.lastname)}, 28',
+                                    //               style: const TextStyle(
+                                    //                   color: Colors.black,
+                                    //                   fontWeight: FontWeight.bold),
+                                    //             ),
+                                    //             subtitle: Text(
+                                    //                 (widget.enrolledClass.subjectinfo
+                                    //                     .first.subjectName),
+                                    //                 style: const TextStyle(
+                                    //                     color: Colors.black)),
+                                    //             onTap: () {
+                                    //               // Navigate to user profile page
+                                    //               // Navigator.pushNamed(context, '/profile',
+                                    //               //     arguments: {'username': users[index]['name']});
+                                    //               //  final provider =
+                                    //               //           context.read<ChatDisplayProvider>();
+                                    //               //       provider.setOpenMessage(true);
+                                    //             },
+                                    //           ),
+                                    //         ),
+                                    //         // Row(
+                                    //         //   mainAxisAlignment: MainAxisAlignment.center,
+                                    //         //   children: const [
+                                    //         //     Icon(EvaIcons.clockOutline),
+                                    //         //     Text('50 minutes per class session')
+                                    //         //   ],
+                                    //         // ),
+                                    //       ],
+                                    //     ),
+                                    //   ),
+                                    // )
+                                  ],
                                 ),
-                              )
-                            ],
-                          )),
-                    ],
-                  ),
-                ),
+                              )),
+                        ],
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 350,
+                            child: DefaultTabController(
+                              length: 2,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    height: 50,
+                                    child: TabBar(
+                                      indicator: BoxDecoration(
+                                        boxShadow: const [
+                                          BoxShadow(
+                                              color: Colors.black26,
+                                              offset: Offset(0, 4),
+                                              blurRadius: 5.0)
+                                        ],
+                                        gradient: const LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          stops: [0.0, 1.0],
+                                          colors: buttonFocuscolors,
+                                        ),
+                                        color: Colors.deepPurple.shade300,
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      indicatorColor: kColorPrimary,
+                                      tabs: const [
+                                        Tab(
+                                          icon: Icon(
+                                              Icons.insert_drive_file_outlined),
+                                          text: 'Class Info',
+                                          iconMargin:
+                                              EdgeInsets.only(bottom: 3),
+                                        ),
+                                        Tab(
+                                          icon: Icon(Icons.list_alt_outlined),
+                                          text: 'Materials',
+                                          iconMargin:
+                                              EdgeInsets.only(bottom: 3),
+                                        ),
+                                      ],
+                                      unselectedLabelColor: Colors.grey,
+                                      labelStyle: const TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                      labelColor: Colors.white,
+                                    ),
+                                  ),
+                                  Flexible(
+                                    flex: 20,
+                                    child: TabBarView(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 8.0,
+                                          ),
+                                          child: SingleChildScrollView(
+                                            controller: ScrollController(),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Text.rich(
+                                                  TextSpan(
+                                                    children: [
+                                                      TextSpan(
+                                                        text:
+                                                            "You are enrolled in ",
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              ResponsiveBuilder
+                                                                      .isMobile(
+                                                                          context)
+                                                                  ? 15
+                                                                  : 16,
+                                                          fontStyle:
+                                                              FontStyle.normal,
+                                                          color: kColorGrey,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text:
+                                                            "${widget.enrolledClass.totalClasses} classes ",
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              ResponsiveBuilder
+                                                                      .isMobile(
+                                                                          context)
+                                                                  ? 15
+                                                                  : 16,
+                                                          fontStyle:
+                                                              FontStyle.normal,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: kColorGrey,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text:
+                                                            "of ${widget.enrolledClass.subjectinfo.first.subjectName}.",
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              ResponsiveBuilder
+                                                                      .isMobile(
+                                                                          context)
+                                                                  ? 15
+                                                                  : 16,
+                                                          fontStyle:
+                                                              FontStyle.normal,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: kColorGrey,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text:
+                                                            "\nEach class lasts ",
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              ResponsiveBuilder
+                                                                      .isMobile(
+                                                                          context)
+                                                                  ? 15
+                                                                  : 16,
+                                                          fontStyle:
+                                                              FontStyle.normal,
+                                                          color: kColorGrey,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text: "50 minutes",
+                                                        style: TextStyle(
+                                                          fontSize:
+                                                              ResponsiveBuilder
+                                                                      .isMobile(
+                                                                          context)
+                                                                  ? 15
+                                                                  : 16,
+                                                          fontStyle:
+                                                              FontStyle.normal,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: kColorGrey,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  textAlign: TextAlign.left,
+                                                ),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Text(
+                                                  "Schedule:",
+                                                  style: TextStyle(
+                                                    fontSize: ResponsiveBuilder
+                                                            .isMobile(context)
+                                                        ? 15
+                                                        : 16,
+                                                    fontStyle: FontStyle.normal,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    color: kColorGrey,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Consumer<List<Schedule>>(
+                                                    builder: (context,
+                                                        scheduleListdata, _) {
+                                                  dynamic data =
+                                                      scheduleListdata;
+                                                  ClassesData? newclassdata =
+                                                      widget.enrolledClass;
+                                                  return Container(
+                                                    width: 600,
+                                                    // height: 30 * 3,
+                                                    child: ListView.builder(
+                                                        physics:
+                                                            const NeverScrollableScrollPhysics(),
+                                                        shrinkWrap: true,
+                                                        itemCount: int.tryParse(
+                                                            newclassdata
+                                                                .totalClasses),
+                                                        itemBuilder:
+                                                            (context, index) {
+                                                          Schedule? temp;
+                                                          List<Schedule>
+                                                              filteredScheduleList =
+                                                              data
+                                                                  .where((element) =>
+                                                                      element
+                                                                          .scheduleID ==
+                                                                      widget
+                                                                          .enrolledClass
+                                                                          .classid)
+                                                                  .toList();
+                                                          filteredScheduleList
+                                                              .sort((a, b) => a
+                                                                  .schedule
+                                                                  .compareTo(b
+                                                                      .schedule));
+                                                          final scheduledata =
+                                                              filteredScheduleList
+                                                                          .length >
+                                                                      index
+                                                                  ? filteredScheduleList[
+                                                                      index]
+                                                                  : null;
+                                                          return Visibility(
+                                                            visible: true,
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(5.0),
+                                                              child: Row(
+                                                                children: [
+                                                                  filteredScheduleList
+                                                                          .isEmpty
+                                                                      ? Flexible(
+                                                                          flex:
+                                                                              60,
+                                                                          child:
+                                                                              Text(
+                                                                            (() {
+                                                                              if (filteredScheduleList.isEmpty && index == 0) {
+                                                                                return "${(index + 1)}st class (Unschedule)";
+                                                                              } else if (filteredScheduleList.isEmpty && index == 1) {
+                                                                                return "${(index + 1)}nd class (Unschedule)";
+                                                                              } else if (filteredScheduleList.isEmpty && index == 2) {
+                                                                                return "${(index + 1)}rd class (Unschedule)";
+                                                                              } else {
+                                                                                return "${(index + 1)}th class (Unschedule)";
+                                                                              }
+                                                                            })(),
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontSize: ResponsiveBuilder.isMobile(context) ? 15 : 16,
+                                                                              fontStyle: FontStyle.normal,
+                                                                              color: kColorGrey,
+                                                                            ),
+                                                                            textAlign:
+                                                                                TextAlign.justify,
+                                                                          ),
+                                                                        )
+                                                                      : Flexible(
+                                                                          flex:
+                                                                              60,
+                                                                          child:
+                                                                              Text(
+                                                                            (() {
+                                                                              if (filteredScheduleList.length > index) {
+                                                                                if (index == 0) {
+                                                                                  return "${(index + 1)}st class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                                } else if (index == 1) {
+                                                                                  return "${(index + 1)}nd class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                                } else if (index == 2) {
+                                                                                  return "${(index + 1)}rd class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                                } else {
+                                                                                  return "${(index + 1)}th class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                                }
+                                                                              } else {
+                                                                                if (index == 0) {
+                                                                                  return "${(index + 1)}st class (Unschedule)";
+                                                                                } else if (index == 1) {
+                                                                                  return "${(index + 1)}nd class (Unschedule)";
+                                                                                } else if (index == 2) {
+                                                                                  return "${(index + 1)}rd class (Unschedule)";
+                                                                                } else {
+                                                                                  return "${(index + 1)}th class (Unschedule)";
+                                                                                }
+                                                                              }
+                                                                            })(),
+                                                                            style:
+                                                                                TextStyle(
+                                                                              color: kColorGrey,
+                                                                              fontSize: ResponsiveBuilder.isMobile(context) ? 15 : 16,
+                                                                              fontStyle: FontStyle.normal,
+                                                                            ),
+                                                                            textAlign:
+                                                                                TextAlign.justify,
+                                                                            overflow:
+                                                                                TextOverflow.ellipsis,
+                                                                          ),
+                                                                        ),
+                                                                  const Spacer(),
+                                                                  newclassdata.status ==
+                                                                          'Cancelled'
+                                                                      ? Center(
+                                                                          child:
+                                                                              Text(
+                                                                            'Cancelled Class',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              color: kCalendarColorB,
+                                                                              fontSize: ResponsiveBuilder.isMobile(context) ? 15 : 16,
+                                                                              fontStyle: FontStyle.normal,
+                                                                            ),
+                                                                          ),
+                                                                        )
+                                                                      : filteredScheduleList.length >
+                                                                              index
+                                                                          ? TextButton(
+                                                                              child: Text(
+                                                                                "Reschedule",
+                                                                                style: TextStyle(
+                                                                                  color: kColorPrimary,
+                                                                                  fontSize: ResponsiveBuilder.isMobile(context) ? 15 : 16,
+                                                                                  fontStyle: FontStyle.normal,
+                                                                                ),
+                                                                              ),
+                                                                              onPressed: () {
+                                                                                String dateresult = dueCancelDate(scheduledata!.schedule);
+
+                                                                                rescheduleclass(context, filteredScheduleList[index]);
+                                                                              },
+                                                                            )
+                                                                          :
+                                                                          // TextButton(
+                                                                          //     child:
+                                                                          //         Text(
+                                                                          //       "Set Schedule",
+                                                                          //       style:
+                                                                          //           TextStyle(
+                                                                          //         color: Colors
+                                                                          //             .green
+                                                                          //             .shade400,
+                                                                          //         fontSize:
+                                                                          //             18,
+                                                                          //         fontStyle:
+                                                                          //             FontStyle.normal,
+                                                                          //       ),
+                                                                          //     ),
+                                                                          //     onPressed:
+                                                                          //         () {
+                                                                          //       TutorInformation data = widget
+                                                                          //           .enrolledClass.tutorinfo
+                                                                          //           .first;
+                                                                          //       showDialog(
+                                                                          //           barrierDismissible:
+                                                                          //               false,
+                                                                          //           context:
+                                                                          //               context,
+                                                                          //           builder:
+                                                                          //               (BuildContext context) {
+                                                                          //             var height = MediaQuery.of(context).size.height;
+                                                                          //             var width = MediaQuery.of(context).size.width;
+                                                                          //             return AlertDialog(
+                                                                          //               shape: RoundedRectangleBorder(
+                                                                          //                 borderRadius: BorderRadius.circular(15.0),
+                                                                          //               ),
+                                                                          //               contentPadding: EdgeInsets.zero,
+                                                                          //               content: ClipRRect(
+                                                                          //                 borderRadius: BorderRadius.circular(15.0),
+                                                                          //                 child: Container(
+                                                                          //                   color: Colors.white,
+                                                                          //                   child: Stack(
+                                                                          //                     children: <Widget>[
+                                                                          //                       SizedBox(
+                                                                          //                         height: height - 100,
+                                                                          //                         width: width - 300,
+                                                                          //                         child: SetScheduleData(
+                                                                          //                           data: widget.enrolledClass,
+                                                                          //                           session: index.toString(),
+                                                                          //                           uID: widget.uID,
+                                                                          //                         ),
+                                                                          //                       ),
+                                                                          //                       Positioned(
+                                                                          //                         top: 10.0,
+                                                                          //                         right: 10.0,
+                                                                          //                         child: GestureDetector(
+                                                                          //                           onTap: () {
+                                                                          //                             Navigator.of(context).pop(false); // Close the dialog
+                                                                          //                           },
+                                                                          //                           child: const Icon(
+                                                                          //                             Icons.close,
+                                                                          //                             color: Colors.red,
+                                                                          //                             size: 20,
+                                                                          //                           ),
+                                                                          //                         ),
+                                                                          //                       ),
+                                                                          //                     ],
+                                                                          //                   ),
+                                                                          //                 ),
+                                                                          //               ),
+                                                                          //             );
+                                                                          //           }).then((selectedDate) {});
+                                                                          //     },
+                                                                          //   )
+                                                                          Container(),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          );
+                                                        }),
+                                                  );
+                                                }),
+                                                // const SizedBox(
+                                                //   height: 10,
+                                                // ),
+                                                // Container(
+                                                //   height: 40,
+                                                //   padding: const EdgeInsets.fromLTRB(
+                                                //       10, 0, 10, 0),
+                                                //   decoration: const BoxDecoration(
+                                                //       color: kColorPrimary),
+                                                //   child: const Align(
+                                                //     alignment: Alignment.centerLeft,
+                                                //     child: Text(
+                                                //       'Class Grade',
+                                                //       style: TextStyle(
+                                                //           fontSize: 18,
+                                                //           fontWeight: FontWeight.bold,
+                                                //           color: Colors.white),
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                                // const SizedBox(
+                                                //   height: 10,
+                                                // ),
+                                                // const Align(
+                                                //   alignment: Alignment.centerLeft,
+                                                //   child: SizedBox(
+                                                //     height: 50,
+                                                //     child: TextField(
+                                                //       textAlignVertical:
+                                                //           TextAlignVertical.top,
+                                                //       maxLines: null,
+                                                //       expands: true,
+                                                //       decoration: InputDecoration(
+                                                //         border: OutlineInputBorder(),
+                                                //         hintText: 'eg. 100',
+                                                //       ),
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                                // const SizedBox(
+                                                //   height: 10,
+                                                // ),
+                                                // Container(
+                                                //   height: 40,
+                                                //   padding: const EdgeInsets.fromLTRB(
+                                                //       10, 0, 10, 0),
+                                                //   decoration: const BoxDecoration(
+                                                //       color: kColorPrimary),
+                                                //   child: const Align(
+                                                //     alignment: Alignment.centerLeft,
+                                                //     child: Text(
+                                                //       'Write down your comment',
+                                                //       style: TextStyle(
+                                                //           fontSize: 18,
+                                                //           fontWeight: FontWeight.bold,
+                                                //           color: Colors.white),
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                                // const SizedBox(
+                                                //   height: 10,
+                                                // ),
+                                                // const SizedBox(
+                                                //   height: 200,
+                                                //   child: TextField(
+                                                //     textAlignVertical:
+                                                //         TextAlignVertical.top,
+                                                //     maxLines: null,
+                                                //     expands: true,
+                                                //     decoration: InputDecoration(
+                                                //       border: OutlineInputBorder(),
+                                                //       hintText:
+                                                //           'Enter your comment....',
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                                // const SizedBox(
+                                                //   height: 10,
+                                                // ),
+                                                // Align(
+                                                //   alignment: Alignment.centerRight,
+                                                //   child: SizedBox(
+                                                //     width: 130,
+                                                //     height: 40,
+                                                //     child: ElevatedButton(
+                                                //       style: ElevatedButton.styleFrom(
+                                                //         backgroundColor:
+                                                //             kColorPrimary,
+                                                //         shape:
+                                                //             const RoundedRectangleBorder(
+                                                //                 borderRadius:
+                                                //                     BorderRadius.all(
+                                                //                         Radius
+                                                //                             .circular(
+                                                //                                 20))),
+                                                //       ),
+                                                //       onPressed: () {},
+                                                //       child: const Text('SAVE'),
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 8.0,
+                                          ),
+                                          child: SingleChildScrollView(
+                                            controller: ScrollController(),
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  width: 600,
+                                                  child: ListView.builder(
+                                                    shrinkWrap: true,
+                                                    itemCount: int.tryParse(
+                                                        widget.enrolledClass
+                                                            .totalClasses),
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      final selectedmaterials =
+                                                          materials.length >
+                                                                  index
+                                                              ? materials[index]
+                                                              : null;
+
+                                                      return Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                bottom: 10.0),
+                                                        child: Card(
+                                                          child: ExpansionTile(
+                                                            title: Text(
+                                                              (() {
+                                                                if (materials
+                                                                    .isNotEmpty) {
+                                                                  if (materials
+                                                                          .length >
+                                                                      index) {
+                                                                    if (selectedmaterials!
+                                                                            .session ==
+                                                                        '1') {
+                                                                      return "${(selectedmaterials.session)}st session materials.";
+                                                                    } else if (selectedmaterials
+                                                                            .session ==
+                                                                        '2') {
+                                                                      return "${(selectedmaterials.session)}nd session materials";
+                                                                    } else if (selectedmaterials
+                                                                            .session ==
+                                                                        '3') {
+                                                                      return "${(selectedmaterials.session)}rd session materials";
+                                                                    } else if (int.tryParse(
+                                                                            selectedmaterials.session)! >
+                                                                        3) {
+                                                                      return "${(selectedmaterials.session)}th session materials";
+                                                                    } else {
+                                                                      return "${(index + 1)}th session materials";
+                                                                    }
+                                                                  } else {
+                                                                    if (index ==
+                                                                        0) {
+                                                                      return "${(index + 1)}st session materials";
+                                                                    } else if (index ==
+                                                                        1) {
+                                                                      return "${(index + 1)}nd session materials";
+                                                                    } else if (index ==
+                                                                        2) {
+                                                                      return "${(index + 1)}rd session materials";
+                                                                    } else {
+                                                                      return "${(index + 1)}th session materials";
+                                                                    }
+                                                                  }
+                                                                } else {
+                                                                  if (index ==
+                                                                      0) {
+                                                                    return "${(index + 1)}st session materials.";
+                                                                  } else if (index ==
+                                                                      1) {
+                                                                    return "${(index + 1)}nd session materials";
+                                                                  } else if (index ==
+                                                                      2) {
+                                                                    return "${(index + 1)}rd session materials";
+                                                                  } else {
+                                                                    return "${(index + 1)}th session materials";
+                                                                  }
+                                                                }
+                                                              })(),
+                                                              style:
+                                                                  const TextStyle(
+                                                                color:
+                                                                    kColorGrey,
+                                                              ),
+                                                            ),
+                                                            children: <Widget>[
+                                                              widget.enrolledClass
+                                                                          .status ==
+                                                                      'Cancelled'
+                                                                  ? const Text(
+                                                                      'Cancelled Class',
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              20,
+                                                                          color:
+                                                                              kCalendarColorB),
+                                                                    )
+                                                                  : Column(
+                                                                      children: [
+                                                                        Padding(
+                                                                          padding:
+                                                                              const EdgeInsets.all(16.0),
+                                                                          child:
+                                                                              Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.start,
+                                                                            children: [
+                                                                              const Flexible(
+                                                                                flex: 60,
+                                                                                child: Text(
+                                                                                  'Files:',
+                                                                                  style: TextStyle(color: kColorGrey),
+                                                                                ),
+                                                                              ),
+                                                                              SizedBox(
+                                                                                width: ResponsiveBuilder.isMobile(context) ? 5 : 10,
+                                                                              ),
+                                                                              SizedBox(
+                                                                                width: 160,
+                                                                                height: 40,
+                                                                                child: ElevatedButton.icon(
+                                                                                  style: ElevatedButton.styleFrom(
+                                                                                    backgroundColor: Colors.white,
+                                                                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+                                                                                  ),
+                                                                                  onPressed: () {
+                                                                                    selectImage(widget.enrolledClass.classid, index.toString());
+                                                                                  },
+                                                                                  icon: const Icon(
+                                                                                    Icons.attach_file_outlined,
+                                                                                    color: kColorPrimary,
+                                                                                  ),
+                                                                                  label: const Text(
+                                                                                    'Add Files',
+                                                                                    style: TextStyle(color: kColorPrimary),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                              const SizedBox(
+                                                                                width: 5,
+                                                                              ),
+                                                                              // Visibility(
+                                                                              //   visible: progressupload == 0 || progressupload == 100
+                                                                              //       ? false
+                                                                              //       : true,
+                                                                              //   child:
+                                                                              //       SizedBox(
+                                                                              //     width: 50,
+                                                                              //     height: 5,
+                                                                              //     child: LinearProgressIndicator(
+                                                                              //       key: progressKey,
+                                                                              //       value: double.parse(progressupload.toString()),
+                                                                              //     ),
+                                                                              //   ),
+                                                                              // )
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        // Padding(
+                                                                        //   padding:
+                                                                        //       const EdgeInsets
+                                                                        //               .fromLTRB(
+                                                                        //           50,
+                                                                        //           10,
+                                                                        //           50,
+                                                                        //           10),
+                                                                        //   child: TextFormField(
+                                                                        //     decoration:
+                                                                        //         const InputDecoration(
+                                                                        //       labelText:
+                                                                        //           'Add notes here',
+                                                                        //       border:
+                                                                        //           OutlineInputBorder(
+                                                                        //         borderSide:
+                                                                        //             BorderSide(),
+                                                                        //         gapPadding: 0,
+                                                                        //       ),
+                                                                        //     ),
+                                                                        //   ),
+                                                                        // ),
+                                                                        // Align(
+                                                                        //   alignment: Alignment
+                                                                        //       .topRight,
+                                                                        //   child: Padding(
+                                                                        //     padding:
+                                                                        //         const EdgeInsets
+                                                                        //                 .fromLTRB(
+                                                                        //             50,
+                                                                        //             0,
+                                                                        //             50,
+                                                                        //             10),
+                                                                        //     child: SizedBox(
+                                                                        //       width: 100,
+                                                                        //       height: 40,
+                                                                        //       child:
+                                                                        //           ElevatedButton(
+                                                                        //         style: ElevatedButton
+                                                                        //             .styleFrom(
+                                                                        //           minimumSize:
+                                                                        //               Size.zero,
+                                                                        //           padding:
+                                                                        //               EdgeInsets
+                                                                        //                   .zero,
+                                                                        //           backgroundColor:
+                                                                        //               kColorPrimary,
+                                                                        //           shape: const RoundedRectangleBorder(
+                                                                        //               borderRadius:
+                                                                        //                   BorderRadius.all(
+                                                                        //                       Radius.circular(15))),
+                                                                        //         ),
+                                                                        //         onPressed:
+                                                                        //             () {},
+                                                                        //         // icon: const Icon(Icons.attach_file_outlined, color: kColorPrimary,),
+                                                                        //         child:
+                                                                        //             const Text(
+                                                                        //           'Save',
+                                                                        //           style: TextStyle(
+                                                                        //               color: Colors
+                                                                        //                   .white),
+                                                                        //         ),
+                                                                        //       ),
+                                                                        //     ),
+                                                                        //   ),
+                                                                        // ),
+                                                                        Consumer<MaterialNotifier>(builder: (context,
+                                                                            materialNotifier,
+                                                                            _) {
+                                                                          if (materialNotifier
+                                                                              .materials
+                                                                              .isEmpty) {
+                                                                            return Container(
+                                                                                width: 600,
+                                                                                child: Center(
+                                                                                  child: Text(
+                                                                                    '(No materials added!)',
+                                                                                    style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
+                                                                                  ),
+                                                                                )); // Show loading indicator
+                                                                          }
+                                                                          List<Map<String, dynamic>>
+                                                                              materialsdata =
+                                                                              materialNotifier.materials.where((element) => element['classno'] == index.toString()).toList();
+                                                                          if (materialsdata
+                                                                              .isEmpty) {
+                                                                            return Container(
+                                                                                width: 600,
+                                                                                child: Center(
+                                                                                  child: Text(
+                                                                                    '(No materials added!)',
+                                                                                    style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
+                                                                                  ),
+                                                                                )); // Show loading indicator
+                                                                          }
+                                                                          return Container(
+                                                                              width: 600,
+                                                                              height: 120,
+                                                                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                                                              child: Row(
+                                                                                children: [
+                                                                                  IconButton(
+                                                                                    iconSize: 12,
+                                                                                    padding: EdgeInsets.zero,
+                                                                                    splashRadius: 1,
+                                                                                    icon: const Icon(
+                                                                                      Icons.arrow_back_ios, // Left arrow icon
+                                                                                      color: Colors.blue,
+                                                                                    ),
+                                                                                    onPressed: () {
+                                                                                      // Scroll to the left
+                                                                                      updatescrollController1.animateTo(
+                                                                                        updatescrollController1.offset - 100.0, // Adjust the value as needed
+                                                                                        duration: const Duration(milliseconds: 500), // Adjust the duration as needed
+                                                                                        curve: Curves.ease,
+                                                                                      );
+                                                                                    },
+                                                                                  ),
+                                                                                  Expanded(
+                                                                                    child: ListView.builder(
+                                                                                      shrinkWrap: true,
+                                                                                      controller: updatescrollController1, // Assign the ScrollController to the ListView
+                                                                                      scrollDirection: Axis.horizontal,
+                                                                                      itemCount: materialsdata.length,
+                                                                                      itemBuilder: (context, index) {
+                                                                                        if (materialsdata[index]['extension'] == 'Image') {
+                                                                                          return FutureBuilder(
+                                                                                              future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                                              builder: (context, snapshot) {
+                                                                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                                  return Container(
+                                                                                                      height: 60,
+                                                                                                      width: 60,
+                                                                                                      child: const Center(
+                                                                                                          child: CircularProgressIndicator(
+                                                                                                        strokeWidth: 2,
+                                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                                                                } else if (snapshot.hasError) {
+                                                                                                  return Text('Error: ${snapshot.error}');
+                                                                                                }
+
+                                                                                                return Padding(
+                                                                                                  padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                                  child: Row(
+                                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                                    children: [
+                                                                                                      Column(
+                                                                                                        children: [
+                                                                                                          InkWell(
+                                                                                                            onTap: () {
+                                                                                                              showDialog(
+                                                                                                                  barrierDismissible: false,
+                                                                                                                  context: context,
+                                                                                                                  builder: (BuildContext context) {
+                                                                                                                    var height = MediaQuery.of(context).size.height;
+                                                                                                                    return AlertDialog(
+                                                                                                                      shape: RoundedRectangleBorder(
+                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                                      ),
+                                                                                                                      contentPadding: EdgeInsets.zero,
+                                                                                                                      content: ClipRRect(
+                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                                        child: Container(
+                                                                                                                          color: Colors.white, // Set the background color of the circular content
+
+                                                                                                                          child: Stack(
+                                                                                                                            children: <Widget>[
+                                                                                                                              SizedBox(
+                                                                                                                                height: height,
+                                                                                                                                width: 900,
+                                                                                                                                child: ViewFile(imageURL: snapshot.data.toString()),
+                                                                                                                              ),
+                                                                                                                              Positioned(
+                                                                                                                                top: 10.0,
+                                                                                                                                right: 10.0,
+                                                                                                                                child: GestureDetector(
+                                                                                                                                  onTap: () {
+                                                                                                                                    Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                                  },
+                                                                                                                                  child: const Icon(
+                                                                                                                                    Icons.close,
+                                                                                                                                    color: Colors.red,
+                                                                                                                                    size: 20,
+                                                                                                                                  ),
+                                                                                                                                ),
+                                                                                                                              ),
+                                                                                                                            ],
+                                                                                                                          ),
+                                                                                                                        ),
+                                                                                                                      ),
+                                                                                                                    );
+                                                                                                                  });
+                                                                                                            },
+                                                                                                            child: Stack(
+                                                                                                              children: <Widget>[
+                                                                                                                Container(
+                                                                                                                  height: 60,
+                                                                                                                  width: 60,
+                                                                                                                  decoration: BoxDecoration(
+                                                                                                                    borderRadius: BorderRadius.circular(10),
+                                                                                                                    color: Colors.grey.shade200,
+                                                                                                                  ),
+                                                                                                                  child: ClipRRect(
+                                                                                                                    borderRadius: BorderRadius.circular(10.0),
+                                                                                                                    child: Image.network(
+                                                                                                                      snapshot.data.toString(),
+                                                                                                                      fit: BoxFit.cover,
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                                Positioned(
+                                                                                                                  top: 0,
+                                                                                                                  right: 0,
+                                                                                                                  child: GestureDetector(
+                                                                                                                    onTap: () async {
+                                                                                                                      bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
+                                                                                                                      if (result) {
+                                                                                                                        handleUpload('Deleted Successfully!', true);
+                                                                                                                      } else {
+                                                                                                                        handleUpload('Deleted Successfully!', false);
+                                                                                                                      }
+                                                                                                                    },
+                                                                                                                    child: Container(
+                                                                                                                      padding: const EdgeInsets.all(2),
+                                                                                                                      decoration: const BoxDecoration(
+                                                                                                                        shape: BoxShape.circle,
+                                                                                                                        color: Colors.red,
+                                                                                                                      ),
+                                                                                                                      child: const Icon(
+                                                                                                                        Icons.remove,
+                                                                                                                        color: Colors.white,
+                                                                                                                        size: 15,
+                                                                                                                      ),
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ],
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                          Center(
+                                                                                                            child: Tooltip(
+                                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                              child: SizedBox(
+                                                                                                                height: 60,
+                                                                                                                width: 60,
+                                                                                                                child: TextButton(
+                                                                                                                  onPressed: () {
+                                                                                                                    fetchFileData(snapshot.data.toString());
+                                                                                                                  },
+                                                                                                                  child: Text(
+                                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          )
+                                                                                                        ],
+                                                                                                      ),
+                                                                                                    ],
+                                                                                                  ),
+                                                                                                );
+                                                                                              });
+                                                                                        } else if (materialsdata[index]['extension'] == 'pdf') {
+                                                                                          return FutureBuilder(
+                                                                                              future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                                              builder: (context, snapshot) {
+                                                                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                                  return Container(
+                                                                                                      height: 60,
+                                                                                                      width: 60,
+                                                                                                      child: const Center(
+                                                                                                          child: CircularProgressIndicator(
+                                                                                                        strokeWidth: 2,
+                                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                                                                } else if (snapshot.hasError) {
+                                                                                                  return Text('Error: ${snapshot.error}');
+                                                                                                }
+                                                                                                return Padding(
+                                                                                                  padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                                  child: Row(
+                                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                                    children: [
+                                                                                                      Column(
+                                                                                                        children: [
+                                                                                                          InkWell(
+                                                                                                            onTap: () {
+                                                                                                              showDialog(
+                                                                                                                  barrierDismissible: false,
+                                                                                                                  context: context,
+                                                                                                                  builder: (BuildContext context) {
+                                                                                                                    var height = MediaQuery.of(context).size.height;
+                                                                                                                    return AlertDialog(
+                                                                                                                      shape: RoundedRectangleBorder(
+                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                                      ),
+                                                                                                                      contentPadding: EdgeInsets.zero,
+                                                                                                                      content: ClipRRect(
+                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                                        child: Container(
+                                                                                                                          color: Colors.white, // Set the background color of the circular content
+
+                                                                                                                          child: Stack(
+                                                                                                                            children: <Widget>[
+                                                                                                                              SizedBox(
+                                                                                                                                height: height,
+                                                                                                                                width: 900,
+                                                                                                                                child: TermPage(pdfurl: snapshot.data.toString()),
+                                                                                                                              ),
+                                                                                                                              Positioned(
+                                                                                                                                top: 10.0,
+                                                                                                                                right: 10.0,
+                                                                                                                                child: GestureDetector(
+                                                                                                                                  onTap: () {
+                                                                                                                                    Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                                  },
+                                                                                                                                  child: const Icon(
+                                                                                                                                    Icons.close,
+                                                                                                                                    color: Colors.red,
+                                                                                                                                    size: 20,
+                                                                                                                                  ),
+                                                                                                                                ),
+                                                                                                                              ),
+                                                                                                                            ],
+                                                                                                                          ),
+                                                                                                                        ),
+                                                                                                                      ),
+                                                                                                                    );
+                                                                                                                  });
+                                                                                                            },
+                                                                                                            child: Stack(children: <Widget>[
+                                                                                                              Container(
+                                                                                                                height: 60,
+                                                                                                                width: 60,
+                                                                                                                decoration: BoxDecoration(
+                                                                                                                  borderRadius: BorderRadius.circular(10),
+                                                                                                                  color: Colors.grey.shade200, // You can adjust the fit as needed.
+                                                                                                                ),
+                                                                                                                child: ClipRRect(
+                                                                                                                  borderRadius: BorderRadius.circular(10.0),
+                                                                                                                  child: const Icon(
+                                                                                                                    Icons.picture_as_pdf,
+                                                                                                                    size: 48,
+                                                                                                                    color: Colors.red,
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                              Positioned(
+                                                                                                                top: 0,
+                                                                                                                right: 0,
+                                                                                                                child: GestureDetector(
+                                                                                                                  onTap: () async {
+                                                                                                                    bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
+                                                                                                                    if (result) {
+                                                                                                                      handleUpload('Deleted Successfully!', true);
+                                                                                                                    } else {
+                                                                                                                      handleUpload('Deleted Successfully!', false);
+                                                                                                                    }
+                                                                                                                  },
+                                                                                                                  child: Container(
+                                                                                                                    padding: const EdgeInsets.all(2),
+                                                                                                                    decoration: const BoxDecoration(
+                                                                                                                      shape: BoxShape.circle,
+                                                                                                                      color: Colors.red,
+                                                                                                                    ),
+                                                                                                                    child: const Icon(
+                                                                                                                      Icons.remove,
+                                                                                                                      color: Colors.white,
+                                                                                                                      size: 15,
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ]),
+                                                                                                          ),
+                                                                                                          Center(
+                                                                                                            child: Tooltip(
+                                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                              child: SizedBox(
+                                                                                                                height: 60,
+                                                                                                                width: 60,
+                                                                                                                child: TextButton(
+                                                                                                                  onPressed: () {
+                                                                                                                    fetchFileData(snapshot.data.toString());
+                                                                                                                  },
+                                                                                                                  child: Text(
+                                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          )
+                                                                                                        ],
+                                                                                                      ),
+                                                                                                    ],
+                                                                                                  ),
+                                                                                                );
+                                                                                              });
+                                                                                        } else {
+                                                                                          return FutureBuilder(
+                                                                                              future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                                              builder: (context, snapshot) {
+                                                                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                                  return Container(
+                                                                                                      height: 60,
+                                                                                                      width: 60,
+                                                                                                      child: const Center(
+                                                                                                          child: CircularProgressIndicator(
+                                                                                                        strokeWidth: 2,
+                                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                                                                } else if (snapshot.hasError) {
+                                                                                                  return Text('Error: ${snapshot.error}');
+                                                                                                }
+                                                                                                return Padding(
+                                                                                                  padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                                  child: Row(
+                                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                                    children: [
+                                                                                                      Column(
+                                                                                                        children: [
+                                                                                                          InkWell(
+                                                                                                            onTap: () {
+                                                                                                              showDialog(
+                                                                                                                  barrierDismissible: false,
+                                                                                                                  context: context,
+                                                                                                                  builder: (BuildContext context) {
+                                                                                                                    var height = MediaQuery.of(context).size.height;
+                                                                                                                    return AlertDialog(
+                                                                                                                      shape: RoundedRectangleBorder(
+                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                                      ),
+                                                                                                                      contentPadding: EdgeInsets.zero,
+                                                                                                                      content: ClipRRect(
+                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                                        child: Container(
+                                                                                                                          color: Colors.white, // Set the background color of the circular content
+
+                                                                                                                          child: Stack(
+                                                                                                                            children: <Widget>[
+                                                                                                                              SizedBox(
+                                                                                                                                height: height,
+                                                                                                                                width: 900,
+                                                                                                                                child: ViewFile(imageURL: snapshot.data.toString()),
+                                                                                                                              ),
+                                                                                                                              Positioned(
+                                                                                                                                top: 10.0,
+                                                                                                                                right: 10.0,
+                                                                                                                                child: GestureDetector(
+                                                                                                                                  onTap: () {
+                                                                                                                                    Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                                  },
+                                                                                                                                  child: const Icon(
+                                                                                                                                    Icons.close,
+                                                                                                                                    color: Colors.red,
+                                                                                                                                    size: 20,
+                                                                                                                                  ),
+                                                                                                                                ),
+                                                                                                                              ),
+                                                                                                                            ],
+                                                                                                                          ),
+                                                                                                                        ),
+                                                                                                                      ),
+                                                                                                                    );
+                                                                                                                  });
+                                                                                                            },
+                                                                                                            child: Stack(
+                                                                                                              children: <Widget>[
+                                                                                                                Container(
+                                                                                                                  height: 60,
+                                                                                                                  width: 60,
+                                                                                                                  decoration: BoxDecoration(
+                                                                                                                    borderRadius: BorderRadius.circular(10),
+                                                                                                                    color: Colors.grey.shade200, // You can adjust the fit as needed.
+                                                                                                                  ),
+                                                                                                                  child: ClipRRect(
+                                                                                                                    borderRadius: BorderRadius.circular(10.0),
+                                                                                                                    child: const Icon(
+                                                                                                                      FontAwesomeIcons.fileWord,
+                                                                                                                      size: 48,
+                                                                                                                      color: Colors.blue,
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                                Positioned(
+                                                                                                                  top: 0,
+                                                                                                                  right: 0,
+                                                                                                                  child: GestureDetector(
+                                                                                                                    onTap: () async {
+                                                                                                                      bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
+                                                                                                                      if (result) {
+                                                                                                                        handleUpload('Deleted Successfully!', true);
+                                                                                                                      } else {
+                                                                                                                        handleUpload('Deleted Successfully!', false);
+                                                                                                                      }
+                                                                                                                    },
+                                                                                                                    child: Container(
+                                                                                                                      padding: const EdgeInsets.all(2),
+                                                                                                                      decoration: const BoxDecoration(
+                                                                                                                        shape: BoxShape.circle,
+                                                                                                                        color: Colors.red,
+                                                                                                                      ),
+                                                                                                                      child: const Icon(
+                                                                                                                        Icons.remove,
+                                                                                                                        color: Colors.white,
+                                                                                                                        size: 15,
+                                                                                                                      ),
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ],
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                          Center(
+                                                                                                            child: Tooltip(
+                                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                              child: SizedBox(
+                                                                                                                height: 60,
+                                                                                                                width: 60,
+                                                                                                                child: TextButton(
+                                                                                                                  onPressed: () {
+                                                                                                                    setState(() {
+                                                                                                                      fetchFileData(snapshot.data.toString());
+                                                                                                                    });
+                                                                                                                  },
+                                                                                                                  child: Text(
+                                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          )
+                                                                                                        ],
+                                                                                                      ),
+                                                                                                    ],
+                                                                                                  ),
+                                                                                                );
+                                                                                              });
+                                                                                        }
+                                                                                      },
+                                                                                    ),
+                                                                                  ),
+                                                                                  IconButton(
+                                                                                    iconSize: 12,
+                                                                                    padding: EdgeInsets.zero,
+                                                                                    splashRadius: 1,
+                                                                                    icon: const Icon(
+                                                                                      Icons.arrow_forward_ios, // Right arrow icon
+                                                                                      color: Colors.blue,
+                                                                                    ),
+                                                                                    onPressed: () {
+                                                                                      // Scroll to the right
+                                                                                      updatescrollController1.animateTo(
+                                                                                        updatescrollController1.offset + 100.0, // Adjust the value as needed
+                                                                                        duration: const Duration(milliseconds: 500), // Adjust the duration as needed
+                                                                                        curve: Curves.ease,
+                                                                                      );
+                                                                                    },
+                                                                                  ),
+                                                                                ],
+                                                                              ));
+                                                                        }),
+
+                                                                        Padding(
+                                                                          padding:
+                                                                              const EdgeInsets.all(16.0),
+                                                                          child:
+                                                                              Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.start,
+                                                                            children: [
+                                                                              const Flexible(flex: 60, child: Text('Class Video Meeting:', style: TextStyle(color: kColorGrey))),
+                                                                              const SizedBox(
+                                                                                width: 10,
+                                                                              ),
+                                                                              Text(
+                                                                                '(Click the link to join the class!)',
+                                                                                style: TextStyle(fontSize: 12, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        Padding(
+                                                                          padding: const EdgeInsets.fromLTRB(
+                                                                              50,
+                                                                              10,
+                                                                              50,
+                                                                              10),
+                                                                          child: Consumer<List<Schedule>>(builder: (context,
+                                                                              scheduleListdata,
+                                                                              _) {
+                                                                            dynamic
+                                                                                data =
+                                                                                scheduleListdata;
+                                                                            ClassesData?
+                                                                                newclassdata =
+                                                                                widget.enrolledClass;
+                                                                            List<Schedule>
+                                                                                filtereddata =
+                                                                                data.where((element) => element.scheduleID == widget.enrolledClass.classid).toList();
+                                                                            filtereddata.sort((a, b) =>
+                                                                                a.schedule.compareTo(b.schedule));
+                                                                            if (filtereddata.length >
+                                                                                index) {
+                                                                              return MouseRegion(
+                                                                                cursor: SystemMouseCursors.click,
+                                                                                child: GestureDetector(
+                                                                                  onTap: () {
+                                                                                    // const VideoCall videoCall = VideoCall(chatID: '123', uID: '456');
+
+                                                                                    // Replace 'your_flutter_app_port' with the actual port your Flutter web app is running on
+                                                                                    String url = 'http://localhost:58586/tutorsList';
+
+                                                                                    // Open the URL in a new tab
+                                                                                    html.window.open('/videoCall', "");
+                                                                                    // html.window.open('/tutorslist', "");
+                                                                                    //  const VideoCall(chatID: '', uID: '',);
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    'work4ututor/${filtereddata[index].meetinglink}',
+                                                                                    style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic, decoration: TextDecoration.underline),
+                                                                                  ),
+                                                                                ),
+                                                                              );
+                                                                            }
+                                                                            return Text(
+                                                                              '(Link will be attached when student set class schedule!)',
+                                                                              style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
+                                                                            );
+                                                                          }),
+                                                                          //add link here
+                                                                        ),
+                                                                        const SizedBox(
+                                                                          height:
+                                                                              10,
+                                                                        ),
+                                                                      ],
+                                                                    )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(10.0), //<-- SEE HERE
+                            ),
+                            elevation: 1,
+                            child: Container(
+                              width: 380,
+                              height: 300,
+                              padding: const EdgeInsets.all(0.0),
+                              decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10))),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(10.0),
+                                    child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          'Class Session',
+                                          style: TextStyle(
+                                              fontSize: 16, color: kColorGrey),
+                                        )),
+                                  ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.fromLTRB(
+                                        15, 10, 15, 10),
+                                    decoration: BoxDecoration(
+                                        color: Colors.grey.shade200),
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount:
+                                          widget.enrolledClass.schedule.length,
+                                      itemBuilder: (context, index) {
+                                        final classCount = widget
+                                            .enrolledClass.schedule[index];
+                                        return Container(
+                                          alignment: Alignment.center,
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: Row(
+                                            children: [
+                                              Tooltip(
+                                                message: (classCount.session ==
+                                                        '1')
+                                                    ? "${(classCount.session)}st Class Session"
+                                                    : (classCount.session ==
+                                                            '2')
+                                                        ? "${(classCount.session)}nd Class Session"
+                                                        : (classCount.session ==
+                                                                '3')
+                                                            ? "${(classCount.session)}rd Class Session"
+                                                            : "${(classCount.session)}th Class Session",
+                                                child: Text(
+                                                  (() {
+                                                    if (classCount.session ==
+                                                        '1') {
+                                                      return "${(classCount.session)}st Class";
+                                                    } else if (classCount
+                                                            .session ==
+                                                        '2') {
+                                                      return "${(classCount.session)}nd Class";
+                                                    } else if (classCount
+                                                            .session ==
+                                                        '3') {
+                                                      return "${(classCount.session)}rd Class";
+                                                    } else {
+                                                      return "${(classCount.session)}th Class";
+                                                    }
+                                                  })(),
+                                                  textAlign:
+                                                      TextAlign.justify,
+                                                  style: const TextStyle(
+                                                      color: kColorGrey),
+                                                  overflow: TextOverflow.fade,
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                              SizedBox(
+                                                height: 40,
+                                                child: ElevatedButton(
+                                                  clipBehavior: Clip.hardEdge,
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    shape: const RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    15))),
+                                                  ),
+                                                  onPressed: () {},
+                                                  child: Flexible(
+                                                    flex: 20,
+                                                    child: Text(
+                                                      size.width < 350
+                                                          ? 'Complete'
+                                                          : 'Complete Session',
+                                                      style: const TextStyle(
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: kColorPrimary),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          10.0), //<-- SEE HERE
+                                    ),
+                                    elevation: 1,
+                                    child: Container(
+                                      width: 380,
+                                      height: 65,
+                                      alignment: Alignment.center,
+                                      // padding:
+                                      // const EdgeInsets.fromLTRB(30, 10, 30, 10),
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.only(
+                                              bottomLeft: Radius.circular(10),
+                                              bottomRight:
+                                                  Radius.circular(10))),
+                                      child: Center(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: const [
+                                            Icon(
+                                              EvaIcons.clockOutline,
+                                              color: kColorGrey,
+                                            ),
+                                            SizedBox(
+                                              width: 5,
+                                            ),
+                                            Flexible(
+                                              flex: 60,
+                                              child: Text(
+                                                '50 minutes per class session',
+                                                style: TextStyle(
+                                                    color: kColorGrey),
+                                                textAlign: TextAlign.justify,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

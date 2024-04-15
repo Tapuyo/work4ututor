@@ -115,7 +115,7 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
     if (studentinfodata.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
       // Scroll to the bottom after the ListView is built
       scrollController.jumpTo(scrollController.position.maxScrollExtent);
     });
@@ -127,6 +127,19 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
             padding: const EdgeInsets.only(right: 16, top: 5, bottom: 5),
             child: Row(
               children: <Widget>[
+                IconButton(
+                  onPressed: () {
+                    final provider = context.read<ChatDisplayProvider>();
+                    provider.setOpenMessage(false);
+                  },
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    color: kColorPrimary,
+                  ),
+                ),
+                const SizedBox(
+                  width: 2,
+                ),
                 CircleAvatar(
                   backgroundColor: Colors.black12,
                   backgroundImage: tutorsList.userId == widget.userID
@@ -149,7 +162,6 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           overflow: TextOverflow.ellipsis,
-                          color: kColorGrey
                         ),
                       ),
                       const SizedBox(
@@ -264,221 +276,136 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                 decoration: BoxDecoration(
                                                   borderRadius:
                                                       const BorderRadius.only(
-                                                          topRight:
-                                                              Radius.circular(
-                                                                  20),
+                                                          topRight: Radius
+                                                              .circular(20),
                                                           bottomLeft:
                                                               Radius.circular(
                                                                   20),
                                                           bottomRight:
                                                               Radius.circular(
-                                                                  20),
-                                                          topLeft:
-                                                              Radius.circular(
                                                                   20)),
-                                                  border: Border.all(
-                                                      width: 2,
-                                                      color: kColorLight),
                                                   color: (messagedata[index]
-                                                              .userID !=
+                                                              .userID ==
                                                           widget.userID
-                                                      ? Colors.white
+                                                      ? kColorLight
                                                       : Colors.grey.shade200),
                                                 ),
                                                 padding:
                                                     const EdgeInsets.fromLTRB(
                                                         2, 2, 2, 10),
                                                 child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Container(
                                                       padding: const EdgeInsets
-                                                          .fromLTRB(5, 2, 5, 5),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Container(
-                                                            decoration:
-                                                                const BoxDecoration(
-                                                              borderRadius: BorderRadius
-                                                                  .all(Radius
+                                                              .fromLTRB(
+                                                          2, 2, 2, 10),
+                                                      decoration: const BoxDecoration(
+                                                          borderRadius: BorderRadius.only(
+                                                              topLeft: Radius
+                                                                  .circular(10),
+                                                              topRight: Radius
+                                                                  .circular(20),
+                                                              bottomLeft: Radius
+                                                                  .circular(10),
+                                                              bottomRight:
+                                                                  Radius
                                                                       .circular(
                                                                           10)),
-                                                            ),
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .all(
-                                                                      10.0),
-                                                              child: RichText(
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .start,
-                                                                text: TextSpan(
-                                                                  style: Theme.of(
-                                                                          context)
+                                                          color: Color.fromRGBO(
+                                                              181,
+                                                              226,
+                                                              250,
+                                                              1)),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(10),
+                                                        child: RichText(
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          text: TextSpan(
+                                                            style: Theme.of(
+                                                                    context)
+                                                                .textTheme
+                                                                .headlineSmall
+                                                                ?.copyWith(
+                                                                  color: const Color
+                                                                          .fromARGB(
+                                                                      255,
+                                                                      59,
+                                                                      59,
+                                                                      59),
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .normal,
+                                                                ),
+                                                            children: <
+                                                                TextSpan>[
+                                                              TextSpan(
+                                                                  text:
+                                                                      '${tutorsList.firstName} ${tutorsList.lastname} offer',
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        15,
+                                                                  )),
+                                                              TextSpan(
+                                                                  text:
+                                                                      ' \$${messagedata[index].classPrice} for ${subjectid!.subjectName}',
+                                                                  style: Theme
+                                                                          .of(
+                                                                              context)
                                                                       .textTheme
                                                                       .headlineSmall
                                                                       ?.copyWith(
-                                                                        color: const Color.fromARGB(
-                                                                            255,
-                                                                            59,
-                                                                            59,
-                                                                            59),
+                                                                          color:
+                                                                              kColorLight,
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontStyle: FontStyle
+                                                                              .italic),
+                                                                  recognizer:
+                                                                      TapGestureRecognizer()
+                                                                        ..onTap =
+                                                                            () {}),
+                                                              const TextSpan(
+                                                                  text:
+                                                                      ' subject with'),
+                                                              TextSpan(
+                                                                text:
+                                                                    ' ${messagedata[index].noofclasses} ',
+                                                                style: Theme.of(
+                                                                        context)
+                                                                    .textTheme
+                                                                    .headlineSmall
+                                                                    ?.copyWith(
+                                                                        color:
+                                                                            kColorLight,
                                                                         fontSize:
                                                                             15,
                                                                         fontWeight:
-                                                                            FontWeight.normal,
-                                                                      ),
-                                                                  children: <
-                                                                      TextSpan>[
-                                                                    TextSpan(
-                                                                        text:
-                                                                            '${tutorsList.firstName} ${tutorsList.lastname} offer',
-                                                                        style:
-                                                                            const TextStyle(
-                                                                          fontSize:
-                                                                              15,
-                                                                        )),
-                                                                    const TextSpan(
-                                                                        text:
-                                                                            ' offer',
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                15,
-                                                                            color:
-                                                                                kColorGrey)),
-                                                                    TextSpan(
-                                                                        text:
-                                                                            ' \$${messagedata[index].classPrice} ',
-                                                                        style: Theme.of(context)
-                                                                            .textTheme
-                                                                            .headlineSmall
-                                                                            ?.copyWith(
-                                                                              color: kColorPrimary,
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.bold,
-                                                                            ),
-                                                                        recognizer: TapGestureRecognizer()
-                                                                          ..onTap =
-                                                                              () {}),
-                                                                    const TextSpan(
-                                                                        text:
-                                                                            'for\n',
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                15,
-                                                                            color:
-                                                                                kColorGrey)),
-                                                                    const TextSpan(
-                                                                        text:
-                                                                            'Subject ',
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                15,
-                                                                            color:
-                                                                                kColorGrey)),
-                                                                    TextSpan(
-                                                                        text: subjectid!
-                                                                            .subjectName,
-                                                                        style: Theme.of(context)
-                                                                            .textTheme
-                                                                            .headlineSmall
-                                                                            ?.copyWith(
-                                                                              color: kColorPrimary,
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.bold,
-                                                                            ),
-                                                                        recognizer: TapGestureRecognizer()
-                                                                          ..onTap =
-                                                                              () {}),
-                                                                    const TextSpan(
-                                                                        text:
-                                                                            '\nClasses ',
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                15,
-                                                                            color:
-                                                                                kColorGrey)),
-                                                                    TextSpan(
-                                                                      text:
-                                                                          '${messagedata[index].noofclasses} ',
-                                                                      style: Theme.of(
-                                                                              context)
-                                                                          .textTheme
-                                                                          .headlineSmall
-                                                                          ?.copyWith(
-                                                                            color:
-                                                                                kColorPrimary,
-                                                                            fontSize:
-                                                                                15,
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                          ),
-                                                                    ),
-                                                                  ],
-                                                                ),
+                                                                            FontWeight
+                                                                                .w500,
+                                                                        fontStyle:
+                                                                            FontStyle.italic),
                                                               ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    LayoutBuilder(builder:
-                                                        (context, constraints) {
-                                                      return Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .fromLTRB(
-                                                                10, 0, 10, 10),
-                                                        child: Container(
-                                                          width: constraints
-                                                              .maxWidth,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  2, 2, 2, 10),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius: const BorderRadius
-                                                                    .only(
-                                                                topLeft: Radius
-                                                                    .circular(
-                                                                        5),
-                                                                topRight: Radius
-                                                                    .circular(
-                                                                        5),
-                                                                bottomLeft: Radius
-                                                                    .circular(
-                                                                        5),
-                                                                bottomRight:
-                                                                    Radius
-                                                                        .circular(
-                                                                            5)),
-                                                            border: Border.all(
-                                                                width: .5,
-                                                                color:
-                                                                    kColorGrey),
-                                                          ),
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(10),
-                                                            child: Text(
-                                                              messagedata[index]
-                                                                  .messageContent,
-                                                              style:
-                                                                  const TextStyle(
-                                                                      fontSize:
-                                                                          15),
-                                                            ),
+                                                              const TextSpan(
+                                                                  text:
+                                                                      'classes.'),
+                                                            ],
                                                           ),
                                                         ),
-                                                      );
-                                                    }),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      messagedata[index]
+                                                          .messageContent,
+                                                      style: const TextStyle(
+                                                          fontSize: 15),
+                                                    ),
                                                   ],
                                                 ),
                                               ),
@@ -646,17 +573,11 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                               bottomRight:
                                                                   Radius
                                                                       .circular(
-                                                                          20),
-                                                              topLeft: Radius
-                                                                  .circular(
-                                                                      20)),
-                                                      border: Border.all(
-                                                          width: 2,
-                                                          color: kColorLight),
+                                                                          20)),
                                                       color: (messagedata[index]
-                                                                  .userID !=
+                                                                  .userID ==
                                                               widget.userID
-                                                          ? Colors.white
+                                                          ? kColorLight
                                                           : Colors
                                                               .grey.shade200),
                                                     ),
@@ -933,19 +854,13 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                               bottomRight:
                                                                   Radius
                                                                       .circular(
-                                                                          20),
-                                                              topLeft: Radius
-                                                                  .circular(
-                                                                      20)),
-                                                          border: Border.all(
-                                                              width: 2,
-                                                              color:
-                                                                  kColorLight),
+                                                                          20)),
                                                           color: (messagedata[
                                                                           index]
                                                                       .userID !=
                                                                   widget.userID
-                                                              ? Colors.white
+                                                              ? Colors
+                                                                  .red.shade200
                                                               : Colors.grey
                                                                   .shade200),
                                                         ),
@@ -1206,28 +1121,22 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                 BoxDecoration(
                                                               borderRadius: const BorderRadius
                                                                       .only(
-                                                                  topRight:
-                                                                      Radius.circular(
+                                                                  topRight: Radius
+                                                                      .circular(
                                                                           20),
                                                                   bottomLeft: Radius
                                                                       .circular(
                                                                           20),
                                                                   bottomRight: Radius
                                                                       .circular(
-                                                                          20),
-                                                                  topLeft: Radius
-                                                                      .circular(
                                                                           20)),
-                                                              border: Border.all(
-                                                                  width: 2,
-                                                                  color:
-                                                                      kColorLight),
                                                               color: (messagedata[
                                                                               index]
                                                                           .userID !=
                                                                       widget
                                                                           .userID
-                                                                  ? Colors.white
+                                                                  ? Colors.red
+                                                                      .shade200
                                                                   : Colors.grey
                                                                       .shade200),
                                                             ),
@@ -1239,9 +1148,6 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                     2,
                                                                     10),
                                                             child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
                                                               children: [
                                                                 Container(
                                                                   padding:
@@ -1251,31 +1157,31 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                           2,
                                                                           2,
                                                                           10),
-                                                                  decoration:
-                                                                      const BoxDecoration(
-                                                                    borderRadius: BorderRadius.only(
-                                                                        topLeft:
-                                                                            Radius.circular(
-                                                                                20),
-                                                                        bottomLeft:
-                                                                            Radius.circular(
-                                                                                10),
-                                                                        bottomRight:
-                                                                            Radius.circular(
-                                                                                10),
-                                                                        topRight:
-                                                                            Radius.circular(10)),
-                                                                  ),
+                                                                  decoration: const BoxDecoration(
+                                                                      borderRadius: BorderRadius.only(
+                                                                          topLeft: Radius.circular(
+                                                                              10),
+                                                                          topRight: Radius.circular(
+                                                                              20),
+                                                                          bottomLeft: Radius.circular(
+                                                                              10),
+                                                                          bottomRight: Radius.circular(
+                                                                              10)),
+                                                                      color: Color.fromRGBO(
+                                                                          181,
+                                                                          226,
+                                                                          250,
+                                                                          1)),
                                                                   child:
                                                                       Padding(
-                                                                    padding: const EdgeInsets
-                                                                            .all(
-                                                                        10.0),
+                                                                    padding:
+                                                                        const EdgeInsets.all(
+                                                                            10),
                                                                     child:
                                                                         RichText(
                                                                       textAlign:
                                                                           TextAlign
-                                                                              .start,
+                                                                              .center,
                                                                       text:
                                                                           TextSpan(
                                                                         style: Theme.of(context)
@@ -1293,87 +1199,36 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                               style: const TextStyle(
                                                                                 fontSize: 15,
                                                                               )),
-                                                                          const TextSpan(
-                                                                              text: ' refused inquiry for\n',
-                                                                              style: TextStyle(fontSize: 15, color: kColorGrey)),
-                                                                          const TextSpan(
-                                                                              text: 'Subject ',
-                                                                              style: TextStyle(fontSize: 15, color: kColorGrey)),
                                                                           TextSpan(
-                                                                              text: subjectid!.subjectName,
-                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                                                                    color: kColorPrimary,
-                                                                                    fontSize: 15,
-                                                                                    fontWeight: FontWeight.bold,
-                                                                                  ),
+                                                                              text: ' inquiry for ${subjectid!.subjectName}',
+                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: kColorLight, fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
                                                                               recognizer: TapGestureRecognizer()..onTap = () {}),
                                                                           const TextSpan(
-                                                                              text: '\nClasses ',
-                                                                              style: TextStyle(fontSize: 15, color: kColorGrey)),
+                                                                              text: ' subject with'),
                                                                           TextSpan(
                                                                             text:
-                                                                                '${messagedata[index].noofclasses} ',
+                                                                                ' ${messagedata[index].noofclasses} ',
                                                                             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                                                                  color: kColorPrimary,
-                                                                                  fontSize: 15,
-                                                                                  fontWeight: FontWeight.bold,
-                                                                                ),
+                                                                                color: kColorLight,
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                fontStyle: FontStyle.italic),
                                                                           ),
+                                                                          const TextSpan(
+                                                                              text: 'classes.'),
                                                                         ],
                                                                       ),
                                                                     ),
                                                                   ),
                                                                 ),
-                                                                LayoutBuilder(
-                                                                    builder:
-                                                                        (context,
-                                                                            constraints) {
-                                                                  return Padding(
-                                                                    padding:
-                                                                        const EdgeInsets.fromLTRB(
-                                                                            10,
-                                                                            0,
-                                                                            10,
-                                                                            10),
-                                                                    child:
-                                                                        Container(
-                                                                      width: constraints
-                                                                          .maxWidth,
-                                                                      padding:
-                                                                          const EdgeInsets.fromLTRB(
-                                                                              2,
-                                                                              2,
-                                                                              2,
-                                                                              10),
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        borderRadius: const BorderRadius.only(
-                                                                            topLeft:
-                                                                                Radius.circular(5),
-                                                                            topRight: Radius.circular(5),
-                                                                            bottomLeft: Radius.circular(5),
-                                                                            bottomRight: Radius.circular(5)),
-                                                                        border: Border.all(
-                                                                            width:
-                                                                                .5,
-                                                                            color:
-                                                                                kColorGrey),
-                                                                      ),
-                                                                      child:
-                                                                          Padding(
-                                                                        padding:
-                                                                            const EdgeInsets.all(10),
-                                                                        child:
-                                                                            Text(
-                                                                          messagedata[index]
-                                                                              .messageContent,
-                                                                          style:
-                                                                              const TextStyle(fontSize: 15),
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  );
-                                                                }),
+                                                                Text(
+                                                                  messagedata[
+                                                                          index]
+                                                                      .messageContent,
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          15),
+                                                                ),
                                                               ],
                                                             ),
                                                           ),
@@ -1442,19 +1297,12 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                               bottomRight:
                                                                   Radius
                                                                       .circular(
-                                                                          20),
-                                                              topLeft: Radius
-                                                                  .circular(
-                                                                      20)),
-                                                          border: Border.all(
-                                                              width: 2,
-                                                              color:
-                                                                  kColorLight),
+                                                                          20)),
                                                           color: (messagedata[
                                                                           index]
-                                                                      .userID !=
+                                                                      .userID ==
                                                                   widget.userID
-                                                              ? Colors.white
+                                                              ? kColorLight
                                                               : Colors.grey
                                                                   .shade200),
                                                         ),
@@ -1526,25 +1374,18 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                 decoration: BoxDecoration(
                                                   borderRadius:
                                                       const BorderRadius.only(
-                                                          topRight:
-                                                              Radius.circular(
-                                                                  20),
+                                                          topRight: Radius
+                                                              .circular(20),
                                                           bottomLeft:
                                                               Radius.circular(
                                                                   20),
                                                           bottomRight:
                                                               Radius.circular(
-                                                                  20),
-                                                          topLeft:
-                                                              Radius.circular(
                                                                   20)),
-                                                  border: Border.all(
-                                                      width: 2,
-                                                      color: kColorLight),
                                                   color: (messagedata[index]
-                                                              .userID !=
+                                                              .userID ==
                                                           widget.userID
-                                                      ? Colors.white
+                                                      ? kColorLight
                                                       : Colors.grey.shade200),
                                                 ),
                                                 padding:
@@ -1806,48 +1647,43 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                               bottomRight:
                                                                   Radius
                                                                       .circular(
-                                                                          20),
-                                                              topLeft: Radius
-                                                                  .circular(
-                                                                      20)),
-                                                      border: Border.all(
-                                                          width: 2,
-                                                          color: kColorLight),
+                                                                          20)),
                                                       color: (messagedata[index]
-                                                                  .userID !=
+                                                                  .userID ==
                                                               widget.userID
-                                                          ? Colors.white
+                                                          ? kColorLight
                                                           : Colors
                                                               .grey.shade200),
                                                     ),
                                                     padding: const EdgeInsets
                                                         .fromLTRB(2, 2, 2, 10),
                                                     child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
                                                       children: [
                                                         Container(
                                                           padding:
                                                               const EdgeInsets
                                                                       .fromLTRB(
                                                                   2, 2, 2, 10),
-                                                          decoration:
-                                                              const BoxDecoration(
-                                                            borderRadius: BorderRadius.only(
-                                                                topLeft: Radius
-                                                                    .circular(
-                                                                        10),
-                                                                topRight: Radius
-                                                                    .circular(
-                                                                        20),
-                                                                bottomLeft: Radius
-                                                                    .circular(
-                                                                        10),
-                                                                bottomRight: Radius
-                                                                    .circular(
-                                                                        10)),
-                                                          ),
+                                                          decoration: const BoxDecoration(
+                                                              borderRadius: BorderRadius.only(
+                                                                  topLeft: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  topRight: Radius
+                                                                      .circular(
+                                                                          20),
+                                                                  bottomLeft: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  bottomRight: Radius
+                                                                      .circular(
+                                                                          10)),
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      181,
+                                                                      226,
+                                                                      250,
+                                                                      1)),
                                                           child: Padding(
                                                             padding:
                                                                 const EdgeInsets
@@ -1855,7 +1691,7 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                             child: RichText(
                                                               textAlign:
                                                                   TextAlign
-                                                                      .start,
+                                                                      .center,
                                                               text: TextSpan(
                                                                 style: Theme.of(
                                                                         context)
@@ -1879,147 +1715,73 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                   TextSpan(
                                                                       text:
                                                                           '${studentinfodata.first.studentFirstname} ${studentinfodata.first.studentLastname}',
-                                                                      style: Theme.of(
-                                                                              context)
-                                                                          .textTheme
-                                                                          .headlineSmall
-                                                                          ?.copyWith(
-                                                                            color:
-                                                                                kColorPrimary,
-                                                                            fontSize:
-                                                                                15,
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                          ),
+                                                                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                          color:
+                                                                              kColorLight,
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontStyle: FontStyle
+                                                                              .italic),
                                                                       recognizer: TapGestureRecognizer()
                                                                         ..onTap =
                                                                             () {}),
                                                                   const TextSpan(
                                                                       text:
-                                                                          ' is inquiring for\n',
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              15,
-                                                                          color:
-                                                                              kColorGrey)),
-                                                                  const TextSpan(
-                                                                      text:
-                                                                          'Subject ',
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              15,
-                                                                          color:
-                                                                              kColorGrey)),
+                                                                          ' is inquiring for ',
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            15,
+                                                                      )),
                                                                   TextSpan(
                                                                       text: subjectid!
                                                                           .subjectName,
-                                                                      style: Theme.of(
-                                                                              context)
-                                                                          .textTheme
-                                                                          .headlineSmall
-                                                                          ?.copyWith(
-                                                                            color:
-                                                                                kColorPrimary,
-                                                                            fontSize:
-                                                                                15,
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
-                                                                          ),
+                                                                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                          color:
+                                                                              kColorLight,
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontStyle: FontStyle
+                                                                              .italic),
                                                                       recognizer: TapGestureRecognizer()
                                                                         ..onTap =
                                                                             () {}),
                                                                   const TextSpan(
                                                                       text:
-                                                                          '\nClasses ',
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              15,
-                                                                          color:
-                                                                              kColorGrey)),
+                                                                          ' subject with'),
                                                                   TextSpan(
                                                                     text:
-                                                                        '${messagedata[index].noofclasses} ',
-                                                                    style: Theme.of(
-                                                                            context)
-                                                                        .textTheme
-                                                                        .headlineSmall
-                                                                        ?.copyWith(
-                                                                          color:
-                                                                              kColorPrimary,
-                                                                          fontSize:
-                                                                              15,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                        ),
+                                                                        ' ${messagedata[index].noofclasses} ',
+                                                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                        color:
+                                                                            kColorLight,
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w500,
+                                                                        fontStyle:
+                                                                            FontStyle.italic),
                                                                   ),
+                                                                  const TextSpan(
+                                                                      text:
+                                                                          'classes.'),
                                                                 ],
                                                               ),
                                                             ),
                                                           ),
                                                         ),
-                                                        LayoutBuilder(builder:
-                                                            (context,
-                                                                constraints) {
-                                                          return Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .fromLTRB(
-                                                                    10,
-                                                                    0,
-                                                                    10,
-                                                                    10),
-                                                            child: Container(
-                                                              width: constraints
-                                                                  .maxWidth,
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .fromLTRB(
-                                                                      2,
-                                                                      2,
-                                                                      2,
-                                                                      10),
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                borderRadius: const BorderRadius
-                                                                        .only(
-                                                                    topLeft:
-                                                                        Radius.circular(
-                                                                            5),
-                                                                    topRight: Radius
-                                                                        .circular(
-                                                                            5),
-                                                                    bottomLeft:
-                                                                        Radius.circular(
-                                                                            5),
-                                                                    bottomRight:
-                                                                        Radius.circular(
-                                                                            5)),
-                                                                border: Border.all(
-                                                                    width: .5,
-                                                                    color:
-                                                                        kColorGrey),
-                                                              ),
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(10),
-                                                                child: Text(
-                                                                  messagedata[
-                                                                          index]
-                                                                      .messageContent,
-                                                                  style: const TextStyle(
-                                                                      fontSize:
-                                                                          15,
-                                                                      color:
-                                                                          kColorGrey),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .start,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          );
-                                                        }),
+                                                        Text(
+                                                          messagedata[index]
+                                                              .messageContent,
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 15),
+                                                        ),
                                                       ],
                                                     ),
                                                   ),
@@ -2064,11 +1826,8 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                             child: const Text(
                                                               'Refuse',
                                                               style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      kCalendarColorB),
+                                                                  color: Colors
+                                                                      .red),
                                                             ),
                                                           ),
                                                           const SizedBox(
@@ -2100,14 +1859,12 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                 }
                                                               });
                                                             },
-                                                            child: const Text(
+                                                            child: Text(
                                                               'Offer',
                                                               style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      kColorPrimary),
+                                                                  color: Colors
+                                                                          .grey[
+                                                                      600]),
                                                             ),
                                                           ),
                                                         ],
@@ -2186,19 +1943,13 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                               bottomRight:
                                                                   Radius
                                                                       .circular(
-                                                                          20),
-                                                              topLeft: Radius
-                                                                  .circular(
-                                                                      20)),
-                                                          border: Border.all(
-                                                              width: 2,
-                                                              color:
-                                                                  kColorLight),
+                                                                          20)),
                                                           color: (messagedata[
                                                                           index]
                                                                       .userID !=
                                                                   widget.userID
-                                                              ? Colors.white
+                                                              ? Colors
+                                                                  .red.shade200
                                                               : Colors.grey
                                                                   .shade200),
                                                         ),
@@ -2207,9 +1958,6 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                     .fromLTRB(
                                                                 2, 2, 2, 10),
                                                         child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
                                                           children: [
                                                             Container(
                                                               padding:
@@ -2219,22 +1967,26 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                       2,
                                                                       2,
                                                                       10),
-                                                              decoration:
-                                                                  const BoxDecoration(
-                                                                borderRadius: BorderRadius.only(
-                                                                    topLeft: Radius
-                                                                        .circular(
-                                                                            10),
-                                                                    topRight: Radius
-                                                                        .circular(
-                                                                            20),
-                                                                    bottomLeft:
-                                                                        Radius.circular(
-                                                                            10),
-                                                                    bottomRight:
-                                                                        Radius.circular(
-                                                                            10)),
-                                                              ),
+                                                              decoration: const BoxDecoration(
+                                                                  borderRadius: BorderRadius.only(
+                                                                      topLeft:
+                                                                          Radius.circular(
+                                                                              10),
+                                                                      topRight:
+                                                                          Radius.circular(
+                                                                              20),
+                                                                      bottomLeft:
+                                                                          Radius.circular(
+                                                                              10),
+                                                                      bottomRight:
+                                                                          Radius.circular(
+                                                                              10)),
+                                                                  color: Color
+                                                                      .fromRGBO(
+                                                                          181,
+                                                                          226,
+                                                                          250,
+                                                                          1)),
                                                               child: Padding(
                                                                 padding:
                                                                     const EdgeInsets
@@ -2242,7 +1994,7 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                 child: RichText(
                                                                   textAlign:
                                                                       TextAlign
-                                                                          .start,
+                                                                          .center,
                                                                   text:
                                                                       TextSpan(
                                                                     style: Theme.of(
@@ -2265,128 +2017,60 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                       TextSpan(
                                                                           text:
                                                                               '${studentinfodata.first.studentFirstname} ${studentinfodata.first.studentLastname}',
-                                                                          style: Theme.of(context)
-                                                                              .textTheme
-                                                                              .headlineSmall
-                                                                              ?.copyWith(
-                                                                                color: kColorPrimary,
-                                                                                fontSize: 15,
-                                                                                fontWeight: FontWeight.bold,
-                                                                              ),
-                                                                          recognizer: TapGestureRecognizer()
-                                                                            ..onTap =
-                                                                                () {}),
+                                                                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                              color: kColorLight,
+                                                                              fontSize: 15,
+                                                                              fontWeight: FontWeight.w500,
+                                                                              fontStyle: FontStyle.italic),
+                                                                          recognizer: TapGestureRecognizer()..onTap = () {}),
                                                                       const TextSpan(
                                                                           text:
-                                                                              ' declined offer for\n',
-                                                                          style: TextStyle(
-                                                                              fontSize: 15,
-                                                                              color: kColorGrey)),
-                                                                      const TextSpan(
-                                                                          text:
-                                                                              'Subject ',
-                                                                          style: TextStyle(
-                                                                              fontSize: 15,
-                                                                              color: kColorGrey)),
+                                                                              ' declined offer for ',
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                15,
+                                                                          )),
                                                                       TextSpan(
                                                                           text: subjectid!
                                                                               .subjectName,
-                                                                          style: Theme.of(context)
-                                                                              .textTheme
-                                                                              .headlineSmall
-                                                                              ?.copyWith(
-                                                                                color: kColorPrimary,
-                                                                                fontSize: 15,
-                                                                                fontWeight: FontWeight.bold,
-                                                                              ),
-                                                                          recognizer: TapGestureRecognizer()
-                                                                            ..onTap =
-                                                                                () {}),
+                                                                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                              color: kColorLight,
+                                                                              fontSize: 15,
+                                                                              fontWeight: FontWeight.w500,
+                                                                              fontStyle: FontStyle.italic),
+                                                                          recognizer: TapGestureRecognizer()..onTap = () {}),
                                                                       const TextSpan(
                                                                           text:
-                                                                              '\nClasses ',
-                                                                          style: TextStyle(
-                                                                              fontSize: 15,
-                                                                              color: kColorGrey)),
+                                                                              ' subject with'),
                                                                       TextSpan(
                                                                         text:
-                                                                            '${messagedata[index].noofclasses} ',
-                                                                        style: Theme.of(context)
-                                                                            .textTheme
-                                                                            .headlineSmall
-                                                                            ?.copyWith(
-                                                                              color: kColorPrimary,
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.bold,
-                                                                            ),
+                                                                            ' ${messagedata[index].noofclasses} ',
+                                                                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                            color:
+                                                                                kColorLight,
+                                                                            fontSize:
+                                                                                15,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                            fontStyle: FontStyle.italic),
                                                                       ),
+                                                                      const TextSpan(
+                                                                          text:
+                                                                              'classes.'),
                                                                     ],
                                                                   ),
                                                                 ),
                                                               ),
                                                             ),
-                                                            LayoutBuilder(builder:
-                                                                (context,
-                                                                    constraints) {
-                                                              return Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .fromLTRB(
-                                                                        10,
-                                                                        0,
-                                                                        10,
-                                                                        10),
-                                                                child:
-                                                                    Container(
-                                                                  width: constraints
-                                                                      .maxWidth,
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                              .fromLTRB(
-                                                                          2,
-                                                                          2,
-                                                                          2,
-                                                                          10),
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    borderRadius: const BorderRadius
-                                                                            .only(
-                                                                        topLeft:
-                                                                            Radius.circular(
-                                                                                5),
-                                                                        topRight:
-                                                                            Radius.circular(
-                                                                                5),
-                                                                        bottomLeft:
-                                                                            Radius.circular(
-                                                                                5),
-                                                                        bottomRight:
-                                                                            Radius.circular(5)),
-                                                                    border: Border.all(
-                                                                        width:
-                                                                            .5,
-                                                                        color:
-                                                                            kColorGrey),
-                                                                  ),
-                                                                  child:
-                                                                      Padding(
-                                                                    padding:
-                                                                        const EdgeInsets.all(
-                                                                            10),
-                                                                    child: Text(
-                                                                      messagedata[
-                                                                              index]
-                                                                          .messageContent,
-                                                                      style: const TextStyle(
-                                                                          fontSize:
-                                                                              15,
-                                                                          color:
-                                                                              kColorGrey),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              );
-                                                            }),
+                                                            Text(
+                                                              messagedata[index]
+                                                                  .messageContent,
+                                                              style:
+                                                                  const TextStyle(
+                                                                      fontSize:
+                                                                          15),
+                                                            ),
                                                           ],
                                                         ),
                                                       ),
@@ -2450,28 +2134,22 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                 BoxDecoration(
                                                               borderRadius: const BorderRadius
                                                                       .only(
-                                                                  topRight:
-                                                                      Radius.circular(
+                                                                  topRight: Radius
+                                                                      .circular(
                                                                           20),
                                                                   bottomLeft: Radius
                                                                       .circular(
                                                                           20),
                                                                   bottomRight: Radius
                                                                       .circular(
-                                                                          20),
-                                                                  topLeft: Radius
-                                                                      .circular(
                                                                           20)),
-                                                              border: Border.all(
-                                                                  width: 2,
-                                                                  color:
-                                                                      kColorLight),
                                                               color: (messagedata[
                                                                               index]
                                                                           .userID !=
                                                                       widget
                                                                           .userID
-                                                                  ? Colors.white
+                                                                  ? Colors.red
+                                                                      .shade200
                                                                   : Colors.grey
                                                                       .shade200),
                                                             ),
@@ -2722,19 +2400,12 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                               bottomRight:
                                                                   Radius
                                                                       .circular(
-                                                                          20),
-                                                              topLeft: Radius
-                                                                  .circular(
-                                                                      20)),
-                                                          border: Border.all(
-                                                              width: 2,
-                                                              color:
-                                                                  kColorLight),
+                                                                          20)),
                                                           color: (messagedata[
                                                                           index]
-                                                                      .userID !=
+                                                                      .userID ==
                                                                   widget.userID
-                                                              ? Colors.white
+                                                              ? kColorLight
                                                               : Colors.grey
                                                                   .shade200),
                                                         ),
@@ -2746,9 +2417,7 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                               .messageContent,
                                                           style:
                                                               const TextStyle(
-                                                            fontSize: 15,
-                                                            color: kColorGrey,
-                                                          ),
+                                                                  fontSize: 15),
                                                         ),
                                                       ),
                                                     ],
@@ -2786,24 +2455,19 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                   decoration: BoxDecoration(
                                                     borderRadius:
                                                         const BorderRadius.only(
-                                                            topRight: Radius
-                                                                .circular(20),
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                    20),
                                                             bottomLeft:
                                                                 Radius.circular(
                                                                     20),
                                                             bottomRight:
                                                                 Radius.circular(
-                                                                    20),
-                                                            topLeft:
-                                                                Radius.circular(
                                                                     20)),
-                                                    border: Border.all(
-                                                        width: 2,
-                                                        color: kColorPrimary),
                                                     color: (messagedata[index]
                                                                 .userID ==
                                                             widget.userID
-                                                        ? Colors.white
+                                                        ? kColorLight
                                                         : Colors.grey.shade200),
                                                   ),
                                                   padding:
@@ -3039,7 +2703,7 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                         borderRadius:
                                                             const BorderRadius
                                                                     .only(
-                                                                topRight:
+                                                                topLeft:
                                                                     Radius
                                                                         .circular(
                                                                             20),
@@ -3047,22 +2711,14 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                     Radius
                                                                         .circular(
                                                                             20),
-                                                                bottomRight:
-                                                                    Radius
-                                                                        .circular(
-                                                                            20),
-                                                                topLeft: Radius
+                                                                bottomRight: Radius
                                                                     .circular(
                                                                         20)),
-                                                        border: Border.all(
-                                                            width: 2,
-                                                            color:
-                                                                kColorPrimary),
                                                         color: (messagedata[
                                                                         index]
                                                                     .userID ==
                                                                 widget.userID
-                                                            ? Colors.white
+                                                            ? kColorLight
                                                             : Colors
                                                                 .grey.shade200),
                                                       ),
@@ -3070,9 +2726,6 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                               .fromLTRB(
                                                           2, 2, 2, 10),
                                                       child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
                                                         children: [
                                                           Container(
                                                             padding:
@@ -3080,17 +2733,17 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                         .fromLTRB(
                                                                     5, 2, 5, 5),
                                                             child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
                                                               children: [
                                                                 Container(
-                                                                  decoration:
-                                                                      const BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius.all(
-                                                                            Radius.circular(10)),
-                                                                  ),
+                                                                  decoration: const BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.all(Radius.circular(
+                                                                              10)),
+                                                                      color: Color.fromRGBO(
+                                                                          181,
+                                                                          226,
+                                                                          250,
+                                                                          1)),
                                                                   child:
                                                                       Padding(
                                                                     padding: const EdgeInsets
@@ -3100,7 +2753,7 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                         RichText(
                                                                       textAlign:
                                                                           TextAlign
-                                                                              .start,
+                                                                              .center,
                                                                       text:
                                                                           TextSpan(
                                                                         style: Theme.of(context)
@@ -3115,41 +2768,37 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                             TextSpan>[
                                                                           const TextSpan(
                                                                               text: 'You offer',
-                                                                              style: TextStyle(fontSize: 15, color: kColorGrey)),
+                                                                              style: TextStyle(
+                                                                                fontSize: 15,
+                                                                              )),
                                                                           TextSpan(
-                                                                              text: ' \$${messagedata[index].classPrice} ',
+                                                                              text: ' \$${messagedata[index].classPrice}',
+                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: kColorLight, fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
+                                                                              recognizer: TapGestureRecognizer()..onTap = () {}),
+                                                                          TextSpan(
+                                                                              text: ' for',
                                                                               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                                                                    color: kColorPrimary,
                                                                                     fontSize: 15,
-                                                                                    fontWeight: FontWeight.bold,
+                                                                                    fontWeight: FontWeight.w500,
                                                                                   ),
                                                                               recognizer: TapGestureRecognizer()..onTap = () {}),
-                                                                          const TextSpan(
-                                                                              text: 'for\n',
-                                                                              style: TextStyle(fontSize: 15, color: kColorGrey)),
-                                                                          const TextSpan(
-                                                                              text: 'Subject ',
-                                                                              style: TextStyle(fontSize: 15, color: kColorGrey)),
                                                                           TextSpan(
-                                                                              text: subjectid!.subjectName,
-                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                                                                    color: kColorPrimary,
-                                                                                    fontSize: 15,
-                                                                                    fontWeight: FontWeight.bold,
-                                                                                  ),
+                                                                              text: ' ${subjectid!.subjectName}',
+                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: kColorLight, fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
                                                                               recognizer: TapGestureRecognizer()..onTap = () {}),
                                                                           const TextSpan(
-                                                                              text: '\nClasses ',
-                                                                              style: TextStyle(fontSize: 15, color: kColorGrey)),
+                                                                              text: ' subject with'),
                                                                           TextSpan(
                                                                             text:
-                                                                                '${messagedata[index].noofclasses} ',
+                                                                                ' ${messagedata[index].noofclasses} ',
                                                                             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                                                                  color: kColorPrimary,
-                                                                                  fontSize: 15,
-                                                                                  fontWeight: FontWeight.bold,
-                                                                                ),
+                                                                                color: kColorLight,
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                fontStyle: FontStyle.italic),
                                                                           ),
+                                                                          const TextSpan(
+                                                                              text: 'classes.'),
                                                                         ],
                                                                       ),
                                                                     ),
@@ -3158,64 +2807,14 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                               ],
                                                             ),
                                                           ),
-                                                          LayoutBuilder(builder:
-                                                              (context,
-                                                                  constraints) {
-                                                            return Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                          .fromLTRB(
-                                                                      10,
-                                                                      0,
-                                                                      10,
-                                                                      10),
-                                                              child: Container(
-                                                                width: constraints
-                                                                    .maxWidth,
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .fromLTRB(
-                                                                        2,
-                                                                        2,
-                                                                        2,
-                                                                        10),
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  borderRadius: const BorderRadius
-                                                                          .only(
-                                                                      topLeft:
-                                                                          Radius.circular(
-                                                                              5),
-                                                                      topRight:
-                                                                          Radius.circular(
-                                                                              5),
-                                                                      bottomLeft:
-                                                                          Radius.circular(
-                                                                              5),
-                                                                      bottomRight:
-                                                                          Radius.circular(
-                                                                              5)),
-                                                                  border: Border.all(
-                                                                      width: .5,
-                                                                      color:
-                                                                          kColorGrey),
-                                                                ),
-                                                                child: Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                          .all(10),
-                                                                  child: Text(
-                                                                    messagedata[
-                                                                            index]
-                                                                        .messageContent,
-                                                                    style: const TextStyle(
-                                                                        fontSize:
-                                                                            15),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            );
-                                                          }),
+                                                          Text(
+                                                            messagedata[index]
+                                                                .messageContent,
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        15),
+                                                          ),
                                                         ],
                                                       ),
                                                     ),
@@ -3333,30 +2932,22 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                               BoxDecoration(
                                                             borderRadius: const BorderRadius
                                                                     .only(
-                                                                topRight:
-                                                                    Radius
-                                                                        .circular(
-                                                                            20),
+                                                                topLeft: Radius
+                                                                    .circular(
+                                                                        20),
                                                                 bottomLeft: Radius
                                                                     .circular(
                                                                         20),
-                                                                bottomRight:
-                                                                    Radius
-                                                                        .circular(
-                                                                            20),
-                                                                topLeft: Radius
+                                                                bottomRight: Radius
                                                                     .circular(
                                                                         20)),
-                                                            border: Border.all(
-                                                                width: 2,
-                                                                color:
-                                                                    kColorPrimary),
                                                             color: (messagedata[
                                                                             index]
                                                                         .userID ==
                                                                     widget
                                                                         .userID
-                                                                ? Colors.white
+                                                                ? Colors.red
+                                                                    .shade200
                                                                 : Colors.grey
                                                                     .shade200),
                                                           ),
@@ -3590,28 +3181,22 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                   BoxDecoration(
                                                                 borderRadius: const BorderRadius
                                                                         .only(
-                                                                    topRight:
-                                                                        Radius.circular(
+                                                                    topLeft: Radius
+                                                                        .circular(
                                                                             20),
                                                                     bottomLeft:
                                                                         Radius.circular(
                                                                             20),
                                                                     bottomRight:
                                                                         Radius.circular(
-                                                                            20),
-                                                                    topLeft: Radius
-                                                                        .circular(
                                                                             20)),
-                                                                border: Border.all(
-                                                                    width: 2,
-                                                                    color:
-                                                                        kColorPrimary),
-                                                                color: (messagedata[index]
+                                                                color: (messagedata[
+                                                                                index]
                                                                             .userID ==
                                                                         widget
                                                                             .userID
-                                                                    ? Colors
-                                                                        .white
+                                                                    ? Colors.red
+                                                                        .shade200
                                                                     : Colors
                                                                         .grey
                                                                         .shade200),
@@ -3624,9 +3209,6 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                       2,
                                                                       10),
                                                               child: Column(
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
                                                                 children: [
                                                                   Container(
                                                                     padding:
@@ -3635,18 +3217,21 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                             2,
                                                                             2,
                                                                             10),
-                                                                    decoration:
-                                                                        const BoxDecoration(
-                                                                      borderRadius: BorderRadius.only(
-                                                                          topLeft: Radius.circular(
-                                                                              20),
-                                                                          bottomLeft: Radius.circular(
-                                                                              10),
-                                                                          bottomRight: Radius.circular(
-                                                                              10),
-                                                                          topRight:
-                                                                              Radius.circular(10)),
-                                                                    ),
+                                                                    decoration: const BoxDecoration(
+                                                                        borderRadius: BorderRadius.only(
+                                                                            topLeft: Radius.circular(
+                                                                                20),
+                                                                            bottomLeft: Radius.circular(
+                                                                                10),
+                                                                            bottomRight: Radius.circular(
+                                                                                10),
+                                                                            topRight: Radius.circular(
+                                                                                10)),
+                                                                        color: Color.fromRGBO(
+                                                                            181,
+                                                                            226,
+                                                                            250,
+                                                                            1)),
                                                                     child:
                                                                         Padding(
                                                                       padding: const EdgeInsets
@@ -3655,7 +3240,7 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                       child:
                                                                           RichText(
                                                                         textAlign:
-                                                                            TextAlign.start,
+                                                                            TextAlign.center,
                                                                         text:
                                                                             TextSpan(
                                                                           style: Theme.of(context)
@@ -3669,80 +3254,33 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                           children: <
                                                                               TextSpan>[
                                                                             const TextSpan(
-                                                                                text: 'You refused inquiry for\n',
-                                                                                style: TextStyle(fontSize: 15, color: kColorGrey)),
-                                                                            const TextSpan(
-                                                                                text: 'Subject ',
-                                                                                style: TextStyle(fontSize: 15, color: kColorGrey)),
+                                                                                text: 'You refuse inquiry for ',
+                                                                                style: TextStyle(
+                                                                                  fontSize: 15,
+                                                                                )),
                                                                             TextSpan(
                                                                                 text: subjectid!.subjectName,
-                                                                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                                                                      color: kColorPrimary,
-                                                                                      fontSize: 15,
-                                                                                      fontWeight: FontWeight.bold,
-                                                                                    ),
+                                                                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: kColorLight, fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
                                                                                 recognizer: TapGestureRecognizer()..onTap = () {}),
-                                                                            const TextSpan(
-                                                                                text: '\nClasses ',
-                                                                                style: TextStyle(fontSize: 15, color: kColorGrey)),
+                                                                            const TextSpan(text: ' subject with'),
                                                                             TextSpan(
-                                                                              text: '${messagedata[index].noofclasses} ',
-                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                                                                    color: kColorPrimary,
-                                                                                    fontSize: 15,
-                                                                                    fontWeight: FontWeight.bold,
-                                                                                  ),
+                                                                              text: ' ${messagedata[index].noofclasses} ',
+                                                                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: kColorLight, fontSize: 15, fontWeight: FontWeight.w500, fontStyle: FontStyle.italic),
                                                                             ),
+                                                                            const TextSpan(text: 'classes.'),
                                                                           ],
                                                                         ),
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                  LayoutBuilder(
-                                                                      builder:
-                                                                          (context,
-                                                                              constraints) {
-                                                                    return Padding(
-                                                                      padding: const EdgeInsets
-                                                                              .fromLTRB(
-                                                                          10,
-                                                                          0,
-                                                                          10,
-                                                                          10),
-                                                                      child:
-                                                                          Container(
-                                                                        width: constraints
-                                                                            .maxWidth,
-                                                                        padding: const EdgeInsets.fromLTRB(
-                                                                            2,
-                                                                            2,
-                                                                            2,
-                                                                            10),
-                                                                        decoration:
-                                                                            BoxDecoration(
-                                                                          borderRadius: const BorderRadius.only(
-                                                                              topLeft: Radius.circular(5),
-                                                                              topRight: Radius.circular(5),
-                                                                              bottomLeft: Radius.circular(5),
-                                                                              bottomRight: Radius.circular(5)),
-                                                                          border: Border.all(
-                                                                              width: .5,
-                                                                              color: kColorGrey),
-                                                                        ),
-                                                                        child:
-                                                                            Padding(
-                                                                          padding:
-                                                                              const EdgeInsets.all(10),
-                                                                          child:
-                                                                              Text(
-                                                                            messagedata[index].messageContent,
-                                                                            style:
-                                                                                const TextStyle(fontSize: 15),
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    );
-                                                                  }),
+                                                                  Text(
+                                                                    messagedata[
+                                                                            index]
+                                                                        .messageContent,
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            15),
+                                                                  ),
                                                                 ],
                                                               ),
                                                             ),
@@ -3777,28 +3315,20 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                   BoxDecoration(
                                                                 borderRadius: const BorderRadius
                                                                         .only(
-                                                                    topRight:
-                                                                        Radius.circular(
+                                                                    topLeft: Radius
+                                                                        .circular(
                                                                             20),
                                                                     bottomLeft:
                                                                         Radius.circular(
                                                                             20),
                                                                     bottomRight:
                                                                         Radius.circular(
-                                                                            20),
-                                                                    topLeft: Radius
-                                                                        .circular(
                                                                             20)),
-                                                                border: Border.all(
-                                                                    width: 2,
-                                                                    color:
-                                                                        kColorPrimary),
                                                                 color: (messagedata[index]
                                                                             .userID ==
                                                                         widget
                                                                             .userID
-                                                                    ? Colors
-                                                                        .white
+                                                                    ? kColorLight
                                                                     : Colors
                                                                         .grey
                                                                         .shade200),
@@ -3853,60 +3383,59 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                   decoration: BoxDecoration(
                                                     borderRadius:
                                                         const BorderRadius.only(
-                                                            topRight: Radius
-                                                                .circular(20),
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                    20),
                                                             bottomLeft:
                                                                 Radius.circular(
                                                                     20),
                                                             bottomRight:
                                                                 Radius.circular(
-                                                                    20),
-                                                            topLeft:
-                                                                Radius.circular(
                                                                     20)),
-                                                    border: Border.all(
-                                                        width: 2,
-                                                        color: kColorPrimary),
                                                     color: (messagedata[index]
                                                                 .userID ==
                                                             widget.userID
-                                                        ? Colors.white
+                                                        ? kColorLight
                                                         : Colors.grey.shade200),
                                                   ),
                                                   padding:
                                                       const EdgeInsets.fromLTRB(
                                                           2, 2, 2, 10),
                                                   child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
                                                     children: [
                                                       Container(
                                                         padding:
                                                             const EdgeInsets
                                                                     .fromLTRB(
                                                                 2, 2, 2, 10),
-                                                        decoration:
-                                                            const BoxDecoration(
-                                                          borderRadius: BorderRadius.only(
-                                                              topLeft: Radius
-                                                                  .circular(10),
-                                                              topRight: Radius
-                                                                  .circular(20),
-                                                              bottomLeft: Radius
-                                                                  .circular(10),
-                                                              bottomRight:
-                                                                  Radius
-                                                                      .circular(
-                                                                          10)),
-                                                        ),
+                                                        decoration: const BoxDecoration(
+                                                            borderRadius: BorderRadius.only(
+                                                                topLeft: Radius
+                                                                    .circular(
+                                                                        20),
+                                                                bottomLeft: Radius
+                                                                    .circular(
+                                                                        10),
+                                                                bottomRight:
+                                                                    Radius
+                                                                        .circular(
+                                                                            10),
+                                                                topRight: Radius
+                                                                    .circular(
+                                                                        10)),
+                                                            color:
+                                                                Color.fromRGBO(
+                                                                    181,
+                                                                    226,
+                                                                    250,
+                                                                    1)),
                                                         child: Padding(
                                                           padding:
                                                               const EdgeInsets
-                                                                  .all(10),
+                                                                  .all(10.0),
                                                           child: RichText(
-                                                            textAlign:
-                                                                TextAlign.start,
+                                                            textAlign: TextAlign
+                                                                .center,
                                                             text: TextSpan(
                                                               style: Theme.of(
                                                                       context)
@@ -3929,131 +3458,65 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                   TextSpan>[
                                                                 const TextSpan(
                                                                     text:
-                                                                        'You are inquiring for\n',
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            15,
-                                                                        color:
-                                                                            kColorGrey)),
-                                                                const TextSpan(
-                                                                    text:
-                                                                        'Subject ',
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            15,
-                                                                        color:
-                                                                            kColorGrey)),
+                                                                        'You are inquiring for ',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          15,
+                                                                    )),
                                                                 TextSpan(
                                                                     text: subjectid!
                                                                         .subjectName,
-                                                                    style: Theme.of(
-                                                                            context)
-                                                                        .textTheme
-                                                                        .headlineSmall
-                                                                        ?.copyWith(
-                                                                          color:
-                                                                              kColorPrimary,
-                                                                          fontSize:
-                                                                              15,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                        ),
+                                                                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                        color:
+                                                                            kColorLight,
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w500,
+                                                                        fontStyle:
+                                                                            FontStyle
+                                                                                .italic),
                                                                     recognizer:
                                                                         TapGestureRecognizer()
                                                                           ..onTap =
                                                                               () {}),
                                                                 const TextSpan(
                                                                     text:
-                                                                        '\nClasses ',
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            15,
-                                                                        color:
-                                                                            kColorGrey)),
+                                                                        ' subject with'),
                                                                 TextSpan(
                                                                   text:
-                                                                      '${messagedata[index].noofclasses} ',
-                                                                  style: Theme.of(
-                                                                          context)
+                                                                      ' ${messagedata[index].noofclasses} ',
+                                                                  style: Theme
+                                                                          .of(
+                                                                              context)
                                                                       .textTheme
                                                                       .headlineSmall
                                                                       ?.copyWith(
-                                                                        color:
-                                                                            kColorPrimary,
-                                                                        fontSize:
-                                                                            15,
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                      ),
+                                                                          color:
+                                                                              kColorLight,
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .w500,
+                                                                          fontStyle:
+                                                                              FontStyle.italic),
                                                                 ),
+                                                                const TextSpan(
+                                                                    text:
+                                                                        'classes.'),
                                                               ],
                                                             ),
                                                           ),
                                                         ),
                                                       ),
-                                                      LayoutBuilder(builder:
-                                                          (context,
-                                                              constraints) {
-                                                        return Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  10,
-                                                                  0,
-                                                                  10,
-                                                                  10),
-                                                          child: Container(
-                                                            width: constraints
-                                                                .maxWidth,
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .fromLTRB(
-                                                                    2,
-                                                                    2,
-                                                                    2,
-                                                                    10),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius: const BorderRadius
-                                                                      .only(
-                                                                  topLeft: Radius
-                                                                      .circular(
-                                                                          5),
-                                                                  topRight: Radius
-                                                                      .circular(
-                                                                          5),
-                                                                  bottomLeft: Radius
-                                                                      .circular(
-                                                                          5),
-                                                                  bottomRight: Radius
-                                                                      .circular(
-                                                                          5)),
-                                                              border: Border.all(
-                                                                  width: .5,
-                                                                  color:
-                                                                      kColorGrey),
-                                                            ),
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(10),
-                                                              child: Text(
-                                                                messagedata[
-                                                                        index]
-                                                                    .messageContent,
-                                                                style: const TextStyle(
-                                                                    fontSize:
-                                                                        15,
-                                                                    color:
-                                                                        kColorGrey),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .start,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        );
-                                                      }),
+                                                      Text(
+                                                        messagedata[index]
+                                                            .messageContent,
+                                                        style: const TextStyle(
+                                                            fontSize: 15),
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
@@ -4168,7 +3631,7 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                         borderRadius:
                                                             const BorderRadius
                                                                     .only(
-                                                                topRight:
+                                                                topLeft:
                                                                     Radius
                                                                         .circular(
                                                                             20),
@@ -4176,22 +3639,14 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                     Radius
                                                                         .circular(
                                                                             20),
-                                                                bottomRight:
-                                                                    Radius
-                                                                        .circular(
-                                                                            20),
-                                                                topLeft: Radius
+                                                                bottomRight: Radius
                                                                     .circular(
                                                                         20)),
-                                                        border: Border.all(
-                                                            width: 2,
-                                                            color:
-                                                                kColorPrimary),
                                                         color: (messagedata[
                                                                         index]
                                                                     .userID ==
                                                                 widget.userID
-                                                            ? Colors.white
+                                                            ? kColorLight
                                                             : Colors
                                                                 .grey.shade200),
                                                       ),
@@ -4397,30 +3852,22 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                               BoxDecoration(
                                                             borderRadius: const BorderRadius
                                                                     .only(
-                                                                topRight:
-                                                                    Radius
-                                                                        .circular(
-                                                                            20),
+                                                                topLeft: Radius
+                                                                    .circular(
+                                                                        20),
                                                                 bottomLeft: Radius
                                                                     .circular(
                                                                         20),
-                                                                bottomRight:
-                                                                    Radius
-                                                                        .circular(
-                                                                            20),
-                                                                topLeft: Radius
+                                                                bottomRight: Radius
                                                                     .circular(
                                                                         20)),
-                                                            border: Border.all(
-                                                                width: 2,
-                                                                color:
-                                                                    kColorPrimary),
                                                             color: (messagedata[
                                                                             index]
                                                                         .userID ==
                                                                     widget
                                                                         .userID
-                                                                ? Colors.white
+                                                                ? Colors.red
+                                                                    .shade200
                                                                 : Colors.grey
                                                                     .shade200),
                                                           ),
@@ -4429,9 +3876,6 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                       .fromLTRB(
                                                                   2, 2, 2, 10),
                                                           child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
                                                             children: [
                                                               Container(
                                                                 padding:
@@ -4441,31 +3885,36 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                         2,
                                                                         2,
                                                                         10),
-                                                                decoration:
-                                                                    const BoxDecoration(
-                                                                  borderRadius: BorderRadius.only(
-                                                                      topLeft:
-                                                                          Radius.circular(
-                                                                              10),
-                                                                      topRight:
-                                                                          Radius.circular(
-                                                                              20),
-                                                                      bottomLeft:
-                                                                          Radius.circular(
-                                                                              10),
-                                                                      bottomRight:
-                                                                          Radius.circular(
-                                                                              10)),
-                                                                ),
+                                                                decoration: const BoxDecoration(
+                                                                    borderRadius: BorderRadius.only(
+                                                                        topLeft:
+                                                                            Radius.circular(
+                                                                                20),
+                                                                        bottomLeft:
+                                                                            Radius.circular(
+                                                                                10),
+                                                                        bottomRight:
+                                                                            Radius.circular(
+                                                                                10),
+                                                                        topRight:
+                                                                            Radius.circular(
+                                                                                10)),
+                                                                    color: Color
+                                                                        .fromRGBO(
+                                                                            181,
+                                                                            226,
+                                                                            250,
+                                                                            1)),
                                                                 child: Padding(
                                                                   padding:
                                                                       const EdgeInsets
-                                                                          .all(10),
+                                                                              .all(
+                                                                          10.0),
                                                                   child:
                                                                       RichText(
                                                                     textAlign:
                                                                         TextAlign
-                                                                            .start,
+                                                                            .center,
                                                                     text:
                                                                         TextSpan(
                                                                       style: Theme.of(
@@ -4487,107 +3936,49 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                           TextSpan>[
                                                                         const TextSpan(
                                                                             text:
-                                                                                'You declined offer for\n',
+                                                                                'You declined  offer for ',
                                                                             style:
-                                                                                TextStyle(fontSize: 15, color: kColorGrey)),
-                                                                        const TextSpan(
-                                                                            text:
-                                                                                'Subject ',
-                                                                            style:
-                                                                                TextStyle(fontSize: 15, color: kColorGrey)),
+                                                                                TextStyle(
+                                                                              fontSize: 15,
+                                                                            )),
                                                                         TextSpan(
                                                                             text: subjectid!
                                                                                 .subjectName,
-                                                                            style: Theme.of(context)
-                                                                                .textTheme
-                                                                                .headlineSmall
-                                                                                ?.copyWith(
-                                                                                  color: kColorPrimary,
-                                                                                  fontSize: 15,
-                                                                                  fontWeight: FontWeight.bold,
-                                                                                ),
-                                                                            recognizer: TapGestureRecognizer()
-                                                                              ..onTap = () {}),
+                                                                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                                color: kColorLight,
+                                                                                fontSize: 15,
+                                                                                fontWeight: FontWeight.w500,
+                                                                                fontStyle: FontStyle.italic),
+                                                                            recognizer: TapGestureRecognizer()..onTap = () {}),
                                                                         const TextSpan(
                                                                             text:
-                                                                                '\nClasses ',
-                                                                            style:
-                                                                                TextStyle(fontSize: 15, color: kColorGrey)),
+                                                                                ' subject with'),
                                                                         TextSpan(
                                                                           text:
-                                                                              '${messagedata[index].noofclasses} ',
-                                                                          style: Theme.of(context)
-                                                                              .textTheme
-                                                                              .headlineSmall
-                                                                              ?.copyWith(
-                                                                                color: kColorPrimary,
-                                                                                fontSize: 15,
-                                                                                fontWeight: FontWeight.bold,
-                                                                              ),
+                                                                              ' ${messagedata[index].noofclasses} ',
+                                                                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                                                              color: kColorLight,
+                                                                              fontSize: 15,
+                                                                              fontWeight: FontWeight.w500,
+                                                                              fontStyle: FontStyle.italic),
                                                                         ),
+                                                                        const TextSpan(
+                                                                            text:
+                                                                                'classes.'),
                                                                       ],
                                                                     ),
                                                                   ),
                                                                 ),
                                                               ),
-                                                              LayoutBuilder(builder:
-                                                                  (context,
-                                                                      constraints) {
-                                                                return Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                              .fromLTRB(
-                                                                          10,
-                                                                          0,
-                                                                          10,
-                                                                          10),
-                                                                  child:
-                                                                      Container(
-                                                                    width: constraints
-                                                                        .maxWidth,
-                                                                    padding:
-                                                                        const EdgeInsets.fromLTRB(
-                                                                            2,
-                                                                            2,
-                                                                            2,
-                                                                            10),
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      borderRadius: const BorderRadius
-                                                                              .only(
-                                                                          topLeft: Radius.circular(
-                                                                              5),
-                                                                          topRight: Radius.circular(
-                                                                              5),
-                                                                          bottomLeft: Radius.circular(
-                                                                              5),
-                                                                          bottomRight:
-                                                                              Radius.circular(5)),
-                                                                      border: Border.all(
-                                                                          width:
-                                                                              .5,
-                                                                          color:
-                                                                              kColorGrey),
-                                                                    ),
-                                                                    child:
-                                                                        Padding(
-                                                                      padding:
-                                                                          const EdgeInsets.all(
-                                                                              10),
-                                                                      child:
-                                                                          Text(
-                                                                        messagedata[index]
-                                                                            .messageContent,
-                                                                        style: const TextStyle(
-                                                                            fontSize:
-                                                                                15,
-                                                                            color:
-                                                                                kColorGrey),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                );
-                                                              }),
+                                                              Text(
+                                                                messagedata[
+                                                                        index]
+                                                                    .messageContent,
+                                                                style:
+                                                                    const TextStyle(
+                                                                        fontSize:
+                                                                            15),
+                                                              ),
                                                             ],
                                                           ),
                                                         ),
@@ -4710,28 +4101,22 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                   BoxDecoration(
                                                                 borderRadius: const BorderRadius
                                                                         .only(
-                                                                    topRight:
-                                                                        Radius.circular(
+                                                                    topLeft: Radius
+                                                                        .circular(
                                                                             20),
                                                                     bottomLeft:
                                                                         Radius.circular(
                                                                             20),
                                                                     bottomRight:
                                                                         Radius.circular(
-                                                                            20),
-                                                                    topLeft: Radius
-                                                                        .circular(
                                                                             20)),
-                                                                border: Border.all(
-                                                                    width: 2,
-                                                                    color:
-                                                                        kColorPrimary),
-                                                                color: (messagedata[index]
+                                                                color: (messagedata[
+                                                                                index]
                                                                             .userID ==
                                                                         widget
                                                                             .userID
-                                                                    ? Colors
-                                                                        .white
+                                                                    ? Colors.red
+                                                                        .shade200
                                                                     : Colors
                                                                         .grey
                                                                         .shade200),
@@ -4850,28 +4235,20 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
                                                                   BoxDecoration(
                                                                 borderRadius: const BorderRadius
                                                                         .only(
-                                                                    topRight:
-                                                                        Radius.circular(
+                                                                    topLeft: Radius
+                                                                        .circular(
                                                                             20),
                                                                     bottomLeft:
                                                                         Radius.circular(
                                                                             20),
                                                                     bottomRight:
                                                                         Radius.circular(
-                                                                            20),
-                                                                    topLeft: Radius
-                                                                        .circular(
                                                                             20)),
-                                                                border: Border.all(
-                                                                    width: 2,
-                                                                    color:
-                                                                        kColorPrimary),
                                                                 color: (messagedata[index]
                                                                             .userID ==
                                                                         widget
                                                                             .userID
-                                                                    ? Colors
-                                                                        .white
+                                                                    ? kColorLight
                                                                     : Colors
                                                                         .grey
                                                                         .shade200),
@@ -4899,67 +4276,50 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
               ),
               Align(
                 alignment: Alignment.bottomLeft,
-                child: Card(
-                  elevation: 2,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.only(left: 10, bottom: 10, top: 10),
-                    height: 60,
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(5),
-                          bottomLeft: Radius.circular(5),
-                          bottomRight: Radius.circular(5),
-                          topLeft: Radius.circular(5)),
-                    ),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: TextField(
-                            controller: messageContent,
-                            decoration: const InputDecoration(
-                                hintText: "Write message...",
-                                hintStyle: TextStyle(color: Colors.black54),
-                                border: InputBorder.none),
-                            onSubmitted: (value) {
-                              sendmessage(messageContent.text, widget.chatID,
-                                  widget.userID);
-                              bool usertype =
-                                  tutorsList.userId == widget.userID;
-                              updatemessagestatusInfo(
-                                  !usertype, widget.chatID, '1');
-                              scrollController.jumpTo(
-                                  scrollController.position.maxScrollExtent);
-                              messageContent.clear();
-                            },
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 15,
-                        ),
-                        FloatingActionButton(
-                          onPressed: () {
+                child: Container(
+                  padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
+                  height: 60,
+                  width: double.infinity,
+                  color: Colors.white,
+                  child: Row(
+                    children: <Widget>[
+                   
+                      Expanded(
+                        child: TextField(
+                          controller: messageContent,
+                          decoration: const InputDecoration(
+                              hintText: "Write message...",
+                              hintStyle: TextStyle(color: Colors.black54),
+                              border: InputBorder.none),
+                          onSubmitted: (value) {
                             sendmessage(messageContent.text, widget.chatID,
                                 widget.userID);
-                             bool usertype =
-                                  tutorsList.userId == widget.userID;
-                              updatemessagestatusInfo(
-                                  !usertype, widget.chatID, '1');
-                              scrollController.jumpTo(
-                                  scrollController.position.maxScrollExtent);
+                            scrollController.jumpTo(
+                                scrollController.position.maxScrollExtent);
                             messageContent.clear();
                           },
-                          backgroundColor: Colors.white,
-                          elevation: 0,
-                          child: const Icon(
-                            Icons.send_outlined,
-                            color: kColorPrimary,
-                            size: 30,
-                          ),
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(
+                        width: 15,
+                      ),
+                      FloatingActionButton(
+                        onPressed: () {
+                          sendmessage(messageContent.text, widget.chatID,
+                              widget.userID);
+                          scrollController.jumpTo(
+                              scrollController.position.maxScrollExtent);
+                          messageContent.clear();
+                        },
+                        backgroundColor: kColorPrimary,
+                        elevation: 0,
+                        child: const Icon(
+                          Icons.send,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

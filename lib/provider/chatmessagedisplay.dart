@@ -10,3 +10,14 @@ class ChatDisplayProvider with ChangeNotifier{
     notifyListeners();
   }
 }
+
+class GotMessageProvider with ChangeNotifier{
+  bool _gotMessage = false;
+
+  bool get gotMessage => _gotMessage;
+
+   void setGotMessage(bool set){
+    _gotMessage = set;
+    notifyListeners();
+  }
+}

@@ -235,6 +235,12 @@ class _UserListState extends State<UserList> {
         FocusScope.of(context).requestFocus(_searchFocusNode);
       });
     }
+    messagelist.sort((a, b) {
+      DateTime messagedateA = a.messageDate;
+      DateTime messagedateB = b.messageDate;
+
+      return messagedateB.compareTo(messagedateA);
+    });
     return Consumer<StarMessagesNotifier>(
         builder: (context, messagenotifierdata, _) {
       starred = messagenotifierdata.starMessages;
@@ -252,7 +258,7 @@ class _UserListState extends State<UserList> {
             },
             icon: const Icon(EvaIcons.searchOutline),
             iconSize: 25,
-            color: Colors.orange,
+            color: kColorPrimary,
           ),
           title: PreferredSize(
             preferredSize: const Size.fromHeight(48),
@@ -263,15 +269,24 @@ class _UserListState extends State<UserList> {
                       key: const Key(
                           'search-bar-key'), // Add a key to differentiate between widgets
 
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 0, vertical: 2),
                       child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
                         alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Colors.grey.shade400, // Border color
+                            width: 1.0, // Border width
+                          ),
+                        ),
                         width: 250,
                         child: TextField(
-                          decoration: const InputDecoration(
+                          decoration:  InputDecoration(
                             fillColor: Colors.white,
                             border: InputBorder.none,
-                            hintText: 'Search users',
+                            hintText: _items.first['role'] == 'tutor' ?'Search student' : 'Search tutor',
                           ),
                           focusNode: _searchFocusNode, // Assign the focus node
 
@@ -300,7 +315,7 @@ class _UserListState extends State<UserList> {
             IconButton(
               icon: Icon(
                 openStarred ? Icons.star : Icons.star_border,
-                color: openStarred ? Colors.orange : Colors.orange,
+                color: kColorPrimary,
               ),
               onPressed: () {
                 final provider = context.read<StarDisplayProvider>();
@@ -328,7 +343,14 @@ class _UserListState extends State<UserList> {
                     onHover: (event) {},
                     cursor: SystemMouseCursors.click,
                     child: messagelist.isEmpty
-                        ? const Text('No users found..')
+                        ? LayoutBuilder(builder: (context, constrain) {
+                            return Container(
+                                constraints: BoxConstraints(
+                                  minWidth: 0,
+                                  maxWidth: constrain.maxWidth,
+                                ),
+                                child: const Text('No users found..'));
+                          })
                         : ListView.builder(
                             shrinkWrap: true,
                             itemCount: messagelist.length,
@@ -339,106 +361,144 @@ class _UserListState extends State<UserList> {
                                   studentinfodata.firstWhere((student) =>
                                       student.userID ==
                                       messagelist[index].studentID);
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.only(bottom: 5, top: 5),
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                      border: Border(
-                                          bottom: BorderSide(width: .05))),
-                                  child: ListTile(
-                                    leading: CircleAvatar(
-                                      backgroundColor: Colors.black12,
-                                      backgroundImage:
-                                          data.userId == _items.first['userID']
-                                              ? NetworkImage(
-                                                  studentdata.profilelink)
-                                              : NetworkImage(data.imageID),
-                                    ),
-                                    title: Text(
-                                      data.userId == _items.first['userID']
-                                          ? '${studentdata.studentFirstname} ${studentdata.studentLastname}'
-                                          : '${data.firstName} ${data.lastname}',
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    // subtitle: Text(messagelist[index].lastmessage,
-                                    //     style: TextStyle(
-                                    //         color: Colors.black,
-                                    //         fontWeight: messagelist[index]
-                                    //                     .messageStatus
-                                    //                     .toString() ==
-                                    //                 'unread'
-                                    //             ? FontWeight.bold
-                                    //             : FontWeight.normal)),
-                                    trailing: Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            IconButton(
-                                              iconSize: 20,
-                                              icon: Icon(
-                                                starred.contains(data.userId) ||
-                                                        starred.contains(
-                                                            studentdata.userID)
-                                                    ? Icons.star
-                                                    : Icons.star_border,
-                                                color: Colors.orange,
-                                              ),
-                                              splashColor: Colors.transparent,
-                                              highlightColor:
-                                                  Colors.transparent,
-                                              hoverColor: Colors.transparent,
-                                              mouseCursor:
-                                                  MaterialStateMouseCursor
-                                                      .clickable,
-                                              onPressed: () {
-                                                if (_items.first['role'] ==
-                                                    'student') {
-                                                  if (starred
-                                                      .contains(data.userId)) {
-                                                    starred.remove(data.userId);
-                                                  } else {
-                                                    starred.add(data.userId);
-                                                  }
-                                                } else {
-                                                  if (starred.contains(
-                                                      studentdata.userID)) {
-                                                    starred.remove(
-                                                        studentdata.userID);
-                                                  } else {
-                                                    starred.add(
-                                                        studentdata.userID);
-                                                  }
-                                                }
 
-                                                updateStarredMessagesInFirestore(
-                                                    starred,
-                                                    _items.first['userID']);
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                        const Spacer(),
-                                      ],
-                                    ),
-                                    onTap: () {
-                                      final provider =
-                                          context.read<ChatDisplayProvider>();
-                                      provider.setOpenMessage(true);
-                                      setState(() {
-                                        currentconvo = messagelist[index];
-                                        updatemessagestatusInfo(
-                                            messagelist[index].chatID);
-                                        chatID = messagelist[index].chatID;
-                                      });
-                                    },
+                              return Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: currentconvo != null && currentconvo!.chatID == messagelist[index].chatID ? kColorPrimary : Colors.grey.shade400, // Border color
+                                    width: currentconvo != null && currentconvo!.chatID == messagelist[index].chatID ? 2.0: 1.0, // Border width
                                   ),
+                                ),
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    bool showFullTile =
+                                        constraints.maxWidth >= 100;
+                                    return ListTile(
+                                      contentPadding: showFullTile
+                                          ? const EdgeInsets.symmetric(
+                                              horizontal: 16.0)
+                                          : const EdgeInsets.symmetric(
+                                              horizontal: 16.0),
+                                      leading: CircleAvatar(
+                                          backgroundColor: Colors.black12,
+                                          backgroundImage: (data.userId ==
+                                                  _items.first['userID']
+                                              ? NetworkImage(
+                                                  studentdata.profilelink,
+                                                  scale: Checkbox.width)
+                                              : NetworkImage(data.imageID,
+                                                  scale: Checkbox.width))),
+                                      title: showFullTile
+                                          ? Text(
+                                              data.userId ==
+                                                      _items.first['userID']
+                                                  ? '${studentdata.studentFirstname} ${studentdata.studentLastname}'
+                                                  : '${data.firstName} ${data.lastname}',
+                                              style: TextStyle(
+                                                color: data.userId ==
+                                                        _items.first['userID']
+                                                    ? messagelist[index]
+                                                                    .messageStatus[
+                                                                'tutorRead'] !=
+                                                            '0'
+                                                        ? Colors.black
+                                                        : kColorGrey
+                                                    : messagelist[index]
+                                                                    .messageStatus[
+                                                                'studentRead'] !=
+                                                            '0'
+                                                        ? Colors.black
+                                                        : kColorGrey,
+                                                fontWeight: FontWeight.bold,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            )
+                                          : null,
+                                      subtitle: showFullTile
+                                          ? Text(
+                                              data.userId ==
+                                                      _items.first['userID']
+                                                  ? studentdata.studentID
+                                                  : data.tutorID,
+                                              style: const TextStyle(
+                                                color: kColorGrey,
+                                                fontWeight: FontWeight.normal,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            )
+                                          : null,
+                                      trailing: IconButton(
+                                        iconSize: 20,
+                                        icon: Icon(
+                                          starred.contains(data.userId) ||
+                                                  starred.contains(
+                                                      studentdata.userID)
+                                              ? Icons.star
+                                              : Icons.star_border,
+                                          color: kColorPrimary,
+                                        ),
+                                        splashColor: Colors.transparent,
+                                        highlightColor: kColorLight,
+                                        hoverColor: kColorLight,
+                                        mouseCursor:
+                                            MaterialStateMouseCursor.clickable,
+                                        onPressed: () {
+                                          if (_items.first['role'] ==
+                                              'student') {
+                                            if (starred.contains(data.userId)) {
+                                              starred.remove(data.userId);
+                                            } else {
+                                              starred.add(data.userId);
+                                            }
+                                          } else {
+                                            if (starred
+                                                .contains(studentdata.userID)) {
+                                              starred
+                                                  .remove(studentdata.userID);
+                                            } else {
+                                              starred.add(studentdata.userID);
+                                            }
+                                          }
+
+                                          updateStarredMessagesInFirestore(
+                                            starred,
+                                            _items.first['userID'],
+                                          );
+                                        },
+                                      ),
+                                      onTap: () {
+                                        final provider =
+                                            context.read<ChatDisplayProvider>();
+                                        provider.setOpenMessage(true);
+                                        setState(() {
+                                          currentconvo = messagelist[index];
+                                          bool usertype = data.userId ==
+                                              _items.first['userID'];
+                                          if (usertype == true) {
+                                            if (currentconvo!.messageStatus[
+                                                    'tutorRead'] ==
+                                                '1') {
+                                              updatemessagestatusInfo(
+                                                  usertype,
+                                                  messagelist[index].chatID,
+                                                  '0');
+                                            }
+                                          } else {
+                                            if (currentconvo!.messageStatus[
+                                                    'studentRead'] ==
+                                                '1') {
+                                              updatemessagestatusInfo(
+                                                  usertype,
+                                                  messagelist[index].chatID,
+                                                  '0');
+                                            }
+                                          }
+                                          chatID = messagelist[index].chatID;
+                                        });
+                                      },
+                                    );
+                                  },
                                 ),
                               );
                             },
@@ -463,27 +523,28 @@ class _UserListState extends State<UserList> {
                             children: [
                               const Icon(
                                 Icons.wechat_rounded,
-                                color: Colors.orange,
+                                color: kColorPrimary,
                                 size: 75,
                               ),
                               const Text(
                                 'Select a conversation to display messages',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
+                                  color: kColorGrey,
                                 ),
+                                textAlign: TextAlign.center,
                               ),
                               const Text(
                                 'or',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                ),
+                                style:
+                                    TextStyle(fontSize: 16, color: kColorGrey),
                               ),
                               InkWell(
                                   onTap: () {},
                                   child: const Text(
                                     'Start a new conversation',
                                     style: TextStyle(
-                                        fontSize: 18, color: Colors.orange),
+                                        fontSize: 16, color: kColorPrimary),
                                   ))
                             ],
                           ),

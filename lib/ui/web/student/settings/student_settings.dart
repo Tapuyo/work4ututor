@@ -103,33 +103,33 @@ class _StudentSettingsPageState extends State<StudentSettingsPage> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 200,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: settingsView == "/accounts"
-                            ? kColorPrimary
-                            : Colors.white,
-                        disabledForegroundColor: Colors.blueGrey,
-                        disabledBackgroundColor: Colors.blueGrey,
-                        shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5))),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          settingsView = "/accounts";
-                        });
-                      },
-                      child: Text(
-                        'Account Information',
-                        style: TextStyle(
-                            color: settingsView == "/accounts"
-                                ? Colors.white
-                                : Colors.black),
-                      ),
-                    ),
-                  ),
+                  // SizedBox(
+                  //   width: 200,
+                  //   height: 50,
+                  //   child: ElevatedButton(
+                  //     style: ElevatedButton.styleFrom(
+                  //       backgroundColor: settingsView == "/accounts"
+                  //           ? kColorPrimary
+                  //           : Colors.white,
+                  //       disabledForegroundColor: Colors.blueGrey,
+                  //       disabledBackgroundColor: Colors.blueGrey,
+                  //       shape: const RoundedRectangleBorder(
+                  //           borderRadius: BorderRadius.all(Radius.circular(5))),
+                  //     ),
+                  //     onPressed: () {
+                  //       setState(() {
+                  //         settingsView = "/accounts";
+                  //       });
+                  //     },
+                  //     child: Text(
+                  //       'Account Information',
+                  //       style: TextStyle(
+                  //           color: settingsView == "/accounts"
+                  //               ? Colors.white
+                  //               : Colors.black),
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(
                     width: 200,
                     height: 50,

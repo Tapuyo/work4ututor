@@ -11,6 +11,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:country_pickers/country_pickers.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'dart:js' as js;
@@ -3853,12 +3854,10 @@ class _InputInfoState extends State<InputInfo> {
                                         autoCloseDuration:
                                             const Duration(seconds: 1),
                                       ).then(
-                                          (value) => Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const LoginPage()),
-                                              ));
+                                          (value) {
+                                            GoRouter.of(context).go(
+                                          '/');
+                                          });
                                     });
                                   } else {
                                     CoolAlert.show(

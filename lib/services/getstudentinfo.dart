@@ -780,3 +780,305 @@ Future<void> _updateEmailAndPassword(String email, String password) async {
     }
   }
 }
+
+Future<String?> updateTutorCertificates(
+  String uid,
+  List<String?> certificates,
+  List<String?> certificatestype,
+) async {
+  try {
+    final docSnapshot =
+        await FirebaseFirestore.instance.collection('tutor').doc(uid).get();
+    final currentCertificates =
+        List<String?>.from(docSnapshot.data()?['certificates'] ?? []);
+    final currentCertificateTypes =
+        List<String?>.from(docSnapshot.data()?['certificatestype'] ?? []);
+
+    final updatedCertificates = [...currentCertificates, ...certificates];
+    final updatedCertificateTypes = [
+      ...currentCertificateTypes,
+      ...certificatestype
+    ];
+
+    await FirebaseFirestore.instance.collection('tutor').doc(uid).update({
+      "certificates": updatedCertificates,
+      "certificatestype": updatedCertificateTypes,
+    });
+
+    return 'success';
+  } catch (error) {
+    return error.toString();
+  }
+}
+
+Future<String?> updateTutorResume(
+  String uid,
+  List<String?> resume,
+  List<String?> resumetype,
+) async {
+  try {
+    final docSnapshot =
+        await FirebaseFirestore.instance.collection('tutor').doc(uid).get();
+    final currentCertificates =
+        List<String?>.from(docSnapshot.data()?['resume'] ?? []);
+    final currentCertificateTypes =
+        List<String?>.from(docSnapshot.data()?['resumetype'] ?? []);
+
+    final updatedResume = [...currentCertificates, ...resume];
+    final updatedType = [...currentCertificateTypes, ...resumetype];
+
+    await FirebaseFirestore.instance.collection('tutor').doc(uid).update({
+      "resume": updatedResume,
+      "resumetype": updatedType,
+    });
+
+    return 'success';
+  } catch (error) {
+    return error.toString();
+  }
+}
+
+Future<String?> updateTutorVideo(
+  String uid,
+  List<String?> video,
+) async {
+  try {
+    final docSnapshot =
+        await FirebaseFirestore.instance.collection('tutor').doc(uid).get();
+    final currentCertificates =
+        List<String?>.from(docSnapshot.data()?['presentation'] ?? []);
+
+    final updatedVideo = [...currentCertificates, ...video];
+
+    await FirebaseFirestore.instance.collection('tutor').doc(uid).update({
+      "presentation": updatedVideo,
+    });
+
+    return 'success';
+  } catch (error) {
+    return error.toString();
+  }
+}
+
+Future<String?> updateTutorInfoOffer(
+  String uid,
+  String promotionalMessage,
+  List<String?> servicesprovided,
+  List<String?> video,
+  List<String?> resume,
+  List<String?> resumetype,
+  List<String?> certificates,
+  List<String?> certificatestype,
+) async {
+  try {
+    //
+    final docSnapshot =
+        await FirebaseFirestore.instance.collection('tutor').doc(uid).get();
+
+    //
+    final currentResume =
+        List<String?>.from(docSnapshot.data()?['resume'] ?? []);
+    final currentResumeTypes =
+        List<String?>.from(docSnapshot.data()?['resumetype'] ?? []);
+
+    final updatedResume = [...currentResume, ...resume];
+    final updatedType = [...currentResumeTypes, ...resumetype];
+    //
+    final currentCertificates =
+        List<String?>.from(docSnapshot.data()?['certificates'] ?? []);
+    final currentCertificateTypes =
+        List<String?>.from(docSnapshot.data()?['certificatestype'] ?? []);
+
+    final updatedCertificates = [...currentCertificates, ...certificates];
+    final updatedCertificateTypes = [
+      ...currentCertificateTypes,
+      ...certificatestype
+    ];
+    //
+    final currentVideos =
+        List<String?>.from(docSnapshot.data()?['presentation'] ?? []);
+
+    final updatedVideo = [...currentVideos, ...video];
+    //
+    await FirebaseFirestore.instance.collection('tutor').doc(uid).update({
+      "promotionalMessage": promotionalMessage,
+      "servicesprovided": servicesprovided,
+      "presentation": updatedVideo,
+      "resume": updatedResume,
+      "resumetype": updatedType,
+      "certificates": updatedCertificates,
+      "certificatestype": updatedCertificateTypes,
+    });
+
+    return 'success';
+  } catch (error) {
+    return error.toString();
+  }
+}
+
+Future<void> deleteFileCertificate(
+    List<String> fileUrl, String uid, List<int> itemsToRemove) async {
+  try {
+    for (String fileUrl in fileUrl) {
+      Reference ref = FirebaseStorage.instance.refFromURL(fileUrl);
+
+      await ref.delete().then((value) async {
+        try {
+          final DocumentReference docRef =
+              FirebaseFirestore.instance.collection('tutor').doc(uid);
+
+          // Get the current document snapshot
+          DocumentSnapshot snapshot = await docRef.get();
+          if (!snapshot.exists) {
+            print('Document does not exist');
+            return;
+          }
+
+          // Ensure that the data retrieved from Firestore is Map<String, dynamic>
+          Map<String, dynamic> data =
+              snapshot.data() as Map<String, dynamic>? ?? {};
+
+          // Get the current arrays from the document and ensure they are List<dynamic>
+          List<dynamic> certificates =
+              (data['certificates'] as List<dynamic>?) ?? [];
+          List<dynamic> certificatestype =
+              (data['certificatestype'] as List<dynamic>?) ?? [];
+
+          // Remove items at specified indexes from the arrays
+          itemsToRemove.sort(
+              (a, b) => b.compareTo(a)); // Sort indexes in descending order
+          for (int index in itemsToRemove) {
+            if (index >= 0 && index < certificates.length) {
+              certificates.removeAt(index);
+            }
+            if (index >= 0 && index < certificatestype.length) {
+              certificatestype.removeAt(index);
+            }
+          }
+
+          // Update the Firestore document with the modified arrays
+          await docRef.update({
+            'certificates': certificates,
+            'certificatestype': certificatestype,
+          });
+
+          print('Indexes removed from array fields successfully');
+        } catch (e) {
+          print('Error removing indexes from array fields: $e');
+        }
+      });
+    }
+    print('File deleted successfully');
+  } catch (e) {
+    print('Error deleting file: $e');
+  }
+}
+
+Future<void> deleteFileResume(
+    List<String> fileUrl, String uid, List<int> itemsToRemove) async {
+  try {
+    for (String fileUrl in fileUrl) {
+      Reference ref = FirebaseStorage.instance.refFromURL(fileUrl);
+
+      await ref.delete().then((value) async {
+        try {
+          final DocumentReference docRef =
+              FirebaseFirestore.instance.collection('tutor').doc(uid);
+
+          // Get the current document snapshot
+          DocumentSnapshot snapshot = await docRef.get();
+          if (!snapshot.exists) {
+            print('Document does not exist');
+            return;
+          }
+
+          // Ensure that the data retrieved from Firestore is Map<String, dynamic>
+          Map<String, dynamic> data =
+              snapshot.data() as Map<String, dynamic>? ?? {};
+
+          // Get the current arrays from the document and ensure they are List<dynamic>
+          List<dynamic> resume = (data['resume'] as List<dynamic>?) ?? [];
+          List<dynamic> resumetype =
+              (data['resumetype'] as List<dynamic>?) ?? [];
+
+          // Remove items at specified indexes from the arrays
+          itemsToRemove.sort(
+              (a, b) => b.compareTo(a)); // Sort indexes in descending order
+          for (int index in itemsToRemove) {
+            if (index >= 0 && index < resume.length) {
+              resume.removeAt(index);
+            }
+            if (index >= 0 && index < resumetype.length) {
+              resumetype.removeAt(index);
+            }
+          }
+
+          // Update the Firestore document with the modified arrays
+          await docRef.update({
+            'resume': resume,
+            'resumetype': resumetype,
+          });
+
+          print('Indexes removed from array fields successfully');
+        } catch (e) {
+          print('Error removing indexes from array fields: $e');
+        }
+      });
+    }
+    print('File deleted successfully');
+  } catch (e) {
+    print('Error deleting file: $e');
+  }
+}
+
+Future<void> deleteFileVideo(
+    List<String> fileUrl, String uid, List<int> itemsToRemove) async {
+  try {
+    for (String fileUrl in fileUrl) {
+      Reference ref = FirebaseStorage.instance.refFromURL(fileUrl);
+
+      await ref.delete().then((value) async {
+        try {
+          final DocumentReference docRef =
+              FirebaseFirestore.instance.collection('tutor').doc(uid);
+
+          // Get the current document snapshot
+          DocumentSnapshot snapshot = await docRef.get();
+          if (!snapshot.exists) {
+            print('Document does not exist');
+            return;
+          }
+
+          // Ensure that the data retrieved from Firestore is Map<String, dynamic>
+          Map<String, dynamic> data =
+              snapshot.data() as Map<String, dynamic>? ?? {};
+
+          // Get the current arrays from the document and ensure they are List<dynamic>
+          List<dynamic> presentation =
+              (data['presentation'] as List<dynamic>?) ?? [];
+
+          // Remove items at specified indexes from the arrays
+          itemsToRemove.sort(
+              (a, b) => b.compareTo(a)); // Sort indexes in descending order
+          for (int index in itemsToRemove) {
+            if (index >= 0 && index < presentation.length) {
+              presentation.removeAt(index);
+            }
+          }
+
+          // Update the Firestore document with the modified arrays
+          await docRef.update({
+            'presentation': presentation,
+          });
+
+          print('Indexes removed from array fields successfully');
+        } catch (e) {
+          print('Error removing indexes from array fields: $e');
+        }
+      });
+    }
+    print('File deleted successfully');
+  } catch (e) {
+    print('Error deleting file: $e');
+  }
+}

@@ -3,6 +3,8 @@
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
 import 'package:work4ututor/ui/web/login/resetpassword.dart';
 
 import '../../../components/nav_bar.dart';
@@ -19,6 +21,7 @@ import '../signup/tutor_signup.dart';
 import '../student/main_dashboard/student_dashboard.dart';
 import '../terms/termpage.dart';
 import '../tutor/tutor_dashboard/tutor_dashboard.dart';
+import 'dart:html' as html;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -38,6 +41,56 @@ bool obscure = true;
 final scafoldKey = GlobalKey<ScaffoldState>();
 
 class _LoginPageState extends State<LoginPage> {
+  final _userinfo = Hive.box('userID');
+  List<Map<String, dynamic>> _items = [];
+  _refreshItems() {
+    final data = _userinfo.keys.map((key) {
+      final item = _userinfo.get(key);
+      return {
+        "key": key,
+        "userID": item["userID"],
+        "role": item["role"],
+        "userStatus": item["userStatus"]
+      };
+    }).toList();
+    setState(() {
+      _items = data.toList();
+    });
+  }
+
+  @override
+  void initState() {
+    _refreshItems();
+    final index = _items.length;
+    if (index == 0) {
+      // GoRouter.of(context).go('/');
+    } else {
+      debugPrint(index.toString());
+      if (_items[0]['role'].toString() == 'student' &&
+          _items[0]['userStatus'].toString() == 'unfinished') {
+        GoRouter.of(context)
+            .go('/studentsignup/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'student' &&
+          _items[0]['userStatus'].toString() == 'completed') {
+        Uri.base.toString().contains('/tutors')
+            ? GoRouter.of(context)
+                .go('/studentdiary/${_items[0]['userID'].toString()}/tutors')
+            : GoRouter.of(context)
+                .go('/studentdiary/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'tutor' &&
+          _items[0]['userStatus'].toString() == 'completed') {
+        GoRouter.of(context).go('/tutordesk/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'tutor' &&
+          _items[0]['userStatus'].toString() == 'unfinished') {
+        GoRouter.of(context)
+            .go('/tutorsignup/${_items[0]['userID'].toString()}');
+      } else {
+        GoRouter.of(context).go('/');
+      }
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,11 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const StudentSignup()),
-                          );
+                          GoRouter.of(context).go('/account/student');
                         },
                         child: const Text('BECOME A STUDENT'),
                       ),
@@ -120,11 +169,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const TutorSignup()),
-                          );
+                          GoRouter.of(context).go('/account/tutor');
                         },
                         child: const Text('BECOME A TUTOR'),
                       ),
@@ -156,11 +201,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginPage()),
-                          );
+                          GoRouter.of(context).go('/');
                         },
                         child: const Text('LOG IN'),
                       ),
@@ -169,14 +210,11 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
               ),
-        // bottomNavigationBar:
-        //     (ResponsiveBuilder.isDesktop(context) || kIsWeb) ? null : null,
         body: SafeArea(
           child: Center(
             child: Column(
               children: const <Widget>[
                 LogScreen(),
-                // It will cover 1/3 of free spaces
               ],
             ),
           ),
@@ -462,12 +500,8 @@ class _SigniNState extends State<SigniN> {
                                       const TextStyle(color: Colors.black),
                                 ),
                                 onPressed: () {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const ResetPage()),
-                                  );
+                                  html.window.open('/#/account/reset', '');
+                                  // GoRouter.of(context).go('/account/reset');
                                 },
                                 child: Text(
                                   style: TextStyle(
@@ -501,84 +535,111 @@ class _SigniNState extends State<SigniN> {
                             ),
                           ),
                           onPressed: () async {
-                            isLoading ? null : _handleButtonPress;
-                            UserData? result =
+                            dynamic result =
                                 await _auth.signinwEmailandPassword(
                                     userEmail, userPassword);
                             // 'mjselma@gmail.com',
                             // '123456');
-                            if (result == null) {
-                              setState(() {
-                                error = 'Could not sign in w/ those credential';
-                                print(error);
-                              });
-                            } else {
-                              setState(() {
-                                _auth.adduserInfo({
-                                  "userID": result.uid,
-                                  "role": result.role,
-                                  "userStatus": ''
-                                });
-                              });
-                              if (result.role == 'tutor' &&
-                                  result.status == 'unfinished') {
+                            setState(() {
+                              isLoading ? _handleButtonPress : null;
+                              if (result == null) {
                                 setState(() {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => TutorInfo(
-                                              uid: result.uid.toString(),
-                                              email: result.email.toString(),
-                                            )),
+                                  error =
+                                      'Could not sign in w/ those credential';
+                                  print(error);
+                                  CoolAlert.show(
+                                    context: context,
+                                    width: 200,
+                                    title: 'Error!',
+                                    type: CoolAlertType.error,
+                                    text: error,
                                   );
                                 });
+                              } else {
+                                setState(() {
+                                  _auth.adduserInfo({
+                                    "userID": result.uid,
+                                    "role": result.role,
+                                    "userStatus": result.status
+                                  });
+                                });
+                                if (result.role == 'tutor' &&
+                                    result.status == 'unfinished') {
+                                  setState(() {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      type: CoolAlertType.success,
+                                      text: "You will redirected to sign up!",
+                                      autoCloseDuration:
+                                          const Duration(seconds: 5),
+                                    ).then((value) {
+                                      GoRouter.of(context).go(
+                                          '/tutorsignup/${result.uid.toString()}');
+                                    });
+                                  });
 
-                                StudentDashboardPage(
-                                  uID: result.uid.toString(),
-                                  email: result.email.toString(),
-                                );
-                              } else if (result.role == 'tutor' &&
-                                  result.status == 'completed') {
-                                setState(() {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => DashboardPage(
-                                            uID: result.uid.toString())),
+                                  // StudentDashboardPage(
+                                  //   uID: result.uid.toString(),
+                                  //   email: result.email.toString(),
+                                  // );
+                                } else if (result.role == 'tutor' &&
+                                    result.status == 'completed') {
+                                  setState(() {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      type: CoolAlertType.success,
+                                      text: 'Log in Succesfully!',
+                                      autoCloseDuration:
+                                          const Duration(seconds: 5),
+                                    ).then((value) {
+                                      GoRouter.of(context).go(
+                                          '/tutordesk/${result.uid.toString()}');
+                                    });
+                                  });
+                                } else if (result.role == 'student' &&
+                                    result.status == 'completed') {
+                                  setState(() {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      type: CoolAlertType.success,
+                                      text: 'Log in Succesfully!',
+                                      autoCloseDuration:
+                                          const Duration(seconds: 5),
+                                    ).then((value) {
+                                      GoRouter.of(context).go(
+                                          '/studentdiary/${result.uid.toString()}');
+                                    });
+                                  });
+                                } else if (result.role == 'student' &&
+                                    result.status == 'unfinished') {
+                                  setState(() {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      type: CoolAlertType.success,
+                                      text: 'You will redirected to sign up!',
+                                      autoCloseDuration:
+                                          const Duration(seconds: 5),
+                                    ).then((value) {
+                                      GoRouter.of(context).go(
+                                          '/studentsignup/${result.uid.toString()}');
+                                    });
+                                  });
+                                } else {
+                                  CoolAlert.show(
+                                    context: context,
+                                    width: 200,
+                                    type: CoolAlertType.error,
+                                    title: 'Oops...',
+                                    text: result.toString(),
+                                    backgroundColor: Colors.black,
                                   );
-                                });
-
-                                StudentDashboardPage(
-                                  uID: result.uid.toString(),
-                                  email: result.email.toString(),
-                                );
-                              } else if (result.role == 'student' &&
-                                  result.status == 'completed') {
-                                setState(() {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            StudentDashboardPage(
-                                              uID: result.uid.toString(),
-                                              email: result.email.toString(),
-                                            )),
-                                  );
-                                });
-                              } else if (result.role == 'student' &&
-                                  result.status == 'unfinished') {
-                                setState(() {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => StudentInfo(
-                                              uid: result.uid.toString(),
-                                              email: result.email,
-                                            )),
-                                  );
-                                });
+                                }
                               }
-                            }
+                            });
                           },
                           child: isLoading
                               ? CircularProgressIndicator() // Display progress indicator
@@ -625,7 +686,9 @@ class _SigniNState extends State<SigniN> {
                                         showDialog(
                                             barrierDismissible: false,
                                             context: context,
-                                            builder: (_) => TermPage(pdfurl: '',));
+                                            builder: (_) => TermPage(
+                                                  pdfurl: '',
+                                                ));
                                       });
                                     }),
                               TextSpan(text: ' and that you have read our '),
@@ -645,7 +708,9 @@ class _SigniNState extends State<SigniN> {
                                         showDialog(
                                             barrierDismissible: false,
                                             context: context,
-                                            builder: (_) => TermPage(pdfurl: '',));
+                                            builder: (_) => TermPage(
+                                                  pdfurl: '',
+                                                ));
                                       });
                                     }),
                             ],
@@ -782,11 +847,9 @@ class _SigniNState extends State<SigniN> {
                               textStyle: const TextStyle(color: Colors.black),
                             ),
                             onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const ResetPage()),
-                              );
+                              html.window.open('/#/account/reset', '');
+
+                              // GoRouter.of(context).go('/account/reset');
                             },
                             child: Text(
                               style: TextStyle(
@@ -819,82 +882,105 @@ class _SigniNState extends State<SigniN> {
                         ),
                       ),
                       onPressed: () async {
-                        isLoading ? null : _handleButtonPress;
-                        UserData? result = await _auth.signinwEmailandPassword(
+                        dynamic result = await _auth.signinwEmailandPassword(
                             userEmail, userPassword);
                         // 'mjselma@gmail.com',
                         // '123456');
-                        if (result == null) {
-                          setState(() {
-                            error = 'Could not sign in w/ those credential';
-                            print(error);
-                          });
-                        } else {
-                          setState(() {
-                            _auth.adduserInfo({
-                              "userID": result.uid,
-                              "role": result.role,
-                              "userStatus": ''
-                            });
-                          });
-                          if (result.role == 'tutor' &&
-                              result.status == 'unfinished') {
+                        setState(() {
+                          isLoading ? _handleButtonPress : null;
+                          if (result == null) {
                             setState(() {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => TutorInfo(
-                                          uid: result.uid.toString(),
-                                          email: result.email.toString(),
-                                        )),
+                              error = 'Could not sign in w/ those credential';
+                              print(error);
+                              CoolAlert.show(
+                                context: context,
+                                width: 200,
+                                title: 'Error!',
+                                type: CoolAlertType.error,
+                                text: error,
                               );
                             });
+                          } else {
+                            setState(() {
+                              _auth.adduserInfo({
+                                "userID": result.uid,
+                                "role": result.role,
+                                "userStatus": result.status
+                              });
+                            });
+                            if (result.role == 'tutor' &&
+                                result.status == 'unfinished') {
+                              setState(() {
+                                CoolAlert.show(
+                                  context: context,
+                                  width: 200,
+                                  type: CoolAlertType.success,
+                                  text: "You will redirected to sign up!",
+                                  autoCloseDuration: const Duration(seconds: 5),
+                                ).then((value) {
+                                  GoRouter.of(context).go(
+                                      '/tutorsignup/${result.uid.toString()}');
+                                });
+                              });
 
-                            StudentDashboardPage(
-                              uID: result.uid.toString(),
-                              email: result.email.toString(),
-                            );
-                          } else if (result.role == 'tutor' &&
-                              result.status == 'completed') {
-                            setState(() {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DashboardPage(
-                                        uID: result.uid.toString())),
+                              // StudentDashboardPage(
+                              //   uID: result.uid.toString(),
+                              //   email: result.email.toString(),
+                              // );
+                            } else if (result.role == 'tutor' &&
+                                result.status == 'completed') {
+                              setState(() {
+                                CoolAlert.show(
+                                  context: context,
+                                  width: 200,
+                                  type: CoolAlertType.success,
+                                  text: 'Log in Succesfully!',
+                                  autoCloseDuration: const Duration(seconds: 5),
+                                ).then((value) {
+                                  GoRouter.of(context).go(
+                                      '/tutordesk/${result.uid.toString()}');
+                                });
+                              });
+                            } else if (result.role == 'student' &&
+                                result.status == 'completed') {
+                              setState(() {
+                                CoolAlert.show(
+                                  context: context,
+                                  width: 200,
+                                  type: CoolAlertType.success,
+                                  text: 'Log in Succesfully!',
+                                  autoCloseDuration: const Duration(seconds: 5),
+                                ).then((value) {
+                                  GoRouter.of(context).go(
+                                      '/studentdiary/${result.uid.toString()}');
+                                });
+                              });
+                            } else if (result.role == 'student' &&
+                                result.status == 'unfinished') {
+                              setState(() {
+                                CoolAlert.show(
+                                  context: context,
+                                  width: 200,
+                                  type: CoolAlertType.success,
+                                  text: 'You will redirected to sign up!',
+                                  autoCloseDuration: const Duration(seconds: 5),
+                                ).then((value) {
+                                  GoRouter.of(context).go(
+                                      '/studentsignup/${result.uid.toString()}');
+                                });
+                              });
+                            } else {
+                              CoolAlert.show(
+                                context: context,
+                                width: 200,
+                                type: CoolAlertType.error,
+                                title: 'Oops...',
+                                text: result.toString(),
+                                backgroundColor: Colors.black,
                               );
-                            });
-
-                            StudentDashboardPage(
-                              uID: result.uid.toString(),
-                              email: result.email.toString(),
-                            );
-                          } else if (result.role == 'student' &&
-                              result.status == 'completed') {
-                            setState(() {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => StudentDashboardPage(
-                                          uID: result.uid.toString(),
-                                          email: result.email.toString(),
-                                        )),
-                              );
-                            });
-                          } else if (result.role == 'student' &&
-                              result.status == 'unfinished') {
-                            setState(() {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => StudentInfo(
-                                          uid: result.uid.toString(),
-                                          email: result.email,
-                                        )),
-                              );
-                            });
+                            }
                           }
-                        }
+                        });
                       },
                       child: isLoading
                           ? CircularProgressIndicator() // Display progress indicator
@@ -938,7 +1024,9 @@ class _SigniNState extends State<SigniN> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage(pdfurl: '',));
+                                        builder: (_) => TermPage(
+                                              pdfurl: '',
+                                            ));
                                   });
                                 }),
                           TextSpan(text: ' and that you have read our '),
@@ -958,7 +1046,9 @@ class _SigniNState extends State<SigniN> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage(pdfurl: '',));
+                                        builder: (_) => TermPage(
+                                              pdfurl: '',
+                                            ));
                                   });
                                 }),
                         ],
@@ -1094,11 +1184,9 @@ class _SigniNState extends State<SigniN> {
                               textStyle: const TextStyle(color: Colors.black),
                             ),
                             onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const ResetPage()),
-                              );
+                              html.window.open('/#/account/reset', '');
+
+                              // GoRouter.of(context).go('/account/reset');
                             },
                             child: Text(
                               style: TextStyle(
@@ -1138,114 +1226,98 @@ class _SigniNState extends State<SigniN> {
                         setState(() {
                           isLoading ? _handleButtonPress : null;
                           if (result == null) {
-                          setState(() {
-                            error = 'Could not sign in w/ those credential';
-                            print(error);
-                            CoolAlert.show(
-                              context: context,
-                              width: 200,
-                              title: 'Error!',
-                              type: CoolAlertType.error,
-                              text: error,
-                            );
-                          });
-                        } else {
-                          setState(() {
-                            _auth.adduserInfo({
-                              "userID": result.uid,
-                              "role": result.role,
-                              "userStatus": result.status
-                            });
-                          });
-                          if (result.role == 'tutor' &&
-                              result.status == 'unfinished') {
                             setState(() {
+                              error = 'Could not sign in w/ those credential';
+                              print(error);
                               CoolAlert.show(
                                 context: context,
                                 width: 200,
-                                type: CoolAlertType.success,
-                                text: "You will redirected to sign up!",
-                                autoCloseDuration: const Duration(seconds: 1),
-                              ).then((value) => Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => TutorInfo(
-                                              uid: result.uid.toString(),
-                                              email: result.email.toString(),
-                                            )),
-                                  ));
-                            });
-
-                            StudentDashboardPage(
-                              uID: result.uid.toString(),
-                              email: result.email.toString(),
-                            );
-                          } else if (result.role == 'tutor' &&
-                              result.status == 'completed') {
-                            setState(() {
-                              CoolAlert.show(
-                                context: context,
-                                width: 200,
-                                type: CoolAlertType.success,
-                                text: 'Log in Succesfully!',
-                                autoCloseDuration: const Duration(seconds: 5),
-                              ).then((value) => Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => DashboardPage(
-                                            uID: result.uid.toString())),
-                                  ));
-                            });
-                          } else if (result.role == 'student' &&
-                              result.status == 'completed') {
-                            setState(() {
-                              CoolAlert.show(
-                                context: context,
-                                width: 200,
-                                type: CoolAlertType.success,
-                                text: 'Log in Succesfully!',
-                                autoCloseDuration: const Duration(seconds: 1),
-                              ).then((value) => Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            StudentDashboardPage(
-                                              uID: result.uid.toString(),
-                                              email: result.email.toString(),
-                                            )),
-                                  ));
-                            });
-                          } else if (result.role == 'student' &&
-                              result.status == 'unfinished') {
-                            setState(() {
-                              CoolAlert.show(
-                                context: context,
-                                width: 200,
-                                type: CoolAlertType.success,
-                                text: 'You will redirected to sign up!',
-                                autoCloseDuration: const Duration(seconds: 1),
-                              ).then((value) => Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => StudentInfo(
-                                              uid: result.uid.toString(),
-                                              email: result.email,
-                                            )),
-                                  ));
+                                title: 'Error!',
+                                type: CoolAlertType.error,
+                                text: error,
+                              );
                             });
                           } else {
-                            CoolAlert.show(
-                              context: context,
-                              width: 200,
-                              type: CoolAlertType.error,
-                              title: 'Oops...',
-                              text: result.toString(),
-                              backgroundColor: Colors.black,
-                            );
+                            setState(() {
+                              _auth.adduserInfo({
+                                "userID": result.uid,
+                                "role": result.role,
+                                "userStatus": result.status
+                              });
+                            });
+                            if (result.role == 'tutor' &&
+                                result.status == 'unfinished') {
+                              setState(() {
+                                CoolAlert.show(
+                                  context: context,
+                                  width: 200,
+                                  type: CoolAlertType.success,
+                                  text: "You will redirected to sign up!",
+                                  autoCloseDuration: const Duration(seconds: 5),
+                                ).then((value) {
+                                  GoRouter.of(context).go(
+                                      '/tutorsignup/${result.uid.toString()}');
+                                });
+                              });
+
+                              // StudentDashboardPage(
+                              //   uID: result.uid.toString(),
+                              //   email: result.email.toString(),
+                              // );
+                            } else if (result.role == 'tutor' &&
+                                result.status == 'completed') {
+                              setState(() {
+                                CoolAlert.show(
+                                  context: context,
+                                  width: 200,
+                                  type: CoolAlertType.success,
+                                  text: 'Log in Succesfully!',
+                                  autoCloseDuration: const Duration(seconds: 5),
+                                ).then((value) {
+                                  GoRouter.of(context).go(
+                                      '/tutordesk/${result.uid.toString()}');
+                                });
+                              });
+                            } else if (result.role == 'student' &&
+                                result.status == 'completed') {
+                              setState(() {
+                                CoolAlert.show(
+                                  context: context,
+                                  width: 200,
+                                  type: CoolAlertType.success,
+                                  text: 'Log in Succesfully!',
+                                  autoCloseDuration: const Duration(seconds: 5),
+                                ).then((value) {
+                                  GoRouter.of(context).go(
+                                      '/studentdiary/${result.uid.toString()}');
+                                });
+                              });
+                            } else if (result.role == 'student' &&
+                                result.status == 'unfinished') {
+                              setState(() {
+                                CoolAlert.show(
+                                  context: context,
+                                  width: 200,
+                                  type: CoolAlertType.success,
+                                  text: 'You will redirected to sign up!',
+                                  autoCloseDuration: const Duration(seconds: 5),
+                                ).then((value) {
+                                  GoRouter.of(context).go(
+                                      '/studentsignup/${result.uid.toString()}');
+                                });
+                              });
+                            } else {
+                              CoolAlert.show(
+                                context: context,
+                                width: 200,
+                                type: CoolAlertType.error,
+                                title: 'Oops...',
+                                text: result.toString(),
+                                backgroundColor: Colors.black,
+                              );
+                            }
                           }
-                        }
                         });
-                        
                       },
                       child: isLoading
                           ? CircularProgressIndicator() // Display progress indicator
@@ -1289,7 +1361,9 @@ class _SigniNState extends State<SigniN> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage(pdfurl: '',));
+                                        builder: (_) => TermPage(
+                                              pdfurl: '',
+                                            ));
                                   });
                                 }),
                           TextSpan(text: ' and that you have read our '),
@@ -1309,7 +1383,9 @@ class _SigniNState extends State<SigniN> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage(pdfurl: '',));
+                                        builder: (_) => TermPage(
+                                              pdfurl: '',
+                                            ));
                                   });
                                 }),
                         ],

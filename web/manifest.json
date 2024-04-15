@@ -2,7 +2,7 @@
     "name": "work4ututor",
     "short_name": "work4ututor",
     "start_url": ".",
-    "display": "browser",
+    "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
     "description": "Elevate your learning with our education website, your gateway to knowledge!",

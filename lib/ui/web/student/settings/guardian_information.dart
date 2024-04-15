@@ -382,9 +382,22 @@ class _GuardianInfoSettingsState extends State<GuardianInfoSettings> {
         alignment: Alignment.topCenter,
         width: size.width - 320,
         height: size.height - 75,
-        child: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        child: Center(
+            child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(
+              Icons.list,
+              size: 50,
+              color: kColorPrimary,
+            ),
+            Text(
+              'Guardian information not available!',
+              style: TextStyle(color: kCalendarColorB, fontSize: 18),
+            ),
+          ],
+        )),
       );
     }
   }
