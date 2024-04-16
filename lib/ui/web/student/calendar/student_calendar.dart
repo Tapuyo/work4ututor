@@ -681,6 +681,8 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                         final timeText = time.format(context);
 
                                         TextStyle textStyle = TextStyle(
+                                          color: kColorGrey,
+
                                           fontWeight: time.minute == 0
                                               ? FontWeight.bold
                                               : FontWeight.normal,
@@ -700,7 +702,11 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                               SizedBox(
                                                 width: 55,
                                                 child: Tooltip(
-                                                  message: index.toString(),
+                                                  message: time.minute == 0
+                                                      ? timeText
+                                                      : time.minute % 15 == 0
+                                                          ? timeText
+                                                          : '',
                                                   child: Text(
                                                     time.minute == 0
                                                         ? timeText
@@ -931,7 +937,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                         decoration:
                                                             BoxDecoration(
                                                           color:
-                                                              kColorSecondary,
+                                                              kSecondarybuttonblue,
                                                           border: Border.all(
                                                             color: isHovered[
                                                                     bookingIndex]
@@ -954,6 +960,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                             Text(
                                                               '${selectedbookingdata!.timefrom} to ${selectedbookingdata!.timeto}',
                                                               style: const TextStyle(
+                                                                color: Colors.white,
                                                                   fontSize: 16,
                                                                   fontWeight:
                                                                       FontWeight
@@ -971,6 +978,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                     ? '${currentbooking.tutorinfo!.firstName} ${currentbooking.tutorinfo!.lastname}'
                                                                     : '',
                                                                 style: const TextStyle(
+                                                                  color: Colors.white,
                                                                     fontSize:
                                                                         18,
                                                                     fontWeight:
@@ -990,6 +998,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                     ? '${currentbooking.subjectinfo!.subjectName} Class ${currentbooking.session}'
                                                                     : '',
                                                                 style: const TextStyle(
+                                                                  color: Colors.white,
                                                                     fontSize:
                                                                         16,
                                                                     fontWeight:
@@ -1009,8 +1018,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                           'blocked'
                                                                       ? Colors
                                                                           .black
-                                                                      : Colors
-                                                                          .white,
+                                                                      : Colors.white,
                                                                   fontSize: 16,
                                                                   fontWeight:
                                                                       FontWeight
@@ -1161,6 +1169,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                             style: const TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.w800,
+                                              color: kColorGrey,
                                             ),
                                           ),
                                           Text(
@@ -1168,6 +1177,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                             textAlign: TextAlign.left,
                                             style: const TextStyle(
                                               fontSize: 16,
+                                              color: kColorGrey,
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
@@ -1177,6 +1187,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                             textAlign: TextAlign.left,
                                             style: const TextStyle(
                                               fontSize: 16,
+                                              color: kColorGrey,
                                               fontWeight: FontWeight.w600,
                                             ),
                                           ),
@@ -1185,6 +1196,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                             textAlign: TextAlign.left,
                                             style: const TextStyle(
                                               fontSize: 18,
+                                              color: kColorGrey,
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ),
@@ -1250,15 +1262,14 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                     materialNotifier, _) {
                                               if (materialNotifier
                                                   .materials.isEmpty) {
-                                                return SizedBox(
+                                                return const SizedBox(
                                                   width: 600,
                                                   child: Center(
                                                     child: Text(
                                                       '(No materials added!)',
                                                       style: TextStyle(
                                                           fontSize: 15,
-                                                          color: Colors
-                                                              .blue.shade200,
+                                                          color: kColorGrey,
                                                           fontStyle:
                                                               FontStyle.italic),
                                                     ),
@@ -1699,7 +1710,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                                             },
                                                                                             child: Text(
                                                                                               getFileNameFromUrl(snapshot.data.toString()),
-                                                                                              style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                              style: const TextStyle(fontSize: 12.0, color: kColorGrey, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
                                                                                             ),
                                                                                           ),
                                                                                         ),
@@ -1756,6 +1767,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                             style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.w800,
+                                              color: kColorGrey
                                             ),
                                           ),
                                           SizedBox(

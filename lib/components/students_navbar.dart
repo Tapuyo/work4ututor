@@ -69,8 +69,8 @@ class StudentsMenu extends HookWidget {
             child: Column(
               children: [
                 const SizedBox(
-                height: 10,
-              ),
+                  height: 10,
+                ),
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Container(
@@ -98,7 +98,8 @@ class StudentsMenu extends HookWidget {
                           ),
                     child: ElevatedButton(
                       style: ButtonStyle(
-                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
                           ),
@@ -144,7 +145,8 @@ class StudentsMenu extends HookWidget {
                                 fontWeight: menuIndex == 0
                                     ? FontWeight.bold
                                     : FontWeight.normal,
-                                color: menuIndex == 0 ? Colors.white : kColorGrey,
+                                color:
+                                    menuIndex == 0 ? Colors.white : kColorGrey,
                               ),
                             ),
                           ],
@@ -397,6 +399,8 @@ class StudentsMenu extends HookWidget {
                               color: menuIndex == 4 ? Colors.white : kColorGrey,
                             ),
                           ),
+                          const Spacer(),
+                          _buildNotif(1),
                         ],
                       ),
                     ),
@@ -849,5 +853,32 @@ class StudentsMenu extends HookWidget {
   void deleteAllData() async {
     final box = await Hive.openBox('userID');
     await box.clear();
+  }
+
+  _buildNotif(int data) {
+    return (data == null || data <= 0)
+        ? Container()
+        : Container(
+            width: 30,
+            padding: const EdgeInsets.all(5),
+            decoration: const BoxDecoration(
+              color: kSecondarybuttonblue,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              (data >= 100) ? "99+" : "${data}",
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          );
   }
 }
