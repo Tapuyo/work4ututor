@@ -14,6 +14,7 @@ import '../../../../provider/classinfo_provider.dart';
 import 'dart:html' as html;
 import 'dart:js' as js;
 
+import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
 
 class MyClasses extends StatefulWidget {
@@ -290,81 +291,42 @@ class _MyClassesState extends State<MyClasses> {
       child: Column(
         children: <Widget>[
           Card(
-            margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
-            elevation: 5,
+            margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+            elevation: 4,
             child: Container(
               height: 50,
-              width: size.width - 310,
+              width: ResponsiveBuilder.isDesktop(context)
+                  ? size.width - 300
+                  : size.width - 30,
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                shape: BoxShape.rectangle,
-                color: kColorPrimary,
+                gradient: const LinearGradient(
+                  begin: Alignment(-0.1, 0), // 0% from the top center
+                  end: Alignment.centerRight, // 86% to the bottom center
+                  // transform: GradientRotation(1.57), // 90 degrees rotation
+                  colors: secondaryHeadercolors, // Add your desired colors here
+                ),
                 borderRadius: BorderRadius.circular(5.0),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const Text(
-                    "CLASSES",
+                children: const [
+                  Text(
+                    "Classes",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
-                      fontWeight: FontWeight.normal,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const Spacer(),
-                  Container(
-                    height: 35,
-                    width: 170,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      color: Color.fromRGBO(1, 118, 132, 1),
-                      borderRadius: BorderRadius.all(Radius.circular(25)),
-                    ),
-                    child: TextButton.icon(
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.all(10),
-                        alignment: Alignment.center,
-                        foregroundColor: const Color.fromRGBO(1, 118, 132, 1),
-                        disabledBackgroundColor: Colors.white,
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          side: const BorderSide(
-                            color: Colors.deepPurple, // your color here
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(24.0),
-                        ),
-                        // ignore: prefer_const_constructors
-                        textStyle: TextStyle(
-                          color: Colors.deepPurple,
-                          fontSize: 12,
-                          fontStyle: FontStyle.normal,
-                          decoration: TextDecoration.none,
-                        ),
-                      ),
-                      onPressed: () {
-                        html.window.open(
-                            '/#/studentdiary/${widget.uID.toString()}/tutors',
-                            '_blank');
-                        // html.window.open('/tutorslist', "");
-                        // js.context.callMethod('open', ['/tutorList', '_blank']);
-                      },
-                      icon: const Icon(
-                        Icons.book_outlined,
-                        size: 15,
-                        color: kColorPrimary,
-                      ),
-                      label: const Text(
-                        'SEARCH TUTOR',
-                        style: TextStyle(fontSize: 15),
-                      ),
-                    ),
-                  ),
+                  Spacer(),
                 ],
               ),
             ),
+          ),
+          const SizedBox(
+            height: 10,
           ),
           Visibility(
             visible: open == false ? true : false,
@@ -516,8 +478,7 @@ class _MyClassesState extends State<MyClasses> {
                         Visibility(
                           visible: open == false ? true : false,
                           child: Container(
-                            padding:
-                                const EdgeInsets.only(left: 5, right: 5),
+                            padding: const EdgeInsets.only(left: 5, right: 5),
                             width: 150,
                             height: 32,
                             decoration: BoxDecoration(
@@ -543,8 +504,7 @@ class _MyClassesState extends State<MyClasses> {
                                 'Ongoing',
                                 'Pending',
                                 'Cancelled',
-                              ].map<DropdownMenuItem<String>>(
-                                  (String value1) {
+                              ].map<DropdownMenuItem<String>>((String value1) {
                                 return DropdownMenuItem<String>(
                                   value: value1,
                                   child: Container(
@@ -579,8 +539,7 @@ class _MyClassesState extends State<MyClasses> {
                         Visibility(
                           visible: open == false ? true : false,
                           child: Container(
-                            padding:
-                                const EdgeInsets.only(left: 5, right: 5),
+                            padding: const EdgeInsets.only(left: 5, right: 5),
                             width: 150,
                             height: 32,
                             decoration: BoxDecoration(
@@ -600,9 +559,8 @@ class _MyClassesState extends State<MyClasses> {
                                 });
                               },
                               underline: Container(),
-                              items: subjectnames
-                                  .map<DropdownMenuItem<String>>(
-                                      (String value) {
+                              items: subjectnames.map<DropdownMenuItem<String>>(
+                                  (String value) {
                                 return DropdownMenuItem<String>(
                                   value: value,
                                   child: Container(
@@ -630,8 +588,8 @@ class _MyClassesState extends State<MyClasses> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: kColorPrimary,
                                 shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(5))),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5))),
                               ),
                               onPressed: () {
                                 setState(() {
@@ -644,8 +602,7 @@ class _MyClassesState extends State<MyClasses> {
                                               .subjectinfo
                                               .where((subject) => subject
                                                   .subjectName
-                                                  .contains(
-                                                      tempdropdownValue)))
+                                                  .contains(tempdropdownValue)))
                                           .toList();
 
                                   subjectID = filteredSubjects.isNotEmpty
