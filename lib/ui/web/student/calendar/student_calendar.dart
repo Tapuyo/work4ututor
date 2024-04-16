@@ -1189,14 +1189,20 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                             ),
                                           ),
                                           const Spacer(),
-                                          const Text(
+                                          Text(
                                             'Class Materials',
                                             textAlign: TextAlign.left,
                                             style: TextStyle(
-                                              fontSize: 18,
+                                              color: kColorGrey,
+                                              fontSize:
+                                                  ResponsiveBuilder.isDesktop(
+                                                          context)
+                                                      ? 18
+                                                      : 16,
                                               fontWeight: FontWeight.w800,
                                             ),
                                           ),
+                                          const SizedBox(height: 10),
                                           Consumer<List<Schedule>>(builder:
                                               (context, scheduleListdata, _) {
                                             if (scheduleListdata.isEmpty) {
@@ -1204,6 +1210,8 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                 child: Text(
                                                   '(Link will be attached when student set class schedule!)',
                                                   style: TextStyle(
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                       fontSize: 15,
                                                       color:
                                                           Colors.blue.shade200,

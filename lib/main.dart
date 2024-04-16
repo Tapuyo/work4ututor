@@ -28,6 +28,7 @@ import 'package:work4ututor/services/getstudentinfo.dart';
 import 'package:work4ututor/services/services.dart';
 import 'package:work4ututor/services/subjectServices.dart';
 import 'package:work4ututor/splash_page.dart';
+import 'package:work4ututor/ui/web/admin/executive_dashboard.dart';
 import 'package:work4ututor/ui/web/login/resetpassword.dart';
 import 'package:work4ututor/ui/web/search_tutor/find_tutors.dart';
 import 'package:work4ututor/ui/web/signup/tutor_information_signup.dart';
@@ -108,7 +109,7 @@ void main() async {
   await Hive.initFlutter();
   await Hive.openBox('userID');
 
-  // Get.lazyPut(() => DashboardController());
+  Get.lazyPut(() => DashboardController());
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -276,6 +277,15 @@ final GoRouter _router = GoRouter(
             return const WebMainPage();
           },
         ),
+        GoRoute(
+          path: 'settings/admin', // Define route with parameters
+          builder: (context, state) {
+            // Retrieve parameters
+            return const AdminPage(
+              uID: '',
+            );
+          },
+        ),
       ],
     ),
   ],
@@ -286,9 +296,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    return GetMaterialApp.router(
       title: 'Work4ututor',
-      routerConfig: _router,
+      routerDelegate: _router.routerDelegate,
+      routeInformationParser: _router.routeInformationParser,
+      routeInformationProvider: _router.routeInformationProvider,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: "Nunito",
