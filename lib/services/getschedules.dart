@@ -238,6 +238,10 @@ class ScheduleEnrolledClass {
       DateTime schedule = subdata['schedule'].toDate() ?? DateTime.now();
       String classstatus = subdata['classstatus'] ?? '';
       String meetinglink = subdata['meetinglink'] ?? '';
+      String rating = subdata['rating'] ?? '';
+      String studentStatus = subdata['studentStatus'] ?? '';
+      String tutorStatus = subdata['tutorStatus'] ?? '';
+
       return Schedule(
         scheduleID: scheduleID,
         session: session,
@@ -246,6 +250,9 @@ class ScheduleEnrolledClass {
         timeto: timeto,
         classstatus: classstatus,
         meetinglink: meetinglink,
+        rating: rating,
+        studentStatus: studentStatus,
+        tutorStatus: tutorStatus,
       );
     }).toList();
   }
@@ -298,6 +305,8 @@ class ScheduleEnrolledClassData {
 
       StudentInfoClass tempinfo = StudentInfoClass(
         languages: (data['language'] as List<dynamic>).cast<String>(),
+        citizenship: (data['citizenship'] as List<dynamic>).cast<String>(),
+        gender: data['gender'] ?? '',
         address: data['address'] ?? '',
         country: data['country'] ?? '',
         studentFirstname: data['studentFirstName'] ?? '',
@@ -308,7 +317,7 @@ class ScheduleEnrolledClassData {
         contact: data['contact'] ?? '',
         emailadd: data['emailadd'] ?? '',
         profilelink: data['profileurl'] ?? '',
-        dateregistered: data['dateregistered'].toDate() ?? '',
+        dateregistered: (data['dateregistered'] as Timestamp).toDate(),
         age: data['age'] ?? '',
         dateofbirth: data['dateofbirth'] ?? '',
         timezone: data['timezone'] ?? '',
@@ -337,7 +346,7 @@ class ScheduleEnrolledClassData {
           withdrawal: tutordata['withdrawal'] ?? '',
           status: tutordata['status'] ?? '',
           extensionName: tutordata['extensionName'] ?? '',
-          dateSign: tutordata['dateSign']?.toDate() ?? '',
+          dateSign: (tutordata['dateSign'] as Timestamp).toDate(),
           firstName: tutordata['firstName'] ?? '',
           imageID: tutordata['imageID'] ?? '',
           language: (tutordata['language'] as List<dynamic>).cast<String>(),
@@ -349,7 +358,7 @@ class ScheduleEnrolledClassData {
           age: tutordata['age'] ?? '',
           applicationID: tutordata['applicationID'] ?? '',
           birthCity: tutordata['birthCity'] ?? '',
-          birthdate: tutordata['birthdate'] ?? '',
+          birthdate: (tutordata['birthdate'] as Timestamp).toDate(),
           emailadd: tutordata['emailadd'] ?? '',
           city: tutordata['city'] ?? '',
           servicesprovided:
@@ -363,6 +372,9 @@ class ScheduleEnrolledClassData {
               (tutordata['resumetype'] as List<dynamic>).cast<String>(),
           validIDstype:
               (tutordata['validIDstype'] as List<dynamic>).cast<String>(),
+          citizenship:
+              (tutordata['citizenship'] as List<dynamic>).cast<String>(),
+          gender: tutordata['gender'] ?? '',
         );
         tutorinfo.add(temptutorinfo);
       }
@@ -410,8 +422,11 @@ class ScheduleEnrolledClassData {
           schedule: schedule,
           timefrom: data['timefrom'] ?? '',
           timeto: data['timeto'] ?? '',
-          classstatus:  data['classstatus'] ?? '',
-          meetinglink:  data['meetinglink'] ?? '',
+          classstatus: data['classstatus'] ?? '',
+          meetinglink: data['meetinglink'] ?? '',
+          rating: data['rating'] ?? '',
+          studentStatus: data['studentStatus'] ?? '',
+          tutorStatus: data['tutorStatus'] ?? '',
         );
         finalschedule.add(tempschedinfo);
       }
@@ -436,6 +451,7 @@ class ScheduleEnrolledClassData {
       studentinfo: studentinfo,
       tutorinfo: tutorinfo,
       subjectinfo: subjectinfo,
+      price: data['totalPrice'] ?? 0,
     ));
     List<ScheduleData> schedule = [];
 

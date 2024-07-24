@@ -9,10 +9,7 @@ Future<void> updateprefferdInFirestore(
     await preftutorCollection.doc(studentID).set({
       'tutorId': FieldValue.arrayUnion(preftutorId),
     });
-    print('List updated in Firestore');
-  } catch (e) {
-    print('Error updating list: $e');
-  }
+  } catch (e) {}
 }
 
 class PreferredTutorsNotifier with ChangeNotifier {
@@ -30,15 +27,14 @@ class PreferredTutorsNotifier with ChangeNotifier {
       _isFetching = true; // Set the flag to true before fetching
       notifyListeners();
 
-      DocumentSnapshot studentDoc = await preftutorCollection.doc(studentID).get();
+      DocumentSnapshot studentDoc =
+          await preftutorCollection.doc(studentID).get();
 
       if (studentDoc.exists) {
         _preferredTutors = List<String>.from(studentDoc['tutorId']);
-      } else {
-        print('Document with ID $studentID does not exist in Firestore');
-      }
+      } else {}
+      // ignore: empty_catches
     } catch (e) {
-      print('Error getting preferred tutors: $e');
     } finally {
       _isFetching = false; // Set the flag back to false after fetching
       notifyListeners();

@@ -39,11 +39,10 @@ class SendEmailService {
   }
 }
 
-class SendEmailtoadmin {
+class SendWelcomeEmailtoUser {
   static sendMail({
     required String name,
     required String email,
-    required String message,
   }) async {
     try {
       var endPointUrl =
@@ -56,9 +55,8 @@ class SendEmailtoadmin {
           'template_id': 'template_gdnslk7',
           'user_id': 'sAaiMSlffCYzPDOCa',
           'template_params': {
-            'from_name': name,
+            'to_name': name,
             'to_email': email,
-            'message': message,
           }
         }),
       );
@@ -72,3 +70,4 @@ class SendEmailtoadmin {
     }
   }
 }
+

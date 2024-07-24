@@ -7,6 +7,7 @@ Future<String?> setClassSchedule(
   timefrom,
   timeto,
   DateTime dateschedule,
+  String subjectId,
 ) async {
   try {
     // Create a reference to the student's document in the 'classes' collection
@@ -24,6 +25,10 @@ Future<String?> setClassSchedule(
       'timeto': timeto,
       'classstatus': 'unfinish',
       'meetinglink': '$uid$formattedDate$timefrom'.replaceAll(' ', ''),
+      'rating': '',
+      'subjectId': subjectId,
+      'studentStatus': 'Pending',
+      'tutorStatus': 'Pending',
     };
 
     await scheduleCollectionRef.add(schdeduledata).then((value) {
@@ -32,7 +37,6 @@ Future<String?> setClassSchedule(
 
     return 'success';
   } catch (e) {
-    print('Error adding schedule to subcollection: $e');
     return e.toString();
   }
 }
@@ -94,22 +98,56 @@ Future<String?> updateSchedule(String documentId, oldtimefrom, oldtimeto,
         'timeto': timeto,
       });
 
-      print('Status updated successfully!');
       return 'Success';
     } else {
-      print(
-          'Document with scheduleID $documentId and scheduledate $oldDate not found.');
       return null;
     }
   } catch (error) {
-    print('Error updating schedule: $error');
     return error.toString();
   }
 }
 
 Future<String?> updateScheduleStatus(
   String documentId,
+  DateTime currentDate,
+  String paymentId,
+) async {
+  try {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    QuerySnapshot querySnapshot = await firestore
+        .collection('schedule')
+        .where('scheduleID', isEqualTo: documentId)
+        .where('schedule', isEqualTo: currentDate)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      // Assuming there is only one document with the given scheduleID and scheduledate
+      String docIdToUpdate = querySnapshot.docs[0].id;
+
+      // Update schedule collection
+      await firestore.collection('schedule').doc(docIdToUpdate).update({
+        'studentStatus': 'Completed',
+      });
+
+      // Update tutorPayment collection
+      await firestore.collection('tutorPayment').doc(paymentId).update({
+        'studentStatus': 'Completed',
+      });
+
+      return 'Success';
+    } else {
+      return null;
+    }
+  } catch (error) {
+    return error.toString();
+  }
+}
+
+Future<String?> addRateClass(
+  String documentId,
   DateTime oldDate,
+  String ratecount,
 ) async {
   try {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -126,18 +164,39 @@ Future<String?> updateScheduleStatus(
           .collection('schedule')
           .doc(docIdToUpdate)
           .update({
-        'classstatus': 'finished',
+        'rating': ratecount,
       });
 
-      print('Status updated successfully!');
       return 'Success';
     } else {
-      print(
-          'Document with scheduleID $documentId and scheduledate $oldDate not found.');
       return null;
     }
   } catch (error) {
-    print('Error updating schedule: $error');
     return error.toString();
+  }
+}
+
+Future<String> adminNotification(
+    String type, String message, String classID, List<String> userIds) async {
+  try {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    CollectionReference notificationCollection =
+        firestore.collection('adminnotification');
+
+    Map<String, dynamic> notificationData = {
+      'dateNotify': DateTime.now(),
+      'notificationContent': message,
+      'type': type,
+      'classID': classID,
+      'userIDs': userIds,
+      'status': 'unread',
+    };
+
+    await notificationCollection.add(notificationData);
+
+    return 'Success';
+  } catch (e) {
+    return 'Error: $e';
   }
 }

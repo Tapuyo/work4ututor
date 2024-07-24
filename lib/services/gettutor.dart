@@ -18,7 +18,7 @@ Future<TutorInformation?> getTutorInfo(String tutorID) async {
 
 TutorInformation? _getTutorInfo(
     DocumentSnapshot<Map<String, dynamic>> snapshot) {
-        TutorInformation? data1;
+  TutorInformation? data1;
   try {
     return TutorInformation(
       contact: snapshot.get('contact') ??
@@ -32,7 +32,7 @@ TutorInformation? _getTutorInfo(
       withdrawal: snapshot.get('withdrawal') ?? '',
       status: snapshot.get('status') ?? '',
       extensionName: snapshot.get('extensionName') ?? '',
-      dateSign: snapshot.get('dateSign')?.toDate() ?? '',
+      dateSign: (snapshot.get('dateSign') as Timestamp).toDate(),
       firstName: snapshot.get('firstName') ?? '',
       imageID: snapshot.get('imageID') ?? '',
       language: (snapshot.get('language') as List<dynamic>).cast<String>(),
@@ -45,7 +45,7 @@ TutorInformation? _getTutorInfo(
       age: snapshot.get('age') ?? '',
       applicationID: snapshot.get('applicationID') ?? '',
       birthCity: snapshot.get('birthCity') ?? '',
-      birthdate: snapshot.get('birthdate') ?? '',
+      birthdate:(snapshot.get('birthdate') as Timestamp).toDate(),
       emailadd: snapshot.get('emailadd') ?? '',
       city: snapshot.get('city') ?? '',
       servicesprovided:
@@ -58,6 +58,9 @@ TutorInformation? _getTutorInfo(
           (snapshot.get('resumetype') as List<dynamic>).cast<String>(),
       validIDstype:
           (snapshot.get('validIDstype') as List<dynamic>).cast<String>(),
+      citizenship:
+          (snapshot.get('citizenship') as List<dynamic>).cast<String>(),
+      gender: snapshot.get('gender') ?? '',
     );
   } catch (e) {
     print("Error occurred while parsing TutorInformation: $e");

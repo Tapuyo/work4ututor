@@ -9,8 +9,10 @@ import '../../../../utils/themes.dart';
 import 'coupon.dart';
 
 class VoucherData extends StatefulWidget {
-  VoucherData({
+  final String uid;
+  const VoucherData({
     Key? key,
+    required this.uid,
   }) : super(key: key);
 
   @override
@@ -34,15 +36,50 @@ List<Voucherclass> _getVouchers(QuerySnapshot snapshot) {
       startDate: cardtask['startDate'] ?? '',
       voucherName: cardtask['vName'] ?? '',
       vstatus: cardtask['vstatus'] ?? '',
+      docID: cardtask.id,
     );
   }).toList();
 }
 
 class _VoucherDataState extends State<VoucherData> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final notifier = Provider.of<VoucherProvider>(context, listen: false);
+      notifier.fetchVouchers(widget.uid);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final data = Provider.of<List<Voucherclass>>(context);
-    if (data.isNotEmpty) {
+    return Consumer<VoucherProvider>(
+        builder: (context, voucherProvider, child) {
+      if (voucherProvider.vouchers.isEmpty) {
+       return  SizedBox(
+          height: 150,
+          child: Center(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    Icons.receipt_long_sharp,
+                    size: 50,
+                    color: kColorPrimary,
+                  ),
+                  Text(
+                    'Voucher is empty.',
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: kCalendarColorB,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+          ),
+        );
+      }
       return ClipRRect(
         borderRadius: BorderRadius.circular(kBorderRadius * 2),
         child: SizedBox(
@@ -51,9 +88,9 @@ class _VoucherDataState extends State<VoucherData> {
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
-                itemCount: data.length,
+                itemCount: voucherProvider.vouchers.length,
                 itemBuilder: (context, index) {
-                  final document = data[index];
+                  final document = voucherProvider.vouchers[index];
                   return Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: kSpacing / 2),
@@ -65,15 +102,7 @@ class _VoucherDataState extends State<VoucherData> {
                   );
                 })),
       );
-    } else {
-      return const Center(
-        child: Text(
-          'No available voucher.',
-          style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.w600, color: Colors.red),
-        ),
-      );
-    }
+    });
   }
 
   Color _getSequenceColor(int index) {

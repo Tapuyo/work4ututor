@@ -43,7 +43,6 @@ class _IndividualPageState extends State<IndividualPage> {
     return StreamProvider<List<MessageContent>>.value(
       value: GetMessageConversation(chatID: widget.uID, userID: 'tutor').getmessage,
       catchError: (context, error) {
-        print('Error occurred: $error');
         return [];
       },
       initialData: const [],
@@ -193,33 +192,32 @@ class _IndividualPageBodyState extends State<IndividualPageBody> {
                 PopupMenuButton<String>(
                   padding: const EdgeInsets.all(0),
                   onSelected: (value) {
-                    print(value);
                   },
                   itemBuilder: (BuildContext contesxt) {
                     return [
                       const PopupMenuItem(
-                        child: Text("View Contact"),
                         value: "View Contact",
+                        child: Text("View Contact"),
                       ),
                       const PopupMenuItem(
-                        child: Text("Media, links, and docs"),
                         value: "Media, links, and docs",
+                        child: Text("Media, links, and docs"),
                       ),
                       const PopupMenuItem(
-                        child: Text("Whatsapp Web"),
                         value: "Whatsapp Web",
+                        child: Text("Whatsapp Web"),
                       ),
                       const PopupMenuItem(
-                        child: Text("Search"),
                         value: "Search",
+                        child: Text("Search"),
                       ),
                       const PopupMenuItem(
-                        child: Text("Mute Notification"),
                         value: "Mute Notification",
+                        child: Text("Mute Notification"),
                       ),
                       const PopupMenuItem(
-                        child: Text("Wallpaper"),
                         value: "Wallpaper",
+                        child: Text("Wallpaper"),
                       ),
                     ];
                   },

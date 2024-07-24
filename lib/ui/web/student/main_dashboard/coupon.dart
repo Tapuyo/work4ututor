@@ -142,6 +142,142 @@ class CardTask extends StatelessWidget {
     );
   }
 }
+class CardTaskSmall extends StatelessWidget {
+  const CardTaskSmall({
+    required this.data,
+    required this.primary,
+    required this.onPrimary,
+    Key? key,
+  }) : super(key: key);
+
+  final Voucherclass data;
+  final Color primary;
+  final Color onPrimary;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Material(
+        child: InkWell(
+          onTap: () {},
+          child: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [primary, primary.withOpacity(.7)],
+                begin: AlignmentDirectional.topCenter,
+                end: AlignmentDirectional.bottomCenter,
+              ),
+            ),
+            child: _BackgroundDecoration(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 120,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          _buildLabel(),
+                          const SizedBox(height: 20),
+                          _buildJobdesk(),
+                        ],
+                      ),
+                    ),
+                    const Spacer(flex: 1),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildDate(),
+                        SizedBox(
+                          height: 20,
+                          child: VerticalDivider(
+                            thickness: 1,
+                            color: onPrimary,
+                          ),
+                        ),
+                        _buildHours(),
+                      ],
+                    ),
+                    const Spacer(flex: 2),
+                    // _doneButton(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLabel() {
+    return Text(
+      data.voucherName,
+      style: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w800,
+        color: onPrimary,
+        letterSpacing: 1,
+      ),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
+  Widget _buildJobdesk() {
+    return Container(
+      decoration: BoxDecoration(
+        color: onPrimary.withOpacity(.3),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: Text(
+        '\$ ${data.amount}',
+        style: TextStyle(
+          color: onPrimary,
+          fontSize: 10,
+          letterSpacing: 1,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
+  Widget _buildDate() {
+    return _IconLabel(
+      color: onPrimary,
+      iconData: EvaIcons.calendarOutline,
+      label: DateFormat('d MMM').format(data.expiryDate),
+    );
+  }
+
+  Widget _buildHours() {
+    return _IconLabel(
+      color: onPrimary,
+      iconData: EvaIcons.clockOutline,
+      label: data.expiryDate.dueDate(),
+    );
+  }
+
+  Widget _doneButton() {
+    return ElevatedButton.icon(
+      onPressed: () {},
+      style: ElevatedButton.styleFrom(
+        primary: onPrimary,
+        onPrimary: primary,
+      ),
+      icon: const Icon(EvaIcons.checkmarkCircle2Outline),
+      label: const Text("Use Now"),
+    );
+  }
+}
 
 class _IconLabel extends StatelessWidget {
   const _IconLabel({

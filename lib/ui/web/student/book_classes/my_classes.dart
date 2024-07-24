@@ -1,4 +1,4 @@
-// ignore_for_file: unused_element, unused_local_variable, sized_box_for_whitespace, avoid_web_libraries_in_flutter
+// ignore_for_file: unused_element, unused_local_variable, sized_box_for_whitespace, avoid_web_libraries_in_flutter, unused_import
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +26,19 @@ class MyClasses extends StatefulWidget {
 }
 
 class _MyClassesState extends State<MyClasses> {
+  bool _showLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Future.delayed(const Duration(seconds: 10), () {
+    //   setState(() {
+    //     _showLoading = false;
+    //   });
+    // });
+  }
+
   String actionValue = 'View';
   String subjectID = 'All';
   String statusValue = 'All';
@@ -37,22 +50,23 @@ class _MyClassesState extends State<MyClasses> {
   String tempstatusValue = 'All';
   DateTime? _tempfromselectedDate;
   DateTime? _temptoselectedDate;
-  ClassesData selectedclass = ClassesData(
-      classid: '',
-      subjectID: '',
-      tutorID: '',
-      studentID: '',
-      materials: [],
-      schedule: [],
-      score: [],
-      status: '',
-      totalClasses: '',
-      completedClasses: '',
-      pendingClasses: '',
-      dateEnrolled: DateTime.now(),
-      studentinfo: [],
-      tutorinfo: [],
-      subjectinfo: []);
+  // ClassesData selectedclass = ClassesData(
+  //     classid: '',
+  //     subjectID: '',
+  //     tutorID: '',
+  //     studentID: '',
+  //     materials: [],
+  //     schedule: [],
+  //     score: [],
+  //     status: '',
+  //     totalClasses: '',
+  //     completedClasses: '',
+  //     pendingClasses: '',
+  //     dateEnrolled: DateTime.now(),
+  //     studentinfo: [],
+  //     tutorinfo: [],
+  //     subjectinfo: [],
+  //     price: 0);
 
   String? downloadURL;
   List<String> imagelinks = [];
@@ -127,7 +141,14 @@ class _MyClassesState extends State<MyClasses> {
   }
 
   ScrollController alllistscroll = ScrollController();
+  ScrollController studentsDataController = ScrollController();
 
+//style Header Fontsize
+  TextStyle tableHeaderStyle = const TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+    color: kColorGrey,
+  );
   @override
   Widget build(BuildContext context) {
     final bool open =
@@ -152,9 +173,6 @@ class _MyClassesState extends State<MyClasses> {
                     subjectID != ''
                 ? newenrolledlist.where((item) {
                     bool isStatusMatch = item.status == statusValue;
-                    // bool isDateInRange =
-                    //     item.dateEnrolled.isAfter(_fromselectedDate!) &&
-                    //         item.dateEnrolled.isBefore(_toselectedDate!);
 
                     return isStatusMatch;
                   }).toList()
@@ -191,7 +209,6 @@ class _MyClassesState extends State<MyClasses> {
                             _fromselectedDate != null &&
                             _toselectedDate != null
                         ? newenrolledlist.where((item) {
-                            // Format the selected dates to compare only the date part
                             DateTime formattedFromDate = DateTime(
                                 _fromselectedDate!.year,
                                 _fromselectedDate!.month,
@@ -279,509 +296,535 @@ class _MyClassesState extends State<MyClasses> {
                 .map((subjectList) =>
                     subjectList.map((subject) => subject.subjectName).toList())
                 .expand((names) => names)
-                .toSet() // Use a Set to eliminate duplicates
+                .toSet()
                 .toList();
       });
     }
 
     Size size = MediaQuery.of(context).size;
+    //
 
-    return Container(
-      padding: const EdgeInsets.only(left: 10, right: 10),
-      child: Column(
-        children: <Widget>[
-          Card(
-            margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
-            elevation: 4,
-            child: Container(
-              height: 50,
-              width: ResponsiveBuilder.isDesktop(context)
-                  ? size.width - 300
-                  : size.width - 30,
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment(-0.1, 0), // 0% from the top center
-                  end: Alignment.centerRight, // 86% to the bottom center
-                  // transform: GradientRotation(1.57), // 90 degrees rotation
-                  colors: secondaryHeadercolors, // Add your desired colors here
-                ),
-                borderRadius: BorderRadius.circular(5.0),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
-                  Text(
-                    "Classes",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Spacer(),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Visibility(
-            visible: open == false ? true : false,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: size.width - 310,
+    return Consumer<SelectedClassInfoProvider>(
+        builder: (context, selectedclass, child) {
+        return Container(
+          padding: const EdgeInsets.only(left: 10, right: 10),
+          child: Column(
+            children: <Widget>[
+              Card(
+                margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+                elevation: 4,
+                child: Container(
                   height: 50,
-                  child: Card(
-                    elevation: 5.0,
-                    child: Row(
-                      children: [
-                        // Visibility(
-                        //   visible: open == true ? true : false,
-                        //   child: TextButton.icon(
-                        //     // <-- TextButton
-                        //     onPressed: () {
-                        //       setState(
-                        //         () {
-                        //           final provider = context
-                        //               .read<ViewClassDisplayProvider>();
-                        //           provider.setViewClassinfo(false);
-                        //         },
-                        //       );
-                        //     },
-                        //     icon: const Icon(
-                        //       Icons.arrow_back,
-                        //       size: 24.0,
-                        //       color: Colors.black,
-                        //     ),
-                        //     label: const Text(
-                        //       'Back',
-                        //       style: TextStyle(
-                        //         color: Colors.black,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Visibility(
-                          visible: open == false ? true : false,
-                          child: const Padding(
-                            padding: EdgeInsets.all(5.0),
-                            child: Text(
-                              "Date Enrolled:",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Visibility(
-                          visible: open == false ? true : false,
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            width: 185,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(
-                                color: Colors.black45,
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 150,
-                                  child: Text(
-                                    _tempfromselectedDate == null
-                                        ? 'From'
-                                        : DateFormat.yMMMMd()
-                                            .format(_tempfromselectedDate!),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    _pickDateDialog();
-                                  },
-                                  child: const Icon(
-                                    Icons.calendar_month,
-                                    size: 20,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Visibility(
-                          visible: open == false ? true : false,
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            width: 185,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(
-                                color: Colors.black45,
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 150,
-                                  child: Text(
-                                    _temptoselectedDate == null
-                                        ? 'To'
-                                        : DateFormat.yMMMMd()
-                                            .format(_temptoselectedDate!),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    _topickDateDialog();
-                                  },
-                                  child: const Icon(
-                                    Icons.calendar_month,
-                                    size: 20,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 30,
-                        ),
-                        Visibility(
-                          visible: open == false ? true : false,
-                          child: const Padding(
-                            padding: EdgeInsets.all(5.0),
-                            child: Text(
-                              "Status:",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Visibility(
-                          visible: open == false ? true : false,
-                          child: Container(
-                            padding: const EdgeInsets.only(left: 5, right: 5),
-                            width: 150,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.black45,
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(5),
-                              color: Colors.white,
-                            ),
-                            child: DropdownButton<String>(
-                              elevation: 10,
-                              value: tempstatusValue,
-                              onChanged: (statValue) {
-                                setState(() {
-                                  tempstatusValue = statValue!;
-                                });
-                              },
-                              underline: Container(),
-                              items: <String>[
-                                'All',
-                                'Completed',
-                                'Ongoing',
-                                'Pending',
-                                'Cancelled',
-                              ].map<DropdownMenuItem<String>>((String value1) {
-                                return DropdownMenuItem<String>(
-                                  value: value1,
-                                  child: Container(
-                                    width: 110,
-                                    child: Text(
-                                      value1,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 30,
-                        ),
-                        Visibility(
-                          visible: open == false ? true : false,
-                          child: const Padding(
-                            padding: EdgeInsets.all(5.0),
-                            child: Text(
-                              "Subject:",
-                              style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Visibility(
-                          visible: open == false ? true : false,
-                          child: Container(
-                            padding: const EdgeInsets.only(left: 5, right: 5),
-                            width: 150,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.black45,
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(5),
-                              color: Colors.white,
-                            ),
-                            child: DropdownButton<String>(
-                              elevation: 10,
-                              value: tempdropdownValue,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  tempdropdownValue = newValue!;
-                                });
-                              },
-                              underline: Container(),
-                              items: subjectnames.map<DropdownMenuItem<String>>(
-                                  (String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Container(
-                                    width: 110,
-                                    child: Text(
-                                      value,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Visibility(
-                          visible: open == false ? true : false,
-                          child: SizedBox(
-                            width: 100,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: kColorPrimary,
-                                shape: const RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(5))),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _toselectedDate = _temptoselectedDate;
-                                  _fromselectedDate = _tempfromselectedDate;
-                                  statusValue = tempstatusValue;
-                                  List<SubjectClass> filteredSubjects =
-                                      enrolledlist
-                                          .expand((classesData) => classesData
-                                              .subjectinfo
-                                              .where((subject) => subject
-                                                  .subjectName
-                                                  .contains(tempdropdownValue)))
-                                          .toList();
-
-                                  subjectID = filteredSubjects.isNotEmpty
-                                      ? filteredSubjects.first.subjectID
-                                          .toString()
-                                      : tempdropdownValue;
-                                });
-                              },
-                              child: const Text('Search'),
-                            ),
-                          ),
-                        ),
-                        const Spacer(),
-                      ],
+                  width: ResponsiveBuilder.isDesktop(context)
+                      ? size.width - 300
+                      : size.width - 30,
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment(-0.1, 0), // 0% from the top center
+                      end: Alignment.centerRight, // 86% to the bottom center
+                      // transform: GradientRotation(1.57), // 90 degrees rotation
+                      colors: secondaryHeadercolors, // Add your desired colors here
                     ),
+                    borderRadius: BorderRadius.circular(5.0),
                   ),
-                )
-              ],
-            ),
-          ),
-          Container(
-            width: size.width - 310,
-            height: size.height - 80,
-            child: newenrolledlist.isEmpty
-                ? Container(
-                    width: size.width - 320,
-                    height: size.height - 80,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(
-                          Icons.list,
-                          size: 50,
-                          color: kColorPrimary,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: const [
+                      Text(
+                        "Classes",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
-                        Text(
-                          'No data found!',
-                          style:
-                              TextStyle(color: kCalendarColorB, fontSize: 18),
-                        ),
-                      ],
-                    ))
-                : enrolledlist.isEmpty
-                    ? Container(
-                        width: size.width - 320,
-                        height: size.height - 80,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(
-                              Icons.list,
-                              size: 50,
-                              color: kColorPrimary,
-                            ),
-                            Text(
-                              'No data found!',
-                              style: TextStyle(
-                                  color: kCalendarColorB, fontSize: 18),
-                            ),
-                          ],
-                        ))
-                    : Card(
-                        child: open == false
-                            ? Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      top: 8.0,
-                                      left: 10,
-                                      right: 10,
-                                      bottom: 8.0,
-                                    ),
+                      ),
+                      Spacer(),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Container(
+                width: ResponsiveBuilder.isDesktop(context)
+                    ? size.width - 290
+                    : size.width - 30,
+                alignment: Alignment.center,
+                child: open == false
+                    ? Scrollbar(
+                        thumbVisibility: true,
+                        controller: studentsDataController,
+                        child: SingleChildScrollView(
+                          padding: EdgeInsets.zero,
+                          scrollDirection: Axis.horizontal,
+                          controller: studentsDataController,
+                          child: Column(
+                            children: [
+                              Card(
+                                margin: EdgeInsets.zero,
+                                elevation: 4,
+                                child: SizedBox(
+                                  width: 1235,
+                                  child: Visibility(
+                                    visible: open == false ? true : false,
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: const [
-                                        // Checkbox(
-                                        //   checkColor: Colors.black,
-                                        //   activeColor: Colors.green,
-                                        //   value: select,
-                                        //   onChanged: (value) {
-                                        //     setState(() {
-                                        //       select = value!;
-                                        //     });
-                                        //   },
-                                        // ),
-                                        SizedBox(
-                                          width: 15,
-                                        ),
-                                        Text(
-                                          "Tutor Name",
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w800,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          width: 1235,
+                                          height: 50,
+                                          child: Row(
+                                            children: [
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              Visibility(
+                                                visible:
+                                                    open == false ? true : false,
+                                                child: const Padding(
+                                                  padding: EdgeInsets.all(5.0),
+                                                  child: Text(
+                                                    "Date Enrolled",
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.w600,
+                                                      color: kColorGrey,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Visibility(
+                                                visible:
+                                                    open == false ? true : false,
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(5),
+                                                  width: 185,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    border: Border.all(
+                                                      color: kColorGrey,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(5),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      SizedBox(
+                                                        width: 150,
+                                                        child: Text(
+                                                          _tempfromselectedDate ==
+                                                                  null
+                                                              ? 'From'
+                                                              : DateFormat.yMMMMd()
+                                                                  .format(
+                                                                      _tempfromselectedDate!),
+                                                          style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: kColorGrey,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      InkWell(
+                                                        onTap: () {
+                                                          _pickDateDialog();
+                                                        },
+                                                        child: const Icon(
+                                                          Icons.calendar_month,
+                                                          size: 20,
+                                                          color: kColorPrimary,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Visibility(
+                                                visible:
+                                                    open == false ? true : false,
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(5),
+                                                  width: 185,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    border: Border.all(
+                                                      color: kColorGrey,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(5),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      SizedBox(
+                                                        width: 150,
+                                                        child: Text(
+                                                          _temptoselectedDate ==
+                                                                  null
+                                                              ? 'To'
+                                                              : DateFormat.yMMMMd()
+                                                                  .format(
+                                                                      _temptoselectedDate!),
+                                                          style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: kColorGrey,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      InkWell(
+                                                        onTap: () {
+                                                          _topickDateDialog();
+                                                        },
+                                                        child: const Icon(
+                                                          Icons.calendar_month,
+                                                          size: 20,
+                                                          color: kColorPrimary,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 30,
+                                              ),
+                                              Visibility(
+                                                visible:
+                                                    open == false ? true : false,
+                                                child: const Padding(
+                                                  padding: EdgeInsets.all(5.0),
+                                                  child: Text(
+                                                    "Status",
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.w600,
+                                                      color: kColorGrey,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Visibility(
+                                                visible:
+                                                    open == false ? true : false,
+                                                child: Container(
+                                                  padding: const EdgeInsets.only(
+                                                      left: 5, right: 5),
+                                                  width: 150,
+                                                  height: 32,
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color: kColorGrey,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(5),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: DropdownButton<String>(
+                                                    elevation: 10,
+                                                    value: tempstatusValue,
+                                                    onChanged: (statValue) {
+                                                      setState(() {
+                                                        tempstatusValue =
+                                                            statValue!;
+                                                      });
+                                                    },
+                                                    underline: Container(),
+                                                    items: <String>[
+                                                      'All',
+                                                      'Completed',
+                                                      'Ongoing',
+                                                      'Pending',
+                                                      'Cancelled',
+                                                    ].map<DropdownMenuItem<String>>(
+                                                        (String value1) {
+                                                      return DropdownMenuItem<
+                                                          String>(
+                                                        value: value1,
+                                                        child: Container(
+                                                          width: 110,
+                                                          child: Text(
+                                                            value1,
+                                                            style: const TextStyle(
+                                                              fontSize: 16,
+                                                              color: kColorGrey,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 30,
+                                              ),
+                                              Visibility(
+                                                visible:
+                                                    open == false ? true : false,
+                                                child: const Padding(
+                                                  padding: EdgeInsets.all(5.0),
+                                                  child: Text(
+                                                    "Subject",
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.w600,
+                                                      color: kColorGrey,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Visibility(
+                                                visible:
+                                                    open == false ? true : false,
+                                                child: Container(
+                                                  padding: const EdgeInsets.only(
+                                                      left: 5, right: 5),
+                                                  width: 150,
+                                                  height: 32,
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color: kColorGrey,
+                                                      width: 1,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(5),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: DropdownButton<String>(
+                                                    elevation: 10,
+                                                    value: tempdropdownValue,
+                                                    onChanged: (newValue) {
+                                                      setState(() {
+                                                        tempdropdownValue =
+                                                            newValue!;
+                                                      });
+                                                    },
+                                                    underline: Container(),
+                                                    items: subjectnames.map<
+                                                            DropdownMenuItem<
+                                                                String>>(
+                                                        (String value) {
+                                                      return DropdownMenuItem<
+                                                          String>(
+                                                        value: value,
+                                                        child: Container(
+                                                          width: 110,
+                                                          child: Text(
+                                                            value,
+                                                            style: const TextStyle(
+                                                              fontSize: 16,
+                                                              color: kColorGrey,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                  ),
+                                                ),
+                                              ),
+                                              const Spacer(flex: 2),
+                                              Visibility(
+                                                visible:
+                                                    open == false ? true : false,
+                                                child: SizedBox(
+                                                  width: 100,
+                                                  child: ElevatedButton(
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: Colors.white,
+                                                      disabledForegroundColor:
+                                                          kColorLight
+                                                              .withOpacity(0.38),
+                                                      disabledBackgroundColor:
+                                                          kColorLight
+                                                              .withOpacity(0.12),
+                                                      shape:
+                                                          const RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius.all(
+                                                                      Radius
+                                                                          .circular(
+                                                                              5))),
+                                                      elevation: 0,
+                                                    ),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        _toselectedDate =
+                                                            _temptoselectedDate;
+                                                        _fromselectedDate =
+                                                            _tempfromselectedDate;
+                                                        statusValue =
+                                                            tempstatusValue;
+                                                        List<SubjectClass>
+                                                            filteredSubjects =
+                                                            enrolledlist
+                                                                .expand((classesData) => classesData
+                                                                    .subjectinfo
+                                                                    .where((subject) => subject
+                                                                        .subjectName
+                                                                        .contains(
+                                                                            tempdropdownValue)))
+                                                                .toList();
+
+                                                        subjectID = filteredSubjects
+                                                                .isNotEmpty
+                                                            ? filteredSubjects
+                                                                .first.subjectID
+                                                                .toString()
+                                                            : tempdropdownValue;
+                                                      });
+                                                    },
+                                                    child: const Text(
+                                                      'Search',
+                                                      style: TextStyle(
+                                                          color: kColorPrimary,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 16),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const Spacer(),
+                                            ],
                                           ),
-                                        ),
-                                        Spacer(
-                                          flex: 2,
-                                        ),
-                                        SizedBox(
-                                          width: 35,
-                                        ),
-                                        Text(
-                                          "Date Enrolled",
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                        Spacer(
-                                            // flex: 2,
-                                            ),
-                                        Text(
-                                          "Subject",
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                        Spacer(
-                                            // flex: 1,
-                                            ),
-                                        Text(
-                                          "Status",
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                        Spacer(
-                                          flex: 1,
-                                        ),
-                                        Text(
-                                          "Classes",
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                        Spacer(
-                                          flex: 2,
-                                        ),
-                                        Text(
-                                          "Action",
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                        Spacer(
-                                            // flex: 1,
-                                            ),
+                                        )
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(
-                                    child: Divider(
-                                      height: 1,
-                                      thickness: 2,
-                                    ),
-                                  ),
-                                  enrolledlist.isNotEmpty
-                                      ? Consumer<List<Schedule>>(builder:
-                                          (context, scheduleListdata, _) {
-                                          dynamic data = scheduleListdata;
-                                          return Container(
-                                            width: size.width - 320,
-                                            height: size.height - 175,
-                                            child: ListView(
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                children: [
-                                                  Container(
-                                                    width: size.width - 320,
-                                                    height: size.height - 175,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Card(
+                                  elevation: 4.0,
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: 1235,
+                                        padding: const EdgeInsets.only(
+                                          top: 5.0,
+                                          left: 10,
+                                          right: 5,
+                                          bottom: 5.0,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              width: 300,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 60.0),
+                                                child: Text(
+                                                  "Name",
+                                                  style: tableHeaderStyle,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            SizedBox(
+                                              width: 200,
+                                              child: Text(
+                                                "Date Enrolled",
+                                                style: tableHeaderStyle,
+                                                textAlign: TextAlign.start,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            SizedBox(
+                                              width: 140,
+                                              child: Text(
+                                                "Subject",
+                                                style: tableHeaderStyle,
+                                                textAlign: TextAlign.start,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            SizedBox(
+                                              width: 100,
+                                              child: Text(
+                                                "Status",
+                                                style: tableHeaderStyle,
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 40,
+                                            ),
+                                            SizedBox(
+                                              width: 230,
+                                              child: Text(
+                                                "Classes",
+                                                style: tableHeaderStyle,
+                                                textAlign: TextAlign.start,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            SizedBox(
+                                              width: 140,
+                                              child: Text(
+                                                "Action",
+                                                style: tableHeaderStyle,
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 1235,
+                                        child: const Divider(
+                                          height: 1,
+                                          thickness: 1,
+                                        ),
+                                      ),
+                                      newenrolledlist == null
+                                          ? Container(
+                                              width: 1235,
+                                              height: size.height - 230,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: const [
+                                                  Icon(
+                                                        Icons.collections_bookmark_outlined,
+                                                    size: 50,
+                                                    color: kColorPrimary,
+                                                  ),
+                                                  Text(
+                                                    'No classes found!',
+                                                    style: TextStyle(
+                                                       fontStyle: FontStyle.italic,
+                                                        color: kCalendarColorB,
+                                                        fontSize: 24),
+                                                  ),
+                                                ],
+                                              ))
+                                          : enrolledlist.isNotEmpty
+                                              ? Consumer<List<Schedule>>(builder:
+                                                  (context, scheduleListdata, _) {
+                                                  dynamic data = scheduleListdata;
+                                                  return Container(
+                                                    width: 1235,
+                                                    height: size.height - 230,
                                                     child: ListView.builder(
                                                       shrinkWrap: true,
                                                       itemCount:
@@ -796,8 +839,7 @@ class _MyClassesState extends State<MyClasses> {
                                                                 .subjectinfo;
                                                         List<TutorInformation>
                                                             tutorinfo =
-                                                            enrolledClass
-                                                                .tutorinfo;
+                                                            enrolledClass.tutorinfo;
                                                         List<StudentInfoClass>
                                                             studentinfo =
                                                             enrolledClass
@@ -829,309 +871,712 @@ class _MyClassesState extends State<MyClasses> {
                                                         //   });
                                                         // }
 
-                                                        return SingleChildScrollView(
-                                                          scrollDirection:
-                                                              Axis.horizontal,
-                                                          controller:
-                                                              alllistscroll,
-                                                          child: Column(
-                                                            children: [
-                                                              Container(
-                                                                color: (index %
-                                                                            2 ==
-                                                                        0)
-                                                                    ? Colors
-                                                                        .white
-                                                                    : Colors.grey[
-                                                                        200],
-                                                                child: InkWell(
-                                                                  highlightColor:
-                                                                      kCalendarColorFB,
-                                                                  splashColor:
-                                                                      kColorPrimary,
-                                                                  focusColor: Colors
-                                                                      .green
-                                                                      .withOpacity(
-                                                                          0.0),
-                                                                  hoverColor:
-                                                                      kColorLight,
-                                                                  onTap: () {
-                                                                    setState(
-                                                                        () {
-                                                                      selectedclass =
-                                                                          enrolledClass;
-                                                                    });
-                                                                    final provider =
-                                                                        context.read<
-                                                                            ViewClassDisplayProvider>();
-                                                                    provider
-                                                                        .setViewClassinfo(
-                                                                            true);
-                                                                  },
-                                                                  child:
-                                                                      Padding(
-                                                                    padding:
-                                                                        const EdgeInsets
-                                                                            .only(
-                                                                      top: 5.0,
-                                                                      left: 10,
-                                                                      right: 10,
-                                                                      bottom:
-                                                                          5.0,
-                                                                    ),
-                                                                    child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .start,
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        // Checkbox(
-                                                                        //   checkColor: Colors.black,
-                                                                        //   activeColor: Colors.red,
-                                                                        //   value: select,
-                                                                        //   onChanged: (value) {
-                                                                        //     setState(() {
-                                                                        //       select = value!;
-                                                                        //     });
-                                                                        //   },
-                                                                        // ),
-                                                                        SizedBox(
-                                                                          width:
-                                                                              300,
-                                                                          child:
-                                                                              ListTile(
-                                                                            leading:
-                                                                                CircleAvatar(
-                                                                              backgroundImage: NetworkImage(
-                                                                                tutorinfo.first.imageID.toString(),
-                                                                              ),
-                                                                              radius: 25,
+                                                        return Column(
+                                                          children: [
+                                                            Container(
+                                                              color: (index % 2 ==
+                                                                      0)
+                                                                  ? Colors.white
+                                                                  : Colors
+                                                                      .grey[200],
+                                                              child: InkWell(
+                                                                highlightColor:
+                                                                    kCalendarColorFB,
+                                                                splashColor:
+                                                                    kColorPrimary,
+                                                                focusColor: Colors
+                                                                    .green
+                                                                    .withOpacity(
+                                                                        0.0),
+                                                                hoverColor:
+                                                                    kColorLight,
+                                                                onTap: () {
+                                                                  setState(() {
+                                                                     final provider1 =
+                                                                      context.read<
+                                                                          SelectedClassInfoProvider>();
+                                                                  provider1
+                                                                      .setSelectedClass(
+                                                                          enrolledClass);
+                                                                  });
+                                                                  final provider =
+                                                                      context.read<
+                                                                          ViewClassDisplayProvider>();
+                                                                  provider
+                                                                      .setViewClassinfo(
+                                                                          true);
+                                                                },
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                    top: 5.0,
+                                                                    left: 10,
+                                                                    right: 10,
+                                                                    bottom: 5.0,
+                                                                  ),
+                                                                  child: Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .start,
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      SizedBox(
+                                                                        width: 300,
+                                                                        child:
+                                                                            ListTile(
+                                                                          leading:
+                                                                              CircleAvatar(
+                                                                            backgroundImage:
+                                                                                NetworkImage(
+                                                                              tutorinfo
+                                                                                  .first
+                                                                                  .imageID
+                                                                                  .toString(),
                                                                             ),
-                                                                            title:
-                                                                                Text(
-                                                                              '${(tutorinfo.first.firstName)}${(tutorinfo.first.middleName == 'N/A' || tutorinfo.first.middleName == '' ? '' : ' ${(tutorinfo.first.middleName)}')} ${(tutorinfo.first.lastname)}',
-                                                                              // 'Name',
-                                                                              style: const TextStyle(
-                                                                                fontSize: 18,
-                                                                                fontWeight: FontWeight.w700,
-                                                                              ),
-                                                                            ),
-                                                                            subtitle:
-                                                                                Text(
-                                                                              tutorinfo.first.country,
-                                                                              // 'Country',
-                                                                              style: const TextStyle(
-                                                                                fontSize: 15,
-                                                                                fontWeight: FontWeight.normal,
-                                                                              ),
-                                                                            ),
+                                                                            radius:
+                                                                                25,
                                                                           ),
-                                                                        ),
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              5,
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width:
-                                                                              200,
-                                                                          child:
+                                                                          title:
                                                                               Text(
-                                                                            DateFormat('MMMM dd, yyyy').format(enrolledlist[index].dateEnrolled).toString(),
-                                                                            style:
-                                                                                const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                                                                            '${(tutorinfo.first.firstName)}${(tutorinfo.first.middleName == 'N/A' || tutorinfo.first.middleName == '' ? '' : ' ${(tutorinfo.first.middleName)}')} ${(tutorinfo.first.lastname)}',
+                                                                            // 'Name',
+                                                                            style: const TextStyle(
+                                                                                fontSize:
+                                                                                    18,
+                                                                                fontWeight:
+                                                                                    FontWeight.w700,
+                                                                                color: kColorGrey),
                                                                           ),
-                                                                        ),
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              10,
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width:
-                                                                              120,
-                                                                          child:
+                                                                          subtitle:
                                                                               Text(
-                                                                            subjectinfo.first.subjectName,
-                                                                            // 'Subject Name',
-                                                                            style:
-                                                                                const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                                                                            tutorinfo
+                                                                                .first
+                                                                                .country,
+                                                                            // 'Country',
+                                                                            style: const TextStyle(
+                                                                                fontSize:
+                                                                                    15,
+                                                                                fontWeight:
+                                                                                    FontWeight.normal,
+                                                                                color: kColorGrey),
                                                                           ),
                                                                         ),
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              10,
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width: 5,
+                                                                      ),
+                                                                      Container(
+                                                                        width: 200,
+                                                                        alignment:
+                                                                            Alignment
+                                                                                .centerLeft,
+                                                                        child: Text(
+                                                                          DateFormat(
+                                                                                  'MMMM dd, yyyy')
+                                                                              .format(
+                                                                                  enrolledlist[index].dateEnrolled)
+                                                                              .toString(),
+                                                                          style: const TextStyle(
+                                                                              fontSize:
+                                                                                  16,
+                                                                              fontWeight: FontWeight
+                                                                                  .normal,
+                                                                              color:
+                                                                                  kColorGrey),
                                                                         ),
-                                                                        SizedBox(
-                                                                            width:
-                                                                                100,
-                                                                            child: Container(
-                                                                                alignment: Alignment.center,
-                                                                                decoration: BoxDecoration(
-                                                                                  borderRadius: BorderRadius.circular(8),
-                                                                                  color: enrolledlist[index].status == 'Pending'
-                                                                                      ? kCalendarColorFB
-                                                                                      : enrolledlist[index].status == 'Ongoing'
-                                                                                          ? kColorSecondary
-                                                                                          : enrolledlist[index].status == 'Completed'
-                                                                                              ? Colors.green.shade200
-                                                                                              : kCalendarColorB,
-                                                                                ),
-                                                                                child: Align(alignment: Alignment.center, child: Text(enrolledlist[index].status)))),
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              10,
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width: 10,
+                                                                      ),
+                                                                      Container(
+                                                                        width: 140,
+                                                                        alignment:
+                                                                            Alignment
+                                                                                .centerLeft,
+                                                                        child: Text(
+                                                                          subjectinfo
+                                                                              .first
+                                                                              .subjectName,
+                                                                          // 'Subject Name',
+                                                                          style: const TextStyle(
+                                                                              fontSize:
+                                                                                  16,
+                                                                              fontWeight: FontWeight
+                                                                                  .normal,
+                                                                              color:
+                                                                                  kColorGrey),
                                                                         ),
-                                                                        SizedBox(
-                                                                            width:
-                                                                                230,
-                                                                            child:
-                                                                                Column(
-                                                                              children: [
-                                                                                ListTile(
-                                                                                  title: Text('${(enrolledClass.totalClasses)} Classes'),
-                                                                                  subtitle: enrolledlist[index].status == 'Cancelled' ? const Text('Cancelled Classes') : Text('Completed: ${(enrolledClass.completedClasses)} Class \nUpcoming: ${(filteredScheduleList.length)} Classes'),
-                                                                                )
-                                                                              ],
-                                                                            )),
-                                                                        const SizedBox(
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        width: 10,
+                                                                      ),
+                                                                      SizedBox(
                                                                           width:
-                                                                              10,
-                                                                        ),
-                                                                        SizedBox(
+                                                                              100,
+                                                                          height:
+                                                                              30,
+                                                                          child: Container(
+                                                                              alignment: Alignment.center,
+                                                                              decoration: BoxDecoration(
+                                                                                  borderRadius: BorderRadius.circular(15),
+                                                                                  color: Colors.white,
+                                                                                  boxShadow: [
+                                                                                    BoxShadow(
+                                                                                      color: Colors.grey.withOpacity(0.5),
+                                                                                      spreadRadius: 2,
+                                                                                      blurRadius: 3,
+                                                                                      offset: const Offset(3, 4),
+                                                                                    ),
+                                                                                    const BoxShadow(
+                                                                                      color: Colors.transparent,
+                                                                                      spreadRadius: 2,
+                                                                                      blurRadius: 3,
+                                                                                      offset: Offset(-3, 0),
+                                                                                    ),
+                                                                                  ],
+                                                                                  border: Border.all(
+                                                                                    width: 1.5,
+                                                                                    color: enrolledlist[index].status == 'Pending'
+                                                                                        ? classStatuscolor[0]
+                                                                                        : enrolledlist[index].status == 'Ongoing'
+                                                                                            ? classStatuscolor[1]
+                                                                                            : enrolledlist[index].status == 'Completed'
+                                                                                                ? Colors.green.shade200
+                                                                                                : classStatuscolor[2],
+                                                                                  )),
+                                                                              child: Align(
+                                                                                  alignment: Alignment.center,
+                                                                                  child: Text(
+                                                                                    enrolledlist[index].status,
+                                                                                    style: const TextStyle(color: kColorGrey),
+                                                                                  )))),
+                                                                      const SizedBox(
+                                                                        width: 40,
+                                                                      ),
+                                                                      SizedBox(
                                                                           width:
-                                                                              200,
+                                                                              180,
                                                                           child:
-                                                                              Row(
+                                                                              Column(
                                                                             mainAxisAlignment:
-                                                                                MainAxisAlignment.spaceEvenly,
+                                                                                MainAxisAlignment.center,
                                                                             children: [
-                                                                              Tooltip(
-                                                                                message: 'View Class',
-                                                                                child: Container(
-                                                                                  width: 90,
-                                                                                  height: 30,
-                                                                                  decoration: BoxDecoration(
-                                                                                    borderRadius: BorderRadius.circular(20),
-                                                                                    color: Colors.green.shade400,
-                                                                                  ),
-                                                                                  child: TextButton.icon(
-                                                                                    style: TextButton.styleFrom(
-                                                                                      padding: const EdgeInsets.all(10),
-                                                                                      alignment: Alignment.center,
-                                                                                      foregroundColor: const Color.fromRGBO(1, 118, 132, 1),
-                                                                                      backgroundColor: Colors.green.shade200,
-                                                                                      shape: RoundedRectangleBorder(
-                                                                                        borderRadius: BorderRadius.circular(24.0),
-                                                                                      ),
-                                                                                      // ignore: prefer_const_constructors
-                                                                                      textStyle: const TextStyle(
-                                                                                        color: Colors.deepPurple,
-                                                                                        fontSize: 12,
-                                                                                        fontStyle: FontStyle.normal,
-                                                                                        decoration: TextDecoration.none,
-                                                                                      ),
-                                                                                    ),
-                                                                                    onPressed: () {
-                                                                                      setState(() {
-                                                                                        selectedclass = enrolledClass;
-                                                                                      });
-                                                                                      final provider = context.read<ViewClassDisplayProvider>();
-                                                                                      provider.setViewClassinfo(true);
-                                                                                    },
-                                                                                    icon: const Icon(
-                                                                                      Icons.open_in_new,
-                                                                                      size: 15,
-                                                                                    ),
-                                                                                    label: const Text(
-                                                                                      'View',
-                                                                                      style: TextStyle(fontSize: 13),
-                                                                                    ),
-                                                                                  ),
+                                                                              ListTile(
+                                                                                contentPadding:
+                                                                                    EdgeInsets.zero,
+                                                                                title:
+                                                                                    Text(
+                                                                                  '${(enrolledClass.totalClasses)} Classes',
+                                                                                  style: const TextStyle(color: kColorGrey),
                                                                                 ),
-                                                                              ),
-                                                                              Tooltip(
-                                                                                message: 'Cancel Class',
-                                                                                child: Container(
-                                                                                  width: 90,
-                                                                                  height: 30,
-                                                                                  decoration: BoxDecoration(
-                                                                                    borderRadius: BorderRadius.circular(20),
-                                                                                    color: Colors.red.shade400,
-                                                                                  ),
-                                                                                  child: TextButton.icon(
-                                                                                    style: TextButton.styleFrom(
-                                                                                      padding: const EdgeInsets.all(10),
-                                                                                      alignment: Alignment.center,
-                                                                                      foregroundColor: const Color.fromRGBO(1, 118, 132, 1),
-                                                                                      backgroundColor: Colors.red.shade200,
-                                                                                      shape: RoundedRectangleBorder(
-                                                                                        borderRadius: BorderRadius.circular(24.0),
-                                                                                      ),
-                                                                                      // ignore: prefer_const_constructors
-                                                                                      textStyle: const TextStyle(
-                                                                                        color: Colors.deepPurple,
-                                                                                        fontSize: 12,
-                                                                                        fontStyle: FontStyle.normal,
-                                                                                        decoration: TextDecoration.none,
-                                                                                      ),
-                                                                                    ),
-                                                                                    onPressed: () {
-                                                                                      cancellclass(context, enrolledClass.classid);
-                                                                                    },
-                                                                                    icon: const Icon(
-                                                                                      Icons.cancel_presentation,
-                                                                                      size: 15,
-                                                                                    ),
-                                                                                    label: const Text(
-                                                                                      'Cancel',
-                                                                                      style: TextStyle(fontSize: 13),
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
+                                                                                subtitle: enrolledlist[index].status == 'Cancelled'
+                                                                                    ? const Text('Cancelled Classes')
+                                                                                    : Text('Completed: ${(enrolledClass.completedClasses)} Class \nUpcoming: ${(filteredScheduleList.length)} Classes'),
+                                                                              )
                                                                             ],
-                                                                          ),
+                                                                          )),
+                                                                      const SizedBox(
+                                                                        width: 10,
+                                                                      ),
+                                                                      SizedBox(
+                                                                        width: 200,
+                                                                        child: Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment
+                                                                                  .spaceEvenly,
+                                                                          children: [
+                                                                            Tooltip(
+                                                                              message:
+                                                                                  'View Class',
+                                                                              child:
+                                                                                  Container(
+                                                                                width:
+                                                                                    90,
+                                                                                height:
+                                                                                    30,
+                                                                                decoration:
+                                                                                    BoxDecoration(
+                                                                                  borderRadius: BorderRadius.circular(20),
+                                                                                  // color: Colors
+                                                                                  //     .green
+                                                                                  //     .shade400,
+                                                                                ),
+                                                                                child:
+                                                                                    TextButton.icon(
+                                                                                  style: TextButton.styleFrom(
+                                                                                    padding: const EdgeInsets.all(10),
+                                                                                    alignment: Alignment.center,
+                                                                                    foregroundColor: const Color.fromRGBO(1, 118, 132, 1),
+                                                                                    // backgroundColor:
+                                                                                    //     Colors
+                                                                                    //         .green
+                                                                                    //         .shade200,
+                                                                                    shape: RoundedRectangleBorder(
+                                                                                      borderRadius: BorderRadius.circular(24.0),
+                                                                                    ),
+                                                                                    // ignore: prefer_const_constructors
+                                                                                    textStyle: const TextStyle(
+                                                                                      color: Colors.deepPurple,
+                                                                                      fontSize: 12,
+                                                                                      fontStyle: FontStyle.normal,
+                                                                                      decoration: TextDecoration.none,
+                                                                                    ),
+                                                                                  ),
+                                                                                  onPressed: () {
+                                                                                    setState(() {
+                                                                                      final provider1 =
+                                                                      context.read<
+                                                                          SelectedClassInfoProvider>();
+                                                                  provider1
+                                                                      .setSelectedClass(
+                                                                          enrolledClass);
+                                                                                    });
+                                                                                    final provider = context.read<ViewClassDisplayProvider>();
+                                                                                    provider.setViewClassinfo(true);
+                                                                                  },
+                                                                                  icon: const Icon(Icons.open_in_new, size: 16, color: kColorPrimary),
+                                                                                  label: const Text(
+                                                                                    'View',
+                                                                                    style: TextStyle(fontSize: 14, color: kColorPrimary),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                            Tooltip(
+                                                                              message:
+                                                                                  'Cancel Class',
+                                                                              child:
+                                                                                  Container(
+                                                                                width:
+                                                                                    90,
+                                                                                height:
+                                                                                    30,
+                                                                                decoration:
+                                                                                    BoxDecoration(
+                                                                                  borderRadius: BorderRadius.circular(20),
+                                                                                  // color: Colors
+                                                                                  //     .green
+                                                                                  //     .shade400,
+                                                                                ),
+                                                                                child:
+                                                                                    TextButton.icon(
+                                                                                  style: TextButton.styleFrom(
+                                                                                    padding: const EdgeInsets.all(10),
+                                                                                    alignment: Alignment.center,
+                                                                                    foregroundColor: const Color.fromRGBO(1, 118, 132, 1),
+                                                                                    // backgroundColor:
+                                                                                    //     Colors
+                                                                                    //         .green
+                                                                                    //         .shade200,
+                                                                                    shape: RoundedRectangleBorder(
+                                                                                      borderRadius: BorderRadius.circular(24.0),
+                                                                                    ),
+                                                                                    // ignore: prefer_const_constructors
+                                                                                    textStyle: const TextStyle(
+                                                                                      color: Colors.deepPurple,
+                                                                                      fontSize: 12,
+                                                                                      fontStyle: FontStyle.normal,
+                                                                                      decoration: TextDecoration.none,
+                                                                                    ),
+                                                                                  ),
+                                                                                  onPressed: () {
+                                                                                    cancellclass(context, enrolledClass.classid);
+                                                                                  },
+                                                                                  icon: const Icon(Icons.close, size: 16, color: kColorDarkRed),
+                                                                                  label: const Text(
+                                                                                    'Cancel',
+                                                                                    style: TextStyle(fontSize: 14, color: kColorDarkRed),
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                            // Tooltip(
+                                                                            //   message: 'Cancel Class',
+                                                                            //   child: Container(
+                                                                            //     width: 90,
+                                                                            //     height: 30,
+                                                                            //     decoration: BoxDecoration(
+                                                                            //       borderRadius: BorderRadius.circular(20),
+                                                                            //       color: Colors.red.shade400,
+                                                                            //     ),
+                                                                            //     child: TextButton.icon(
+                                                                            //       style: TextButton.styleFrom(
+                                                                            //         padding: const EdgeInsets.all(10),
+                                                                            //         alignment: Alignment.center,
+                                                                            //         foregroundColor: const Color.fromRGBO(1, 118, 132, 1),
+                                                                            //         backgroundColor: Colors.red.shade200,
+                                                                            //         shape: RoundedRectangleBorder(
+                                                                            //           borderRadius: BorderRadius.circular(24.0),
+                                                                            //         ),
+                                                                            //         // ignore: prefer_const_constructors
+                                                                            //         textStyle: const TextStyle(
+                                                                            //           color: Colors.deepPurple,
+                                                                            //           fontSize: 12,
+                                                                            //           fontStyle: FontStyle.normal,
+                                                                            //           decoration: TextDecoration.none,
+                                                                            //         ),
+                                                                            //       ),
+                                                                            //       onPressed: () {
+                                                                            //         cancellclass(context, enrolledClass.classid);
+                                                                            //       },
+                                                                            //       icon: const Icon(
+                                                                            //         Icons.cancel_presentation,
+                                                                            //         size: 15,
+                                                                            //       ),
+                                                                            //       label: const Text(
+                                                                            //         'Cancel',
+                                                                            //         style: TextStyle(fontSize: 13),
+                                                                            //       ),
+                                                                            //     ),
+                                                                            //   ),
+                                                                            // ),
+                                                                          ],
                                                                         ),
-                                                                      ],
-                                                                    ),
+                                                                      ),
+                                                                    ],
                                                                   ),
                                                                 ),
                                                               ),
-                                                              const Divider(
-                                                                height: 1,
-                                                                thickness: 1,
-                                                              ),
-                                                            ],
-                                                          ),
+                                                            ),
+                                                            const Divider(
+                                                              height: 1,
+                                                              thickness: 1,
+                                                            ),
+                                                          ],
                                                         );
                                                       },
                                                     ),
-                                                  ),
-                                                ]),
-                                          );
-                                        })
-                                      : Container(
-                                          width: size.width - 320,
-                                          height: size.height - 175,
-                                          child: const Center(
-                                            child: CircularProgressIndicator(),
-                                          ),
-                                        ),
-                                ],
-                              )
-                            : selectedclass.classid == ''
-                                ? const Center(
-                                    child: Text('Press back to select a class'),
-                                  )
-                                : StudentViewClassInfo(
-                                    enrolledClass: selectedclass,
-                                    uID: widget.uID,
-                                  ),
+                                                  );
+                                                })
+                                              : Container(
+                                                  width: 1235,
+                                                  height: size.height - 230,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.center,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.center,
+                                                    children: const [
+                                                      Icon(
+                                                        Icons.collections_bookmark_outlined,
+                                                        size: 50,
+                                                        color: kColorPrimary,
+                                                      ),
+                                                      Text(
+                                                        'No students found.',
+                                                        style: TextStyle(
+                                                            color: kCalendarColorB,
+                                                             fontStyle: FontStyle.italic,
+                                                            fontSize: 24),
+                                                      ),
+                                                    ],
+                                                  ))
+                                    ],
+                                  )),
+                            ],
+                          ),
+                        ),
+                      )
+                    : Card(
+                        margin: EdgeInsets.zero,
+                        elevation: 0,
+                        color: Colors.white,
+                        child: StudentViewClassInfo(
+                          enrolledClass: selectedclass.selectedclass,
+                          uID: widget.uID,
+                        ),
                       ),
+              )
+
+              // Card(
+              //   margin: EdgeInsets.zero,
+              //   elevation: 4,
+              //   child: SizedBox(
+              //     width: 1235,
+              //     child: Visibility(
+              //       visible: open == false ? true : false,
+              //       child: Row(
+              //         crossAxisAlignment: CrossAxisAlignment.start,
+              //         children: [
+              //           Container(
+              //             width: size.width - 310,
+              //             height: 50,
+              //             child: Card(
+              //               elevation: 5.0,
+              //               child: Row(
+              //                 children: [
+              //                   const SizedBox(
+              //                     width: 10,
+              //                   ),
+              //                   Visibility(
+              //                     visible: open == false ? true : false,
+              //                     child: const Padding(
+              //                       padding: EdgeInsets.all(5.0),
+              //                       child: Text(
+              //                         "Date Enrolled:",
+              //                         style: TextStyle(
+              //                           fontWeight: FontWeight.w600,
+              //                           color: kColorGrey,
+              //                         ),
+              //                       ),
+              //                     ),
+              //                   ),
+              //                   Visibility(
+              //                     visible: open == false ? true : false,
+              //                     child: Container(
+              //                       padding: const EdgeInsets.all(5),
+              //                       width: 185,
+              //                       decoration: BoxDecoration(
+              //                         color: Colors.white,
+              //                         border: Border.all(
+              //                           color: Colors.black45,
+              //                           width: 1,
+              //                         ),
+              //                         borderRadius: BorderRadius.circular(5),
+              //                       ),
+              //                       child: Row(
+              //                         children: [
+              //                           SizedBox(
+              //                             width: 150,
+              //                             child: Text(
+              //                               _tempfromselectedDate == null
+              //                                   ? 'From'
+              //                                   : DateFormat.yMMMMd()
+              //                                       .format(_tempfromselectedDate!),
+              //                               style: const TextStyle(
+              //                                   fontWeight: FontWeight.w500),
+              //                             ),
+              //                           ),
+              //                           InkWell(
+              //                             onTap: () {
+              //                               _pickDateDialog();
+              //                             },
+              //                             child: const Icon(
+              //                               Icons.calendar_month,
+              //                               size: 20,
+              //                             ),
+              //                           ),
+              //                         ],
+              //                       ),
+              //                     ),
+              //                   ),
+              //                   const SizedBox(width: 10),
+              //                   Visibility(
+              //                     visible: open == false ? true : false,
+              //                     child: Container(
+              //                       padding: const EdgeInsets.all(5),
+              //                       width: 185,
+              //                       decoration: BoxDecoration(
+              //                         color: Colors.white,
+              //                         border: Border.all(
+              //                           color: Colors.black45,
+              //                           width: 1,
+              //                         ),
+              //                         borderRadius: BorderRadius.circular(5),
+              //                       ),
+              //                       child: Row(
+              //                         children: [
+              //                           SizedBox(
+              //                             width: 150,
+              //                             child: Text(
+              //                               _temptoselectedDate == null
+              //                                   ? 'To'
+              //                                   : DateFormat.yMMMMd()
+              //                                       .format(_temptoselectedDate!),
+              //                               style: const TextStyle(
+              //                                   fontWeight: FontWeight.w500),
+              //                             ),
+              //                           ),
+              //                           InkWell(
+              //                             onTap: () {
+              //                               _topickDateDialog();
+              //                             },
+              //                             child: const Icon(
+              //                               Icons.calendar_month,
+              //                               size: 20,
+              //                             ),
+              //                           ),
+              //                         ],
+              //                       ),
+              //                     ),
+              //                   ),
+              //                   const SizedBox(
+              //                     width: 30,
+              //                   ),
+              //                   Visibility(
+              //                     visible: open == false ? true : false,
+              //                     child: const Padding(
+              //                       padding: EdgeInsets.all(5.0),
+              //                       child: Text(
+              //                         "Status:",
+              //                         style: TextStyle(
+              //                           fontWeight: FontWeight.w600,
+              //                         ),
+              //                       ),
+              //                     ),
+              //                   ),
+              //                   Visibility(
+              //                     visible: open == false ? true : false,
+              //                     child: Container(
+              //                       padding:
+              //                           const EdgeInsets.only(left: 5, right: 5),
+              //                       width: 150,
+              //                       height: 32,
+              //                       decoration: BoxDecoration(
+              //                         border: Border.all(
+              //                           color: Colors.black45,
+              //                           width: 1,
+              //                         ),
+              //                         borderRadius: BorderRadius.circular(5),
+              //                         color: Colors.white,
+              //                       ),
+              //                       child: DropdownButton<String>(
+              //                         elevation: 10,
+              //                         value: tempstatusValue,
+              //                         onChanged: (statValue) {
+              //                           setState(() {
+              //                             tempstatusValue = statValue!;
+              //                           });
+              //                         },
+              //                         underline: Container(),
+              //                         items: <String>[
+              //                           'All',
+              //                           'Completed',
+              //                           'Ongoing',
+              //                           'Pending',
+              //                           'Cancelled',
+              //                         ].map<DropdownMenuItem<String>>(
+              //                             (String value1) {
+              //                           return DropdownMenuItem<String>(
+              //                             value: value1,
+              //                             child: Container(
+              //                               width: 110,
+              //                               child: Text(
+              //                                 value1,
+              //                                 style: const TextStyle(
+              //                                   fontSize: 16,
+              //                                 ),
+              //                               ),
+              //                             ),
+              //                           );
+              //                         }).toList(),
+              //                       ),
+              //                     ),
+              //                   ),
+              //                   const SizedBox(
+              //                     width: 30,
+              //                   ),
+              //                   Visibility(
+              //                     visible: open == false ? true : false,
+              //                     child: const Padding(
+              //                       padding: EdgeInsets.all(5.0),
+              //                       child: Text(
+              //                         "Subject:",
+              //                         style: TextStyle(
+              //                           fontWeight: FontWeight.w600,
+              //                         ),
+              //                       ),
+              //                     ),
+              //                   ),
+              //                   Visibility(
+              //                     visible: open == false ? true : false,
+              //                     child: Container(
+              //                       padding:
+              //                           const EdgeInsets.only(left: 5, right: 5),
+              //                       width: 150,
+              //                       height: 32,
+              //                       decoration: BoxDecoration(
+              //                         border: Border.all(
+              //                           color: Colors.black45,
+              //                           width: 1,
+              //                         ),
+              //                         borderRadius: BorderRadius.circular(5),
+              //                         color: Colors.white,
+              //                       ),
+              //                       child: DropdownButton<String>(
+              //                         elevation: 10,
+              //                         value: tempdropdownValue,
+              //                         onChanged: (newValue) {
+              //                           setState(() {
+              //                             tempdropdownValue = newValue!;
+              //                           });
+              //                         },
+              //                         underline: Container(),
+              //                         items: subjectnames
+              //                             .map<DropdownMenuItem<String>>(
+              //                                 (String value) {
+              //                           return DropdownMenuItem<String>(
+              //                             value: value,
+              //                             child: Container(
+              //                               width: 110,
+              //                               child: Text(
+              //                                 value,
+              //                                 style: const TextStyle(
+              //                                   fontSize: 16,
+              //                                 ),
+              //                               ),
+              //                             ),
+              //                           );
+              //                         }).toList(),
+              //                       ),
+              //                     ),
+              //                   ),
+              //                   const SizedBox(
+              //                     width: 10,
+              //                   ),
+              //                   Visibility(
+              //                     visible: open == false ? true : false,
+              //                     child: SizedBox(
+              //                       width: 100,
+              //                       child: ElevatedButton(
+              //                         style: ElevatedButton.styleFrom(
+              //                           backgroundColor: kColorPrimary,
+              //                           shape: const RoundedRectangleBorder(
+              //                               borderRadius: BorderRadius.all(
+              //                                   Radius.circular(5))),
+              //                         ),
+              //                         onPressed: () {
+              //                           setState(() {
+              //                             _toselectedDate = _temptoselectedDate;
+              //                             _fromselectedDate = _tempfromselectedDate;
+              //                             statusValue = tempstatusValue;
+              //                             List<SubjectClass> filteredSubjects =
+              //                                 enrolledlist
+              //                                     .expand((classesData) => classesData
+              //                                         .subjectinfo
+              //                                         .where((subject) => subject
+              //                                             .subjectName
+              //                                             .contains(
+              //                                                 tempdropdownValue)))
+              //                                     .toList();
+
+              //                             subjectID = filteredSubjects.isNotEmpty
+              //                                 ? filteredSubjects.first.subjectID
+              //                                     .toString()
+              //                                 : tempdropdownValue;
+              //                           });
+              //                         },
+              //                         child: const Text('Search'),
+              //                       ),
+              //                     ),
+              //                   ),
+              //                   const Spacer(),
+              //                 ],
+              //               ),
+              //             ),
+              //           )
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              // ),
+            ],
           ),
-        ],
-      ),
+        );
+      }
     );
   }
 

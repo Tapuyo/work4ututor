@@ -29,8 +29,17 @@ class _TermPage extends State<TermPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: kColorPrimary,
-        title:  HeaderText(widget.pdfurl == '' ?'Terms & Condition' :'Tutor Certificate'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment(-0.1, 0),
+              end: Alignment.centerRight,
+              colors: secondaryHeadercolors, // Define this list of colors
+            ),
+          ),
+        ),
+        title: HeaderText(
+            widget.pdfurl == '' ? 'Terms & Condition' : 'Tutor Certificate'),
       ),
       body: Container(
         height: height,
@@ -238,7 +247,8 @@ class _TermPage extends State<TermPage> {
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: kColorPrimary, // Text color
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
@@ -256,7 +266,8 @@ class _TermPage extends State<TermPage> {
               style: ElevatedButton.styleFrom(
                 foregroundColor: kColorPrimary,
                 backgroundColor: Colors.white, // Text color
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),

@@ -148,6 +148,8 @@ class DashboardController extends GetxController {
 
         StudentInfoClass students = StudentInfoClass(
           languages: (data['language'] as List<dynamic>).cast<String>(),
+          citizenship: (data['citizenship'] as List<dynamic>).cast<String>(),
+          gender: data['gender'] ?? '',
           address: data['address'] ?? '',
           country: data['country'] ?? '',
           studentFirstname: data['studentFirstName'] ?? '',
@@ -160,7 +162,8 @@ class DashboardController extends GetxController {
           profilelink: data['profileurl'] ?? '',
           dateregistered: data['dateregistered'].toDate() ?? '',
           age: data['age'] ?? '',
-          dateofbirth: data['dateofbirth'] ?? '', timezone: data['timezone'] ?? '',
+          dateofbirth: data['dateofbirth'] ?? '',
+          timezone: data['timezone'] ?? '',
         );
 
         studentdatalist.add(students);

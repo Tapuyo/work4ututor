@@ -20,8 +20,6 @@ class _VideoUploadWidgetState extends State<VideoUploadWidget> {
   final FirebaseStorage storage = FirebaseStorage.instance;
   final Reference storageRef = FirebaseStorage.instance.ref();
 
-  double _progress = 0.0;
-  String _downloadUrl = '';
   VideoPlayerController? _videoPlayerController;
   double _sliderValue = 0.0;
   bool _isDraggingSlider = false;
@@ -164,8 +162,16 @@ class _VideoUploadWidgetState extends State<VideoUploadWidget> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: kColorPrimary,
-        title: const HeaderText('Tutors Presentation'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment(-0.1, 0),
+              end: Alignment.centerRight,
+              colors: secondaryHeadercolors, // Define this list of colors
+            ),
+          ),
+        ),
+        title: const HeaderText('Tutor Presentation'),
       ),
       body: Container(
         height: height,

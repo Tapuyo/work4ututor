@@ -1,7 +1,6 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, avoid_web_libraries_in_flutter
 
 import 'package:cool_alert/cool_alert.dart';
-import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -12,16 +11,20 @@ import 'package:provider/provider.dart';
 import '../provider/chatmessagedisplay.dart';
 import '../provider/classinfo_provider.dart';
 import '../provider/init_provider.dart';
+import '../services/getunreadmessages.dart';
 import '../ui/auth/auth.dart';
-import '../ui/web/login/login.dart';
 import '../ui/web/terms/termpage.dart';
 import '../utils/themes.dart';
+import 'dart:html' as html;
 
 class StudentsMenu extends HookWidget {
-  StudentsMenu({Key? key}) : super(key: key);
+  final String uid;
+  StudentsMenu(this.uid, {Key? key}) : super(key: key);
   final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
+    Provider.of<MessageNotifier>(context, listen: false)
+        .getHistory(uid, 'student');
     final int menuIndex = context.select((InitProvider p) => p.menuIndex);
     return Column(
       children: <Widget>[
@@ -400,7 +403,10 @@ class StudentsMenu extends HookWidget {
                             ),
                           ),
                           const Spacer(),
-                          _buildNotif(1),
+                          Consumer<MessageNotifier>(
+                              builder: (context, messagedetails, child) {
+                            return _buildNotif(messagedetails.messages.length);
+                          }),
                         ],
                       ),
                     ),
@@ -682,31 +688,12 @@ class StudentsMenu extends HookWidget {
                       elevation: 0,
                     ),
                     onPressed: () {
-                      CoolAlert.show(
-                        context: context,
-                        barrierDismissible: false,
-                        width: 200,
-                        type: CoolAlertType.confirm,
-                        text: 'You want to Log Out?',
-                        confirmBtnText: 'Proceed',
-                        confirmBtnColor: Colors.greenAccent,
-                        cancelBtnText: 'Go back',
-                        showCancelBtn: true,
-                        cancelBtnTextStyle: const TextStyle(color: Colors.red),
-                        onCancelBtnTap: () {
-                          Navigator.of(context).pop;
-                        },
-                        onConfirmBtnTap: () async {
-                          final provider = context.read<ChatDisplayProvider>();
-                          provider.setOpenMessage(false);
-                          final provider1 = context.read<InitProvider>();
-                          provider1.setMenuIndex(0);
-                          await _auth.signOutAnon();
-                          deleteAllData();
-                          // ignore: use_build_context_synchronously
-                          GoRouter.of(context).go('/');
-                        },
-                      );
+                      GoRouter.of(context)
+                          .go('/studentdiary/${uid.toString()}/tutors');
+                      // Construct the URL for the desired route
+                      // html.window.open(
+                      //     '/#/studentdiary/${uid.toString()}/tutors',
+                      //     '_blank');
                     },
                     icon: const Icon(
                       Icons.search,

@@ -39,7 +39,7 @@ bool obscurecon = true;
 final scafoldKey = GlobalKey<ScaffoldState>();
 
 class _TutorSignupState extends State<TutorSignup> {
-    final _userinfo = Hive.box('userID');
+  final _userinfo = Hive.box('userID');
   List<Map<String, dynamic>> _items = [];
   _refreshItems() {
     final data = _userinfo.keys.map((key) {
@@ -55,36 +55,37 @@ class _TutorSignupState extends State<TutorSignup> {
       _items = data.toList();
     });
   }
+
   @override
   void initState() {
     _refreshItems();
-     final index = _items.length;
-      if (index == 0) {
-        // GoRouter.of(context).go('/');
+    final index = _items.length;
+    if (index == 0) {
+      // GoRouter.of(context).go('/');
+    } else {
+      debugPrint(index.toString());
+      if (_items[0]['role'].toString() == 'student' &&
+          _items[0]['userStatus'].toString() == 'unfinished') {
+        GoRouter.of(context)
+            .go('/studentsignup/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'student' &&
+          _items[0]['userStatus'].toString() == 'completed') {
+        GoRouter.of(context)
+            .go('/studentdiary/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'tutor' &&
+          _items[0]['userStatus'].toString() == 'completed') {
+        GoRouter.of(context).go('/tutordesk/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'tutor' &&
+          _items[0]['userStatus'].toString() == 'unfinished') {
+        GoRouter.of(context)
+            .go('/tutorsignup/${_items[0]['userID'].toString()}');
       } else {
-        debugPrint(index.toString());
-        if (_items[0]['role'].toString() == 'student' &&
-            _items[0]['userStatus'].toString() == 'unfinished') {
-          GoRouter.of(context)
-              .go('/studentsignup/${_items[0]['userID'].toString()}');
-        } else if (_items[0]['role'].toString() == 'student' &&
-            _items[0]['userStatus'].toString() == 'completed') {
-          GoRouter.of(context)
-              .go('/studentdiary/${_items[0]['userID'].toString()}');
-        } else if (_items[0]['role'].toString() == 'tutor' &&
-            _items[0]['userStatus'].toString() == 'completed') {
-          GoRouter.of(context)
-              .go('/tutordesk/${_items[0]['userID'].toString()}');
-        } else if (_items[0]['role'].toString() == 'tutor' &&
-            _items[0]['userStatus'].toString() == 'unfinished') {
-          GoRouter.of(context)
-              .go('/tutorsignup/${_items[0]['userID'].toString()}');
-        } else {
-          GoRouter.of(context).go('/');
-        }
+        GoRouter.of(context).go('/');
       }
+    }
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -131,7 +132,7 @@ class _TutorSignupState extends State<TutorSignup> {
                         ),
                       ),
                       onPressed: () {
-                       GoRouter.of(context).go('/account/student');
+                        GoRouter.of(context).go('/account/student');
                       },
                       child: const Text('BECOME A STUDENT'),
                     ),
@@ -162,7 +163,7 @@ class _TutorSignupState extends State<TutorSignup> {
                         ),
                       ),
                       onPressed: () {
-                       GoRouter.of(context).go('/account/tutor');
+                        GoRouter.of(context).go('/account/tutor');
                       },
                       child: const Text('BECOME A TUTOR'),
                     ),
@@ -950,14 +951,8 @@ class _SignUpState extends State<SignUp> {
                                         width: 200,
                                         confirmBtnText: 'Okay',
                                         onConfirmBtnTap: () {
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => TutorInfo(
-                                                      uid: result.uid,
-                                                      email: result.email,
-                                                    )),
-                                          );
+                                          GoRouter.of(context).go(
+                                              '/tutorsignup/${result.uid.toString()}');
                                         },
                                       );
                                     }
@@ -1270,6 +1265,7 @@ class _SignUpState extends State<SignUp> {
                                       context: context,
                                       type: CoolAlertType.error,
                                       title: 'Oops...',
+                                      width: 200,
                                       text: result,
                                       backgroundColor: Colors.black,
                                     );
@@ -1281,18 +1277,13 @@ class _SignUpState extends State<SignUp> {
                                       CoolAlert.show(
                                         context: context,
                                         type: CoolAlertType.success,
-                                        text: resultdata,
+                                      width: 200,
+                                          text: resultdata,
+                                          confirmBtnText: 'Okay',
                                         autoCloseDuration:
                                             const Duration(seconds: 1),
-                                      ).then((value) =>
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => TutorInfo(
-                                                      uid: result.uid,
-                                                      email: result.email,
-                                                    )),
-                                          ));
+                                      ).then((value) => GoRouter.of(context).go(
+                                          '/tutorsignup/${result.uid.toString()}'));
                                     });
                                   }
                                 });

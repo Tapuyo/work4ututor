@@ -555,6 +555,21 @@ class _SigniNState extends State<SigniN> {
                                     text: error,
                                   );
                                 });
+                              } else if (result.role == 'tutor' &&
+                                  result.status == 'pending') {
+                                setState(() {
+                                  CoolAlert.show(
+                                    context: context,
+                                    width: 200,
+                                    type: CoolAlertType.error,
+                                    backgroundColor: kCalendarColorFB,
+                                    title: '',
+                                    text:
+                                        "Account still pending, proceed interview and wait to be activated.",
+                                    autoCloseDuration:
+                                        const Duration(seconds: 5),
+                                  );
+                                });
                               } else {
                                 setState(() {
                                   _auth.adduserInfo({
@@ -578,11 +593,6 @@ class _SigniNState extends State<SigniN> {
                                           '/tutorsignup/${result.uid.toString()}');
                                     });
                                   });
-
-                                  // StudentDashboardPage(
-                                  //   uID: result.uid.toString(),
-                                  //   email: result.email.toString(),
-                                  // );
                                 } else if (result.role == 'tutor' &&
                                     result.status == 'completed') {
                                   setState(() {
@@ -898,6 +908,20 @@ class _SigniNState extends State<SigniN> {
                                 title: 'Error!',
                                 type: CoolAlertType.error,
                                 text: error,
+                              );
+                            });
+                          } else if (result.role == 'tutor' &&
+                              result.status == 'pending') {
+                            setState(() {
+                              CoolAlert.show(
+                                context: context,
+                                width: 200,
+                                type: CoolAlertType.error,
+                                backgroundColor: kCalendarColorFB,
+                                title: '',
+                                text:
+                                    "Account still pending, proceed interview and wait to be activated",
+                                autoCloseDuration: const Duration(seconds: 5),
                               );
                             });
                           } else {
@@ -1235,6 +1259,20 @@ class _SigniNState extends State<SigniN> {
                                 title: 'Error!',
                                 type: CoolAlertType.error,
                                 text: error,
+                              );
+                            });
+                          } else if (result.role == 'tutor' &&
+                              result.status == 'pending') {
+                            setState(() {
+                              CoolAlert.show(
+                                context: context,
+                                width: 200,
+                                type: CoolAlertType.error,
+                                backgroundColor: kCalendarColorFB,
+                                title: '',
+                                text:
+                                    "Account still pending, proceed interview and wait to be activated",
+                                autoCloseDuration: const Duration(seconds: 5),
                               );
                             });
                           } else {

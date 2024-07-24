@@ -1,6 +1,7 @@
 // ignore_for_file: unused_local_variable, empty_catches, unnecessary_null_comparison, avoid_function_literals_in_foreach_calls, unused_element, no_leading_underscores_for_local_identifiers, null_argument_to_non_null_type
 
 import 'dart:async';
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:universal_html/html.dart' as html;
@@ -167,6 +168,9 @@ class StudentInfoData {
     return [
       StudentInfoClass(
         languages: (snapshot.get('language') as List<dynamic>).cast<String>(),
+        citizenship:
+            (snapshot.get('citizenship') as List<dynamic>).cast<String>(),
+        gender: snapshot.get('gender') ?? '',
         address: snapshot.get('address') ?? '',
         country: snapshot.get('country') ?? '',
         studentFirstname: snapshot.get('studentFirstName') ?? '',
@@ -177,7 +181,7 @@ class StudentInfoData {
         contact: snapshot.get('contact') ?? '',
         emailadd: snapshot.get('emailadd') ?? '',
         profilelink: snapshot.get('profileurl') ?? '',
-        dateregistered: snapshot.get('dateregistered').toDate() ?? '',
+        dateregistered: (snapshot.get('dateregistered') as Timestamp).toDate(),
         age: snapshot.get('age') ?? '',
         dateofbirth: snapshot.get('dateofbirth') ?? '',
         timezone: snapshot.get('timezone') ?? '',
@@ -202,6 +206,8 @@ class AllStudentInfoData {
     return snapshot.docs.map((DocumentSnapshot<Map<String, dynamic>> doc) {
       return StudentInfoClass(
         languages: (doc.get('language') as List<dynamic>).cast<String>(),
+        citizenship: (doc.get('citizenship') as List<dynamic>).cast<String>(),
+        gender: doc.get('gender') ?? '',
         address: doc.get('address') ?? '',
         country: doc.get('country') ?? '',
         studentFirstname: doc.get('studentFirstName') ?? '',
@@ -212,7 +218,7 @@ class AllStudentInfoData {
         contact: doc.get('contact') ?? '',
         emailadd: doc.get('emailadd') ?? '',
         profilelink: doc.get('profileurl') ?? '',
-        dateregistered: doc.get('dateregistered').toDate() ?? '',
+        dateregistered: (doc.get('dateregistered') as Timestamp).toDate(),
         age: doc.get('age') ?? '',
         dateofbirth: doc.get('dateofbirth') ?? '',
         timezone: doc.get('timezone') ?? '',
@@ -238,20 +244,27 @@ class StudentGuardianData {
         .doc(uid)
         .collection('guardianname')
         .snapshots()
-        .map(_getGuardian);
+        .map((snapshot) {
+      if (snapshot.docs.isEmpty) {
+        // Handle case where no documents are found
+        return []; // Return empty list or throw an error
+      }
+      return _getGuardian(snapshot);
+    });
   }
 
   List<StudentGuardianClass> _getGuardian(QuerySnapshot snapshot) {
     return snapshot.docs.map((guardians) {
       return StudentGuardianClass(
         docID: guardians.id,
-        address: guardians['address'] ?? '',
+        address: '',
         contact: guardians['guardianscontact'] ?? '',
-        country: guardians['country'] ?? '',
-        guardianMiddlename: guardians['guardianMiddleName'] ?? '',
+        country: '',
+        guardianFullname: guardians['guardiansfullname'] ?? '',
         email: guardians['guardiansemail'] ?? '',
-        guardianFirstname: guardians['guardiansfullname'] ?? '',
-        guardianLastname: guardians['guardianLastName'] ?? '',
+        guardianBday: guardians['guardiansbirthday'] ?? '',
+        ids: (guardians['guardianids'] as List<dynamic>).cast<String>(),
+        picture: guardians['guardianpicture'] ?? '',
       );
     }).toList();
   }
@@ -259,6 +272,8 @@ class StudentGuardianData {
 
 Future<void> updateStudentInfo(
   String uid,
+  String gender,
+  List<dynamic> citizenship,
   String address,
   String country,
   String name,
@@ -278,6 +293,8 @@ Future<void> updateStudentInfo(
   try {
     await FirebaseFirestore.instance.collection('students').doc(uid).set({
       "language": language,
+      "gender": gender,
+      "citizenship": citizenship,
       "address": address,
       "country": country,
       "studentFirstName": name,
@@ -494,6 +511,8 @@ Future<List<String?>> uploadTutorvideoList(String uid, String type,
 
 Future<void> updateStudentInfowGuardian(
     String uid,
+    String gender,
+    List<dynamic> citizenship,
     String address,
     String country,
     String name,
@@ -519,7 +538,9 @@ Future<void> updateStudentInfowGuardian(
   try {
     // Update the main student document
     await FirebaseFirestore.instance.collection('students').doc(uid).set({
-      "language": language,
+     "language": language,
+      "gender": gender,
+      "citizenship": citizenship,
       "address": address,
       "country": country,
       "studentFirstName": name,
@@ -527,6 +548,7 @@ Future<void> updateStudentInfowGuardian(
       "studentLastName": lastname,
       "studentID": studentid,
       "userID": userid,
+      "profileurl": profileurl,
       "contact": contact,
       "dateregistered": dateregistered,
       "age": age,
@@ -561,13 +583,24 @@ Future<void> updateStudentInfowGuardian(
       html.window.alert('No guardian found in the subcollection');
     }
   } catch (error) {
+    print(error);
     html.window.alert('Update Failed: $error');
   }
 }
 
 // }
+Future<bool> doesSubjectExist(String subjectName) async {
+  final querySnapshot = await FirebaseFirestore.instance
+      .collection('subjects')
+      .where('subjectName', isEqualTo: subjectName)
+      .get();
+  return querySnapshot.docs.isNotEmpty;
+}
+
 Future<String?> updateTutorInformation(
   String uid,
+  String gender,
+  List<dynamic> citizenships,
   String address,
   String country,
   String birthCountry,
@@ -582,7 +615,7 @@ Future<String?> updateTutorInformation(
   String contact,
   DateTime dateregistered,
   String age,
-  String dateofbirth,
+  DateTime dateofbirth,
   String timezone,
   String applicationID,
   List<SubjectTeach> mycourses,
@@ -612,8 +645,10 @@ Future<String?> updateTutorInformation(
       "city": city,
       "contact": contact,
       "dateSign": dateregistered,
+      "gender": gender,
       "extensionName": "",
       "language": language,
+      "citizenship": citizenships,
       "timezone": timezone,
       "firstName": name,
       "lastName": lastname,
@@ -628,6 +663,7 @@ Future<String?> updateTutorInformation(
       "validIDs": validIDs,
       "validIDstype": validIDstypes,
       "servicesprovided": servicesprovided,
+      "status": "Pending",
       "withdrawal": "",
     }, SetOptions(merge: true));
 
@@ -643,6 +679,10 @@ Future<String?> updateTutorInformation(
         doc.reference.delete();
       });
     });
+    Future<int> getSubjectCount() async {
+      QuerySnapshot querySnapshot = await coursesCollectionRef.get();
+      return querySnapshot.docs.length;
+    }
 
     // Add all the new SubjectTeach objects to the subcollection
     for (int i = 0; i < mycourses.length; i++) {
@@ -652,12 +692,43 @@ Future<String?> updateTutorInformation(
         "price3": mycourses[i].price3,
         "price5": mycourses[i].price5,
       });
+
+      // Check if the subject exists in the subjects collection
+      bool subjectExists = await doesSubjectExist(mycourses[i].subjectname);
+
+      if (!subjectExists) {
+        // Save the subject if it does not exist
+        int count = await getSubjectCount();
+        String randomString =
+            generateRandomString(5); // Length of the random part
+        String subjectId = '$randomString${count + 1}';
+
+        await FirebaseFirestore.instance.collection('subjects').add({
+          'subjectid': subjectId, // Use a suitable ID generation method
+          'subjectName': mycourses[i].subjectname,
+          'totaltutors':
+              '0', // You might want to set an initial value or handle this appropriately
+          'datetime': DateTime.now(),
+          'subjectStatus': 'Inactive', // Set an initial status
+        });
+      }
     }
-    await updateUserStatus(uid, status);
+
+    await updateUserStatus(uid, 'pending');
     return 'success';
   } catch (error) {
     return error.toString();
   }
+}
+
+// You need to add this method to generate random strings
+String generateRandomString(int length) {
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  Random random = Random();
+  return String.fromCharCodes(Iterable.generate(
+    length,
+    (_) => characters.codeUnitAt(random.nextInt(characters.length)),
+  ));
 }
 
 Future<void> updateImage(String uID, String path) async {
@@ -962,15 +1033,11 @@ Future<void> deleteFileCertificate(
             'certificatestype': certificatestype,
           });
 
-          print('Indexes removed from array fields successfully');
         } catch (e) {
-          print('Error removing indexes from array fields: $e');
         }
       });
     }
-    print('File deleted successfully');
   } catch (e) {
-    print('Error deleting file: $e');
   }
 }
 
@@ -1019,15 +1086,11 @@ Future<void> deleteFileResume(
             'resumetype': resumetype,
           });
 
-          print('Indexes removed from array fields successfully');
         } catch (e) {
-          print('Error removing indexes from array fields: $e');
         }
       });
     }
-    print('File deleted successfully');
   } catch (e) {
-    print('Error deleting file: $e');
   }
 }
 
@@ -1071,14 +1134,10 @@ Future<void> deleteFileVideo(
             'presentation': presentation,
           });
 
-          print('Indexes removed from array fields successfully');
         } catch (e) {
-          print('Error removing indexes from array fields: $e');
         }
       });
     }
-    print('File deleted successfully');
   } catch (e) {
-    print('Error deleting file: $e');
   }
 }

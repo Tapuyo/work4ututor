@@ -1,6 +1,5 @@
 library dashboard;
 
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -40,7 +39,6 @@ import '../../tutor/performance/tutor_performance.dart';
 import '../book_classes/my_classes.dart';
 import '../calendar/student_calendar.dart';
 import '../settings/student_settings.dart';
-import '../student_inquiry/student_inquiry.dart';
 
 class StudentDashboardPage extends StatefulWidget {
   final String uID;
@@ -174,7 +172,6 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
             context: context,
           ).getenrolled,
           catchError: (context, error) {
-            print('Error occurred: $error');
             return [];
           },
           initialData: const [],
@@ -185,7 +182,6 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
             role: 'student',
           ).getenrolled,
           catchError: (context, error) {
-            print('Error occurred: $error');
             return [];
           },
           initialData: const [],
@@ -245,7 +241,7 @@ class _MainPageBodyPageState extends State<MainPageBody> {
     downloadURL = await FirebaseStorage.instance.ref(path).getDownloadURL();
   }
 
-  ScrollController _scrollController = ScrollController();
+  ScrollController scrollController = ScrollController();
   final studentdeskkey = GlobalKey<ScaffoldState>();
 
   @override
@@ -263,11 +259,12 @@ class _MainPageBodyPageState extends State<MainPageBody> {
               ? '$firstname $lastname'
               : '$firstname $middlename $lastname';
           studentID = studentdata.studentID;
-          profileurl = studentdata.profilelink;
-          _updateResponse();
+          downloadURL1 = studentdata.profilelink;
+          // _updateResponse();
         });
       }
     }
+
     return Stack(
       children: [
         GestureDetector(
@@ -328,7 +325,7 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                           Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
@@ -351,33 +348,34 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                RatingBar(
-                                    initialRating: 0,
-                                    direction: Axis.horizontal,
-                                    allowHalfRating: true,
-                                    itemCount: 5,
-                                    itemSize: 16,
-                                    ratingWidget: RatingWidget(
-                                        full: const Icon(Icons.star,
-                                            color: Colors.orange),
-                                        half: const Icon(
-                                          Icons.star_half,
-                                          color: Colors.orange,
-                                        ),
-                                        empty: const Icon(
-                                          Icons.star_outline,
-                                          color: Colors.orange,
-                                        )),
-                                    onRatingUpdate: (value) {
-                                      // _ratingValue = value;
-                                    }),
+                                // RatingBar(
+                                //     initialRating: 0,
+                                //     direction: Axis.horizontal,
+                                //     allowHalfRating: true,
+                                //     itemCount: 5,
+                                //     itemSize: 16,
+                                //     ratingWidget: RatingWidget(
+                                //         full: const Icon(Icons.star,
+                                //             color: Colors.orange),
+                                //         half: const Icon(
+                                //           Icons.star_half,
+                                //           color: Colors.orange,
+                                //         ),
+                                //         empty: const Icon(
+                                //           Icons.star_outline,
+                                //           color: Colors.orange,
+                                //         )),
+                                //     onRatingUpdate: (value) {
+                                //       // _ratingValue = value;
+                                //     }),
                               ],
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 5, 10, 5),
+                            padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                             child: downloadURL1 == null
-                                ? const Center(child: Icon(Icons.person))
+                                ? const Center(
+                                    child: CircularProgressIndicator())
                                 : CircleAvatar(
                                     backgroundImage: NetworkImage(
                                       downloadURL1.toString(),
@@ -468,9 +466,11 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(0, 5, 10, 5),
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 5, 10, 5),
                                 child: downloadURL1 == null
-                                    ? const Center(child: Icon(Icons.person))
+                                    ? const Center(
+                                        child: CircularProgressIndicator())
                                     : CircleAvatar(
                                         backgroundImage: NetworkImage(
                                           downloadURL1.toString(),
@@ -598,7 +598,7 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                     visible: ResponsiveBuilder.isDesktop(context),
                     child: SingleChildScrollView(
                       controller: ScrollController(),
-                      child: StudentsMenu(),
+                      child: StudentsMenu(widget.uID),
                     ),
                   ),
                   SizedBox(
@@ -606,9 +606,9 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                   ),
                   Scrollbar(
                     trackVisibility: true,
-                    controller: _scrollController,
+                    controller: scrollController,
                     child: SingleChildScrollView(
-                      controller: _scrollController,
+                      controller: scrollController,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
@@ -748,7 +748,9 @@ class _MainPageBodyPageState extends State<MainPageBody> {
       child: Padding(
         padding: const EdgeInsets.only(top: 10.0),
         child: SingleChildScrollView(
-            controller: ScrollController(), child: StudentsMenu()),
+          controller: ScrollController(),
+          child: StudentsMenu(widget.uID),
+        ),
       ),
     );
   }

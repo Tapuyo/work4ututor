@@ -19,7 +19,15 @@ class _ViewFileState extends State<ViewFile> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: kColorPrimary,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment(-0.1, 0),
+              end: Alignment.centerRight,
+              colors: secondaryHeadercolors, // Define this list of colors
+            ),
+          ),
+        ),
         title: const HeaderText('Tutor Certificate'),
       ),
       body: Container(

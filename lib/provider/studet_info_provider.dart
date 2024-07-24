@@ -15,12 +15,14 @@ class StudentInfoProvider with ChangeNotifier {
         contact: '',
         dateofbirth: '',
         country: '',
-        dateregistered:DateTime.now(),
+        dateregistered: DateTime.now(),
         languages: [],
         emailadd: '',
         profilelink: '',
         studentFirstname: '',
-        timezone: ''); // Initialize _studentData in the constructor
+        timezone: '',
+        citizenship: [],
+        gender: ''); // Initialize _studentData in the constructor
   }
 
   StudentInfoClass get studentData => _studentData;

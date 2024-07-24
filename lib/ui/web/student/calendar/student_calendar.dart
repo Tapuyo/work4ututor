@@ -3,20 +3,17 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:work4ututor/data_class/voucherclass.dart';
-import 'package:work4ututor/services/getvouchers.dart';
 
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../provider/init_provider.dart';
-import '../../../../provider/schedulenotifier.dart';
 import '../../../../services/getenrolledclasses.dart';
 import '../../../../services/getmaterials.dart';
-import '../../../../services/getschedules.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
 import '../../terms/termpage.dart';
@@ -544,17 +541,20 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Container(
-                                        width: 15,
-                                        height: 15,
+                                        width: 12,
+                                        height: 12,
                                         alignment: Alignment.center,
                                         decoration: BoxDecoration(
                                             color: kCalendarColorFB,
                                             borderRadius:
                                                 BorderRadius.circular(6)),
-                                        child: Text(
-                                          '$count',
-                                          style: const TextStyle(
-                                              color: Colors.black),
+                                        child: Center(
+                                          child: Text(
+                                            '$count',
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 8),
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -566,8 +566,9 @@ class _StudentCalendarState extends State<StudentCalendar> {
                             },
                             todayBuilder: (context, date, _) {
                               return Container(
-                                margin: const EdgeInsets.all(5),
-                                alignment: Alignment.centerRight,
+                                margin: const EdgeInsets.only(
+                                    top: 5, left: 5, right: 5),
+                                alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                   color: Colors.transparent,
                                   shape: BoxShape.rectangle,
@@ -580,9 +581,9 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                 child: Text(
                                   '${date.day}',
                                   style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                    color: kColorGrey,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.normal,
                                   ),
                                 ),
                               );
@@ -1957,13 +1958,16 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                   // const VideoCall videoCall = VideoCall(chatID: '123', uID: '456');
 
                                                                   // Replace 'your_flutter_app_port' with the actual port your Flutter web app is running on
-                                                                  String url =
-                                                                      'http://localhost:58586/tutorsList';
+                                                                  // String url =
+                                                                  //     'http://localhost:58586/tutorsList';
 
                                                                   // Open the URL in a new tab
                                                                   // html.window.open('/videoCall', "");
                                                                   // html.window.open('/tutorslist', "");
                                                                   //  const VideoCall(chatID: '', uID: '',);
+                                                                  GoRouter.of(
+                                                                          context)
+                                                                      .go('/videocall/${widget.uID.toString()}&${filtereddata[index].scheduleID}&${filtereddata[index].meetinglink}');
                                                                 },
                                                                 child: Text(
                                                                   'work4ututor/${filtereddata[index].meetinglink}',
@@ -3327,13 +3331,16 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                   // const VideoCall videoCall = VideoCall(chatID: '123', uID: '456');
 
                                                                   // Replace 'your_flutter_app_port' with the actual port your Flutter web app is running on
-                                                                  String url =
-                                                                      'http://localhost:58586/tutorsList';
+                                                                  // String url =
+                                                                  //     'http://localhost:58586/tutorsList';
 
                                                                   // Open the URL in a new tab
                                                                   // html.window.open('/videoCall', "");
                                                                   // html.window.open('/tutorslist', "");
                                                                   //  const VideoCall(chatID: '', uID: '',);
+                                                                  GoRouter.of(
+                                                                          context)
+                                                                      .go('/videocall/${widget.uID.toString()}&${filtereddata[index].scheduleID}&${filtereddata[index].meetinglink}');
                                                                 },
                                                                 child: Text(
                                                                   'work4ututor/${filtereddata[index].meetinglink}',

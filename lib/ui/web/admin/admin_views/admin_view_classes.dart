@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
 import '../../../../utils/themes.dart';
-import '../../student/book_classes/cancelclasses.dart';
 import '../../student/book_classes/rescheduleclasses.dart';
 import '../../tutor/tutor_profile/view_file.dart';
 
@@ -514,7 +513,10 @@ class _ViewStudentClassInfoState extends State<ViewStudentClassInfo> {
                                                                 timefrom:
                                                                     'timefrom',
                                                                 timeto:
-                                                                    'timeto', classstatus: '', meetinglink: '');
+                                                                    'timeto',
+                                                                classstatus: '',
+                                                                meetinglink: '',
+                                                                rating: '', studentStatus: 'Pending', tutorStatus: 'Pending');
                                                             // String dateresult =
                                                             //     dueCancelDate(
                                                             //         scheduledata

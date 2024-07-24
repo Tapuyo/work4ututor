@@ -6,22 +6,23 @@ import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:work4ututor/ui/web/terms/termpage.dart';
 
 import '../../../../data_class/classesdataclass.dart';
-import '../../../../data_class/tutor_info_class.dart';
 import '../../../../provider/classinfo_provider.dart';
+import '../../../../services/addfinishedclass.dart';
 import '../../../../services/addmaterial.dart';
 import '../../../../services/deletematerial.dart';
 import '../../../../services/getmaterials.dart';
+import '../../../../services/gettutorpayments.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
-import '../../student/book_classes/cancelclasses.dart';
 import '../../student/book_classes/rescheduleclasses.dart';
-import '../../student/book_classes/setschedule.dart';
 import '../tutor_profile/view_file.dart';
 import 'package:universal_html/html.dart' as html;
 
@@ -45,11 +46,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
     });
   }
 
-  final List<ClassesData> _tiles = [
-    // ClassesData(title: 'Class 1', fields: ['Field 1', 'Field 2', 'Field 3']),
-    // ClassesData(title: 'Class 2', fields: ['Field A', 'Field B', 'Field C']),
-    // ClassesData(title: 'Class 3', fields: ['Field X', 'Field Y', 'Field Z']),
-  ];
+  final List<ClassesData> _tiles = [];
 
   bool _expanded = false;
   bool viewClassState = false;
@@ -207,6 +204,8 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ClaimableNotifier>(context, listen: false)
+        .getClaims(widget.enrolledClass.tutorID, 'tutor');
     bool selection5 = false;
     const Color background = Color(0xFF377487);
     const Color fill = Colors.white;
@@ -282,7 +281,6 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                 ResponsiveBuilder.isMobile(context) ? 10 : 20.0,
                             color: Colors.white,
                           ),
-                         
                         ),
                       ),
                     ],
@@ -658,6 +656,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                           .enrolledClass
                                                                           .classid)
                                                                   .toList();
+
                                                           filteredScheduleList
                                                               .sort((a, b) => a
                                                                   .schedule
@@ -710,23 +709,23 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                             if (filteredScheduleList.length >
                                                                                 index) {
                                                                               if (index == 0) {
-                                                                                return "${(index + 1)}st class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                                return "${(index + 1)}st class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? ' ' : ' '}";
                                                                               } else if (index == 1) {
-                                                                                return "${(index + 1)}nd class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                                return "${(index + 1)}nd class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? ' ' : ' '}";
                                                                               } else if (index == 2) {
-                                                                                return "${(index + 1)}rd class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                                return "${(index + 1)}rd class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? ' ' : ' '}";
                                                                               } else {
-                                                                                return "${(index + 1)}th class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
+                                                                                return "${(index + 1)}th class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? ' ' : ' '}";
                                                                               }
                                                                             } else {
                                                                               if (index == 0) {
-                                                                                return "${(index + 1)}st class (Unschedule)";
+                                                                                return "${(index + 1)}st class ";
                                                                               } else if (index == 1) {
-                                                                                return "${(index + 1)}nd class (Unschedule)";
+                                                                                return "${(index + 1)}nd class ";
                                                                               } else if (index == 2) {
-                                                                                return "${(index + 1)}rd class (Unschedule)";
+                                                                                return "${(index + 1)}rd class ";
                                                                               } else {
-                                                                                return "${(index + 1)}th class (Unschedule)";
+                                                                                return "${(index + 1)}th class ";
                                                                               }
                                                                             }
                                                                           })(),
@@ -742,6 +741,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                           textAlign:
                                                                               TextAlign.justify,
                                                                         ),
+                                                                 
                                                                   const Spacer(),
                                                                   newclassdata.status ==
                                                                           'Cancelled'
@@ -759,94 +759,66 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                         )
                                                                       : filteredScheduleList.length >
                                                                               index
-                                                                          ? TextButton(
-                                                                              child: const Text(
-                                                                                "Reschedule",
-                                                                                style: TextStyle(
-                                                                                  color: kColorPrimary,
-                                                                                  fontSize: 16,
-                                                                                  fontStyle: FontStyle.normal,
-                                                                                ),
-                                                                              ),
-                                                                              onPressed: () {
-                                                                                String dateresult = dueCancelDate(scheduledata!.schedule);
+                                                                          ? filteredScheduleList[index].classstatus == 'finish'
+                                                                              ? RatingBar(
+                                                                                  ignoreGestures: true,
+                                                                                  initialRating: filteredScheduleList[index].rating == '' ? 0 : double.parse(filteredScheduleList[index].rating),
+                                                                                  direction: Axis.horizontal,
+                                                                                  allowHalfRating: false,
+                                                                                  itemCount: 5,
+                                                                                  itemSize: 18,
+                                                                                  ratingWidget: RatingWidget(
+                                                                                      full: const Icon(Icons.star, color: Colors.orange),
+                                                                                      half: const Icon(
+                                                                                        Icons.star_half,
+                                                                                        color: Colors.orange,
+                                                                                      ),
+                                                                                      empty: const Icon(
+                                                                                        Icons.star_outline,
+                                                                                        color: Colors.orange,
+                                                                                      )),
+                                                                                  onRatingUpdate: (value) {
+                                                                                    // _ratingValue = value;
+                                                                                  })
+                                                                              : TextButton(
+                                                                                  child: const Text(
+                                                                                    "Reschedule",
+                                                                                    style: TextStyle(
+                                                                                      color: kColorPrimary,
+                                                                                      fontSize: 16,
+                                                                                      fontStyle: FontStyle.normal,
+                                                                                    ),
+                                                                                  ),
+                                                                                  onPressed: () {
+                                                                                    String dateresult = dueCancelDate(scheduledata!.schedule);
 
-                                                                                rescheduleclass(context, filteredScheduleList[index]);
-                                                                              },
-                                                                            )
-                                                                          :
-                                                                          // TextButton(
-                                                                          //     child:
-                                                                          //         Text(
-                                                                          //       "Set Schedule",
-                                                                          //       style:
-                                                                          //           TextStyle(
-                                                                          //         color: Colors
-                                                                          //             .green
-                                                                          //             .shade400,
-                                                                          //         fontSize:
-                                                                          //             18,
-                                                                          //         fontStyle:
-                                                                          //             FontStyle.normal,
-                                                                          //       ),
-                                                                          //     ),
-                                                                          //     onPressed:
-                                                                          //         () {
-                                                                          //       TutorInformation data = widget
-                                                                          //           .enrolledClass.tutorinfo
-                                                                          //           .first;
-                                                                          //       showDialog(
-                                                                          //           barrierDismissible:
-                                                                          //               false,
-                                                                          //           context:
-                                                                          //               context,
-                                                                          //           builder:
-                                                                          //               (BuildContext context) {
-                                                                          //             var height = MediaQuery.of(context).size.height;
-                                                                          //             var width = MediaQuery.of(context).size.width;
-                                                                          //             return AlertDialog(
-                                                                          //               shape: RoundedRectangleBorder(
-                                                                          //                 borderRadius: BorderRadius.circular(15.0),
-                                                                          //               ),
-                                                                          //               contentPadding: EdgeInsets.zero,
-                                                                          //               content: ClipRRect(
-                                                                          //                 borderRadius: BorderRadius.circular(15.0),
-                                                                          //                 child: Container(
-                                                                          //                   color: Colors.white,
-                                                                          //                   child: Stack(
-                                                                          //                     children: <Widget>[
-                                                                          //                       SizedBox(
-                                                                          //                         height: height - 100,
-                                                                          //                         width: width - 300,
-                                                                          //                         child: SetScheduleData(
-                                                                          //                           data: widget.enrolledClass,
-                                                                          //                           session: index.toString(),
-                                                                          //                           uID: widget.uID,
-                                                                          //                         ),
-                                                                          //                       ),
-                                                                          //                       Positioned(
-                                                                          //                         top: 10.0,
-                                                                          //                         right: 10.0,
-                                                                          //                         child: GestureDetector(
-                                                                          //                           onTap: () {
-                                                                          //                             Navigator.of(context).pop(false); // Close the dialog
-                                                                          //                           },
-                                                                          //                           child: const Icon(
-                                                                          //                             Icons.close,
-                                                                          //                             color: Colors.red,
-                                                                          //                             size: 20,
-                                                                          //                           ),
-                                                                          //                         ),
-                                                                          //                       ),
-                                                                          //                     ],
-                                                                          //                   ),
-                                                                          //                 ),
-                                                                          //               ),
-                                                                          //             );
-                                                                          //           }).then((selectedDate) {});
-                                                                          //     },
-                                                                          //   )
-                                                                          Container(),
+                                                                                    rescheduleclass(context, filteredScheduleList[index]);
+                                                                                  },
+                                                                                )
+                                                                          : 
+                                                                          // filteredScheduleList[index].tutorStatus == 'Completed'
+                                                                          //     ? RatingBar(
+                                                                          //         ignoreGestures: true,
+                                                                          //         initialRating: filteredScheduleList[index].rating == '' ? 0 : double.parse(filteredScheduleList[index].rating),
+                                                                          //         direction: Axis.horizontal,
+                                                                          //         allowHalfRating: false,
+                                                                          //         itemCount: 5,
+                                                                          //         itemSize: 18,
+                                                                          //         ratingWidget: RatingWidget(
+                                                                          //             full: const Icon(Icons.star, color: Colors.orange),
+                                                                          //             half: const Icon(
+                                                                          //               Icons.star_half,
+                                                                          //               color: Colors.orange,
+                                                                          //             ),
+                                                                          //             empty: const Icon(
+                                                                          //               Icons.star_outline,
+                                                                          //               color: Colors.orange,
+                                                                          //             )),
+                                                                          //         onRatingUpdate: (value) {
+                                                                          //           // _ratingValue = value;
+                                                                          //         })
+                                                                          //     :
+                                                                               Container(),
                                                                 ],
                                                               ),
                                                             ),
@@ -1096,8 +1068,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                                   ),
                                                                                   label: const Text(
                                                                                     'Add Files',
-                                                                                    style: TextStyle(color: kColorPrimary,
-                                                                                    overflow: TextOverflow.ellipsis),
+                                                                                    style: TextStyle(color: kColorPrimary, overflow: TextOverflow.ellipsis),
                                                                                   ),
                                                                                 ),
                                                                               ),
@@ -1739,9 +1710,10 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                                     String url = 'http://localhost:58586/tutorsList';
 
                                                                                     // Open the URL in a new tab
-                                                                                    html.window.open('/videoCall', "");
+                                                                                    // html.window.open('/videoCall', "");
                                                                                     // html.window.open('/tutorslist', "");
                                                                                     //  const VideoCall(chatID: '', uID: '',);
+                                                                                    GoRouter.of(context).go('/videocall/${widget.enrolledClass.tutorID}&${filtereddata[index].scheduleID}&${filtereddata[index].meetinglink}');
                                                                                   },
                                                                                   child: Text(
                                                                                     'work4ututor/${filtereddata[index].meetinglink}',
@@ -1829,93 +1801,183 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                       15, 10, 15, 10),
                                               decoration: BoxDecoration(
                                                   color: Colors.grey.shade200),
-                                              child: ListView.builder(
-                                                shrinkWrap: true,
-                                                itemCount: widget.enrolledClass
-                                                    .schedule.length,
-                                                itemBuilder: (context, index) {
-                                                  final classCount = widget
-                                                      .enrolledClass
-                                                      .schedule[index];
-                                                  return Container(
-                                                    alignment: Alignment.center,
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            5.0),
-                                                    child: Row(
-                                                      children: [
-                                                        Tooltip(
-                                                          message: (classCount
-                                                                      .session ==
-                                                                  '1')
-                                                              ? "${(classCount.session)}st Class Session"
-                                                              : (classCount
+                                              child:
+                                                  Consumer<ClaimableNotifier>(
+                                                      builder: (context,
+                                                          claimDetailsNotifier,
+                                                          child) {
+                                                dynamic claims =
+                                                    claimDetailsNotifier.claims;
+                                                dynamic claimdata = claims
+                                                    .where((element) =>
+                                                        element['classId'] ==
+                                                        widget.enrolledClass
+                                                            .classid)
+                                                    .toList();
+                                                return Consumer<List<Schedule>>(
+                                                    builder: (context,
+                                                        scheduleListdata, _) {
+                                                  dynamic data =
+                                                      scheduleListdata;
+                                                  List<Schedule>
+                                                      filteredScheduleList =
+                                                      data
+                                                          .where((element) =>
+                                                              element
+                                                                  .scheduleID ==
+                                                              widget
+                                                                  .enrolledClass
+                                                                  .classid)
+                                                          .toList();
+                                                  return ListView.builder(
+                                                    shrinkWrap: true,
+                                                    itemCount:
+                                                        filteredScheduleList
+                                                            .length,
+                                                    itemBuilder:
+                                                        (context, index) {
+                                                      final sortedSchedule =
+                                                          filteredScheduleList;
+                                                      sortedSchedule.sort((a,
+                                                              b) =>
+                                                          int.parse(a.session)
+                                                              .compareTo(
+                                                                  int.parse(b
+                                                                      .session)));
+
+                                                      final classCount =
+                                                          sortedSchedule[index];
+                                                      return Container(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(5.0),
+                                                        child: Row(
+                                                          children: [
+                                                            Tooltip(
+                                                              message: (classCount
                                                                           .session ==
-                                                                      '2')
-                                                                  ? "${(classCount.session)}nd Class Session"
+                                                                      '1')
+                                                                  ? "${(classCount.session)}st Class Session"
                                                                   : (classCount
                                                                               .session ==
-                                                                          '3')
-                                                                      ? "${(classCount.session)}rd Class Session"
-                                                                      : "${(classCount.session)}th Class Session",
-                                                          child: Text(
-                                                            (() {
-                                                              if (classCount
-                                                                      .session ==
-                                                                  '1') {
-                                                                return "${(classCount.session)}st Class";
-                                                              } else if (classCount
-                                                                      .session ==
-                                                                  '2') {
-                                                                return "${(classCount.session)}nd Class";
-                                                              } else if (classCount
-                                                                      .session ==
-                                                                  '3') {
-                                                                return "${(classCount.session)}rd Class";
-                                                              } else {
-                                                                return "${(classCount.session)}th Class";
-                                                              }
-                                                            })(),
-                                                            style: const TextStyle(
-                                                                color:
-                                                                    kColorGrey),
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .fade,
-                                                          ),
-                                                        ),
-                                                        const Spacer(),
-                                                        SizedBox(
-                                                          height: 40,
-                                                          child: ElevatedButton(
-                                                            style:
-                                                                ElevatedButton
+                                                                          '2')
+                                                                      ? "${(classCount.session)}nd Class Session"
+                                                                      : (classCount.session ==
+                                                                              '3')
+                                                                          ? "${(classCount.session)}rd Class Session"
+                                                                          : "${(classCount.session)}th Class Session",
+                                                              child: Text(
+                                                                (() {
+                                                                  if (classCount
+                                                                          .session ==
+                                                                      '1') {
+                                                                    return "${(classCount.session)}st Class";
+                                                                  } else if (classCount
+                                                                          .session ==
+                                                                      '2') {
+                                                                    return "${(classCount.session)}nd Class";
+                                                                  } else if (classCount
+                                                                          .session ==
+                                                                      '3') {
+                                                                    return "${(classCount.session)}rd Class";
+                                                                  } else {
+                                                                    return "${(classCount.session)}th Class";
+                                                                  }
+                                                                })(),
+                                                                style: const TextStyle(
+                                                                    color:
+                                                                        kColorGrey),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .fade,
+                                                              ),
+                                                            ),
+                                                            const Spacer(),
+                                                            SizedBox(
+                                                              height: 40,
+                                                              child:
+                                                                  ElevatedButton(
+                                                                style: ElevatedButton
                                                                     .styleFrom(
-                                                              backgroundColor:
-                                                                  Colors.white,
-                                                              shape: const RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius.all(
-                                                                          Radius.circular(
-                                                                              15))),
+                                                                  backgroundColor: classCount
+                                                                              .tutorStatus ==
+                                                                          'Completed'
+                                                                      ? Colors
+                                                                          .amber
+                                                                      : Colors
+                                                                          .white,
+                                                                  shape: const RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.all(
+                                                                              Radius.circular(15))),
+                                                                ),
+                                                                onPressed: classCount.tutorStatus ==
+                                                                            'Completed' ||
+                                                                        classCount
+                                                                            .schedule
+                                                                            .isAfter(DateTime.now())
+                                                                    ? null
+                                                                    : () {
+                                                                        double
+                                                                            disburseAmount =
+                                                                            widget.enrolledClass.price /
+                                                                                double.parse(widget.enrolledClass.totalClasses);
+                                                                        // addClassFinished(
+                                                                        //     widget
+                                                                        //         .enrolledClass
+                                                                        //         .price,
+                                                                        //     widget
+                                                                        //         .enrolledClass
+                                                                        //         .classid,
+                                                                        //     disburseAmount,
+                                                                        //     '001235',
+                                                                        //     widget
+                                                                        //         .enrolledClass
+                                                                        //         .studentID,
+                                                                        //     widget
+                                                                        //         .enrolledClass
+                                                                        //         .tutorID);
+                                                                        updateScheduleAndAddClassFinished(
+                                                                            classCount.scheduleID,
+                                                                            classCount.schedule,
+                                                                            widget.enrolledClass.price,
+                                                                            widget.enrolledClass.classid,
+                                                                            double.parse(disburseAmount.toStringAsFixed(2)),
+                                                                            '',
+                                                                            widget.enrolledClass.studentID,
+                                                                            widget.enrolledClass.tutorID);
+                                                                      },
+                                                                child: Text(
+                                                                  classCount.tutorStatus ==
+                                                                          'Completed'
+                                                                      ? 'Completed'
+                                                                      : 'Complete Session',
+                                                                  style: TextStyle(
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                      fontWeight: classCount.tutorStatus ==
+                                                                              'Completed'
+                                                                          ? FontWeight
+                                                                              .normal
+                                                                          : FontWeight
+                                                                              .bold,
+                                                                      color: classCount.tutorStatus ==
+                                                                              'Completed'
+                                                                          ? kColorLight
+                                                                          : kColorPrimary),
+                                                                ),
+                                                              ),
                                                             ),
-                                                            onPressed: () {},
-                                                            child: const Text(
-                                                              'Complete Session',
-                                                              style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color:
-                                                                      kColorPrimary),
-                                                            ),
-                                                          ),
+                                                          ],
                                                         ),
-                                                      ],
-                                                    ),
+                                                      );
+                                                    },
                                                   );
-                                                },
-                                              ),
+                                                });
+                                              }),
                                             ),
                                             const Spacer(),
                                             Card(
@@ -2056,1519 +2118,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                               )),
                         ],
                       )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            height: 350,
-                            child: DefaultTabController(
-                              length: 2,
-                              child: Column(
-                                children: [
-                                  Container(
-                                    height: 50,
-                                    child: TabBar(
-                                      indicator: BoxDecoration(
-                                        boxShadow: const [
-                                          BoxShadow(
-                                              color: Colors.black26,
-                                              offset: Offset(0, 4),
-                                              blurRadius: 5.0)
-                                        ],
-                                        gradient: const LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          stops: [0.0, 1.0],
-                                          colors: buttonFocuscolors,
-                                        ),
-                                        color: Colors.deepPurple.shade300,
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      indicatorColor: kColorPrimary,
-                                      tabs: const [
-                                        Tab(
-                                          icon: Icon(
-                                              Icons.insert_drive_file_outlined),
-                                          text: 'Class Info',
-                                          iconMargin:
-                                              EdgeInsets.only(bottom: 3),
-                                        ),
-                                        Tab(
-                                          icon: Icon(Icons.list_alt_outlined),
-                                          text: 'Materials',
-                                          iconMargin:
-                                              EdgeInsets.only(bottom: 3),
-                                        ),
-                                      ],
-                                      unselectedLabelColor: Colors.grey,
-                                      labelStyle: const TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                      labelColor: Colors.white,
-                                    ),
-                                  ),
-                                  Flexible(
-                                    flex: 20,
-                                    child: TabBarView(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            top: 8.0,
-                                          ),
-                                          child: SingleChildScrollView(
-                                            controller: ScrollController(),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Text.rich(
-                                                  TextSpan(
-                                                    children: [
-                                                      TextSpan(
-                                                        text:
-                                                            "You are enrolled in ",
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              ResponsiveBuilder
-                                                                      .isMobile(
-                                                                          context)
-                                                                  ? 15
-                                                                  : 16,
-                                                          fontStyle:
-                                                              FontStyle.normal,
-                                                          color: kColorGrey,
-                                                        ),
-                                                      ),
-                                                      TextSpan(
-                                                        text:
-                                                            "${widget.enrolledClass.totalClasses} classes ",
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              ResponsiveBuilder
-                                                                      .isMobile(
-                                                                          context)
-                                                                  ? 15
-                                                                  : 16,
-                                                          fontStyle:
-                                                              FontStyle.normal,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: kColorGrey,
-                                                        ),
-                                                      ),
-                                                      TextSpan(
-                                                        text:
-                                                            "of ${widget.enrolledClass.subjectinfo.first.subjectName}.",
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              ResponsiveBuilder
-                                                                      .isMobile(
-                                                                          context)
-                                                                  ? 15
-                                                                  : 16,
-                                                          fontStyle:
-                                                              FontStyle.normal,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: kColorGrey,
-                                                        ),
-                                                      ),
-                                                      TextSpan(
-                                                        text:
-                                                            "\nEach class lasts ",
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              ResponsiveBuilder
-                                                                      .isMobile(
-                                                                          context)
-                                                                  ? 15
-                                                                  : 16,
-                                                          fontStyle:
-                                                              FontStyle.normal,
-                                                          color: kColorGrey,
-                                                        ),
-                                                      ),
-                                                      TextSpan(
-                                                        text: "50 minutes",
-                                                        style: TextStyle(
-                                                          fontSize:
-                                                              ResponsiveBuilder
-                                                                      .isMobile(
-                                                                          context)
-                                                                  ? 15
-                                                                  : 16,
-                                                          fontStyle:
-                                                              FontStyle.normal,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: kColorGrey,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  textAlign: TextAlign.left,
-                                                ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Text(
-                                                  "Schedule:",
-                                                  style: TextStyle(
-                                                    fontSize: ResponsiveBuilder
-                                                            .isMobile(context)
-                                                        ? 15
-                                                        : 16,
-                                                    fontStyle: FontStyle.normal,
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                    color: kColorGrey,
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Consumer<List<Schedule>>(
-                                                    builder: (context,
-                                                        scheduleListdata, _) {
-                                                  dynamic data =
-                                                      scheduleListdata;
-                                                  ClassesData? newclassdata =
-                                                      widget.enrolledClass;
-                                                  return Container(
-                                                    width: 600,
-                                                    // height: 30 * 3,
-                                                    child: ListView.builder(
-                                                        physics:
-                                                            const NeverScrollableScrollPhysics(),
-                                                        shrinkWrap: true,
-                                                        itemCount: int.tryParse(
-                                                            newclassdata
-                                                                .totalClasses),
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          Schedule? temp;
-                                                          List<Schedule>
-                                                              filteredScheduleList =
-                                                              data
-                                                                  .where((element) =>
-                                                                      element
-                                                                          .scheduleID ==
-                                                                      widget
-                                                                          .enrolledClass
-                                                                          .classid)
-                                                                  .toList();
-                                                          filteredScheduleList
-                                                              .sort((a, b) => a
-                                                                  .schedule
-                                                                  .compareTo(b
-                                                                      .schedule));
-                                                          final scheduledata =
-                                                              filteredScheduleList
-                                                                          .length >
-                                                                      index
-                                                                  ? filteredScheduleList[
-                                                                      index]
-                                                                  : null;
-                                                          return Visibility(
-                                                            visible: true,
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(5.0),
-                                                              child: Row(
-                                                                children: [
-                                                                  filteredScheduleList
-                                                                          .isEmpty
-                                                                      ? Flexible(
-                                                                          flex:
-                                                                              60,
-                                                                          child:
-                                                                              Text(
-                                                                            (() {
-                                                                              if (filteredScheduleList.isEmpty && index == 0) {
-                                                                                return "${(index + 1)}st class (Unschedule)";
-                                                                              } else if (filteredScheduleList.isEmpty && index == 1) {
-                                                                                return "${(index + 1)}nd class (Unschedule)";
-                                                                              } else if (filteredScheduleList.isEmpty && index == 2) {
-                                                                                return "${(index + 1)}rd class (Unschedule)";
-                                                                              } else {
-                                                                                return "${(index + 1)}th class (Unschedule)";
-                                                                              }
-                                                                            })(),
-                                                                            style:
-                                                                                TextStyle(
-                                                                              fontSize: ResponsiveBuilder.isMobile(context) ? 15 : 16,
-                                                                              fontStyle: FontStyle.normal,
-                                                                              color: kColorGrey,
-                                                                            ),
-                                                                            textAlign:
-                                                                                TextAlign.justify,
-                                                                          ),
-                                                                        )
-                                                                      : Flexible(
-                                                                          flex:
-                                                                              60,
-                                                                          child:
-                                                                              Text(
-                                                                            (() {
-                                                                              if (filteredScheduleList.length > index) {
-                                                                                if (index == 0) {
-                                                                                  return "${(index + 1)}st class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
-                                                                                } else if (index == 1) {
-                                                                                  return "${(index + 1)}nd class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
-                                                                                } else if (index == 2) {
-                                                                                  return "${(index + 1)}rd class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
-                                                                                } else {
-                                                                                  return "${(index + 1)}th class  ${DateFormat('MMMM, dd yyyy').format(scheduledata!.schedule)} ${scheduledata.schedule.isAfter(DateTime.now()) ? '(Upcoming)' : '(Expired)'}";
-                                                                                }
-                                                                              } else {
-                                                                                if (index == 0) {
-                                                                                  return "${(index + 1)}st class (Unschedule)";
-                                                                                } else if (index == 1) {
-                                                                                  return "${(index + 1)}nd class (Unschedule)";
-                                                                                } else if (index == 2) {
-                                                                                  return "${(index + 1)}rd class (Unschedule)";
-                                                                                } else {
-                                                                                  return "${(index + 1)}th class (Unschedule)";
-                                                                                }
-                                                                              }
-                                                                            })(),
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: kColorGrey,
-                                                                              fontSize: ResponsiveBuilder.isMobile(context) ? 15 : 16,
-                                                                              fontStyle: FontStyle.normal,
-                                                                            ),
-                                                                            textAlign:
-                                                                                TextAlign.justify,
-                                                                            overflow:
-                                                                                TextOverflow.ellipsis,
-                                                                          ),
-                                                                        ),
-                                                                  const Spacer(),
-                                                                  newclassdata.status ==
-                                                                          'Cancelled'
-                                                                      ? Center(
-                                                                          child:
-                                                                              Text(
-                                                                            'Cancelled Class',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              color: kCalendarColorB,
-                                                                              fontSize: ResponsiveBuilder.isMobile(context) ? 15 : 16,
-                                                                              fontStyle: FontStyle.normal,
-                                                                            ),
-                                                                          ),
-                                                                        )
-                                                                      : filteredScheduleList.length >
-                                                                              index
-                                                                          ? TextButton(
-                                                                              child: Text(
-                                                                                "Reschedule",
-                                                                                style: TextStyle(
-                                                                                  color: kColorPrimary,
-                                                                                  fontSize: ResponsiveBuilder.isMobile(context) ? 15 : 16,
-                                                                                  fontStyle: FontStyle.normal,
-                                                                                ),
-                                                                              ),
-                                                                              onPressed: () {
-                                                                                String dateresult = dueCancelDate(scheduledata!.schedule);
-
-                                                                                rescheduleclass(context, filteredScheduleList[index]);
-                                                                              },
-                                                                            )
-                                                                          :
-                                                                          // TextButton(
-                                                                          //     child:
-                                                                          //         Text(
-                                                                          //       "Set Schedule",
-                                                                          //       style:
-                                                                          //           TextStyle(
-                                                                          //         color: Colors
-                                                                          //             .green
-                                                                          //             .shade400,
-                                                                          //         fontSize:
-                                                                          //             18,
-                                                                          //         fontStyle:
-                                                                          //             FontStyle.normal,
-                                                                          //       ),
-                                                                          //     ),
-                                                                          //     onPressed:
-                                                                          //         () {
-                                                                          //       TutorInformation data = widget
-                                                                          //           .enrolledClass.tutorinfo
-                                                                          //           .first;
-                                                                          //       showDialog(
-                                                                          //           barrierDismissible:
-                                                                          //               false,
-                                                                          //           context:
-                                                                          //               context,
-                                                                          //           builder:
-                                                                          //               (BuildContext context) {
-                                                                          //             var height = MediaQuery.of(context).size.height;
-                                                                          //             var width = MediaQuery.of(context).size.width;
-                                                                          //             return AlertDialog(
-                                                                          //               shape: RoundedRectangleBorder(
-                                                                          //                 borderRadius: BorderRadius.circular(15.0),
-                                                                          //               ),
-                                                                          //               contentPadding: EdgeInsets.zero,
-                                                                          //               content: ClipRRect(
-                                                                          //                 borderRadius: BorderRadius.circular(15.0),
-                                                                          //                 child: Container(
-                                                                          //                   color: Colors.white,
-                                                                          //                   child: Stack(
-                                                                          //                     children: <Widget>[
-                                                                          //                       SizedBox(
-                                                                          //                         height: height - 100,
-                                                                          //                         width: width - 300,
-                                                                          //                         child: SetScheduleData(
-                                                                          //                           data: widget.enrolledClass,
-                                                                          //                           session: index.toString(),
-                                                                          //                           uID: widget.uID,
-                                                                          //                         ),
-                                                                          //                       ),
-                                                                          //                       Positioned(
-                                                                          //                         top: 10.0,
-                                                                          //                         right: 10.0,
-                                                                          //                         child: GestureDetector(
-                                                                          //                           onTap: () {
-                                                                          //                             Navigator.of(context).pop(false); // Close the dialog
-                                                                          //                           },
-                                                                          //                           child: const Icon(
-                                                                          //                             Icons.close,
-                                                                          //                             color: Colors.red,
-                                                                          //                             size: 20,
-                                                                          //                           ),
-                                                                          //                         ),
-                                                                          //                       ),
-                                                                          //                     ],
-                                                                          //                   ),
-                                                                          //                 ),
-                                                                          //               ),
-                                                                          //             );
-                                                                          //           }).then((selectedDate) {});
-                                                                          //     },
-                                                                          //   )
-                                                                          Container(),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          );
-                                                        }),
-                                                  );
-                                                }),
-                                                // const SizedBox(
-                                                //   height: 10,
-                                                // ),
-                                                // Container(
-                                                //   height: 40,
-                                                //   padding: const EdgeInsets.fromLTRB(
-                                                //       10, 0, 10, 0),
-                                                //   decoration: const BoxDecoration(
-                                                //       color: kColorPrimary),
-                                                //   child: const Align(
-                                                //     alignment: Alignment.centerLeft,
-                                                //     child: Text(
-                                                //       'Class Grade',
-                                                //       style: TextStyle(
-                                                //           fontSize: 18,
-                                                //           fontWeight: FontWeight.bold,
-                                                //           color: Colors.white),
-                                                //     ),
-                                                //   ),
-                                                // ),
-                                                // const SizedBox(
-                                                //   height: 10,
-                                                // ),
-                                                // const Align(
-                                                //   alignment: Alignment.centerLeft,
-                                                //   child: SizedBox(
-                                                //     height: 50,
-                                                //     child: TextField(
-                                                //       textAlignVertical:
-                                                //           TextAlignVertical.top,
-                                                //       maxLines: null,
-                                                //       expands: true,
-                                                //       decoration: InputDecoration(
-                                                //         border: OutlineInputBorder(),
-                                                //         hintText: 'eg. 100',
-                                                //       ),
-                                                //     ),
-                                                //   ),
-                                                // ),
-                                                // const SizedBox(
-                                                //   height: 10,
-                                                // ),
-                                                // Container(
-                                                //   height: 40,
-                                                //   padding: const EdgeInsets.fromLTRB(
-                                                //       10, 0, 10, 0),
-                                                //   decoration: const BoxDecoration(
-                                                //       color: kColorPrimary),
-                                                //   child: const Align(
-                                                //     alignment: Alignment.centerLeft,
-                                                //     child: Text(
-                                                //       'Write down your comment',
-                                                //       style: TextStyle(
-                                                //           fontSize: 18,
-                                                //           fontWeight: FontWeight.bold,
-                                                //           color: Colors.white),
-                                                //     ),
-                                                //   ),
-                                                // ),
-                                                // const SizedBox(
-                                                //   height: 10,
-                                                // ),
-                                                // const SizedBox(
-                                                //   height: 200,
-                                                //   child: TextField(
-                                                //     textAlignVertical:
-                                                //         TextAlignVertical.top,
-                                                //     maxLines: null,
-                                                //     expands: true,
-                                                //     decoration: InputDecoration(
-                                                //       border: OutlineInputBorder(),
-                                                //       hintText:
-                                                //           'Enter your comment....',
-                                                //     ),
-                                                //   ),
-                                                // ),
-                                                // const SizedBox(
-                                                //   height: 10,
-                                                // ),
-                                                // Align(
-                                                //   alignment: Alignment.centerRight,
-                                                //   child: SizedBox(
-                                                //     width: 130,
-                                                //     height: 40,
-                                                //     child: ElevatedButton(
-                                                //       style: ElevatedButton.styleFrom(
-                                                //         backgroundColor:
-                                                //             kColorPrimary,
-                                                //         shape:
-                                                //             const RoundedRectangleBorder(
-                                                //                 borderRadius:
-                                                //                     BorderRadius.all(
-                                                //                         Radius
-                                                //                             .circular(
-                                                //                                 20))),
-                                                //       ),
-                                                //       onPressed: () {},
-                                                //       child: const Text('SAVE'),
-                                                //     ),
-                                                //   ),
-                                                // ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            top: 8.0,
-                                          ),
-                                          child: SingleChildScrollView(
-                                            controller: ScrollController(),
-                                            child: Column(
-                                              children: [
-                                                Container(
-                                                  width: 600,
-                                                  child: ListView.builder(
-                                                    shrinkWrap: true,
-                                                    itemCount: int.tryParse(
-                                                        widget.enrolledClass
-                                                            .totalClasses),
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      final selectedmaterials =
-                                                          materials.length >
-                                                                  index
-                                                              ? materials[index]
-                                                              : null;
-
-                                                      return Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .only(
-                                                                bottom: 10.0),
-                                                        child: Card(
-                                                          child: ExpansionTile(
-                                                            title: Text(
-                                                              (() {
-                                                                if (materials
-                                                                    .isNotEmpty) {
-                                                                  if (materials
-                                                                          .length >
-                                                                      index) {
-                                                                    if (selectedmaterials!
-                                                                            .session ==
-                                                                        '1') {
-                                                                      return "${(selectedmaterials.session)}st session materials.";
-                                                                    } else if (selectedmaterials
-                                                                            .session ==
-                                                                        '2') {
-                                                                      return "${(selectedmaterials.session)}nd session materials";
-                                                                    } else if (selectedmaterials
-                                                                            .session ==
-                                                                        '3') {
-                                                                      return "${(selectedmaterials.session)}rd session materials";
-                                                                    } else if (int.tryParse(
-                                                                            selectedmaterials.session)! >
-                                                                        3) {
-                                                                      return "${(selectedmaterials.session)}th session materials";
-                                                                    } else {
-                                                                      return "${(index + 1)}th session materials";
-                                                                    }
-                                                                  } else {
-                                                                    if (index ==
-                                                                        0) {
-                                                                      return "${(index + 1)}st session materials";
-                                                                    } else if (index ==
-                                                                        1) {
-                                                                      return "${(index + 1)}nd session materials";
-                                                                    } else if (index ==
-                                                                        2) {
-                                                                      return "${(index + 1)}rd session materials";
-                                                                    } else {
-                                                                      return "${(index + 1)}th session materials";
-                                                                    }
-                                                                  }
-                                                                } else {
-                                                                  if (index ==
-                                                                      0) {
-                                                                    return "${(index + 1)}st session materials.";
-                                                                  } else if (index ==
-                                                                      1) {
-                                                                    return "${(index + 1)}nd session materials";
-                                                                  } else if (index ==
-                                                                      2) {
-                                                                    return "${(index + 1)}rd session materials";
-                                                                  } else {
-                                                                    return "${(index + 1)}th session materials";
-                                                                  }
-                                                                }
-                                                              })(),
-                                                              style:
-                                                                  const TextStyle(
-                                                                color:
-                                                                    kColorGrey,
-                                                              ),
-                                                            ),
-                                                            children: <Widget>[
-                                                              widget.enrolledClass
-                                                                          .status ==
-                                                                      'Cancelled'
-                                                                  ? const Text(
-                                                                      'Cancelled Class',
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              20,
-                                                                          color:
-                                                                              kCalendarColorB),
-                                                                    )
-                                                                  : Column(
-                                                                      children: [
-                                                                        Padding(
-                                                                          padding:
-                                                                              const EdgeInsets.all(16.0),
-                                                                          child:
-                                                                              Row(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.start,
-                                                                            children: [
-                                                                              const Flexible(
-                                                                                flex: 60,
-                                                                                child: Text(
-                                                                                  'Files:',
-                                                                                  style: TextStyle(color: kColorGrey),
-                                                                                ),
-                                                                              ),
-                                                                              SizedBox(
-                                                                                width: ResponsiveBuilder.isMobile(context) ? 5 : 10,
-                                                                              ),
-                                                                              SizedBox(
-                                                                                width: 160,
-                                                                                height: 40,
-                                                                                child: ElevatedButton.icon(
-                                                                                  style: ElevatedButton.styleFrom(
-                                                                                    backgroundColor: Colors.white,
-                                                                                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
-                                                                                  ),
-                                                                                  onPressed: () {
-                                                                                    selectImage(widget.enrolledClass.classid, index.toString());
-                                                                                  },
-                                                                                  icon: const Icon(
-                                                                                    Icons.attach_file_outlined,
-                                                                                    color: kColorPrimary,
-                                                                                  ),
-                                                                                  label: const Text(
-                                                                                    'Add Files',
-                                                                                    style: TextStyle(color: kColorPrimary),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                              const SizedBox(
-                                                                                width: 5,
-                                                                              ),
-                                                                              // Visibility(
-                                                                              //   visible: progressupload == 0 || progressupload == 100
-                                                                              //       ? false
-                                                                              //       : true,
-                                                                              //   child:
-                                                                              //       SizedBox(
-                                                                              //     width: 50,
-                                                                              //     height: 5,
-                                                                              //     child: LinearProgressIndicator(
-                                                                              //       key: progressKey,
-                                                                              //       value: double.parse(progressupload.toString()),
-                                                                              //     ),
-                                                                              //   ),
-                                                                              // )
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                        // Padding(
-                                                                        //   padding:
-                                                                        //       const EdgeInsets
-                                                                        //               .fromLTRB(
-                                                                        //           50,
-                                                                        //           10,
-                                                                        //           50,
-                                                                        //           10),
-                                                                        //   child: TextFormField(
-                                                                        //     decoration:
-                                                                        //         const InputDecoration(
-                                                                        //       labelText:
-                                                                        //           'Add notes here',
-                                                                        //       border:
-                                                                        //           OutlineInputBorder(
-                                                                        //         borderSide:
-                                                                        //             BorderSide(),
-                                                                        //         gapPadding: 0,
-                                                                        //       ),
-                                                                        //     ),
-                                                                        //   ),
-                                                                        // ),
-                                                                        // Align(
-                                                                        //   alignment: Alignment
-                                                                        //       .topRight,
-                                                                        //   child: Padding(
-                                                                        //     padding:
-                                                                        //         const EdgeInsets
-                                                                        //                 .fromLTRB(
-                                                                        //             50,
-                                                                        //             0,
-                                                                        //             50,
-                                                                        //             10),
-                                                                        //     child: SizedBox(
-                                                                        //       width: 100,
-                                                                        //       height: 40,
-                                                                        //       child:
-                                                                        //           ElevatedButton(
-                                                                        //         style: ElevatedButton
-                                                                        //             .styleFrom(
-                                                                        //           minimumSize:
-                                                                        //               Size.zero,
-                                                                        //           padding:
-                                                                        //               EdgeInsets
-                                                                        //                   .zero,
-                                                                        //           backgroundColor:
-                                                                        //               kColorPrimary,
-                                                                        //           shape: const RoundedRectangleBorder(
-                                                                        //               borderRadius:
-                                                                        //                   BorderRadius.all(
-                                                                        //                       Radius.circular(15))),
-                                                                        //         ),
-                                                                        //         onPressed:
-                                                                        //             () {},
-                                                                        //         // icon: const Icon(Icons.attach_file_outlined, color: kColorPrimary,),
-                                                                        //         child:
-                                                                        //             const Text(
-                                                                        //           'Save',
-                                                                        //           style: TextStyle(
-                                                                        //               color: Colors
-                                                                        //                   .white),
-                                                                        //         ),
-                                                                        //       ),
-                                                                        //     ),
-                                                                        //   ),
-                                                                        // ),
-                                                                        Consumer<MaterialNotifier>(builder: (context,
-                                                                            materialNotifier,
-                                                                            _) {
-                                                                          if (materialNotifier
-                                                                              .materials
-                                                                              .isEmpty) {
-                                                                            return Container(
-                                                                                width: 600,
-                                                                                child: Center(
-                                                                                  child: Text(
-                                                                                    '(No materials added!)',
-                                                                                    style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
-                                                                                  ),
-                                                                                )); // Show loading indicator
-                                                                          }
-                                                                          List<Map<String, dynamic>>
-                                                                              materialsdata =
-                                                                              materialNotifier.materials.where((element) => element['classno'] == index.toString()).toList();
-                                                                          if (materialsdata
-                                                                              .isEmpty) {
-                                                                            return Container(
-                                                                                width: 600,
-                                                                                child: Center(
-                                                                                  child: Text(
-                                                                                    '(No materials added!)',
-                                                                                    style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
-                                                                                  ),
-                                                                                )); // Show loading indicator
-                                                                          }
-                                                                          return Container(
-                                                                              width: 600,
-                                                                              height: 120,
-                                                                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                                                              child: Row(
-                                                                                children: [
-                                                                                  IconButton(
-                                                                                    iconSize: 12,
-                                                                                    padding: EdgeInsets.zero,
-                                                                                    splashRadius: 1,
-                                                                                    icon: const Icon(
-                                                                                      Icons.arrow_back_ios, // Left arrow icon
-                                                                                      color: Colors.blue,
-                                                                                    ),
-                                                                                    onPressed: () {
-                                                                                      // Scroll to the left
-                                                                                      updatescrollController1.animateTo(
-                                                                                        updatescrollController1.offset - 100.0, // Adjust the value as needed
-                                                                                        duration: const Duration(milliseconds: 500), // Adjust the duration as needed
-                                                                                        curve: Curves.ease,
-                                                                                      );
-                                                                                    },
-                                                                                  ),
-                                                                                  Expanded(
-                                                                                    child: ListView.builder(
-                                                                                      shrinkWrap: true,
-                                                                                      controller: updatescrollController1, // Assign the ScrollController to the ListView
-                                                                                      scrollDirection: Axis.horizontal,
-                                                                                      itemCount: materialsdata.length,
-                                                                                      itemBuilder: (context, index) {
-                                                                                        if (materialsdata[index]['extension'] == 'Image') {
-                                                                                          return FutureBuilder(
-                                                                                              future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
-                                                                                              builder: (context, snapshot) {
-                                                                                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                                  return Container(
-                                                                                                      height: 60,
-                                                                                                      width: 60,
-                                                                                                      child: const Center(
-                                                                                                          child: CircularProgressIndicator(
-                                                                                                        strokeWidth: 2,
-                                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                                      ))); // Display a loading indicator while waiting for the file to download
-                                                                                                } else if (snapshot.hasError) {
-                                                                                                  return Text('Error: ${snapshot.error}');
-                                                                                                }
-
-                                                                                                return Padding(
-                                                                                                  padding: const EdgeInsets.only(left: 10.0, right: 10),
-                                                                                                  child: Row(
-                                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                                    children: [
-                                                                                                      Column(
-                                                                                                        children: [
-                                                                                                          InkWell(
-                                                                                                            onTap: () {
-                                                                                                              showDialog(
-                                                                                                                  barrierDismissible: false,
-                                                                                                                  context: context,
-                                                                                                                  builder: (BuildContext context) {
-                                                                                                                    var height = MediaQuery.of(context).size.height;
-                                                                                                                    return AlertDialog(
-                                                                                                                      shape: RoundedRectangleBorder(
-                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
-                                                                                                                      ),
-                                                                                                                      contentPadding: EdgeInsets.zero,
-                                                                                                                      content: ClipRRect(
-                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Same radius as above
-                                                                                                                        child: Container(
-                                                                                                                          color: Colors.white, // Set the background color of the circular content
-
-                                                                                                                          child: Stack(
-                                                                                                                            children: <Widget>[
-                                                                                                                              SizedBox(
-                                                                                                                                height: height,
-                                                                                                                                width: 900,
-                                                                                                                                child: ViewFile(imageURL: snapshot.data.toString()),
-                                                                                                                              ),
-                                                                                                                              Positioned(
-                                                                                                                                top: 10.0,
-                                                                                                                                right: 10.0,
-                                                                                                                                child: GestureDetector(
-                                                                                                                                  onTap: () {
-                                                                                                                                    Navigator.of(context).pop(false); // Close the dialog
-                                                                                                                                  },
-                                                                                                                                  child: const Icon(
-                                                                                                                                    Icons.close,
-                                                                                                                                    color: Colors.red,
-                                                                                                                                    size: 20,
-                                                                                                                                  ),
-                                                                                                                                ),
-                                                                                                                              ),
-                                                                                                                            ],
-                                                                                                                          ),
-                                                                                                                        ),
-                                                                                                                      ),
-                                                                                                                    );
-                                                                                                                  });
-                                                                                                            },
-                                                                                                            child: Stack(
-                                                                                                              children: <Widget>[
-                                                                                                                Container(
-                                                                                                                  height: 60,
-                                                                                                                  width: 60,
-                                                                                                                  decoration: BoxDecoration(
-                                                                                                                    borderRadius: BorderRadius.circular(10),
-                                                                                                                    color: Colors.grey.shade200,
-                                                                                                                  ),
-                                                                                                                  child: ClipRRect(
-                                                                                                                    borderRadius: BorderRadius.circular(10.0),
-                                                                                                                    child: Image.network(
-                                                                                                                      snapshot.data.toString(),
-                                                                                                                      fit: BoxFit.cover,
-                                                                                                                    ),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                                Positioned(
-                                                                                                                  top: 0,
-                                                                                                                  right: 0,
-                                                                                                                  child: GestureDetector(
-                                                                                                                    onTap: () async {
-                                                                                                                      bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
-                                                                                                                      if (result) {
-                                                                                                                        handleUpload('Deleted Successfully!', true);
-                                                                                                                      } else {
-                                                                                                                        handleUpload('Deleted Successfully!', false);
-                                                                                                                      }
-                                                                                                                    },
-                                                                                                                    child: Container(
-                                                                                                                      padding: const EdgeInsets.all(2),
-                                                                                                                      decoration: const BoxDecoration(
-                                                                                                                        shape: BoxShape.circle,
-                                                                                                                        color: Colors.red,
-                                                                                                                      ),
-                                                                                                                      child: const Icon(
-                                                                                                                        Icons.remove,
-                                                                                                                        color: Colors.white,
-                                                                                                                        size: 15,
-                                                                                                                      ),
-                                                                                                                    ),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              ],
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                          Center(
-                                                                                                            child: Tooltip(
-                                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                              child: SizedBox(
-                                                                                                                height: 60,
-                                                                                                                width: 60,
-                                                                                                                child: TextButton(
-                                                                                                                  onPressed: () {
-                                                                                                                    fetchFileData(snapshot.data.toString());
-                                                                                                                  },
-                                                                                                                  child: Text(
-                                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              ),
-                                                                                                            ),
-                                                                                                          )
-                                                                                                        ],
-                                                                                                      ),
-                                                                                                    ],
-                                                                                                  ),
-                                                                                                );
-                                                                                              });
-                                                                                        } else if (materialsdata[index]['extension'] == 'pdf') {
-                                                                                          return FutureBuilder(
-                                                                                              future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
-                                                                                              builder: (context, snapshot) {
-                                                                                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                                  return Container(
-                                                                                                      height: 60,
-                                                                                                      width: 60,
-                                                                                                      child: const Center(
-                                                                                                          child: CircularProgressIndicator(
-                                                                                                        strokeWidth: 2,
-                                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                                      ))); // Display a loading indicator while waiting for the file to download
-                                                                                                } else if (snapshot.hasError) {
-                                                                                                  return Text('Error: ${snapshot.error}');
-                                                                                                }
-                                                                                                return Padding(
-                                                                                                  padding: const EdgeInsets.only(left: 10.0, right: 10),
-                                                                                                  child: Row(
-                                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                                    children: [
-                                                                                                      Column(
-                                                                                                        children: [
-                                                                                                          InkWell(
-                                                                                                            onTap: () {
-                                                                                                              showDialog(
-                                                                                                                  barrierDismissible: false,
-                                                                                                                  context: context,
-                                                                                                                  builder: (BuildContext context) {
-                                                                                                                    var height = MediaQuery.of(context).size.height;
-                                                                                                                    return AlertDialog(
-                                                                                                                      shape: RoundedRectangleBorder(
-                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
-                                                                                                                      ),
-                                                                                                                      contentPadding: EdgeInsets.zero,
-                                                                                                                      content: ClipRRect(
-                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Same radius as above
-                                                                                                                        child: Container(
-                                                                                                                          color: Colors.white, // Set the background color of the circular content
-
-                                                                                                                          child: Stack(
-                                                                                                                            children: <Widget>[
-                                                                                                                              SizedBox(
-                                                                                                                                height: height,
-                                                                                                                                width: 900,
-                                                                                                                                child: TermPage(pdfurl: snapshot.data.toString()),
-                                                                                                                              ),
-                                                                                                                              Positioned(
-                                                                                                                                top: 10.0,
-                                                                                                                                right: 10.0,
-                                                                                                                                child: GestureDetector(
-                                                                                                                                  onTap: () {
-                                                                                                                                    Navigator.of(context).pop(false); // Close the dialog
-                                                                                                                                  },
-                                                                                                                                  child: const Icon(
-                                                                                                                                    Icons.close,
-                                                                                                                                    color: Colors.red,
-                                                                                                                                    size: 20,
-                                                                                                                                  ),
-                                                                                                                                ),
-                                                                                                                              ),
-                                                                                                                            ],
-                                                                                                                          ),
-                                                                                                                        ),
-                                                                                                                      ),
-                                                                                                                    );
-                                                                                                                  });
-                                                                                                            },
-                                                                                                            child: Stack(children: <Widget>[
-                                                                                                              Container(
-                                                                                                                height: 60,
-                                                                                                                width: 60,
-                                                                                                                decoration: BoxDecoration(
-                                                                                                                  borderRadius: BorderRadius.circular(10),
-                                                                                                                  color: Colors.grey.shade200, // You can adjust the fit as needed.
-                                                                                                                ),
-                                                                                                                child: ClipRRect(
-                                                                                                                  borderRadius: BorderRadius.circular(10.0),
-                                                                                                                  child: const Icon(
-                                                                                                                    Icons.picture_as_pdf,
-                                                                                                                    size: 48,
-                                                                                                                    color: Colors.red,
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              ),
-                                                                                                              Positioned(
-                                                                                                                top: 0,
-                                                                                                                right: 0,
-                                                                                                                child: GestureDetector(
-                                                                                                                  onTap: () async {
-                                                                                                                    bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
-                                                                                                                    if (result) {
-                                                                                                                      handleUpload('Deleted Successfully!', true);
-                                                                                                                    } else {
-                                                                                                                      handleUpload('Deleted Successfully!', false);
-                                                                                                                    }
-                                                                                                                  },
-                                                                                                                  child: Container(
-                                                                                                                    padding: const EdgeInsets.all(2),
-                                                                                                                    decoration: const BoxDecoration(
-                                                                                                                      shape: BoxShape.circle,
-                                                                                                                      color: Colors.red,
-                                                                                                                    ),
-                                                                                                                    child: const Icon(
-                                                                                                                      Icons.remove,
-                                                                                                                      color: Colors.white,
-                                                                                                                      size: 15,
-                                                                                                                    ),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              ),
-                                                                                                            ]),
-                                                                                                          ),
-                                                                                                          Center(
-                                                                                                            child: Tooltip(
-                                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                              child: SizedBox(
-                                                                                                                height: 60,
-                                                                                                                width: 60,
-                                                                                                                child: TextButton(
-                                                                                                                  onPressed: () {
-                                                                                                                    fetchFileData(snapshot.data.toString());
-                                                                                                                  },
-                                                                                                                  child: Text(
-                                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              ),
-                                                                                                            ),
-                                                                                                          )
-                                                                                                        ],
-                                                                                                      ),
-                                                                                                    ],
-                                                                                                  ),
-                                                                                                );
-                                                                                              });
-                                                                                        } else {
-                                                                                          return FutureBuilder(
-                                                                                              future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
-                                                                                              builder: (context, snapshot) {
-                                                                                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                                  return Container(
-                                                                                                      height: 60,
-                                                                                                      width: 60,
-                                                                                                      child: const Center(
-                                                                                                          child: CircularProgressIndicator(
-                                                                                                        strokeWidth: 2,
-                                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                                      ))); // Display a loading indicator while waiting for the file to download
-                                                                                                } else if (snapshot.hasError) {
-                                                                                                  return Text('Error: ${snapshot.error}');
-                                                                                                }
-                                                                                                return Padding(
-                                                                                                  padding: const EdgeInsets.only(left: 10.0, right: 10),
-                                                                                                  child: Row(
-                                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                                    children: [
-                                                                                                      Column(
-                                                                                                        children: [
-                                                                                                          InkWell(
-                                                                                                            onTap: () {
-                                                                                                              showDialog(
-                                                                                                                  barrierDismissible: false,
-                                                                                                                  context: context,
-                                                                                                                  builder: (BuildContext context) {
-                                                                                                                    var height = MediaQuery.of(context).size.height;
-                                                                                                                    return AlertDialog(
-                                                                                                                      shape: RoundedRectangleBorder(
-                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
-                                                                                                                      ),
-                                                                                                                      contentPadding: EdgeInsets.zero,
-                                                                                                                      content: ClipRRect(
-                                                                                                                        borderRadius: BorderRadius.circular(15.0), // Same radius as above
-                                                                                                                        child: Container(
-                                                                                                                          color: Colors.white, // Set the background color of the circular content
-
-                                                                                                                          child: Stack(
-                                                                                                                            children: <Widget>[
-                                                                                                                              SizedBox(
-                                                                                                                                height: height,
-                                                                                                                                width: 900,
-                                                                                                                                child: ViewFile(imageURL: snapshot.data.toString()),
-                                                                                                                              ),
-                                                                                                                              Positioned(
-                                                                                                                                top: 10.0,
-                                                                                                                                right: 10.0,
-                                                                                                                                child: GestureDetector(
-                                                                                                                                  onTap: () {
-                                                                                                                                    Navigator.of(context).pop(false); // Close the dialog
-                                                                                                                                  },
-                                                                                                                                  child: const Icon(
-                                                                                                                                    Icons.close,
-                                                                                                                                    color: Colors.red,
-                                                                                                                                    size: 20,
-                                                                                                                                  ),
-                                                                                                                                ),
-                                                                                                                              ),
-                                                                                                                            ],
-                                                                                                                          ),
-                                                                                                                        ),
-                                                                                                                      ),
-                                                                                                                    );
-                                                                                                                  });
-                                                                                                            },
-                                                                                                            child: Stack(
-                                                                                                              children: <Widget>[
-                                                                                                                Container(
-                                                                                                                  height: 60,
-                                                                                                                  width: 60,
-                                                                                                                  decoration: BoxDecoration(
-                                                                                                                    borderRadius: BorderRadius.circular(10),
-                                                                                                                    color: Colors.grey.shade200, // You can adjust the fit as needed.
-                                                                                                                  ),
-                                                                                                                  child: ClipRRect(
-                                                                                                                    borderRadius: BorderRadius.circular(10.0),
-                                                                                                                    child: const Icon(
-                                                                                                                      FontAwesomeIcons.fileWord,
-                                                                                                                      size: 48,
-                                                                                                                      color: Colors.blue,
-                                                                                                                    ),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                                Positioned(
-                                                                                                                  top: 0,
-                                                                                                                  right: 0,
-                                                                                                                  child: GestureDetector(
-                                                                                                                    onTap: () async {
-                                                                                                                      bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
-                                                                                                                      if (result) {
-                                                                                                                        handleUpload('Deleted Successfully!', true);
-                                                                                                                      } else {
-                                                                                                                        handleUpload('Deleted Successfully!', false);
-                                                                                                                      }
-                                                                                                                    },
-                                                                                                                    child: Container(
-                                                                                                                      padding: const EdgeInsets.all(2),
-                                                                                                                      decoration: const BoxDecoration(
-                                                                                                                        shape: BoxShape.circle,
-                                                                                                                        color: Colors.red,
-                                                                                                                      ),
-                                                                                                                      child: const Icon(
-                                                                                                                        Icons.remove,
-                                                                                                                        color: Colors.white,
-                                                                                                                        size: 15,
-                                                                                                                      ),
-                                                                                                                    ),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              ],
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                          Center(
-                                                                                                            child: Tooltip(
-                                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                              child: SizedBox(
-                                                                                                                height: 60,
-                                                                                                                width: 60,
-                                                                                                                child: TextButton(
-                                                                                                                  onPressed: () {
-                                                                                                                    setState(() {
-                                                                                                                      fetchFileData(snapshot.data.toString());
-                                                                                                                    });
-                                                                                                                  },
-                                                                                                                  child: Text(
-                                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              ),
-                                                                                                            ),
-                                                                                                          )
-                                                                                                        ],
-                                                                                                      ),
-                                                                                                    ],
-                                                                                                  ),
-                                                                                                );
-                                                                                              });
-                                                                                        }
-                                                                                      },
-                                                                                    ),
-                                                                                  ),
-                                                                                  IconButton(
-                                                                                    iconSize: 12,
-                                                                                    padding: EdgeInsets.zero,
-                                                                                    splashRadius: 1,
-                                                                                    icon: const Icon(
-                                                                                      Icons.arrow_forward_ios, // Right arrow icon
-                                                                                      color: Colors.blue,
-                                                                                    ),
-                                                                                    onPressed: () {
-                                                                                      // Scroll to the right
-                                                                                      updatescrollController1.animateTo(
-                                                                                        updatescrollController1.offset + 100.0, // Adjust the value as needed
-                                                                                        duration: const Duration(milliseconds: 500), // Adjust the duration as needed
-                                                                                        curve: Curves.ease,
-                                                                                      );
-                                                                                    },
-                                                                                  ),
-                                                                                ],
-                                                                              ));
-                                                                        }),
-
-                                                                        Padding(
-                                                                          padding:
-                                                                              const EdgeInsets.all(16.0),
-                                                                          child:
-                                                                              Row(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.start,
-                                                                            children: [
-                                                                              const Flexible(flex: 60, child: Text('Class Video Meeting:', style: TextStyle(color: kColorGrey))),
-                                                                              const SizedBox(
-                                                                                width: 10,
-                                                                              ),
-                                                                              Text(
-                                                                                '(Click the link to join the class!)',
-                                                                                style: TextStyle(fontSize: 12, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                        Padding(
-                                                                          padding: const EdgeInsets.fromLTRB(
-                                                                              50,
-                                                                              10,
-                                                                              50,
-                                                                              10),
-                                                                          child: Consumer<List<Schedule>>(builder: (context,
-                                                                              scheduleListdata,
-                                                                              _) {
-                                                                            dynamic
-                                                                                data =
-                                                                                scheduleListdata;
-                                                                            ClassesData?
-                                                                                newclassdata =
-                                                                                widget.enrolledClass;
-                                                                            List<Schedule>
-                                                                                filtereddata =
-                                                                                data.where((element) => element.scheduleID == widget.enrolledClass.classid).toList();
-                                                                            filtereddata.sort((a, b) =>
-                                                                                a.schedule.compareTo(b.schedule));
-                                                                            if (filtereddata.length >
-                                                                                index) {
-                                                                              return MouseRegion(
-                                                                                cursor: SystemMouseCursors.click,
-                                                                                child: GestureDetector(
-                                                                                  onTap: () {
-                                                                                    // const VideoCall videoCall = VideoCall(chatID: '123', uID: '456');
-
-                                                                                    // Replace 'your_flutter_app_port' with the actual port your Flutter web app is running on
-                                                                                    String url = 'http://localhost:58586/tutorsList';
-
-                                                                                    // Open the URL in a new tab
-                                                                                    html.window.open('/videoCall', "");
-                                                                                    // html.window.open('/tutorslist', "");
-                                                                                    //  const VideoCall(chatID: '', uID: '',);
-                                                                                  },
-                                                                                  child: Text(
-                                                                                    'work4ututor/${filtereddata[index].meetinglink}',
-                                                                                    style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic, decoration: TextDecoration.underline),
-                                                                                  ),
-                                                                                ),
-                                                                              );
-                                                                            }
-                                                                            return Text(
-                                                                              '(Link will be attached when student set class schedule!)',
-                                                                              style: TextStyle(fontSize: 15, color: Colors.blue.shade200, fontStyle: FontStyle.italic),
-                                                                            );
-                                                                          }),
-                                                                          //add link here
-                                                                        ),
-                                                                        const SizedBox(
-                                                                          height:
-                                                                              10,
-                                                                        ),
-                                                                      ],
-                                                                    )
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(10.0), //<-- SEE HERE
-                            ),
-                            elevation: 1,
-                            child: Container(
-                              width: 380,
-                              height: 300,
-                              padding: const EdgeInsets.all(0.0),
-                              decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(10))),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Padding(
-                                    padding: EdgeInsets.all(10.0),
-                                    child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          'Class Session',
-                                          style: TextStyle(
-                                              fontSize: 16, color: kColorGrey),
-                                        )),
-                                  ),
-                                  Container(
-                                    alignment: Alignment.center,
-                                    padding: const EdgeInsets.fromLTRB(
-                                        15, 10, 15, 10),
-                                    decoration: BoxDecoration(
-                                        color: Colors.grey.shade200),
-                                    child: ListView.builder(
-                                      shrinkWrap: true,
-                                      itemCount:
-                                          widget.enrolledClass.schedule.length,
-                                      itemBuilder: (context, index) {
-                                        final classCount = widget
-                                            .enrolledClass.schedule[index];
-                                        return Container(
-                                          alignment: Alignment.center,
-                                          padding: const EdgeInsets.all(5.0),
-                                          child: Row(
-                                            children: [
-                                              Tooltip(
-                                                message: (classCount.session ==
-                                                        '1')
-                                                    ? "${(classCount.session)}st Class Session"
-                                                    : (classCount.session ==
-                                                            '2')
-                                                        ? "${(classCount.session)}nd Class Session"
-                                                        : (classCount.session ==
-                                                                '3')
-                                                            ? "${(classCount.session)}rd Class Session"
-                                                            : "${(classCount.session)}th Class Session",
-                                                child: Text(
-                                                  (() {
-                                                    if (classCount.session ==
-                                                        '1') {
-                                                      return "${(classCount.session)}st Class";
-                                                    } else if (classCount
-                                                            .session ==
-                                                        '2') {
-                                                      return "${(classCount.session)}nd Class";
-                                                    } else if (classCount
-                                                            .session ==
-                                                        '3') {
-                                                      return "${(classCount.session)}rd Class";
-                                                    } else {
-                                                      return "${(classCount.session)}th Class";
-                                                    }
-                                                  })(),
-                                                  textAlign:
-                                                      TextAlign.justify,
-                                                  style: const TextStyle(
-                                                      color: kColorGrey),
-                                                  overflow: TextOverflow.fade,
-                                                ),
-                                              ),
-                                              const Spacer(),
-                                              SizedBox(
-                                                height: 40,
-                                                child: ElevatedButton(
-                                                  clipBehavior: Clip.hardEdge,
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    shape: const RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    15))),
-                                                  ),
-                                                  onPressed: () {},
-                                                  child: Flexible(
-                                                    flex: 20,
-                                                    child: Text(
-                                                      size.width < 350
-                                                          ? 'Complete'
-                                                          : 'Complete Session',
-                                                      style: const TextStyle(
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: kColorPrimary),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                          10.0), //<-- SEE HERE
-                                    ),
-                                    elevation: 1,
-                                    child: Container(
-                                      width: 380,
-                                      height: 65,
-                                      alignment: Alignment.center,
-                                      // padding:
-                                      // const EdgeInsets.fromLTRB(30, 10, 30, 10),
-                                      decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.only(
-                                              bottomLeft: Radius.circular(10),
-                                              bottomRight:
-                                                  Radius.circular(10))),
-                                      child: Center(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: const [
-                                            Icon(
-                                              EvaIcons.clockOutline,
-                                              color: kColorGrey,
-                                            ),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Flexible(
-                                              flex: 60,
-                                              child: Text(
-                                                '50 minutes per class session',
-                                                style: TextStyle(
-                                                    color: kColorGrey),
-                                                textAlign: TextAlign.justify,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    : Container(),
               ),
             ),
           ],

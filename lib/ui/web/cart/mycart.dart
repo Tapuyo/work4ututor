@@ -18,6 +18,7 @@ import 'dart:html' as html;
 import '../../../../utils/themes.dart';
 import '../../../data_class/subject_class.dart';
 import '../../../services/gettutor.dart';
+import '../../../shared_components/responsive_builder.dart';
 import '../admin/admin_sharedcomponents/header_text.dart';
 import '../tutor/tutor_profile/view_file.dart';
 
@@ -30,13 +31,19 @@ class MyCart extends StatefulWidget {
 }
 
 class _MyCartState extends State<MyCart> {
+  bool _showLoading = true;
+
   @override
   void initState() {
     super.initState();
-    print(widget.studentID);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final cartNotifier = Provider.of<CartNotifier>(context, listen: false);
       cartNotifier.getCart(widget.studentID);
+    });
+    Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+        _showLoading = false;
+      });
     });
   }
 
@@ -47,21 +54,23 @@ class _MyCartState extends State<MyCart> {
   DateTime? _fromselectedDate;
   DateTime? _toselectedDate;
   ClassesData selectedclass = ClassesData(
-      classid: '',
-      subjectID: '',
-      tutorID: '',
-      studentID: '',
-      materials: [],
-      schedule: [],
-      score: [],
-      status: '',
-      totalClasses: '',
-      completedClasses: '',
-      pendingClasses: '',
-      dateEnrolled: DateTime.now(),
-      studentinfo: [],
-      tutorinfo: [],
-      subjectinfo: []);
+    classid: '',
+    subjectID: '',
+    tutorID: '',
+    studentID: '',
+    materials: [],
+    schedule: [],
+    score: [],
+    status: '',
+    totalClasses: '',
+    completedClasses: '',
+    pendingClasses: '',
+    dateEnrolled: DateTime.now(),
+    studentinfo: [],
+    tutorinfo: [],
+    subjectinfo: [],
+    price: 0,
+  );
 
   String? downloadURL;
   List<String> imagelinks = [];
@@ -125,7 +134,6 @@ class _MyCartState extends State<MyCart> {
 
   @override
   void dispose() {
-    // Dispose of resources when the widget is removed from the widget tree
     setState(() {
       final provider = context.read<ViewClassDisplayProvider>();
       provider.setViewClassinfo(false);
@@ -143,46 +151,97 @@ class _MyCartState extends State<MyCart> {
     final subjectlist = Provider.of<List<Subjects>>(context);
 
     return Consumer<CartNotifier>(builder: (context, cartnotifierdata, _) {
-      if (cartnotifierdata.cart.isEmpty) {
-        return Container(
-            width: size.width - 310,
-            child: Center(
-              child: Text(
-                'Cart is empty.',
-                style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.blue.shade200,
-                    fontStyle: FontStyle.italic),
-              ),
-            )); // Show loading indicator
+      // if (cartnotifierdata.cart.isEmpty) {
+      //   return Container(
+      //       width: ResponsiveBuilder.isDesktop(context)
+      //           ? size.width - 290
+      //           : size.width - 30,
+      //       height: size.height,
+      //       child: Center(
+      //         child: Text(
+      //           'Cart is empty.',
+      //           style: TextStyle(
+      //               fontSize: 15,
+      //               color: Colors.blue.shade200,
+      //               fontStyle: FontStyle.italic),
+      //         ),
+      //       )); // Show loading indicator
+      // }
+      if (_showLoading || cartnotifierdata.cart.isEmpty) {
+        return Center(
+          child: _showLoading
+              ? Container(
+                  width: ResponsiveBuilder.isDesktop(context)
+                      ? size.width - 290
+                      : size.width - 30,
+                  height: size.height,
+                  child: const Center(child: CircularProgressIndicator()))
+              : Card(
+                  margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                  elevation: 4,
+                  child: Container(
+                    width: ResponsiveBuilder.isDesktop(context)
+                        ? size.width - 290
+                        : size.width - 30,
+                    height: size.height,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(
+                            Icons.shopping_cart_outlined,
+                            size: 50,
+                            color: kColorPrimary,
+                          ),
+                          Text(
+                            'Cart is empty.',
+                            style: TextStyle(
+                              fontSize: 24,
+                              color: kCalendarColorB,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+        );
       }
       List<Map<String, dynamic>> cart = cartnotifierdata.cart;
-      return Padding(
+      return Container(
         padding: const EdgeInsets.only(left: 10, right: 10),
         child: Column(
           children: <Widget>[
             Card(
-              margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
-              elevation: 5,
+              margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
+              elevation: 4,
               child: Container(
                 height: 50,
-                width: size.width - 310,
+                width: ResponsiveBuilder.isDesktop(context)
+                    ? size.width - 300
+                    : size.width - 30,
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  color: kColorPrimary,
+                  gradient: const LinearGradient(
+                    begin: Alignment(-0.1, 0), // 0% from the top center
+                    end: Alignment.centerRight, // 86% to the bottom center
+                    // transform: GradientRotation(1.57), // 90 degrees rotation
+                    colors:
+                        secondaryHeadercolors, // Add your desired colors here
+                  ),
                   borderRadius: BorderRadius.circular(5.0),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: const [
                     Text(
-                      "MY CART",
+                      "Classes",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
-                        fontWeight: FontWeight.normal,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     Spacer(),
@@ -190,328 +249,1262 @@ class _MyCartState extends State<MyCart> {
                 ),
               ),
             ),
-            Container(
-                width: size.width - 310,
-                height: size.height - 80,
-                child: cart.isEmpty
-                    ? Container(
-                        width: size.width - 320,
-                        height: size.height - 80,
-                        child: Center(
-                            child: Container(
-                          width: 60,
-                          height: 60,
-                          child: const CircularProgressIndicator(
-                            strokeWidth: 6,
-                            color: Color.fromRGBO(1, 118, 132, 1),
-                          ),
-                        )))
-                    : Container(
-                        width: size.width - 320,
-                        height: size.height - 90,
-                        alignment: Alignment.topCenter,
-                        child: Center(
-                          child: ListView(
-                              scrollDirection: Axis.horizontal,
-                              children: [
-                                Container(
-                                  width: size.width - 320,
-                                  height: size.height - 175,
-                                  child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: (cart.length / 2).ceil(),
-                                    itemBuilder: (context, index) {
-                                      final int firstColumnIndex = index * 2;
-                                      final int? secondColumnIndex =
-                                          firstColumnIndex + 1 < cart.length
-                                              ? firstColumnIndex + 1
-                                              : null;
-                                      final enrolledClass =
-                                          cart[firstColumnIndex];
+            const SizedBox(
+              height: 10,
+            ),
+            Card(
+              margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+              elevation: 4,
+              child: Container(
+                  width: ResponsiveBuilder.isDesktop(context)
+                      ? size.width - 300
+                      : size.width - 30,
+                  height: size.height - 140,
+                  padding: ResponsiveBuilder.isDesktop(context)
+                      ? size.width > 1330
+                          ? const EdgeInsets.fromLTRB(100, 20, 100, 0)
+                          : size.width > 1200 && size.width < 1330
+                              ? const EdgeInsets.fromLTRB(40, 20, 40, 0)
+                              : size.width > 1100 && size.width < 1130
+                                  ? const EdgeInsets.fromLTRB(0, 20, 0, 0)
+                                  : const EdgeInsets.fromLTRB(5, 20, 5, 0)
+                      : ResponsiveBuilder.isTablet(context)
+                          ? const EdgeInsets.fromLTRB(20, 20, 20, 0)
+                          : const EdgeInsets.fromLTRB(5, 20, 5, 0),
+                  alignment:
+                      cart.length > 1 ? Alignment.topCenter : Alignment.topLeft,
+                  child: ResponsiveBuilder.isDesktop(context)
+                      ? ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: (cart.length / 2).ceil(),
+                          itemBuilder: (context, index) {
+                            final int firstColumnIndex = index * 2;
+                            final int? secondColumnIndex =
+                                firstColumnIndex + 1 < cart.length
+                                    ? firstColumnIndex + 1
+                                    : null;
+                            final enrolledClass = cart[firstColumnIndex];
 
-                                      return Row(
-                                        children: [
-                                          // First column
-                                          FutureBuilder<TutorInformation?>(
-                                              future: getTutorInfo(
-                                                  cart[firstColumnIndex]
-                                                          ['tutorid']
-                                                      .toString()),
-                                              builder: (context,
-                                                  AsyncSnapshot<
-                                                          TutorInformation?>
-                                                      snapshot) {
-                                                if (snapshot.connectionState ==
-                                                    ConnectionState.waiting) {
-                                                  return Container();
-                                                } else if (snapshot.hasError) {
-                                                  return Text(
-                                                      'Error: ${snapshot.error}');
-                                                }
-                                                TutorInformation? tutorinfo =
-                                                    snapshot.data;
-                                                Subjects subjectid =
-                                                    subjectlist.firstWhere(
-                                                  (element) =>
-                                                      element.subjectId ==
-                                                      cart[firstColumnIndex]
-                                                          ['subjectid'],
-                                                );
-                                                return Card(
-                                                  elevation: 5,
-                                                  child: SingleChildScrollView(
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    controller: alllistscroll,
-                                                    child: Column(
-                                                      children: [
-                                                        Container(
-                                                          width: 600,
-                                                          color: Colors.white,
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                              top: 5.0,
-                                                              left: 10,
-                                                              right: 10,
-                                                              bottom: 5.0,
-                                                            ),
+                            return Row(
+                              children: [
+                                // First column
+                                FutureBuilder<TutorInformation?>(
+                                    future: getTutorInfo(cart[firstColumnIndex]
+                                            ['tutorid']
+                                        .toString()),
+                                    builder: (context,
+                                        AsyncSnapshot<TutorInformation?>
+                                            snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Container();
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      }
+                                      TutorInformation? tutorinfo =
+                                          snapshot.data;
+                                      Subjects subjectid =
+                                          subjectlist.firstWhere(
+                                        (element) =>
+                                            element.subjectId ==
+                                            cart[firstColumnIndex]['subjectid'],
+                                      );
+                                      return Card(
+                                        elevation: 4,
+                                        child: SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          controller: alllistscroll,
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                width: size.width >= 1100 &&
+                                                        size.width < 1130
+                                                    ? 380
+                                                    : 400,
+                                                color: Colors.white,
+                                                child: Padding(
+                                                  padding: size.width >= 1100 &&
+                                                          size.width < 1130
+                                                      ? const EdgeInsets.only(
+                                                          top: 5.0,
+                                                          left: 0,
+                                                          right: 0,
+                                                          bottom: 5.0,
+                                                        )
+                                                      : const EdgeInsets.only(
+                                                          top: 5.0,
+                                                          left: 10,
+                                                          right: 10,
+                                                          bottom: 5.0,
+                                                        ),
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        '${(tutorinfo!.firstName)}${(tutorinfo.middleName == 'N/A' || tutorinfo.middleName == '' ? '' : ' ${(tutorinfo.middleName)}')} ${(tutorinfo.lastname)}',
+                                                        // 'Name',
+                                                        style: const TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                            color: kColorGrey),
+                                                      ),
+                                                      const SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Align(
+                                                            alignment: Alignment
+                                                                .topRight,
+                                                            child: InkWell(
+                                                                onTap: () {
+                                                                  showDialog<
+                                                                      DateTime>(
+                                                                    context:
+                                                                        context,
+                                                                    builder:
+                                                                        (BuildContext
+                                                                            context) {
+                                                                      return ViewFile(
+                                                                        imageURL: tutorinfo
+                                                                            .imageID
+                                                                            .toString(),
+                                                                      );
+                                                                    },
+                                                                  ).then(
+                                                                      (selectedDate) {
+                                                                    if (selectedDate !=
+                                                                        null) {
+                                                                      // Do something with the selected date
+                                                                    }
+                                                                  });
+                                                                },
+                                                                child: Card(
+                                                                  elevation: 4,
+                                                                  child:
+                                                                      Container(
+                                                                    height: size.width >=
+                                                                                1100 &&
+                                                                            size.width <
+                                                                                1130
+                                                                        ? 150
+                                                                        : 200,
+                                                                    width: size.width >=
+                                                                                1100 &&
+                                                                            size.width <
+                                                                                1130
+                                                                        ? 150
+                                                                        : 200,
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius: BorderRadius.circular(5),
+                                                                        color: Colors.white,
+                                                                        image: DecorationImage(
+                                                                            image: NetworkImage(
+                                                                              tutorinfo.imageID.toString(),
+                                                                            ),
+                                                                            fit: BoxFit.cover)),
+                                                                  ),
+                                                                )),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 10,
+                                                          ),
+                                                          SizedBox(
+                                                            height: size.width >=
+                                                                        1100 &&
+                                                                    size.width <
+                                                                        1130
+                                                                ? 150
+                                                                : 200,
+                                                            width: size.width >=
+                                                                        1100 &&
+                                                                    size.width <
+                                                                        1130
+                                                                ? 150
+                                                                : 150,
                                                             child: Column(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
-                                                                      .start,
+                                                                      .spaceEvenly,
                                                               crossAxisAlignment:
                                                                   CrossAxisAlignment
                                                                       .start,
                                                               children: [
-                                                                HeaderText(
+                                                                Text(
                                                                   subjectid
                                                                       .subjectName,
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          18,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w700,
+                                                                      color:
+                                                                          kColorGrey),
                                                                 ),
-                                                                const SizedBox(
-                                                                  height: 15,
+                                                                Text(
+                                                                  tutorinfo
+                                                                      .country,
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          15,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                      color:
+                                                                          kColorGrey),
                                                                 ),
-                                                                Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .start,
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topRight,
-                                                                      child: InkWell(
-                                                                          onTap: () {
-                                                                            showDialog<DateTime>(
-                                                                              context: context,
-                                                                              builder: (BuildContext context) {
-                                                                                return ViewFile(
-                                                                                  imageURL: tutorinfo!.imageID.toString(),
-                                                                                );
-                                                                              },
-                                                                            ).then((selectedDate) {
-                                                                              if (selectedDate != null) {
-                                                                                // Do something with the selected date
-                                                                              }
-                                                                            });
-                                                                          },
-                                                                          child: Card(
-                                                                            elevation:
-                                                                                4,
+                                                                Text(
+                                                                  '${cart[firstColumnIndex]['classno']} classes',
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          15,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                      color:
+                                                                          kColorGrey),
+                                                                ),
+                                                                Text(
+                                                                  '${cart[firstColumnIndex]['classPrice']} \$',
+                                                                  style: const TextStyle(
+                                                                      fontSize:
+                                                                          15,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .normal,
+                                                                      color:
+                                                                          kColorGrey),
+                                                                ),
+                                                                Padding(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .zero,
+                                                                  child:
+                                                                      SizedBox(
+                                                                    width: size.width >=
+                                                                                1100 &&
+                                                                            size.width <
+                                                                                1130
+                                                                        ? 150
+                                                                        : 150,
+                                                                    child: Row(
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .start,
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .start,
+                                                                      children: [
+                                                                        Tooltip(
+                                                                          message:
+                                                                              'Buy Class',
+                                                                          child:
+                                                                              TextButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              // setState(() {
+                                                                              //   selectedclass = enrolledClass;
+                                                                              // });
+                                                                              // final provider = context.read<ViewClassDisplayProvider>();
+                                                                              // provider.setViewClassinfo(true);
+                                                                            },
                                                                             child:
-                                                                                Container(
-                                                                              height: 200,
-                                                                              width: 200,
-                                                                              decoration: BoxDecoration(
-                                                                                  borderRadius: BorderRadius.circular(5),
-                                                                                  color: Colors.white,
-                                                                                  image: DecorationImage(
-                                                                                      image: NetworkImage(
-                                                                                        tutorinfo!.imageID.toString(),
-                                                                                      ),
-                                                                                      fit: BoxFit.cover)),
+                                                                                const Text(
+                                                                              'Buy Now',
+                                                                              style: TextStyle(color: kColorPrimary, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
                                                                             ),
-                                                                          )),
+                                                                          ),
+                                                                        ),
+                                                                        Tooltip(
+                                                                          message:
+                                                                              'Cancel',
+                                                                          child:
+                                                                              TextButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              // setState(() {
+                                                                              //   selectedclass = enrolledClass;
+                                                                              // });
+                                                                              // final provider = context.read<ViewClassDisplayProvider>();
+                                                                              // provider.setViewClassinfo(true);
+                                                                            },
+                                                                            child:
+                                                                                const Text(
+                                                                              'Cancel',
+                                                                              style: TextStyle(color: kColorDarkRed, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
                                                                     ),
-                                                                    const SizedBox(
-                                                                      width: 10,
-                                                                    ),
-                                                                    SizedBox(
-                                                                      height:
-                                                                          200,
-                                                                      width:
-                                                                          200,
-                                                                      child:
-                                                                          Column(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.spaceEvenly,
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: [
-                                                                          Text(
-                                                                            '${(tutorinfo.firstName)}${(tutorinfo.middleName == 'N/A' || tutorinfo.middleName == '' ? '' : ' ${(tutorinfo.middleName)}')} ${(tutorinfo.lastname)}',
-                                                                            // 'Name',
-                                                                            style:
-                                                                                const TextStyle(
-                                                                              fontSize: 18,
-                                                                              fontWeight: FontWeight.w700,
-                                                                            ),
-                                                                          ),
-                                                                          Text(
-                                                                            tutorinfo.country,
-                                                                            // 'Country',
-                                                                            style:
-                                                                                const TextStyle(
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.normal,
-                                                                            ),
-                                                                          ),
-                                                                          Text(
-                                                                            '${cart[firstColumnIndex]['classno']} classes',
-                                                                            style:
-                                                                                const TextStyle(
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.normal,
-                                                                            ),
-                                                                          ),
-                                                                          Text(
-                                                                            '\$${cart[firstColumnIndex]['classPrice']} classes',
-                                                                            style:
-                                                                                const TextStyle(
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.normal,
-                                                                            ),
-                                                                          ),
-                                                                          Row(
-                                                                            children: [
-                                                                              Tooltip(
-                                                                                message: 'Buy Class',
-                                                                                child: Container(
-                                                                                  width: 120,
-                                                                                  height: 35,
-                                                                                  decoration: BoxDecoration(
-                                                                                    borderRadius: BorderRadius.circular(20),
-                                                                                  ),
-                                                                                  child: TextButton(
-                                                                                    style: TextButton.styleFrom(
-                                                                                      padding: const EdgeInsets.all(10),
-                                                                                      alignment: Alignment.center,
-                                                                                      foregroundColor: const Color.fromRGBO(1, 118, 132, 1),
-                                                                                      backgroundColor: Colors.green.shade200,
-                                                                                      shape: RoundedRectangleBorder(
-                                                                                        borderRadius: BorderRadius.circular(24.0),
-                                                                                      ),
-                                                                                      // ignore: prefer_const_constructors
-                                                                                      textStyle: const TextStyle(
-                                                                                        color: Colors.deepPurple,
-                                                                                        fontSize: 12,
-                                                                                        fontStyle: FontStyle.normal,
-                                                                                        decoration: TextDecoration.none,
-                                                                                      ),
-                                                                                    ),
-                                                                                    onPressed: () {
-                                                                                      // setState(() {
-                                                                                      //   selectedclass = enrolledClass;
-                                                                                      // });
-                                                                                      // final provider = context.read<ViewClassDisplayProvider>();
-                                                                                      // provider.setViewClassinfo(true);
-                                                                                    },
-                                                                                    // icon: const Icon(
-                                                                                    //   Icons.open_in_new,
-                                                                                    //   size: 15,
-                                                                                    // ),
-                                                                                    child: const Text(
-                                                                                      'Buy Now',
-                                                                                      style: TextStyle(fontSize: 13),
-                                                                                    ),
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                              Tooltip(
-                                                                                message: 'Remove Item',
-                                                                                child: IconButton(
-                                                                                  icon: const FaIcon(FontAwesomeIcons.trashArrowUp),
-                                                                                  color: Colors.red.shade200, // You can use a different delete icon
-                                                                                  onPressed: () {
-                                                                                    // Add your logic to remove the item from the cart
-                                                                                    print('Remove item from cart pressed');
-                                                                                  },
-                                                                                  iconSize: 20,
-                                                                                ),
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ],
+                                                                  ),
                                                                 ),
                                                               ],
                                                             ),
                                                           ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 10,
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }),
+
+                                const Spacer(),
+                                if (secondColumnIndex != null)
+                                  FutureBuilder<TutorInformation?>(
+                                      future: getTutorInfo(
+                                          cart[secondColumnIndex]['tutorid']
+                                              .toString()),
+                                      builder: (context,
+                                          AsyncSnapshot<TutorInformation?>
+                                              snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return Container();
+                                        } else if (snapshot.hasError) {
+                                          return Text(
+                                              'Error: ${snapshot.error}');
+                                        }
+                                        TutorInformation? tutorinfo =
+                                            snapshot.data;
+                                        Subjects subjectid =
+                                            subjectlist.firstWhere(
+                                          (element) =>
+                                              element.subjectId ==
+                                              cart[secondColumnIndex]
+                                                  ['subjectid'],
+                                        );
+                                        return Card(
+                                          elevation: 4,
+                                          child: SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            controller: alllistscroll,
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  width: size.width >= 1100 &&
+                                                          size.width < 1130
+                                                      ? 380
+                                                      : 400,
+                                                  color: Colors.white,
+                                                  child: Padding(
+                                                    padding: size.width >=
+                                                                1100 &&
+                                                            size.width < 1130
+                                                        ? const EdgeInsets.only(
+                                                            top: 5.0,
+                                                            left: 0,
+                                                            right: 0,
+                                                            bottom: 5.0,
+                                                          )
+                                                        : const EdgeInsets.only(
+                                                            top: 5.0,
+                                                            left: 10,
+                                                            right: 10,
+                                                            bottom: 5.0,
+                                                          ),
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          '${(tutorinfo!.firstName)}${(tutorinfo.middleName == 'N/A' || tutorinfo.middleName == '' ? '' : ' ${(tutorinfo.middleName)}')} ${(tutorinfo.lastname)}',
+                                                          // 'Name',
+                                                          style: const TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color:
+                                                                  kColorGrey),
                                                         ),
                                                         const SizedBox(
-                                                          height: 20,
-                                                        )
+                                                          height: 5,
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Align(
+                                                              alignment:
+                                                                  Alignment
+                                                                      .topRight,
+                                                              child: InkWell(
+                                                                  onTap: () {
+                                                                    showDialog<
+                                                                        DateTime>(
+                                                                      context:
+                                                                          context,
+                                                                      builder:
+                                                                          (BuildContext
+                                                                              context) {
+                                                                        return ViewFile(
+                                                                          imageURL: tutorinfo
+                                                                              .imageID
+                                                                              .toString(),
+                                                                        );
+                                                                      },
+                                                                    ).then(
+                                                                        (selectedDate) {
+                                                                      if (selectedDate !=
+                                                                          null) {
+                                                                        // Do something with the selected date
+                                                                      }
+                                                                    });
+                                                                  },
+                                                                  child: Card(
+                                                                    elevation:
+                                                                        4,
+                                                                    child:
+                                                                        Container(
+                                                                      height: size.width >= 1100 &&
+                                                                              size.width < 1130
+                                                                          ? 150
+                                                                          : 200,
+                                                                      width: size.width >= 1100 &&
+                                                                              size.width < 1130
+                                                                          ? 150
+                                                                          : 200,
+                                                                      decoration: BoxDecoration(
+                                                                          borderRadius: BorderRadius.circular(5),
+                                                                          color: Colors.white,
+                                                                          image: DecorationImage(
+                                                                              image: NetworkImage(
+                                                                                tutorinfo.imageID.toString(),
+                                                                              ),
+                                                                              fit: BoxFit.cover)),
+                                                                    ),
+                                                                  )),
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 10,
+                                                            ),
+                                                            SizedBox(
+                                                              height: size.width >=
+                                                                          1100 &&
+                                                                      size.width <
+                                                                          1130
+                                                                  ? 150
+                                                                  : 200,
+                                                              width: size.width >=
+                                                                          1100 &&
+                                                                      size.width <
+                                                                          1130
+                                                                  ? 150
+                                                                  : 150,
+                                                              child: Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    subjectid
+                                                                        .subjectName,
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            18,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w700,
+                                                                        color:
+                                                                            kColorGrey),
+                                                                  ),
+                                                                  Text(
+                                                                    tutorinfo
+                                                                        .country,
+                                                                    // 'Country',
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .normal,
+                                                                        color:
+                                                                            kColorGrey),
+                                                                  ),
+                                                                  Text(
+                                                                    '${cart[secondColumnIndex]['classno']} classes',
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .normal,
+                                                                        color:
+                                                                            kColorGrey),
+                                                                  ),
+                                                                  Text(
+                                                                    '${cart[secondColumnIndex]['classPrice']} \$',
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            15,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .normal,
+                                                                        color:
+                                                                            kColorGrey),
+                                                                  ),
+                                                                  Padding(
+                                                                    padding:
+                                                                        EdgeInsets
+                                                                            .zero,
+                                                                    child:
+                                                                        SizedBox(
+                                                                      width: size.width >= 1100 &&
+                                                                              size.width < 1130
+                                                                          ? 150
+                                                                          : 150,
+                                                                      child:
+                                                                          Row(
+                                                                        children: [
+                                                                          Tooltip(
+                                                                            message:
+                                                                                'Buy Class',
+                                                                            child:
+                                                                                TextButton(
+                                                                              onPressed: () {
+                                                                                // setState(() {
+                                                                                //   selectedclass = enrolledClass;
+                                                                                // });
+                                                                                // final provider = context.read<ViewClassDisplayProvider>();
+                                                                                // provider.setViewClassinfo(true);
+                                                                              },
+                                                                              child: const Text(
+                                                                                'Buy Now',
+                                                                                style: TextStyle(color: kColorPrimary, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                          Tooltip(
+                                                                            message:
+                                                                                'Cancel',
+                                                                            child:
+                                                                                TextButton(
+                                                                              onPressed: () {
+                                                                                // setState(() {
+                                                                                //   selectedclass = enrolledClass;
+                                                                                // });
+                                                                                // final provider = context.read<ViewClassDisplayProvider>();
+                                                                                // provider.setViewClassinfo(true);
+                                                                              },
+                                                                              child: const Text(
+                                                                                'Cancel',
+                                                                                style: TextStyle(color: kColorDarkRed, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ],
                                                     ),
                                                   ),
-                                                );
-                                              }),
+                                                ),
+                                                const SizedBox(
+                                                  height: 10,
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }),
+                              ],
+                            );
+                          },
+                        )
+                      :
+                      // ResponsiveBuilder.isTablet(context)
+                      //     ? ListView.builder(
+                      //         shrinkWrap: true,
+                      //         itemCount: cart.length,
+                      //         itemBuilder: (context, index) {
+                      //           return FutureBuilder<TutorInformation?>(
+                      //               future: getTutorInfo(
+                      //                   cart[index]['tutorid'].toString()),
+                      //               builder: (context,
+                      //                   AsyncSnapshot<TutorInformation?>
+                      //                       snapshot) {
+                      //                 if (snapshot.connectionState ==
+                      //                     ConnectionState.waiting) {
+                      //                   return Container();
+                      //                 } else if (snapshot.hasError) {
+                      //                   return Text('Error: ${snapshot.error}');
+                      //                 }
+                      //                 TutorInformation? tutorinfo =
+                      //                     snapshot.data;
+                      //                 Subjects subjectid =
+                      //                     subjectlist.firstWhere(
+                      //                   (element) =>
+                      //                       element.subjectId ==
+                      //                       cart[index]['subjectid'],
+                      //                 );
+                      //                 return Card(
+                      //                   elevation: 4,
+                      //                   child: SingleChildScrollView(
+                      //                     scrollDirection: Axis.horizontal,
+                      //                     controller: alllistscroll,
+                      //                     child: Column(
+                      //                       children: [
+                      //                         Container(
+                      //                           width: size.width >= 1100 &&
+                      //                                   size.width < 1130
+                      //                               ? 380
+                      //                               : 400,
+                      //                           color: Colors.white,
+                      //                           child: Padding(
+                      //                             padding: size.width >= 1100 &&
+                      //                                     size.width < 1130
+                      //                                 ? const EdgeInsets.only(
+                      //                                     top: 5.0,
+                      //                                     left: 0,
+                      //                                     right: 0,
+                      //                                     bottom: 5.0,
+                      //                                   )
+                      //                                 : const EdgeInsets.only(
+                      //                                     top: 5.0,
+                      //                                     left: 10,
+                      //                                     right: 10,
+                      //                                     bottom: 5.0,
+                      //                                   ),
+                      //                             child: Column(
+                      //                               mainAxisAlignment:
+                      //                                   MainAxisAlignment.start,
+                      //                               crossAxisAlignment:
+                      //                                   CrossAxisAlignment
+                      //                                       .start,
+                      //                               children: [
+                      //                                 Text(
+                      //                                   '${(tutorinfo!.firstName)}${(tutorinfo.middleName == 'N/A' || tutorinfo.middleName == '' ? '' : ' ${(tutorinfo.middleName)}')} ${(tutorinfo.lastname)}',
+                      //                                   // 'Name',
+                      //                                   style: const TextStyle(
+                      //                                       fontSize: 18,
+                      //                                       fontWeight:
+                      //                                           FontWeight.w700,
+                      //                                       color: kColorGrey),
+                      //                                 ),
+                      //                                 const SizedBox(
+                      //                                   height: 5,
+                      //                                 ),
+                      //                                 Row(
+                      //                                   mainAxisAlignment:
+                      //                                       MainAxisAlignment
+                      //                                           .start,
+                      //                                   crossAxisAlignment:
+                      //                                       CrossAxisAlignment
+                      //                                           .start,
+                      //                                   children: [
+                      //                                     Align(
+                      //                                       alignment: Alignment
+                      //                                           .topRight,
+                      //                                       child: InkWell(
+                      //                                           onTap: () {
+                      //                                             showDialog<
+                      //                                                 DateTime>(
+                      //                                               context:
+                      //                                                   context,
+                      //                                               builder:
+                      //                                                   (BuildContext
+                      //                                                       context) {
+                      //                                                 return ViewFile(
+                      //                                                   imageURL: tutorinfo
+                      //                                                       .imageID
+                      //                                                       .toString(),
+                      //                                                 );
+                      //                                               },
+                      //                                             ).then(
+                      //                                                 (selectedDate) {
+                      //                                               if (selectedDate !=
+                      //                                                   null) {
+                      //                                                 // Do something with the selected date
+                      //                                               }
+                      //                                             });
+                      //                                           },
+                      //                                           child: Card(
+                      //                                             elevation: 4,
+                      //                                             child:
+                      //                                                 Container(
+                      //                                               height: size.width >=
+                      //                                                           1100 &&
+                      //                                                       size.width <
+                      //                                                           1130
+                      //                                                   ? 150
+                      //                                                   : 200,
+                      //                                               width: size.width >=
+                      //                                                           1100 &&
+                      //                                                       size.width <
+                      //                                                           1130
+                      //                                                   ? 150
+                      //                                                   : 200,
+                      //                                               decoration: BoxDecoration(
+                      //                                                   borderRadius: BorderRadius.circular(5),
+                      //                                                   color: Colors.white,
+                      //                                                   image: DecorationImage(
+                      //                                                       image: NetworkImage(
+                      //                                                         tutorinfo.imageID.toString(),
+                      //                                                       ),
+                      //                                                       fit: BoxFit.cover)),
+                      //                                             ),
+                      //                                           )),
+                      //                                     ),
+                      //                                     const SizedBox(
+                      //                                       width: 10,
+                      //                                     ),
+                      //                                     SizedBox(
+                      //                                       height: size.width >=
+                      //                                                   1100 &&
+                      //                                               size.width <
+                      //                                                   1130
+                      //                                           ? 150
+                      //                                           : 200,
+                      //                                       width: size.width >=
+                      //                                                   1100 &&
+                      //                                               size.width <
+                      //                                                   1130
+                      //                                           ? 150
+                      //                                           : 150,
+                      //                                       child: Column(
+                      //                                         mainAxisAlignment:
+                      //                                             MainAxisAlignment
+                      //                                                 .spaceEvenly,
+                      //                                         crossAxisAlignment:
+                      //                                             CrossAxisAlignment
+                      //                                                 .start,
+                      //                                         children: [
+                      //                                           Text(
+                      //                                             subjectid
+                      //                                                 .subjectName,
+                      //                                             style: const TextStyle(
+                      //                                                 fontSize:
+                      //                                                     18,
+                      //                                                 fontWeight:
+                      //                                                     FontWeight
+                      //                                                         .w700,
+                      //                                                 color:
+                      //                                                     kColorGrey),
+                      //                                           ),
+                      //                                           Text(
+                      //                                             tutorinfo
+                      //                                                 .country,
+                      //                                             style: const TextStyle(
+                      //                                                 fontSize:
+                      //                                                     15,
+                      //                                                 fontWeight:
+                      //                                                     FontWeight
+                      //                                                         .normal,
+                      //                                                 color:
+                      //                                                     kColorGrey),
+                      //                                           ),
+                      //                                           Text(
+                      //                                             '${cart[index]['classno']} classes',
+                      //                                             style: const TextStyle(
+                      //                                                 fontSize:
+                      //                                                     15,
+                      //                                                 fontWeight:
+                      //                                                     FontWeight
+                      //                                                         .normal,
+                      //                                                 color:
+                      //                                                     kColorGrey),
+                      //                                           ),
+                      //                                           Text(
+                      //                                             '${cart[index]['classPrice']} \$',
+                      //                                             style: const TextStyle(
+                      //                                                 fontSize:
+                      //                                                     15,
+                      //                                                 fontWeight:
+                      //                                                     FontWeight
+                      //                                                         .normal,
+                      //                                                 color:
+                      //                                                     kColorGrey),
+                      //                                           ),
+                      //                                           Padding(
+                      //                                             padding:
+                      //                                                 EdgeInsets
+                      //                                                     .zero,
+                      //                                             child:
+                      //                                                 SizedBox(
+                      //                                               width: size.width >=
+                      //                                                           1100 &&
+                      //                                                       size.width <
+                      //                                                           1130
+                      //                                                   ? 150
+                      //                                                   : 150,
+                      //                                               child: Row(
+                      //                                                 crossAxisAlignment:
+                      //                                                     CrossAxisAlignment
+                      //                                                         .start,
+                      //                                                 mainAxisAlignment:
+                      //                                                     MainAxisAlignment
+                      //                                                         .start,
+                      //                                                 children: [
+                      //                                                   Tooltip(
+                      //                                                     message:
+                      //                                                         'Buy Class',
+                      //                                                     child:
+                      //                                                         TextButton(
+                      //                                                       onPressed:
+                      //                                                           () {
+                      //                                                         // setState(() {
+                      //                                                         //   selectedclass = enrolledClass;
+                      //                                                         // });
+                      //                                                         // final provider = context.read<ViewClassDisplayProvider>();
+                      //                                                         // provider.setViewClassinfo(true);
+                      //                                                       },
+                      //                                                       child:
+                      //                                                           const Text(
+                      //                                                         'Buy Now',
+                      //                                                         style: TextStyle(color: kColorPrimary, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                      //                                                       ),
+                      //                                                     ),
+                      //                                                   ),
+                      //                                                   Tooltip(
+                      //                                                     message:
+                      //                                                         'Cancel',
+                      //                                                     child:
+                      //                                                         TextButton(
+                      //                                                       onPressed:
+                      //                                                           () {
+                      //                                                         // setState(() {
+                      //                                                         //   selectedclass = enrolledClass;
+                      //                                                         // });
+                      //                                                         // final provider = context.read<ViewClassDisplayProvider>();
+                      //                                                         // provider.setViewClassinfo(true);
+                      //                                                       },
+                      //                                                       child:
+                      //                                                           const Text(
+                      //                                                         'Cancel',
+                      //                                                         style: TextStyle(color: kColorDarkRed, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                      //                                                       ),
+                      //                                                     ),
+                      //                                                   ),
+                      //                                                 ],
+                      //                                               ),
+                      //                                             ),
+                      //                                           ),
+                      //                                         ],
+                      //                                       ),
+                      //                                     ),
+                      //                                   ],
+                      //                                 ),
+                      //                               ],
+                      //                             ),
+                      //                           ),
+                      //                         ),
+                      //                         const SizedBox(
+                      //                           height: 10,
+                      //                         )
+                      //                       ],
+                      //                     ),
+                      //                   ),
+                      //                 );
+                      //               });
+                      //         },
+                      //       )
+                      //     :
+                      size.width >= 886 && size.width < 1100
+                          ? ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: (cart.length / 2).ceil(),
+                              itemBuilder: (context, index) {
+                                final int firstColumnIndex = index * 2;
+                                final int? secondColumnIndex =
+                                    firstColumnIndex + 1 < cart.length
+                                        ? firstColumnIndex + 1
+                                        : null;
+                                final enrolledClass = cart[firstColumnIndex];
 
-                                          const Spacer(),
-                                          // Second column
-                                          if (secondColumnIndex != null)
-                                            FutureBuilder<TutorInformation?>(
-                                                future: getTutorInfo(
-                                                    cart[secondColumnIndex]
-                                                            ['tutorid']
-                                                        .toString()),
-                                                builder: (context,
-                                                    AsyncSnapshot<
-                                                            TutorInformation?>
-                                                        snapshot) {
-                                                  if (snapshot
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return Container();
-                                                  } else if (snapshot
-                                                      .hasError) {
-                                                    return Text(
-                                                        'Error: ${snapshot.error}');
-                                                  }
-                                                  TutorInformation? tutorinfo =
-                                                      snapshot.data;
-                                                  Subjects subjectid =
-                                                      subjectlist.firstWhere(
-                                                    (element) =>
-                                                        element.subjectId ==
-                                                        cart[secondColumnIndex]
-                                                            ['subjectid'],
-                                                  );
-                                                  return SingleChildScrollView(
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    controller: alllistscroll,
-                                                    child: Column(
-                                                      children: [
-                                                        Container(
-                                                          width: 600,
-                                                          color: Colors.white,
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .only(
+                                return Row(
+                                  children: [
+                                    // First column
+                                    FutureBuilder<TutorInformation?>(
+                                        future: getTutorInfo(
+                                            cart[firstColumnIndex]['tutorid']
+                                                .toString()),
+                                        builder: (context,
+                                            AsyncSnapshot<TutorInformation?>
+                                                snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Container();
+                                          } else if (snapshot.hasError) {
+                                            return Text(
+                                                'Error: ${snapshot.error}');
+                                          }
+                                          TutorInformation? tutorinfo =
+                                              snapshot.data;
+                                          Subjects subjectid =
+                                              subjectlist.firstWhere(
+                                            (element) =>
+                                                element.subjectId ==
+                                                cart[firstColumnIndex]
+                                                    ['subjectid'],
+                                          );
+                                          return Card(
+                                            elevation: 4,
+                                            child: SingleChildScrollView(
+                                              scrollDirection: Axis.horizontal,
+                                              controller: alllistscroll,
+                                              child: Column(
+                                                children: [
+                                                  Container(
+                                                    width: size.width >= 1100 &&
+                                                            size.width < 1130
+                                                        ? 380
+                                                        : 400,
+                                                    color: Colors.white,
+                                                    child: Padding(
+                                                      padding: size.width >=
+                                                                  1100 &&
+                                                              size.width < 1130
+                                                          ? const EdgeInsets
+                                                              .only(
+                                                              top: 5.0,
+                                                              left: 0,
+                                                              right: 0,
+                                                              bottom: 5.0,
+                                                            )
+                                                          : const EdgeInsets
+                                                              .only(
                                                               top: 5.0,
                                                               left: 10,
                                                               right: 10,
                                                               bottom: 5.0,
                                                             ),
-                                                            child: Column(
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            '${(tutorinfo!.firstName)}${(tutorinfo.middleName == 'N/A' || tutorinfo.middleName == '' ? '' : ' ${(tutorinfo.middleName)}')} ${(tutorinfo.lastname)}',
+                                                            // 'Name',
+                                                            style: const TextStyle(
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                color:
+                                                                    kColorGrey),
+                                                          ),
+                                                          const SizedBox(
+                                                            height: 5,
+                                                          ),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .start,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Align(
+                                                                alignment:
+                                                                    Alignment
+                                                                        .topRight,
+                                                                child: InkWell(
+                                                                    onTap: () {
+                                                                      showDialog<
+                                                                          DateTime>(
+                                                                        context:
+                                                                            context,
+                                                                        builder:
+                                                                            (BuildContext
+                                                                                context) {
+                                                                          return ViewFile(
+                                                                            imageURL:
+                                                                                tutorinfo.imageID.toString(),
+                                                                          );
+                                                                        },
+                                                                      ).then(
+                                                                          (selectedDate) {
+                                                                        if (selectedDate !=
+                                                                            null) {
+                                                                          // Do something with the selected date
+                                                                        }
+                                                                      });
+                                                                    },
+                                                                    child: Card(
+                                                                      elevation:
+                                                                          4,
+                                                                      child:
+                                                                          Container(
+                                                                        height: size.width >= 1100 &&
+                                                                                size.width < 1130
+                                                                            ? 150
+                                                                            : 200,
+                                                                        width: size.width >= 1100 &&
+                                                                                size.width < 1130
+                                                                            ? 150
+                                                                            : 200,
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius: BorderRadius.circular(5),
+                                                                            color: Colors.white,
+                                                                            image: DecorationImage(
+                                                                                image: NetworkImage(
+                                                                                  tutorinfo.imageID.toString(),
+                                                                                ),
+                                                                                fit: BoxFit.cover)),
+                                                                      ),
+                                                                    )),
+                                                              ),
+                                                              const SizedBox(
+                                                                width: 10,
+                                                              ),
+                                                              SizedBox(
+                                                                height: size.width >=
+                                                                            1100 &&
+                                                                        size.width <
+                                                                            1130
+                                                                    ? 150
+                                                                    : 200,
+                                                                width: size.width >=
+                                                                            1100 &&
+                                                                        size.width <
+                                                                            1130
+                                                                    ? 150
+                                                                    : 150,
+                                                                child: Column(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceEvenly,
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    Text(
+                                                                      subjectid
+                                                                          .subjectName,
+                                                                      style: const TextStyle(
+                                                                          fontSize:
+                                                                              18,
+                                                                          fontWeight: FontWeight
+                                                                              .w700,
+                                                                          color:
+                                                                              kColorGrey),
+                                                                    ),
+                                                                    Text(
+                                                                      tutorinfo
+                                                                          .country,
+                                                                      style: const TextStyle(
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .normal,
+                                                                          color:
+                                                                              kColorGrey),
+                                                                    ),
+                                                                    Text(
+                                                                      '${cart[firstColumnIndex]['classno']} classes',
+                                                                      style: const TextStyle(
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .normal,
+                                                                          color:
+                                                                              kColorGrey),
+                                                                    ),
+                                                                    Text(
+                                                                      '${cart[firstColumnIndex]['classPrice']} \$',
+                                                                      style: const TextStyle(
+                                                                          fontSize:
+                                                                              15,
+                                                                          fontWeight: FontWeight
+                                                                              .normal,
+                                                                          color:
+                                                                              kColorGrey),
+                                                                    ),
+                                                                    Padding(
+                                                                      padding:
+                                                                          EdgeInsets
+                                                                              .zero,
+                                                                      child:
+                                                                          SizedBox(
+                                                                        width: size.width >= 1100 &&
+                                                                                size.width < 1130
+                                                                            ? 150
+                                                                            : 150,
+                                                                        child:
+                                                                            Row(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.start,
+                                                                          children: [
+                                                                            Tooltip(
+                                                                              message: 'Buy Class',
+                                                                              child: TextButton(
+                                                                                onPressed: () {
+                                                                                  // setState(() {
+                                                                                  //   selectedclass = enrolledClass;
+                                                                                  // });
+                                                                                  // final provider = context.read<ViewClassDisplayProvider>();
+                                                                                  // provider.setViewClassinfo(true);
+                                                                                },
+                                                                                child: const Text(
+                                                                                  'Buy Now',
+                                                                                  style: TextStyle(color: kColorPrimary, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                            Tooltip(
+                                                                              message: 'Cancel',
+                                                                              child: TextButton(
+                                                                                onPressed: () {
+                                                                                  // setState(() {
+                                                                                  //   selectedclass = enrolledClass;
+                                                                                  // });
+                                                                                  // final provider = context.read<ViewClassDisplayProvider>();
+                                                                                  // provider.setViewClassinfo(true);
+                                                                                },
+                                                                                child: const Text(
+                                                                                  'Cancel',
+                                                                                  style: TextStyle(color: kColorDarkRed, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        }),
+
+                                    const Spacer(),
+                                    if (secondColumnIndex != null)
+                                      FutureBuilder<TutorInformation?>(
+                                          future: getTutorInfo(
+                                              cart[secondColumnIndex]['tutorid']
+                                                  .toString()),
+                                          builder: (context,
+                                              AsyncSnapshot<TutorInformation?>
+                                                  snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return Container();
+                                            } else if (snapshot.hasError) {
+                                              return Text(
+                                                  'Error: ${snapshot.error}');
+                                            }
+                                            TutorInformation? tutorinfo =
+                                                snapshot.data;
+                                            Subjects subjectid =
+                                                subjectlist.firstWhere(
+                                              (element) =>
+                                                  element.subjectId ==
+                                                  cart[secondColumnIndex]
+                                                      ['subjectid'],
+                                            );
+                                            return Card(
+                                              elevation: 4,
+                                              child: SingleChildScrollView(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                controller: alllistscroll,
+                                                child: Column(
+                                                  children: [
+                                                    Container(
+                                                      width: size.width >=
+                                                                  1100 &&
+                                                              size.width < 1130
+                                                          ? 380
+                                                          : 400,
+                                                      color: Colors.white,
+                                                      child: Padding(
+                                                        padding: size.width >=
+                                                                    1100 &&
+                                                                size.width <
+                                                                    1130
+                                                            ? const EdgeInsets
+                                                                .only(
+                                                                top: 5.0,
+                                                                left: 0,
+                                                                right: 0,
+                                                                bottom: 5.0,
+                                                              )
+                                                            : const EdgeInsets
+                                                                .only(
+                                                                top: 5.0,
+                                                                left: 10,
+                                                                right: 10,
+                                                                bottom: 5.0,
+                                                              ),
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              '${(tutorinfo!.firstName)}${(tutorinfo.middleName == 'N/A' || tutorinfo.middleName == '' ? '' : ' ${(tutorinfo.middleName)}')} ${(tutorinfo.lastname)}',
+                                                              // 'Name',
+                                                              style: const TextStyle(
+                                                                  fontSize: 18,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
+                                                                  color:
+                                                                      kColorGrey),
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 5,
+                                                            ),
+                                                            Row(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
                                                                       .start,
@@ -519,190 +1512,439 @@ class _MyCartState extends State<MyCart> {
                                                                   CrossAxisAlignment
                                                                       .start,
                                                               children: [
-                                                                HeaderText(
-                                                                  subjectid
-                                                                      .subjectName,
+                                                                Align(
+                                                                  alignment:
+                                                                      Alignment
+                                                                          .topRight,
+                                                                  child: InkWell(
+                                                                      onTap: () {
+                                                                        showDialog<
+                                                                            DateTime>(
+                                                                          context:
+                                                                              context,
+                                                                          builder:
+                                                                              (BuildContext context) {
+                                                                            return ViewFile(
+                                                                              imageURL: tutorinfo.imageID.toString(),
+                                                                            );
+                                                                          },
+                                                                        ).then(
+                                                                            (selectedDate) {
+                                                                          if (selectedDate !=
+                                                                              null) {
+                                                                            // Do something with the selected date
+                                                                          }
+                                                                        });
+                                                                      },
+                                                                      child: Card(
+                                                                        elevation:
+                                                                            4,
+                                                                        child:
+                                                                            Container(
+                                                                          height: size.width >= 1100 && size.width < 1130
+                                                                              ? 150
+                                                                              : 200,
+                                                                          width: size.width >= 1100 && size.width < 1130
+                                                                              ? 150
+                                                                              : 200,
+                                                                          decoration: BoxDecoration(
+                                                                              borderRadius: BorderRadius.circular(5),
+                                                                              color: Colors.white,
+                                                                              image: DecorationImage(
+                                                                                  image: NetworkImage(
+                                                                                    tutorinfo.imageID.toString(),
+                                                                                  ),
+                                                                                  fit: BoxFit.cover)),
+                                                                        ),
+                                                                      )),
                                                                 ),
                                                                 const SizedBox(
-                                                                  height: 15,
+                                                                  width: 10,
                                                                 ),
-                                                                Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .start,
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Align(
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .topRight,
-                                                                      child: InkWell(
-                                                                          onTap: () {
-                                                                            showDialog<DateTime>(
-                                                                              context: context,
-                                                                              builder: (BuildContext context) {
-                                                                                return ViewFile(
-                                                                                  imageURL: tutorinfo!.imageID.toString(),
-                                                                                );
-                                                                              },
-                                                                            ).then((selectedDate) {
-                                                                              if (selectedDate != null) {
-                                                                                // Do something with the selected date
-                                                                              }
-                                                                            });
-                                                                          },
-                                                                          child: Card(
-                                                                            elevation:
-                                                                                4,
-                                                                            child:
-                                                                                Container(
-                                                                              height: 200,
-                                                                              width: 200,
-                                                                              decoration: BoxDecoration(
-                                                                                  borderRadius: BorderRadius.circular(5),
-                                                                                  color: Colors.white,
-                                                                                  image: DecorationImage(
-                                                                                      image: NetworkImage(
-                                                                                        tutorinfo!.imageID.toString(),
-                                                                                      ),
-                                                                                      fit: BoxFit.cover)),
-                                                                            ),
-                                                                          )),
-                                                                    ),
-                                                                    const SizedBox(
-                                                                      width: 10,
-                                                                    ),
-                                                                    SizedBox(
-                                                                      height:
-                                                                          200,
-                                                                      width:
-                                                                          200,
-                                                                      child:
-                                                                          Column(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.spaceEvenly,
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: [
-                                                                          Text(
-                                                                            '${(tutorinfo.firstName)}${(tutorinfo.middleName == 'N/A' || tutorinfo.middleName == '' ? '' : ' ${(tutorinfo.middleName)}')} ${(tutorinfo.lastname)}',
-                                                                            // 'Name',
-                                                                            style:
-                                                                                const TextStyle(
-                                                                              fontSize: 18,
-                                                                              fontWeight: FontWeight.w700,
-                                                                            ),
-                                                                          ),
-                                                                          Text(
-                                                                            tutorinfo.country,
-                                                                            // 'Country',
-                                                                            style:
-                                                                                const TextStyle(
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.normal,
-                                                                            ),
-                                                                          ),
-                                                                          Text(
-                                                                            '${cart[secondColumnIndex]['classno']} classes',
-                                                                            style:
-                                                                                const TextStyle(
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.normal,
-                                                                            ),
-                                                                          ),
-                                                                          Text(
-                                                                            '\$${cart[secondColumnIndex]['classPrice']} classes',
-                                                                            style:
-                                                                                const TextStyle(
-                                                                              fontSize: 15,
-                                                                              fontWeight: FontWeight.normal,
-                                                                            ),
-                                                                          ),
-                                                                          Row(
+                                                                SizedBox(
+                                                                  height: size.width >=
+                                                                              1100 &&
+                                                                          size.width <
+                                                                              1130
+                                                                      ? 150
+                                                                      : 200,
+                                                                  width: size.width >=
+                                                                              1100 &&
+                                                                          size.width <
+                                                                              1130
+                                                                      ? 150
+                                                                      : 150,
+                                                                  child: Column(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceEvenly,
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Text(
+                                                                        subjectid
+                                                                            .subjectName,
+                                                                        style: const TextStyle(
+                                                                            fontSize:
+                                                                                18,
+                                                                            fontWeight:
+                                                                                FontWeight.w700,
+                                                                            color: kColorGrey),
+                                                                      ),
+                                                                      Text(
+                                                                        tutorinfo
+                                                                            .country,
+                                                                        // 'Country',
+                                                                        style: const TextStyle(
+                                                                            fontSize:
+                                                                                15,
+                                                                            fontWeight:
+                                                                                FontWeight.normal,
+                                                                            color: kColorGrey),
+                                                                      ),
+                                                                      Text(
+                                                                        '${cart[secondColumnIndex]['classno']} classes',
+                                                                        style: const TextStyle(
+                                                                            fontSize:
+                                                                                15,
+                                                                            fontWeight:
+                                                                                FontWeight.normal,
+                                                                            color: kColorGrey),
+                                                                      ),
+                                                                      Text(
+                                                                        '${cart[secondColumnIndex]['classPrice']} \$',
+                                                                        style: const TextStyle(
+                                                                            fontSize:
+                                                                                15,
+                                                                            fontWeight:
+                                                                                FontWeight.normal,
+                                                                            color: kColorGrey),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding:
+                                                                            EdgeInsets.zero,
+                                                                        child:
+                                                                            SizedBox(
+                                                                          width: size.width >= 1100 && size.width < 1130
+                                                                              ? 150
+                                                                              : 150,
+                                                                          child:
+                                                                              Row(
                                                                             children: [
                                                                               Tooltip(
                                                                                 message: 'Buy Class',
-                                                                                child: Container(
-                                                                                  width: 120,
-                                                                                  height: 35,
-                                                                                  decoration: BoxDecoration(
-                                                                                    borderRadius: BorderRadius.circular(20),
-                                                                                  ),
-                                                                                  child: TextButton(
-                                                                                    style: TextButton.styleFrom(
-                                                                                      padding: const EdgeInsets.all(10),
-                                                                                      alignment: Alignment.center,
-                                                                                      foregroundColor: const Color.fromRGBO(1, 118, 132, 1),
-                                                                                      backgroundColor: Colors.green.shade200,
-                                                                                      shape: RoundedRectangleBorder(
-                                                                                        borderRadius: BorderRadius.circular(24.0),
-                                                                                      ),
-                                                                                      // ignore: prefer_const_constructors
-                                                                                      textStyle: const TextStyle(
-                                                                                        color: Colors.deepPurple,
-                                                                                        fontSize: 12,
-                                                                                        fontStyle: FontStyle.normal,
-                                                                                        decoration: TextDecoration.none,
-                                                                                      ),
-                                                                                    ),
-                                                                                    onPressed: () {
-                                                                                      // setState(() {
-                                                                                      //   selectedclass = enrolledClass;
-                                                                                      // });
-                                                                                      // final provider = context.read<ViewClassDisplayProvider>();
-                                                                                      // provider.setViewClassinfo(true);
-                                                                                    },
-                                                                                    // icon: const Icon(
-                                                                                    //   Icons.open_in_new,
-                                                                                    //   size: 15,
-                                                                                    // ),
-                                                                                    child: const Text(
-                                                                                      'Buy Now',
-                                                                                      style: TextStyle(fontSize: 13),
-                                                                                    ),
+                                                                                child: TextButton(
+                                                                                  onPressed: () {
+                                                                                    // setState(() {
+                                                                                    //   selectedclass = enrolledClass;
+                                                                                    // });
+                                                                                    // final provider = context.read<ViewClassDisplayProvider>();
+                                                                                    // provider.setViewClassinfo(true);
+                                                                                  },
+                                                                                  child: const Text(
+                                                                                    'Buy Now',
+                                                                                    style: TextStyle(color: kColorPrimary, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
                                                                                   ),
                                                                                 ),
                                                                               ),
                                                                               Tooltip(
-                                                                                message: 'Remove Item',
-                                                                                child: IconButton(
-                                                                                  icon: const FaIcon(FontAwesomeIcons.trashArrowUp),
-                                                                                  color: Colors.red.shade200, // You can use a different delete icon
+                                                                                message: 'Cancel',
+                                                                                child: TextButton(
                                                                                   onPressed: () {
-                                                                                    // Add your logic to remove the item from the cart
-                                                                                    print('Remove item from cart pressed');
+                                                                                    // setState(() {
+                                                                                    //   selectedclass = enrolledClass;
+                                                                                    // });
+                                                                                    // final provider = context.read<ViewClassDisplayProvider>();
+                                                                                    // provider.setViewClassinfo(true);
                                                                                   },
-                                                                                  iconSize: 20,
+                                                                                  child: const Text(
+                                                                                    'Cancel',
+                                                                                    style: TextStyle(color: kColorDarkRed, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                                                                                  ),
                                                                                 ),
                                                                               ),
                                                                             ],
                                                                           ),
-                                                                        ],
+                                                                        ),
                                                                       ),
-                                                                    ),
-                                                                  ],
+                                                                    ],
+                                                                  ),
                                                                 ),
                                                               ],
                                                             ),
-                                                          ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 10,
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          }),
+                                  ],
+                                );
+                              },
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: cart.length,
+                              itemBuilder: (context, index) {
+                                return FutureBuilder<TutorInformation?>(
+                                    future: getTutorInfo(
+                                        cart[index]['tutorid'].toString()),
+                                    builder: (context,
+                                        AsyncSnapshot<TutorInformation?>
+                                            snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Container();
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      }
+                                      TutorInformation? tutorinfo =
+                                          snapshot.data;
+                                      Subjects subjectid =
+                                          subjectlist.firstWhere(
+                                        (element) =>
+                                            element.subjectId ==
+                                            cart[index]['subjectid'],
+                                      );
+                                      return ClipRect(
+                                        child: Card(
+                                          elevation: 4,
+                                          child: SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            controller: alllistscroll,
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  width: 300,
+                                                  color: Colors.white,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                      top: 5.0,
+                                                      left: 0,
+                                                      right: 0,
+                                                      bottom: 5.0,
+                                                    ),
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          '${(tutorinfo!.firstName)}${(tutorinfo.middleName == 'N/A' || tutorinfo.middleName == '' ? '' : ' ${(tutorinfo.middleName)}')} ${(tutorinfo.lastname)}',
+                                                          // 'Name',
+                                                          style: const TextStyle(
+                                                              fontSize: 17,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color:
+                                                                  kColorGrey),
                                                         ),
                                                         const SizedBox(
-                                                          height: 20,
-                                                        )
+                                                          height: 5,
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Align(
+                                                              alignment:
+                                                                  Alignment
+                                                                      .topRight,
+                                                              child: InkWell(
+                                                                  onTap: () {
+                                                                    showDialog<
+                                                                        DateTime>(
+                                                                      context:
+                                                                          context,
+                                                                      builder:
+                                                                          (BuildContext
+                                                                              context) {
+                                                                        return ViewFile(
+                                                                          imageURL: tutorinfo
+                                                                              .imageID
+                                                                              .toString(),
+                                                                        );
+                                                                      },
+                                                                    ).then(
+                                                                        (selectedDate) {
+                                                                      if (selectedDate !=
+                                                                          null) {
+                                                                        // Do something with the selected date
+                                                                      }
+                                                                    });
+                                                                  },
+                                                                  child: Card(
+                                                                    elevation:
+                                                                        4,
+                                                                    child:
+                                                                        Container(
+                                                                      height:
+                                                                          140,
+                                                                      width:
+                                                                          140,
+                                                                      decoration: BoxDecoration(
+                                                                          borderRadius: BorderRadius.circular(5),
+                                                                          color: Colors.white,
+                                                                          image: DecorationImage(
+                                                                              image: NetworkImage(
+                                                                                tutorinfo.imageID.toString(),
+                                                                              ),
+                                                                              fit: BoxFit.cover)),
+                                                                    ),
+                                                                  )),
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 10,
+                                                            ),
+                                                            SizedBox(
+                                                              height: 140,
+                                                              width: 140,
+                                                              child: Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    subjectid
+                                                                        .subjectName,
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            17,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w700,
+                                                                        color:
+                                                                            kColorGrey),
+                                                                  ),
+                                                                  Text(
+                                                                    tutorinfo
+                                                                        .country,
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            14,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .normal,
+                                                                        color:
+                                                                            kColorGrey),
+                                                                  ),
+                                                                  Text(
+                                                                    '${cart[index]['classno']} classes',
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            14,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .normal,
+                                                                        color:
+                                                                            kColorGrey),
+                                                                  ),
+                                                                  Text(
+                                                                    '${cart[index]['classPrice']} \$',
+                                                                    style: const TextStyle(
+                                                                        fontSize:
+                                                                            14,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .normal,
+                                                                        color:
+                                                                            kColorGrey),
+                                                                  ),
+                                                                  Padding(
+                                                                    padding:
+                                                                        EdgeInsets
+                                                                            .zero,
+                                                                    child:
+                                                                        SizedBox(
+                                                                      width:
+                                                                          140,
+                                                                      child:
+                                                                          Row(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.start,
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.start,
+                                                                        children: [
+                                                                          Tooltip(
+                                                                            message:
+                                                                                'Buy Class',
+                                                                            child:
+                                                                                TextButton(
+                                                                              onPressed: () {
+                                                                                // setState(() {
+                                                                                //   selectedclass = enrolledClass;
+                                                                                // });
+                                                                                // final provider = context.read<ViewClassDisplayProvider>();
+                                                                                // provider.setViewClassinfo(true);
+                                                                              },
+                                                                              child: const Text(
+                                                                                'Buy Now',
+                                                                                style: TextStyle(color: kColorPrimary, fontSize: 14, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                          Tooltip(
+                                                                            message:
+                                                                                'Cancel',
+                                                                            child:
+                                                                                TextButton(
+                                                                              onPressed: () {
+                                                                                // setState(() {
+                                                                                //   selectedclass = enrolledClass;
+                                                                                // });
+                                                                                // final provider = context.read<ViewClassDisplayProvider>();
+                                                                                // provider.setViewClassinfo(true);
+                                                                              },
+                                                                              child: const Text(
+                                                                                'Cancel',
+                                                                                style: TextStyle(color: kColorDarkRed, fontSize: 14, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ],
                                                     ),
-                                                  );
-                                                }),
-                                        ],
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 10,
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
                                       );
-                                    },
-                                  ),
-                                ),
-                              ]),
-                        ),
-                      ))
+                                    });
+                              },
+                            )),
+            )
           ],
         ),
       );

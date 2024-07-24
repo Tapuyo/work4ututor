@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:work4ututor/routes/routes.dart';
@@ -15,6 +16,7 @@ import 'package:work4ututor/ui/web/student/main_dashboard/task_progress.dart';
 import '../../../../data_class/studentanalyticsclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/voucherclass.dart';
+import '../../../../services/addpreftutor.dart';
 import '../../../../services/getvouchers.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
@@ -67,6 +69,10 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
       // updateDateTime();
       printtime();
     });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   final notifier = Provider.of<VoucherProvider>(context, listen: false);
+    //   notifier.fetchVouchers(widget.uid);
+    // });
   }
 
   @override
@@ -457,7 +463,9 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                                   Row(
                                     children: [
                                       Expanded(
-                                        child: VoucherData(),
+                                        child: VoucherData(
+                                          uid: widget.uid,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -895,13 +903,11 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                                         ),
                                         const SizedBox(height: 20),
                                         SizedBox(
-                                          width: 320,
+                                          width: 200,
                                           height: 50,
                                           child: ElevatedButton(
                                             style: ElevatedButton.styleFrom(
-                                              padding: const EdgeInsets.only(
-                                                  left: 50),
-                                              alignment: Alignment.centerLeft,
+                                              alignment: Alignment.center,
                                               backgroundColor: Colors.white,
                                               foregroundColor: Colors.white,
                                               shape: RoundedRectangleBorder(
@@ -910,13 +916,21 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                                               ),
                                               elevation: 0,
                                             ),
-                                            onPressed: () {
-                                              // Navigator.of(context)
-                                              //     .restorablePushNamed(
-                                              //         '/tutorList');
-                                              html.window.open(
-                                                  '/#/studentdiary/${widget.uid.toString()}/tutors',
-                                                  '_blank');
+                                            onPressed: () async {
+                                              // final notifier = Provider.of<
+                                              //         PreferredTutorsNotifier>(
+                                              //     context);
+                                              // await notifier
+                                              //     .fetchPreferredTutors(
+                                              //         widget.uid);
+
+                                              GoRouter.of(context).go(
+                                                  '/studentdiary/${widget.uid.toString()}/tutors');
+
+                                              // html.window.open(
+                                              //     '/#/studentdiary/${widget.uid.toString()}/tutors',
+                                              //     '_blank');
+
                                               // html.window
                                               //     .open('/tutorList', "");
                                               // setState(() {
@@ -1000,7 +1014,9 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                                   Row(
                                     children: [
                                       Expanded(
-                                        child: VoucherData(),
+                                        child: VoucherData(
+                                          uid: widget.uid,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -1021,6 +1037,7 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                           
                             Card(
                               elevation: 5,
                               child: Container(
