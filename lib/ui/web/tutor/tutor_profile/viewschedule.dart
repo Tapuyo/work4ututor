@@ -500,15 +500,15 @@ class _CalendarDialogState extends State<CalendarDialog> {
                   const SizedBox(
                     height: 20,
                   ),
-                   Padding(
-                    padding:  const EdgeInsets.fromLTRB(10, 5, 5, 0),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 5, 5, 0),
                     child: Row(
                       children: const [
                         Text(
-                          'Tutors Calendar',
+                          'Tutor Calendar',
                           style: TextStyle(
                             fontSize: 20,
-                            color: Color.fromRGBO(55, 116, 135, 1),
+                            color: kColorGrey,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
@@ -520,16 +520,16 @@ class _CalendarDialogState extends State<CalendarDialog> {
                   ),
                   SizedBox(
                     width: size.width - 160,
-                    height: 450,
+                    height: 500,
                     child: Card(
                       margin: const EdgeInsets.fromLTRB(10, 5, 5, 0),
-                      elevation: 0.0,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5),
-                        ),
-                        side: BorderSide(color: kColorPrimary, width: 4),
-                      ),
+                      elevation: 4,
+                      // shape: const RoundedRectangleBorder(
+                      //   borderRadius: BorderRadius.all(
+                      //     Radius.circular(5),
+                      //   ),
+                      //   side: BorderSide(color: kColorPrimary, width: 2),
+                      // ),
                       child: MouseRegion(
                         onHover: (event) {},
                         cursor: SystemMouseCursors.click,
@@ -541,26 +541,33 @@ class _CalendarDialogState extends State<CalendarDialog> {
                           calendarFormat: _calendarFormat,
                           daysOfWeekHeight: 60,
                           rowHeight: 60,
-                          headerStyle: const HeaderStyle(
-                            titleTextStyle: TextStyle(
+                          headerStyle: HeaderStyle(
+                            titleTextStyle: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 20.0,
                                 fontWeight: FontWeight.w400),
                             decoration: BoxDecoration(
-                              color: kColorPrimary,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
+                              gradient: const LinearGradient(
+                                begin: Alignment(
+                                    -0.1, 0), // 0% from the top center
+                                end: Alignment
+                                    .centerRight, // 86% to the bottom center
+                                // transform: GradientRotation(1.57), // 90 degrees rotation
+                                colors:
+                                    secondaryHeadercolors, // Add your desired colors here
+                              ),
+                              borderRadius: BorderRadius.circular(5.0),
                             ),
                             formatButtonVisible: false,
-                            leftChevronIcon: Icon(
+                            leftChevronIcon: const Icon(
                               Icons.arrow_left_outlined,
                               color: Colors.white,
-                              size: 25,
+                              size: 28,
                             ),
-                            rightChevronIcon: Icon(
+                            rightChevronIcon: const Icon(
                               Icons.arrow_right_outlined,
                               color: Colors.white,
-                              size: 25,
+                              size: 28,
                             ),
                           ),
                           // Calendar Dates styling
@@ -571,16 +578,16 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20),
                             weekdayStyle: TextStyle(
-                                color: Colors.black,
+                                color: kColorGrey,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20),
                           ),
                           calendarStyle: CalendarStyle(
                             // Weekend dates color (Sat & Sun Column)
                             weekendTextStyle: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold),
+                                color: kColorGrey,
+                                fontSize: 16,
+                                fontWeight: FontWeight.normal),
                             outsideDaysVisible: true,
                             cellMargin: const EdgeInsets.fromLTRB(5, 5, 5, 0),
                             rowDecoration: const BoxDecoration(
@@ -601,13 +608,13 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                   color: const Color(0xFF616161), width: .5),
                             ),
                             defaultTextStyle: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              color: kColorGrey,
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
                             ),
                             // highlighted color for today
                             todayDecoration: BoxDecoration(
-                              color: kColorLight,
+                              color: kSecondarybuttonblue,
                               shape: BoxShape.rectangle,
                               borderRadius: BorderRadius.circular(5),
                               border: Border.all(
@@ -616,7 +623,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
                             ),
                             // highlighted color for selected day
                             selectedDecoration: BoxDecoration(
-                              color: kColorLight,
+                              color: kSecondarybuttonblue,
                               shape: BoxShape.rectangle,
                               borderRadius: BorderRadius.circular(5),
                               border: Border.all(
@@ -912,9 +919,9 @@ class _CalendarDialogState extends State<CalendarDialog> {
                   Text(
                     DateFormat('MMMM, dd').format(_selectedDay),
                     style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                    ),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: kColorGrey),
                   ),
                   const SizedBox(
                     width: 5,
@@ -924,9 +931,9 @@ class _CalendarDialogState extends State<CalendarDialog> {
                         ? "(${(filteredSchedules.where((schedule) => schedule.type == 'class').length)} Classes today)"
                         : 'Day Off',
                     style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal,
-                    ),
+                        fontSize: 18,
+                        fontWeight: FontWeight.normal,
+                        color: kColorGrey),
                   ),
                 ],
               ),
@@ -935,11 +942,11 @@ class _CalendarDialogState extends State<CalendarDialog> {
               ),
               SizedBox(
                   width: 720,
-                  height: 560,
+                  height: 550,
                   child: daystatus == false
                       ? SizedBox(
                           width: 720,
-                          height: 560,
+                          height: 540,
                           child: Row(children: [
                             SizedBox(
                               width: 60,
@@ -959,13 +966,13 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                     final timeText = time.format(context);
 
                                     TextStyle textStyle = TextStyle(
-                                      fontWeight: time.minute == 0
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                      fontSize: time.minute == 0
-                                          ? 12
-                                          : 8, // Adjust the font size as needed
-                                    );
+                                        fontWeight: time.minute == 0
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                        fontSize: time.minute == 0 ? 12 : 8,
+                                        color:
+                                            kColorGrey // Adjust the font size as needed
+                                        );
 
                                     return Padding(
                                       padding: const EdgeInsets.only(

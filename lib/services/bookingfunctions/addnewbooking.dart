@@ -3,16 +3,33 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class BookingResult {
   final String status;
   final String classId;
+  final String classReference;
 
-  BookingResult(this.status, this.classId);
+  BookingResult(
+    this.status,
+    this.classId,
+    this.classReference,
+  );
 }
 
-Future<BookingResult> addNewBooking(String tutorID, String studentID, String message,
-    String subjectID, int numberOfClasses, List<String> userIds) async {
+Future<int> getClassCount() async {
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  QuerySnapshot classesSnapshot = await firestore.collection('classes').get();
+  return classesSnapshot.size;
+}
+
+Future<BookingResult> addNewBooking(
+    String tutorID,
+    String studentID,
+    String message,
+    String subjectID,
+    int numberOfClasses,
+    List<String> userIds,
+    double totalPrice) async {
   try {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-    // Check if both tutorID and studentID exist in messageparticipants
+    int classCount = await getClassCount();
     QuerySnapshot query = await firestore
         .collection('messageparticipants')
         .where('tutorID', isEqualTo: tutorID)
@@ -20,8 +37,6 @@ Future<BookingResult> addNewBooking(String tutorID, String studentID, String mes
         .get();
 
     if (query.docs.isNotEmpty) {
-      // If both tutorID and studentID are found, proceed with adding new data
-
       WriteBatch batch = firestore.batch();
 
       CollectionReference classesCollection = firestore.collection('classes');
@@ -29,6 +44,8 @@ Future<BookingResult> addNewBooking(String tutorID, String studentID, String mes
       //     firestore.collection('messageparticipants');
       CollectionReference notificationCollection =
           firestore.collection('notification');
+      CollectionReference messagingCollection =
+          firestore.collection('messaging');
 
       Map<String, dynamic> notificationData = {
         'dateNotify': DateTime.now(),
@@ -47,15 +64,29 @@ Future<BookingResult> addNewBooking(String tutorID, String studentID, String mes
         'subjectID': subjectID,
         'totalClasses': numberOfClasses.toString(),
         'tutorID': tutorID,
+        'totalPrice': totalPrice,
+        'classReference': '0${classCount + 1}'
       };
       DocumentReference classDocRef = await classesCollection.add(classesData);
       String classDocId = classDocRef.id;
       await notificationCollection.add(notificationData);
+      String messageID = query.docs.first.id;
 
+      Map<String, dynamic> sendMessageData = {
+        'dateSent': DateTime.now(),
+        'messageContent': 'New class is book checked classes for details!',
+        'messageID': messageID,
+        'noofclasses': '',
+        'subjectID': '',
+        'classPrice': '',
+        'type': 'message',
+        'userID': studentID
+      };
+      await messagingCollection.add(sendMessageData);
       await batch.commit();
 
-      return BookingResult('success',
-          classDocId); // Return 'success' and the ID of the added document
+      return BookingResult('success', classDocId,
+          '0${classCount + 1}'); // Return 'success' and the ID of the added document
     } else {
       WriteBatch batch = firestore.batch();
 
@@ -64,11 +95,16 @@ Future<BookingResult> addNewBooking(String tutorID, String studentID, String mes
           firestore.collection('messageparticipants');
       CollectionReference notificationCollection =
           firestore.collection('notification');
+      CollectionReference messagingCollection =
+          firestore.collection('messaging');
 
       Map<String, dynamic> messageData = {
         'lastMessage': '',
         'messageDate': DateTime.now(),
-        'messageStatus': 'unread',
+        'messageStatus': {
+          'studentRead': '0',
+          'tutorRead': '0',
+        },
         'studentFav': 'no',
         'studentID': studentID,
         'tutorFav': 'no',
@@ -91,18 +127,34 @@ Future<BookingResult> addNewBooking(String tutorID, String studentID, String mes
         'subjectID': subjectID,
         'totalClasses': numberOfClasses.toString(),
         'tutorID': tutorID,
+        'totalPrice': totalPrice,
+        'classReference': '0${classCount + 1}'
       };
+
       DocumentReference classDocRef = await classesCollection.add(classesData);
       String classDocId = classDocRef.id;
-      await messageParticipantsCollection.add(messageData);
+      DocumentReference messageDocRef =
+          await messageParticipantsCollection.add(messageData);
+      String messageID = messageDocRef.id;
       await notificationCollection.add(notificationData);
+      Map<String, dynamic> sendMessageData = {
+        'dateSent': DateTime.now(),
+        'messageContent': 'Class is Book',
+        'messageID': messageID,
+        'noofclasses': '',
+        'subjectID': '',
+        'classPrice': '',
+        'type': 'message',
+        'userID': studentID
+      };
+      await messagingCollection.add(sendMessageData);
 
       await batch.commit();
 
-      return BookingResult('success',
-          classDocId); // Return 'success' and the ID of the added document
+      return BookingResult('success', classDocId,
+          '0${classCount + 1}'); // Return 'success' and the ID of the added document
     }
   } catch (e) {
-    return BookingResult('Error: $e', '');
+    return BookingResult('Error: $e', '', '');
   }
 }

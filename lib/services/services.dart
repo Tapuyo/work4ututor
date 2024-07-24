@@ -75,20 +75,24 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('studentsEnrolled');
 
   List<TutorInformation> _getTutorInformation(QuerySnapshot snapshot) {
-    return snapshot.docs.map((tutordata) {
+    final tutorList = snapshot.docs.map((tutordata) {
+      final firstName = tutordata['firstName'] ?? '';
+      bool status = tutordata['status'] == 'Active';
+      // Check if firstName is not empty
+      if (firstName.isNotEmpty && status) {
       return TutorInformation(
         contact: tutordata['contact'] ?? '',
         birthPlace: tutordata['birthPlace'] ?? '',
         country: tutordata['country'] ?? '',
         certificates:
             (tutordata['certificates'] as List<dynamic>).cast<String>(),
-        resume: tutordata['resume'] ?? '',
+        resume: (tutordata['resume'] as List<dynamic>).cast<String>(),
         promotionalMessage: tutordata['promotionalMessage'] ?? '',
         withdrawal: tutordata['withdrawal'] ?? '',
         status: tutordata['status'] ?? '',
         extensionName: tutordata['extensionName'] ?? '',
-        dateSign: tutordata['dateSign']?.toDate() ?? '',
-        firstName: tutordata['firstName'] ?? '',
+        dateSign: (tutordata['dateSign'] as Timestamp).toDate(), // Convert Timestamp to DateTime
+        firstName: firstName,
         imageID: tutordata['imageID'] ?? '',
         language: (tutordata['language'] as List<dynamic>).cast<String>(),
         lastname: tutordata['lastName'] ?? '',
@@ -100,7 +104,7 @@ class DatabaseService {
         age: tutordata['age'] ?? '',
         applicationID: tutordata['applicationID'] ?? '',
         birthCity: tutordata['birthCity'] ?? '',
-        birthdate: tutordata['birthdate'] ?? '',
+        birthdate: (tutordata['birthdate'] as Timestamp).toDate(),
         emailadd: tutordata['emailadd'] ?? '',
         city: tutordata['city'] ?? '',
         servicesprovided:
@@ -113,8 +117,18 @@ class DatabaseService {
             (tutordata['resumetype'] as List<dynamic>).cast<String>(),
         validIDstype:
             (tutordata['validIDstype'] as List<dynamic>).cast<String>(),
+        citizenship: (tutordata['citizenship'] as List<dynamic>).cast<String>(),
+        gender: tutordata['gender'] ?? '',
       );
+      } else {
+        return null;
+      }
     }).toList();
+
+    return tutorList
+        .where((tutor) => tutor != null)
+        .cast<TutorInformation>()
+        .toList();
   }
 
   Stream<List<TutorInformation>> get tutorlist {
@@ -138,7 +152,7 @@ class DatabaseService {
 
   Stream<List<StudentsList>> get enrolleelist {
     return enrolleeCollection
-        .doc('YnLdZm2n7bPZSTbXS0VvHgG0Jor2')
+        .doc()
         .collection('students')
         .snapshots()
         .map(_getStudentsEnrolled);
@@ -170,6 +184,8 @@ class DatabaseService {
     final tutorDocumentRef = tutorCollection.doc(uid);
     await tutorDocumentRef.set({
       "language": [],
+      "citizenship": [],
+      "gender": "",
       "birthPlace": "",
       "certificates": [],
       "country": "",
@@ -183,7 +199,7 @@ class DatabaseService {
       "presentation": [],
       "promotionalMessage": "",
       "resume": "",
-      "status": "unsubscribe",
+      "status": "Incomplete",
       "tutorID": "",
       "userID": uid,
       "withdrawal": "",
@@ -362,7 +378,7 @@ class TutorInfoData {
         withdrawal: snapshot.get('withdrawal') ?? '',
         status: snapshot.get('status') ?? '',
         extensionName: snapshot.get('extensionName') ?? '',
-        dateSign: snapshot.get('dateSign')?.toDate() ?? '',
+        dateSign: (snapshot.get('dateSign') as Timestamp).toDate(),
         firstName: snapshot.get('firstName') ?? '',
         imageID: snapshot.get('imageID') ?? '',
         language: (snapshot.get('language') as List<dynamic>).cast<String>(),
@@ -375,7 +391,7 @@ class TutorInfoData {
         age: snapshot.get('age') ?? '',
         applicationID: snapshot.get('applicationID') ?? '',
         birthCity: snapshot.get('birthCity') ?? '',
-        birthdate: snapshot.get('birthdate') ?? '',
+        birthdate: (snapshot.get('birthdate') as Timestamp).toDate(),
         emailadd: snapshot.get('emailadd') ?? '',
         city: snapshot.get('city') ?? '',
         servicesprovided:
@@ -388,6 +404,9 @@ class TutorInfoData {
             (snapshot.get('resumetype') as List<dynamic>).cast<String>(),
         validIDstype:
             (snapshot.get('validIDstype') as List<dynamic>).cast<String>(),
+        citizenship:
+            (snapshot.get('citizenship') as List<dynamic>).cast<String>(),
+        gender: snapshot.get('gender') ?? '',
       )
     ];
   }

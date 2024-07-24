@@ -291,11 +291,11 @@ class _SettingsPageState extends State<SettingsPage> {
           const SizedBox(
             height: 10,
           ),
-          Container(
+          SizedBox(
             width: ResponsiveBuilder.isDesktop(context)
                 ? size.width - 300
                 : size.width - 30,
-                // color: Colors.white,
+            // color: Colors.white,
             height: size.height - 135,
             child: Align(
               alignment: Alignment.topLeft,
@@ -326,41 +326,33 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                         indicatorColor: kColorPrimary,
                         // isScrollable: true,
-                        tabs:  [
+                        tabs: [
                           Tab(
                             icon: const Icon(Icons.account_box_rounded),
-                            text:
-                                 ResponsiveBuilder.isMobile(context)
-                                    ? 'Personal'
-                                    :
-                                'Personal Informations',
+                            text: ResponsiveBuilder.isMobile(context)
+                                ? 'Personal'
+                                : 'Personal Informations',
                             iconMargin: const EdgeInsets.only(bottom: 3),
                           ),
                           Tab(
                             icon: const Icon(Icons.insert_drive_file_outlined),
-                            text:
-                                 ResponsiveBuilder.isMobile(context)
-                                    ? 'Tutor'
-                                    :
-                                'Tutor Informations',
+                            text: ResponsiveBuilder.isMobile(context)
+                                ? 'Tutor'
+                                : 'Tutor Informations',
                             iconMargin: const EdgeInsets.only(bottom: 3),
                           ),
                           Tab(
                             icon: const Icon(Icons.subject_outlined),
-                            text:
-                                ResponsiveBuilder.isMobile(context)
-                                    ? 'Classes'
-                                    :
-                                'Classes & Pricing',
+                            text: ResponsiveBuilder.isMobile(context)
+                                ? 'Classes'
+                                : 'Classes & Pricing',
                             iconMargin: const EdgeInsets.only(bottom: 3),
                           ),
                           Tab(
                             icon: const Icon(Icons.payment_outlined),
-                            text:
-                                ResponsiveBuilder.isMobile(context)
-                                    ? 'Payment'
-                                    :
-                                'Payments & Withdrawals',
+                            text: ResponsiveBuilder.isMobile(context)
+                                ? 'Payment'
+                                : 'Payments & Withdrawals',
                             iconMargin: const EdgeInsets.only(bottom: 3),
                           ),
                         ],
@@ -389,7 +381,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ClassesPricing(
                           uID: widget.uID,
                         ),
-                        const PaymentsWithdrwals(),
+                        PaymentsWithdrwals(userID: widget.uID),
                       ]),
                     ),
                   ],

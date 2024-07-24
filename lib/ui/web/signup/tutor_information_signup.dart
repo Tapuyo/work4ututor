@@ -22,9 +22,10 @@ import '../../../components/nav_bar.dart';
 import '../../../data_class/subject_class.dart';
 import '../../../data_class/subject_teach_pricing.dart';
 import '../../../services/getstudentinfo.dart';
+import '../../../services/send_email.dart';
 import '../../../shared_components/alphacode3.dart';
+import '../../../utils/themes.dart';
 import '../../auth/auth.dart';
-import '../login/login.dart';
 import '../terms/termpage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -96,6 +97,8 @@ class _InputInfoState extends State<InputInfo> {
   String tCountry = "";
   TextEditingController tCity = TextEditingController();
   String selectedbirthCountry = "";
+  String selectedGender = "";
+
   TextEditingController birthtCity = TextEditingController();
   List<String> tTimezone = [];
   int age = 0;
@@ -104,6 +107,13 @@ class _InputInfoState extends State<InputInfo> {
   String uPicture = "";
   List<String> servicesprovided = [];
   List<String> tlanguages = [];
+  List<String> citizenship = [];
+
+  String currentLanguage = '';
+  String currentctzship = '';
+
+  List<String> genders = ['Male', 'Female', 'Rather not say'];
+
   List<SubjectTeach> tSubjects = [];
   String uCV = "";
   String uVideo = "";
@@ -124,6 +134,8 @@ class _InputInfoState extends State<InputInfo> {
   //term
   bool termStatus = false;
   bool countryStatus = false;
+  bool genderStatus = false;
+
   bool showme = false;
   bool showmecustom = false;
 
@@ -245,7 +257,6 @@ class _InputInfoState extends State<InputInfo> {
         }
 
         // Print the list of common names
-        print(commonNamesList);
 
         // If you need to use this list elsewhere, you can assign it to your countryList
         setState(() {
@@ -262,6 +273,7 @@ class _InputInfoState extends State<InputInfo> {
   TextEditingController _selectedCountryController = TextEditingController();
   TextEditingController _selectedBirthCountryController =
       TextEditingController();
+  TextEditingController _selectedGenderController = TextEditingController();
   TextEditingController _selectedTimezoneController = TextEditingController();
   TextEditingController _selectedLanguageController = TextEditingController();
   TextEditingController _selectedSubjectController = TextEditingController();
@@ -503,8 +515,6 @@ class _InputInfoState extends State<InputInfo> {
         selectedImage = result.files.first.bytes;
         filename = result.files.first.name;
       });
-
-      print("Image selected: $filename");
     }
   }
 
@@ -545,8 +555,6 @@ class _InputInfoState extends State<InputInfo> {
           }
         }));
       });
-
-      print("Images selected: $idfilenames");
     }
   }
 
@@ -586,8 +594,6 @@ class _InputInfoState extends State<InputInfo> {
           }
         }));
       });
-
-      print("Images selected: $idfilenames");
     }
   }
 
@@ -627,8 +633,6 @@ class _InputInfoState extends State<InputInfo> {
           }
         }));
       });
-
-      print("Images selected: $idfilenames");
     }
   }
 
@@ -646,8 +650,6 @@ class _InputInfoState extends State<InputInfo> {
         selectedVideos.addAll(result.files.map((file) => file.bytes));
         videoFilenames.addAll(result.files.map((file) => file.name));
       });
-
-      print("Videos selected: $videoFilenames");
     }
   }
 
@@ -658,6 +660,9 @@ class _InputInfoState extends State<InputInfo> {
   ScrollController _scrollController3 = ScrollController();
 
   bool isLoading = false;
+  ScrollController updatescrollController1 = ScrollController();
+  ScrollController updatescrollController2 = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     List<String> countryNames = Provider.of<List<String>>(context);
@@ -681,7 +686,7 @@ class _InputInfoState extends State<InputInfo> {
                       height: 130,
                       child: GestureDetector(
                         onTap: () {
-                          // saveNamesToFirestore(languages);
+                          saveNamesToFirestore(languages);
                         },
                         child: const Text(
                           "Subscribe with your information",
@@ -698,43 +703,50 @@ class _InputInfoState extends State<InputInfo> {
                     Container(
                       padding: const EdgeInsets.fromLTRB(5, 0, 15, 5),
                       alignment: Alignment.centerLeft,
-                      width: 600,
+                      width: 680,
                       child: Row(
                         children: [
                           Stack(
                             alignment: Alignment.centerLeft,
                             children: <Widget>[
-                              Container(
-                                width: 350,
-                                height: 350,
-                                decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(20)),
-                                    color: Colors.grey.shade100,
-                                    border: Border.all(
-                                        color: Colors.grey, width: 1)),
-                                child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: FadeInImage(
-                                      fadeInDuration:
-                                          const Duration(milliseconds: 500),
-                                      placeholder: const AssetImage(
-                                          "assets/images/login.png"),
-                                      image: (selectedImage != null)
-                                          ? MemoryImage(selectedImage!)
-                                          : const AssetImage(
-                                                  "assets/images/login.png")
-                                              as ImageProvider<
-                                                  Object>, // Display image from profileurl
-                                      // imageErrorBuilder:
-                                      //     (context, error, stackTrace) {
-                                      //   return Image.asset(
-                                      //       "assets/images/login.png");
-                                      // },
-                                      fit: BoxFit.cover,
-                                      height: 70,
-                                      width: 70,
-                                    )),
+                              Card(
+                                margin: const EdgeInsets.all(10),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                elevation: 5,
+                                child: SizedBox(
+                                  width: 350,
+                                  height: 350,
+                                  // decoration: BoxDecoration(
+                                  //     borderRadius: const BorderRadius.all(
+                                  //         Radius.circular(20)),
+                                  //     color: Colors.grey.shade100,
+                                  //     border: Border.all(
+                                  //         color: Colors.grey, width: .5)),
+                                  child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: FadeInImage(
+                                        fadeInDuration:
+                                            const Duration(milliseconds: 500),
+                                        placeholder: const AssetImage(
+                                            "assets/images/login.png"),
+                                        image: (selectedImage != null)
+                                            ? MemoryImage(selectedImage!)
+                                            : const AssetImage(
+                                                    "assets/images/login.png")
+                                                as ImageProvider<
+                                                    Object>, // Display image from profileurl
+                                        // imageErrorBuilder:
+                                        //     (context, error, stackTrace) {
+                                        //   return Image.asset(
+                                        //       "assets/images/login.png");
+                                        // },
+                                        fit: BoxFit.cover,
+                                        height: 70,
+                                        width: 70,
+                                      )),
+                                ),
                               ),
                               Positioned(
                                   bottom: 12,
@@ -783,7 +795,7 @@ class _InputInfoState extends State<InputInfo> {
                     Container(
                       padding: const EdgeInsets.fromLTRB(5, 0, 15, 5),
                       alignment: Alignment.centerLeft,
-                      width: 600,
+                      width: 680,
                       child: Column(
                         children: <Widget>[
                           const SizedBox(
@@ -794,7 +806,7 @@ class _InputInfoState extends State<InputInfo> {
                               Text(
                                 "Tutor Identification Number",
                                 style: TextStyle(
-                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  color: kColorLight,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
                                 ),
@@ -817,26 +829,34 @@ class _InputInfoState extends State<InputInfo> {
                           ),
                           Row(
                             children: [
-                              Container(
-                                width: 300,
-                                height: 45,
-                                padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                                decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(5)),
-                                    color: Colors.white,
-                                    border: Border.all(
-                                        color: Colors.grey, width: 1)),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      tutorIDNumber.toString(),
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
+                              Card(
+                                margin: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                elevation: 5,
+                                child: Container(
+                                  width: 300,
+                                  height: 45,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                  // decoration: BoxDecoration(
+                                  //     borderRadius: const BorderRadius.all(
+                                  //         Radius.circular(5)),
+                                  //     color: Colors.white,
+                                  //     border: Border.all(
+                                  //         color: Colors.grey, width: 1)),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        tutorIDNumber.toString(),
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            color: kColorGrey,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
@@ -847,16 +867,16 @@ class _InputInfoState extends State<InputInfo> {
                           Row(
                             children: const [
                               Text(
-                                "Personal Information.",
+                                "Personal Information",
                                 style: TextStyle(
-                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  color: kColorGrey,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
                                 ),
                                 textAlign: TextAlign.left,
                               ),
                               Text(
-                                "Required*",
+                                " Required*",
                                 style: TextStyle(
                                   color: Colors.redAccent,
                                   fontWeight: FontWeight.normal,
@@ -878,112 +898,150 @@ class _InputInfoState extends State<InputInfo> {
                                   const Text(
                                     "First Name",
                                     style: TextStyle(
-                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                        color: kColorLight,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  SizedBox(
-                                    width: 190,
-                                    height: 45,
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: TextFormField(
-                                        controller: firstname,
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(5.0),
+                                  Card(
+                                    margin: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 5,
+                                    child: SizedBox(
+                                      width: 190,
+                                      height: 45,
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: TextFormField(
+                                          controller: firstname,
+                                          decoration: InputDecoration(
+                                            fillColor: Colors.grey,
+                                            hintText: 'First Name',
+                                            hintStyle: const TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 15),
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 12,
+                                                    horizontal: 10),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      10.0), // Rounded border
+                                              borderSide: BorderSide
+                                                  .none, // No outline border
+                                            ),
                                           ),
-                                          fillColor: Colors.grey.shade300,
-                                          hintText: 'Firstname',
-                                          hintStyle: const TextStyle(
-                                              color: Colors.grey, fontSize: 15),
+                                          style: const TextStyle(
+                                              color: kColorGrey),
+                                          // validator: (val) => val!.isEmpty
+                                          //     ? 'Enter a firstname'
+                                          //     : null,
                                         ),
-                                        // validator: (val) => val!.isEmpty
-                                        //     ? 'Enter a firstname'
-                                        //     : null,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(
-                                width: 5,
-                              ),
+                              const Spacer(),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const Text(
                                     "Middle Name",
                                     style: TextStyle(
-                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                        color: kColorLight,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  SizedBox(
-                                    width: 190,
-                                    height: 45,
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: TextFormField(
-                                        controller: middlename,
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(5.0),
+                                  Card(
+                                    margin: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 5,
+                                    child: SizedBox(
+                                      width: 190,
+                                      height: 45,
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: TextFormField(
+                                          controller: middlename,
+                                          decoration: InputDecoration(
+                                            fillColor: Colors.grey,
+                                            hintText: '(Optional)',
+                                            hintStyle: const TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 15),
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 12,
+                                                    horizontal: 10),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      10.0), // Rounded border
+                                              borderSide: BorderSide
+                                                  .none, // No outline border
+                                            ),
                                           ),
-                                          fillColor: Colors.grey,
-                                          hintText: '(Optional)',
-                                          hintStyle: const TextStyle(
-                                              color: Colors.grey, fontSize: 15),
+                                          style: const TextStyle(
+                                              color: kColorGrey),
+                                          // validator: (val) => val!.isEmpty
+                                          //     ? 'Enter a middlename'
+                                          //     : null,
                                         ),
-                                        // validator: (val) => val!.isEmpty
-                                        //     ? 'Enter a middlename'
-                                        //     : null,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(
-                                width: 5,
-                              ),
+                              const Spacer(),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const Text(
                                     "Last Name",
                                     style: TextStyle(
-                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                        color: kColorLight,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  SizedBox(
-                                    width: 190,
-                                    height: 45,
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: TextFormField(
-                                        controller: lastname,
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(5.0),
+                                  Card(
+                                    margin: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 5,
+                                    child: SizedBox(
+                                      width: 190,
+                                      height: 45,
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: TextFormField(
+                                          controller: lastname,
+                                          decoration: InputDecoration(
+                                            fillColor: Colors.grey,
+                                            hintText: 'Last Name',
+                                            hintStyle: const TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 15),
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 12,
+                                                    horizontal: 10),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      10.0), // Rounded border
+                                              borderSide: BorderSide
+                                                  .none, // No outline border
+                                            ),
                                           ),
-                                          // focusedBorder: OutlineInputBorder(
-                                          //   borderSide: const BorderSide(
-                                          //     color: Color.fromRGBO(
-                                          //         1, 118, 132, 1),
-                                          //     width: 2,
-                                          //   ), // Change the color here
-                                          //   borderRadius:
-                                          //       BorderRadius.circular(5.0),
-                                          // ),
-                                          fillColor: Colors.grey,
-                                          hintText: 'Lastname',
-                                          hintStyle: const TextStyle(
-                                              color: Colors.grey, fontSize: 15),
+                                          style: const TextStyle(
+                                              color: kColorGrey),
+                                          // validator: (val) => val!.isEmpty
+                                          //     ? 'Enter a lastname'
+                                          //     : null,
                                         ),
-                                        // validator: (val) => val!.isEmpty
-                                        //     ? 'Enter a lastname'
-                                        //     : null,
                                       ),
                                     ),
                                   ),
@@ -992,7 +1050,7 @@ class _InputInfoState extends State<InputInfo> {
                             ],
                           ),
                           const SizedBox(
-                            height: 10,
+                            height: 15,
                           ),
                           Row(
                             children: [
@@ -1002,44 +1060,51 @@ class _InputInfoState extends State<InputInfo> {
                                   const Text(
                                     "Date of Birth",
                                     style: TextStyle(
-                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                        color: kColorLight,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  Container(
-                                    width: 400,
-                                    height: 45,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                                    decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(5)),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: Colors.grey, width: 1)),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          bdate.toString(),
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              color: bdate == 'Date of Birth'
-                                                  ? Colors.grey
-                                                  : Colors.black),
-                                        ),
-                                        const Spacer(),
-                                        IconButton(
-                                          tooltip: 'Select Date',
-                                          hoverColor: Colors.transparent,
-                                          icon: const Icon(
-                                            EvaIcons.calendarOutline,
-                                            color: Colors.blue,
-                                            size: 25,
+                                  Card(
+                                    margin: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 5,
+                                    child: Container(
+                                      width: 400,
+                                      height: 45,
+                                      padding:
+                                          const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                      // decoration: BoxDecoration(
+                                      //     borderRadius: const BorderRadius.all(
+                                      //         Radius.circular(5)),
+                                      //     color: Colors.white,
+                                      //     border: Border.all(
+                                      //         color: Colors.grey, width: 1)),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            bdate.toString(),
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                color: bdate == 'Date of Birth'
+                                                    ? Colors.grey
+                                                    : kColorGrey),
                                           ),
-                                          onPressed: () {
-                                            _selectDate();
-                                          },
-                                        ),
-                                      ],
+                                          const Spacer(),
+                                          IconButton(
+                                            tooltip: 'Select Date',
+                                            hoverColor: Colors.transparent,
+                                            icon: const Icon(
+                                              EvaIcons.calendarOutline,
+                                              color: Colors.blue,
+                                              size: 25,
+                                            ),
+                                            onPressed: () {
+                                              _selectDate();
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1051,31 +1116,38 @@ class _InputInfoState extends State<InputInfo> {
                                   const Text(
                                     "Age",
                                     style: TextStyle(
-                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                        color: kColorLight,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  Container(
-                                    width: 150,
-                                    height: 45,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                                    decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(5)),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: Colors.grey, width: 1)),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          myage.toString(),
-                                          style: TextStyle(
-                                              fontSize: 15,
-                                              color: myage == 'Age'
-                                                  ? Colors.grey
-                                                  : Colors.black),
-                                        ),
-                                      ],
+                                  Card(
+                                    margin: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 5,
+                                    child: Container(
+                                      width: 150,
+                                      height: 45,
+                                      padding:
+                                          const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                      // decoration: BoxDecoration(
+                                      //     borderRadius: const BorderRadius.all(
+                                      //         Radius.circular(5)),
+                                      //     color: Colors.white,
+                                      //     border: Border.all(
+                                      //         color: Colors.grey, width: 1)),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            myage.toString(),
+                                            style: TextStyle(
+                                                fontSize: 15,
+                                                color: myage == 'Age'
+                                                    ? Colors.grey
+                                                    : kColorGrey),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1083,7 +1155,384 @@ class _InputInfoState extends State<InputInfo> {
                             ],
                           ),
                           const SizedBox(
+                            height: 15,
+                          ),
+                          Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "Gender",
+                                    style: TextStyle(
+                                        color: kColorLight,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  Card(
+                                    margin: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 5,
+                                    child: SizedBox(
+                                      width: 300,
+                                      height: 45,
+
+                                      child: TypeAheadFormField<String>(
+                                        textFieldConfiguration:
+                                            TextFieldConfiguration(
+                                          controller: _selectedGenderController,
+                                          decoration: InputDecoration(
+                                            hintText: 'Select a Gender',
+                                            hintStyle: const TextStyle(
+                                                color: Colors.grey),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      10.0), // Rounded border
+                                              borderSide: BorderSide
+                                                  .none, // No outline border
+                                            ),
+                                            suffixIcon: const Icon(
+                                                Icons.arrow_drop_down),
+                                          ),
+                                        ),
+                                        suggestionsCallback: (String pattern) {
+                                          return genders.where((country) =>
+                                              country.toLowerCase().contains(
+                                                  pattern.toLowerCase()));
+                                        },
+                                        itemBuilder:
+                                            (context, String suggestion) {
+                                          return ListTile(
+                                            title: Text(
+                                              suggestion,
+                                              style: const TextStyle(
+                                                  color: kColorGrey),
+                                            ),
+                                          );
+                                        },
+                                        onSuggestionSelected:
+                                            (String suggestion) {
+                                          setState(() {
+                                            selectedGender = suggestion;
+                                            _selectedGenderController.text =
+                                                suggestion;
+                                          });
+                                        },
+                                      ),
+                                      // country.name
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: const [
+                                      Text(
+                                        "Citizenship",
+                                        style: TextStyle(
+                                            color: kColorLight,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      Text(
+                                        "(You can select more than one language.)",
+                                        style: TextStyle(
+                                            color: Colors.redAccent,
+                                            fontWeight: FontWeight.w100,
+                                            fontSize: 12,
+                                            fontStyle: FontStyle.italic),
+                                        textAlign: TextAlign.left,
+                                      ),
+                                    ],
+                                  ),
+                                  Card(
+                                    margin: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 5,
+                                    child: SizedBox(
+                                      width: 300,
+                                      height: 45,
+
+                                      child: TypeAheadFormField<String>(
+                                        textFieldConfiguration:
+                                            TextFieldConfiguration(
+                                          // controller:
+                                          //     _selectedBirthCountryController,
+                                          decoration: InputDecoration(
+                                            hintText: 'Select a Citizenship',
+                                            hintStyle: const TextStyle(
+                                                color: Colors.grey),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      10.0), // Rounded border
+                                              borderSide: BorderSide
+                                                  .none, // No outline border
+                                            ),
+                                            suffixIcon: const Icon(
+                                                Icons.arrow_drop_down),
+                                          ),
+                                        ),
+                                        suggestionsCallback: (String pattern) {
+                                          return countryNames.where((country) =>
+                                              country.toLowerCase().contains(
+                                                  pattern.toLowerCase()));
+                                        },
+                                        itemBuilder:
+                                            (context, String suggestion) {
+                                          return ListTile(
+                                            title: Text(suggestion),
+                                          );
+                                        },
+                                        onSuggestionSelected:
+                                            (String suggestion) {
+                                          if (citizenship
+                                              .contains(suggestion)) {
+                                            null;
+                                          } else {
+                                            setState(() {
+                                              citizenship.add(suggestion
+                                                  .toString()); // Add the LanguageData object to tlanguages
+                                            });
+                                          }
+                                        },
+                                      ),
+                                      // country.name
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
                             height: 10,
+                          ),
+                          Visibility(
+                            visible: citizenship.isNotEmpty ? true : false,
+                            child: const SizedBox(
+                              height: 10,
+                            ),
+                          ),
+                          Visibility(
+                            visible: citizenship.isNotEmpty ? true : false,
+                            child: Container(
+                              width: 680,
+                              height: 45,
+                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              // decoration: BoxDecoration(
+                              //     borderRadius: const BorderRadius.all(
+                              //         Radius.circular(5)),
+                              //     color: Colors.white,
+                              //     border: Border.all(
+                              //         color: Colors.grey.shade300, width: 1)),
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width: 600,
+                                    child: Row(
+                                      children: [
+                                        IconButton(
+                                          iconSize: 12,
+                                          padding: EdgeInsets.zero,
+                                          splashRadius: 1,
+                                          icon: const Icon(
+                                            Icons
+                                                .arrow_back_ios, // Left arrow icon
+                                            color: kColorPrimary,
+                                          ),
+                                          onPressed: () {
+                                            // Scroll to the left
+                                            updatescrollController2.animateTo(
+                                              updatescrollController2.offset -
+                                                  100.0, // Adjust the value as needed
+                                              duration: const Duration(
+                                                  milliseconds:
+                                                      500), // Adjust the duration as needed
+                                              curve: Curves.ease,
+                                            );
+                                          },
+                                        ),
+                                        Expanded(
+                                          child: ListView.builder(
+                                              shrinkWrap: true,
+                                              scrollDirection: Axis.horizontal,
+                                              controller:
+                                                  updatescrollController1,
+                                              itemCount: citizenship.length,
+                                              itemBuilder: (context, index) {
+                                                String language =
+                                                    citizenship[index];
+                                                Color color = vibrantColors[index %
+                                                    vibrantColors
+                                                        .length]; // Cycle through colors
+
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10.0,
+                                                          right: 10),
+                                                  child: InkWell(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        if (citizenship[
+                                                                index] ==
+                                                            currentctzship) {
+                                                          currentctzship = '';
+                                                        } else {
+                                                          currentctzship =
+                                                              citizenship[
+                                                                  index];
+                                                        }
+                                                      });
+                                                    },
+                                                    child: Card(
+                                                      margin: EdgeInsets.zero,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                      ),
+                                                      elevation: 5,
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                10, 0, 10, 0),
+                                                        decoration: citizenship[
+                                                                    index] ==
+                                                                currentctzship
+                                                            ? const BoxDecoration(
+                                                                boxShadow: [
+                                                                  BoxShadow(
+                                                                      color: Colors
+                                                                          .black12,
+                                                                      offset:
+                                                                          Offset(
+                                                                              0,
+                                                                              4),
+                                                                      blurRadius:
+                                                                          5.0)
+                                                                ],
+                                                                gradient:
+                                                                    LinearGradient(
+                                                                  begin: Alignment
+                                                                      .centerLeft,
+                                                                  end: Alignment
+                                                                      .centerRight,
+                                                                  stops: [
+                                                                    0.0,
+                                                                    1.0
+                                                                  ],
+                                                                  colors:
+                                                                      buttonFocuscolors,
+                                                                ),
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            15)),
+                                                              )
+                                                            : const BoxDecoration(
+                                                                boxShadow: [
+                                                                    BoxShadow(
+                                                                        color: Colors
+                                                                            .black12,
+                                                                        offset: Offset(
+                                                                            0,
+                                                                            4),
+                                                                        blurRadius:
+                                                                            5.0)
+                                                                  ],
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            15)),
+                                                                color: Colors
+                                                                    .white),
+                                                        child: Center(
+                                                          child: Text(
+                                                            language,
+                                                            style: TextStyle(
+                                                                color: citizenship[
+                                                                            index] ==
+                                                                        currentctzship
+                                                                    ? Colors
+                                                                        .white
+                                                                    : kColorGrey),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              }),
+                                        ),
+                                        IconButton(
+                                          iconSize: 12,
+                                          padding: EdgeInsets.zero,
+                                          splashRadius: 1,
+                                          icon: const Icon(
+                                            Icons
+                                                .arrow_forward_ios, // Right arrow icon
+                                            color: kColorPrimary,
+                                          ),
+                                          onPressed: () {
+                                            // Scroll to the right
+                                            updatescrollController2.animateTo(
+                                              updatescrollController2.offset +
+                                                  100.0, // Adjust the value as needed
+                                              duration: const Duration(
+                                                  milliseconds:
+                                                      500), // Adjust the duration as needed
+                                              curve: Curves.ease,
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  IconButton(
+                                    padding: EdgeInsets.zero,
+                                    visualDensity: const VisualDensity(
+                                        horizontal: -4, vertical: -4),
+                                    icon: const Icon(
+                                        Icons.delete_outline_outlined),
+                                    color: Colors.red,
+                                    iconSize: 18,
+                                    onPressed: () {
+                                      setState(() {
+                                        citizenship.removeWhere(
+                                            (item) => item == currentctzship);
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 15,
                           ),
                           Row(
                             children: [
@@ -1096,259 +1545,312 @@ class _InputInfoState extends State<InputInfo> {
                                         color: Color.fromRGBO(1, 118, 132, 1),
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  SizedBox(
-                                    width: 300,
-                                    height: 45,
-                                    child: TypeAheadFormField<String>(
-                                      textFieldConfiguration:
-                                          TextFieldConfiguration(
-                                        controller: _selectedCountryController,
-                                        decoration: const InputDecoration(
-                                          hintText: 'Select a Country',
-                                          hintStyle:
-                                              TextStyle(color: Colors.grey),
-                                          border: OutlineInputBorder(),
-                                          suffixIcon:
-                                              Icon(Icons.arrow_drop_down),
-                                        ),
-                                      ),
-                                      suggestionsCallback: (String pattern) {
-                                        return countryNames.where((country) =>
-                                            country.toLowerCase().contains(
-                                                pattern.toLowerCase()));
-                                      },
-                                      itemBuilder:
-                                          (context, String suggestion) {
-                                        return ListTile(
-                                          title: Text(suggestion),
-                                        );
-                                      },
-                                      onSuggestionSelected:
-                                          (String suggestion) {
-                                        final alpha3Code =
-                                            getAlpha3Code(suggestion);
-                                        Random random = Random();
-
-                                        DateTime datenow = DateTime.now();
-                                        String currenttime =
-                                            DateFormat('HHmmss')
-                                                .format(datenow);
-                                        String randomNumber =
-                                            random.nextInt(1000000).toString() +
-                                                currenttime.toString();
-                                        String currentyear =
-                                            DateFormat('yyyyMMdd')
-                                                .format(datenow);
-                                        //todo please replace the random number with legnth of students enrolled
-                                        setState(() {
-                                          selectedCountry = suggestion;
-                                          _selectedCountryController.text =
-                                              suggestion;
-                                          tutorIDNumber =
-                                              'TTR$alpha3Code$currentyear$currenttime';
-                                          applicantsID =
-                                              'Work$currentyear$currenttime';
-                                        });
-                                        if (countryStatus) {
-                                          setState(() {
-                                            _selectedBirthCountryController
-                                                .text = suggestion;
-                                          });
-                                        }
-                                      },
+                                  Card(
+                                    margin: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                    // country.name
+                                    elevation: 5,
+                                    child: SizedBox(
+                                      width: 300,
+                                      height: 45,
+                                      child: TypeAheadFormField<String>(
+                                        textFieldConfiguration:
+                                            TextFieldConfiguration(
+                                          controller:
+                                              _selectedCountryController,
+                                          decoration: InputDecoration(
+                                            hintText: 'Select a Country',
+                                            hintStyle: const TextStyle(
+                                                color: Colors.grey),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      10.0), // Rounded border
+                                              borderSide: BorderSide
+                                                  .none, // No outline border
+                                            ),
+                                            labelStyle: const TextStyle(
+                                                color: kColorGrey),
+                                            suffixIcon: const Icon(
+                                                Icons.arrow_drop_down),
+                                          ),
+                                        ),
+                                        suggestionsCallback: (String pattern) {
+                                          return countryNames.where((country) =>
+                                              country.toLowerCase().contains(
+                                                  pattern.toLowerCase()));
+                                        },
+                                        itemBuilder:
+                                            (context, String suggestion) {
+                                          return ListTile(
+                                            title: Text(
+                                              suggestion,
+                                              style: const TextStyle(
+                                                  color: kColorGrey),
+                                            ),
+                                          );
+                                        },
+                                        onSuggestionSelected:
+                                            (String suggestion) {
+                                          final alpha3Code =
+                                              getAlpha3Code(suggestion);
+                                          Random random = Random();
+
+                                          DateTime datenow = DateTime.now();
+                                          String currenttime =
+                                              DateFormat('HHmmss')
+                                                  .format(datenow);
+                                          String randomNumber = random
+                                                  .nextInt(1000000)
+                                                  .toString() +
+                                              currenttime.toString();
+                                          String currentyear =
+                                              DateFormat('yyyyMMdd')
+                                                  .format(datenow);
+                                          //todo please replace the random number with legnth of students enrolled
+                                          setState(() {
+                                            selectedCountry = suggestion;
+                                            _selectedCountryController.text =
+                                                suggestion;
+                                            tutorIDNumber =
+                                                'TTR$alpha3Code$currentyear$currenttime';
+                                            applicantsID =
+                                                'Work$currentyear$currenttime';
+                                          });
+                                          if (countryStatus) {
+                                            setState(() {
+                                              _selectedBirthCountryController
+                                                  .text = suggestion;
+                                            });
+                                          }
+                                        },
+                                      ),
+                                      // country.name
+                                    ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(
-                                width: 10,
-                              ),
+                              const Spacer(),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const Text(
                                     "City of Residence",
                                     style: TextStyle(
-                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                        color: kColorLight,
                                         fontWeight: FontWeight.w600),
                                   ),
-                                  Container(
-                                    width: 266,
-                                    height: 45,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                    decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(5)),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: Colors.grey, width: 1)),
-                                    child: TextFormField(
-                                      controller: tCity,
-                                      decoration: const InputDecoration(
-                                        border: InputBorder.none,
-                                        fillColor: Colors.grey,
-                                        hintText: 'City',
-                                        hintStyle: TextStyle(
-                                            color: Colors.grey, fontSize: 15),
-                                      ),
-                                      // validator: (val) => val!.isEmpty
-                                      //     ? 'Enter your City'
-                                      //     : null,
-                                      onChanged: (val) {
-                                        if (countryStatus) {
-                                          setState(() {
-                                            birthtCity.text = tCity.text;
-                                          });
-                                        }
-                                      },
+                                  Card(
+                                    margin: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Container(
-                            alignment: Alignment.topLeft,
-                            child: CheckboxListTile(
-                              contentPadding: EdgeInsets.zero,
-                              title: const Text(
-                                'My residence information is same with birth place',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                              // subtitle: const Text(
-                              //     'A computer science portal for geeks.'),
-                              // secondary: const Icon(Icons.code),
-                              autofocus: false,
-                              activeColor: Colors.green,
-                              checkColor: Colors.white,
-                              selected: countryStatus,
-                              value: countryStatus,
-                              controlAffinity: ListTileControlAffinity.leading,
-                              visualDensity: const VisualDensity(
-                                  horizontal: -4, vertical: -4),
-                              onChanged: (value) {
-                                if (countryStatus) {
-                                  setState(() {
-                                    countryStatus = value!;
-                                    selectedbirthCountry = selectedCountry;
-                                    _selectedBirthCountryController.text =
-                                        selectedCountry;
-                                    birthtCity.text = tCity.text;
-                                  });
-                                } else {
-                                  setState(() {
-                                    countryStatus = value!;
-                                    selectedbirthCountry = selectedCountry;
-                                    _selectedBirthCountryController.text =
-                                        selectedCountry;
-                                    birthtCity.text = tCity.text;
-                                  });
-                                }
-                              },
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    "Country of Birth",
-                                    style: TextStyle(
-                                        color: Color.fromRGBO(1, 118, 132, 1),
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  SizedBox(
-                                    width: 300,
-                                    height: 45,
-
-                                    child: TypeAheadFormField<String>(
-                                      textFieldConfiguration:
-                                          TextFieldConfiguration(
-                                        controller:
-                                            _selectedBirthCountryController,
+                                    elevation: 5,
+                                    child: Container(
+                                      width: 266,
+                                      height: 45,
+                                      padding: const EdgeInsets.fromLTRB(
+                                          10, 0, 10, 0),
+                                      // decoration: BoxDecoration(
+                                      //     borderRadius: const BorderRadius.all(
+                                      //         Radius.circular(5)),
+                                      //     color: Colors.white,
+                                      //     border: Border.all(
+                                      //         color: Colors.grey, width: 1)),
+                                      child: TextFormField(
+                                        style:
+                                            const TextStyle(color: kColorGrey),
+                                        controller: tCity,
                                         decoration: const InputDecoration(
-                                          hintText: 'Select a Country',
-                                          hintStyle:
-                                              TextStyle(color: Colors.grey),
-                                          border: OutlineInputBorder(),
-                                          suffixIcon:
-                                              Icon(Icons.arrow_drop_down),
-                                        ),
+                                            border: InputBorder.none,
+                                            fillColor: Colors.grey,
+                                            hintText: 'City',
+                                            hintStyle: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 15),
+                                            labelStyle:
+                                                TextStyle(color: kColorGrey)),
+                                        // validator: (val) => val!.isEmpty
+                                        //     ? 'Enter your City'
+                                        //     : null,
+                                        onChanged: (val) {
+                                          if (countryStatus) {
+                                            setState(() {
+                                              birthtCity.text = tCity.text;
+                                            });
+                                          }
+                                        },
                                       ),
-                                      suggestionsCallback: (String pattern) {
-                                        return countryNames.where((country) =>
-                                            country.toLowerCase().contains(
-                                                pattern.toLowerCase()));
-                                      },
-                                      itemBuilder:
-                                          (context, String suggestion) {
-                                        return ListTile(
-                                          title: Text(suggestion),
-                                        );
-                                      },
-                                      onSuggestionSelected:
-                                          (String suggestion) {
-                                        setState(() {
-                                          selectedbirthCountry = suggestion;
-                                          _selectedBirthCountryController.text =
-                                              suggestion;
-                                        });
-                                      },
-                                    ),
-                                    // country.name
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    "City of Birth",
-                                    style: TextStyle(
-                                        color: Color.fromRGBO(1, 118, 132, 1),
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  Container(
-                                    width: 266,
-                                    height: 45,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                    decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(5)),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: Colors.grey, width: 1)),
-                                    child: TextFormField(
-                                      controller: birthtCity,
-                                      decoration: const InputDecoration(
-                                        border: InputBorder.none,
-                                        fillColor: Colors.grey,
-                                        hintText: 'City',
-                                        hintStyle: TextStyle(
-                                            color: Colors.grey, fontSize: 15),
-                                      ),
-                                      validator: (val) => val!.isEmpty
-                                          ? 'Enter your City'
-                                          : null,
-                                      // onChanged: (val) {
-                                      //   tCity = val;
-                                      // },
                                     ),
                                   ),
                                 ],
                               ),
                             ],
                           ),
+                          // Container(
+                          //   alignment: Alignment.topLeft,
+                          //   child: CheckboxListTile(
+                          //     contentPadding: EdgeInsets.zero,
+                          //     title: const Text(
+                          //       'My residence information is same with birth place',
+                          //       style:
+                          //           TextStyle(fontSize: 12, color: kColorGrey),
+                          //     ),
+                          //     // subtitle: const Text(
+                          //     //     'A computer science portal for geeks.'),
+                          //     // secondary: const Icon(Icons.code),
+                          //     autofocus: false,
+                          //     activeColor: Colors.green,
+                          //     checkColor: Colors.white,
+                          //     selected: countryStatus,
+                          //     value: countryStatus,
+                          //     controlAffinity: ListTileControlAffinity.leading,
+                          //     visualDensity: const VisualDensity(
+                          //         horizontal: -4, vertical: -4),
+                          //     onChanged: (value) {
+                          //       if (countryStatus) {
+                          //         setState(() {
+                          //           countryStatus = value!;
+                          //           selectedbirthCountry = selectedCountry;
+                          //           _selectedBirthCountryController.text =
+                          //               selectedCountry;
+                          //           birthtCity.text = tCity.text;
+                          //         });
+                          //       } else {
+                          //         setState(() {
+                          //           countryStatus = value!;
+                          //           selectedbirthCountry = selectedCountry;
+                          //           _selectedBirthCountryController.text =
+                          //               selectedCountry;
+                          //           birthtCity.text = tCity.text;
+                          //         });
+                          //       }
+                          //     },
+                          //   ),
+                          // ),
                           const SizedBox(
-                            height: 10,
+                            height: 15,
                           ),
+                          // Row(
+                          //   children: [
+                          //     Column(
+                          //       crossAxisAlignment: CrossAxisAlignment.start,
+                          //       children: [
+                          //         const Text(
+                          //           "Country of Birth",
+                          //           style: TextStyle(
+                          //               color: kColorLight,
+                          //               fontWeight: FontWeight.w600),
+                          //         ),
+                          //         Card(
+                          //           margin: EdgeInsets.zero,
+                          //           shape: RoundedRectangleBorder(
+                          //             borderRadius: BorderRadius.circular(10),
+                          //           ),
+                          //           elevation: 5,
+                          //           child: SizedBox(
+                          //             width: 300,
+                          //             height: 45,
+
+                          //             child: TypeAheadFormField<String>(
+                          //               textFieldConfiguration:
+                          //                   TextFieldConfiguration(
+                          //                 controller:
+                          //                     _selectedBirthCountryController,
+                          //                 decoration: InputDecoration(
+                          //                   hintText: 'Select a Country',
+                          //                   hintStyle: const TextStyle(
+                          //                       color: Colors.grey),
+                          //                   border: OutlineInputBorder(
+                          //                     borderRadius:
+                          //                         BorderRadius.circular(
+                          //                             10.0), // Rounded border
+                          //                     borderSide: BorderSide
+                          //                         .none, // No outline border
+                          //                   ),
+                          //                   suffixIcon: const Icon(
+                          //                       Icons.arrow_drop_down),
+                          //                 ),
+                          //               ),
+                          //               suggestionsCallback: (String pattern) {
+                          //                 return countryNames.where((country) =>
+                          //                     country.toLowerCase().contains(
+                          //                         pattern.toLowerCase()));
+                          //               },
+                          //               itemBuilder:
+                          //                   (context, String suggestion) {
+                          //                 return ListTile(
+                          //                   title: Text(suggestion),
+                          //                 );
+                          //               },
+                          //               onSuggestionSelected:
+                          //                   (String suggestion) {
+                          //                 setState(() {
+                          //                   selectedbirthCountry = suggestion;
+                          //                   _selectedBirthCountryController
+                          //                       .text = suggestion;
+                          //                 });
+                          //               },
+                          //             ),
+                          //             // country.name
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     ),
+                          //     const Spacer(),
+                          //     Column(
+                          //       crossAxisAlignment: CrossAxisAlignment.start,
+                          //       children: [
+                          //         const Text(
+                          //           "City of Birth",
+                          //           style: TextStyle(
+                          //               color: kColorLight,
+                          //               fontWeight: FontWeight.w600),
+                          //         ),
+                          //         Card(
+                          //           margin: EdgeInsets.zero,
+                          //           shape: RoundedRectangleBorder(
+                          //             borderRadius: BorderRadius.circular(10),
+                          //           ),
+                          //           elevation: 5,
+                          //           child: Container(
+                          //             width: 266,
+                          //             height: 45,
+                          //             padding: const EdgeInsets.fromLTRB(
+                          //                 10, 0, 10, 0),
+                          //             // decoration: BoxDecoration(
+                          //             //     borderRadius: const BorderRadius.all(
+                          //             //         Radius.circular(5)),
+                          //             //     color: Colors.white,
+                          //             //     border: Border.all(
+                          //             //         color: Colors.grey, width: 1)),
+                          //             child: TextFormField(
+                          //               controller: birthtCity,
+                          //               decoration: const InputDecoration(
+                          //                 border: InputBorder.none,
+                          //                 fillColor: Colors.grey,
+                          //                 hintText: 'City',
+                          //                 hintStyle: TextStyle(
+                          //                     color: Colors.grey, fontSize: 15),
+                          //               ),
+                          //               validator: (val) => val!.isEmpty
+                          //                   ? 'Enter your City'
+                          //                   : null,
+                          //               // onChanged: (val) {
+                          //               //   tCity = val;
+                          //               // },
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   ],
+                          // ),
+                          // const SizedBox(
+                          //   height: 15,
+                          // ),
+
                           Row(children: [
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1356,64 +1858,80 @@ class _InputInfoState extends State<InputInfo> {
                                 const Text(
                                   "Timezone",
                                   style: TextStyle(
-                                      color: Color.fromRGBO(1, 118, 132, 1),
+                                      color: kColorLight,
                                       fontWeight: FontWeight.w600),
                                 ),
-                                SizedBox(
-                                  width: 300,
-                                  height: 45,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      // Close suggestions when tapped anywhere outside the input field.
-                                      if (_selectedTimeZonefocusNode.hasFocus) {
-                                        _selectedTimeZonefocusNode.unfocus();
-                                        setState(() {
-                                          _showselectedTimeZoneSuggestions =
-                                              false;
-                                        });
-                                      }
-                                    },
-                                    child: TypeAheadFormField<String>(
-                                      textFieldConfiguration:
-                                          TextFieldConfiguration(
-                                        controller: _selectedTimeZone,
-                                        focusNode: _selectedTimeZonefocusNode,
-                                        onTap: () {
+                                Card(
+                                  margin: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 5,
+                                  child: SizedBox(
+                                    width: 300,
+                                    height: 45,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        // Close suggestions when tapped anywhere outside the input field.
+                                        if (_selectedTimeZonefocusNode
+                                            .hasFocus) {
+                                          _selectedTimeZonefocusNode.unfocus();
                                           setState(() {
                                             _showselectedTimeZoneSuggestions =
                                                 false;
                                           });
-                                        },
-                                        decoration: const InputDecoration(
-                                          hintText: 'Select your Timezone',
-                                          hintStyle:
-                                              TextStyle(color: Colors.grey),
-                                          border: OutlineInputBorder(),
-                                          suffixIcon:
-                                              Icon(Icons.arrow_drop_down),
+                                        }
+                                      },
+                                      child: TypeAheadFormField<String>(
+                                        textFieldConfiguration:
+                                            TextFieldConfiguration(
+                                          controller: _selectedTimeZone,
+                                          focusNode: _selectedTimeZonefocusNode,
+                                          onTap: () {
+                                            setState(() {
+                                              _showselectedTimeZoneSuggestions =
+                                                  false;
+                                            });
+                                          },
+                                          decoration: InputDecoration(
+                                            hintText: 'Select your Timezone',
+                                            hintStyle: const TextStyle(
+                                                color: Colors.grey),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      10.0), // Rounded border
+                                              borderSide: BorderSide
+                                                  .none, // No outline border
+                                            ),
+                                            suffixIcon: const Icon(
+                                                Icons.arrow_drop_down),
+                                          ),
                                         ),
+                                        suggestionsCallback: (String pattern) {
+                                          return timezonesList.where(
+                                              (timezone) => timezone
+                                                  .toLowerCase()
+                                                  .contains(
+                                                      pattern.toLowerCase()));
+                                        },
+                                        itemBuilder:
+                                            (context, String suggestion) {
+                                          return ListTile(
+                                            title: Text(suggestion),
+                                          );
+                                        },
+                                        onSuggestionSelected:
+                                            (String suggestion) {
+                                          setState(() {
+                                            _selectedTimeZone.text = suggestion;
+                                          });
+                                        },
+                                        hideOnEmpty:
+                                            true, // Hide suggestions when the input is empty.
+                                        hideOnLoading:
+                                            true, // Hide suggestions during loading.
                                       ),
-                                      suggestionsCallback: (String pattern) {
-                                        return timezonesList.where((timezone) =>
-                                            timezone.toLowerCase().contains(
-                                                pattern.toLowerCase()));
-                                      },
-                                      itemBuilder:
-                                          (context, String suggestion) {
-                                        return ListTile(
-                                          title: Text(suggestion),
-                                        );
-                                      },
-                                      onSuggestionSelected:
-                                          (String suggestion) {
-                                        setState(() {
-                                          _selectedTimeZone.text = suggestion;
-                                        });
-                                      },
-                                      hideOnEmpty:
-                                          true, // Hide suggestions when the input is empty.
-                                      hideOnLoading:
-                                          true, // Hide suggestions during loading.
                                     ),
                                   ),
                                 ),
@@ -1426,56 +1944,65 @@ class _InputInfoState extends State<InputInfo> {
                                 const Text(
                                   "Contact Number",
                                   style: TextStyle(
-                                      color: Color.fromRGBO(1, 118, 132, 1),
+                                      color: kColorLight,
                                       fontWeight: FontWeight.w600),
                                 ),
-                                Container(
-                                  width: 266,
-                                  height: 45,
-                                  padding:
-                                      const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                  decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(5)),
-                                      color: Colors.white,
-                                      border: Border.all(
-                                          color: Colors.grey, width: 1)),
-                                  child: InternationalPhoneNumberInput(
-                                    maxLength: 20,
-                                    onInputChanged: (PhoneNumber number) {
-                                      phoneNumber = number;
-                                    },
-                                    selectorConfig: const SelectorConfig(
-                                      selectorType:
-                                          PhoneInputSelectorType.DIALOG,
-                                      trailingSpace: false,
-                                      leadingPadding: 0,
-                                      setSelectorButtonAsPrefixIcon: true,
+                                Card(
+                                  margin: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 5,
+                                  child: Container(
+                                    width: 266,
+                                    height: 45,
+                                    padding:
+                                        const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                    // decoration: BoxDecoration(
+                                    //     borderRadius: const BorderRadius.all(
+                                    //         Radius.circular(5)),
+                                    //     color: Colors.white,
+                                    //     border: Border.all(
+                                    //         color: Colors.grey, width: 1)),
+                                    child: InternationalPhoneNumberInput(
+                                      maxLength: 20,
+                                      onInputChanged: (PhoneNumber number) {
+                                        phoneNumber = number;
+                                      },
+                                      selectorConfig: const SelectorConfig(
+                                        selectorType:
+                                            PhoneInputSelectorType.DIALOG,
+                                        trailingSpace: false,
+                                        leadingPadding: 0,
+                                        setSelectorButtonAsPrefixIcon: true,
+                                      ),
+                                      ignoreBlank: false,
+                                      autoValidateMode:
+                                          AutovalidateMode.disabled,
+                                      selectorTextStyle: const TextStyle(
+                                          color: Colors.black, fontSize: 15),
+                                      formatInput: true,
+                                      inputDecoration: const InputDecoration(
+                                          filled: false,
+                                          isCollapsed: false,
+                                          isDense: false,
+                                          border: InputBorder.none,
+                                          contentPadding:
+                                              EdgeInsets.only(bottom: 9)),
+                                      // keyboardType:
+                                      //     const TextInputType.numberWithOptions(
+                                      //         signed: true, decimal: true),
+                                      initialValue: phoneNumber,
+                                      textFieldController:
+                                          phoneNumberController,
                                     ),
-                                    ignoreBlank: false,
-                                    autoValidateMode: AutovalidateMode.disabled,
-                                    selectorTextStyle: const TextStyle(
-                                        color: Colors.black, fontSize: 15),
-                                    formatInput: true,
-                                    inputDecoration: const InputDecoration(
-                                        filled: false,
-                                        isCollapsed: false,
-                                        isDense: false,
-                                        border: InputBorder.none,
-                                        contentPadding:
-                                            EdgeInsets.only(bottom: 9)),
-                                    // keyboardType:
-                                    //     const TextInputType.numberWithOptions(
-                                    //         signed: true, decimal: true),
-                                    initialValue: phoneNumber,
-                                    textFieldController: phoneNumberController,
                                   ),
                                 ),
                               ],
                             ),
                           ]),
                           const SizedBox(
-                            height: 10,
+                            height: 15,
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1486,7 +2013,7 @@ class _InputInfoState extends State<InputInfo> {
                                   Text(
                                     "Languages",
                                     style: TextStyle(
-                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                        color: kColorLight,
                                         fontWeight: FontWeight.w600),
                                   ),
                                   Text(
@@ -1500,48 +2027,64 @@ class _InputInfoState extends State<InputInfo> {
                                   ),
                                 ],
                               ),
-                              SizedBox(
-                                width: 600,
-                                height: 45,
-                                child: TypeAheadFormField<LanguageData>(
-                                  // Specify LanguageData as the generic type
-                                  textFieldConfiguration:
-                                      const TextFieldConfiguration(
-                                    // controller: _selectedLanguageController,
-                                    decoration: InputDecoration(
-                                      hintText: 'Choose your language',
-                                      border: OutlineInputBorder(),
-                                      suffixIcon: Icon(Icons.arrow_drop_down),
+                              Card(
+                                margin: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                elevation: 5,
+                                child: SizedBox(
+                                  width: 680,
+                                  height: 45,
+                                  child: TypeAheadFormField<LanguageData>(
+                                    // Specify LanguageData as the generic type
+                                    textFieldConfiguration:
+                                        TextFieldConfiguration(
+                                      // controller: _selectedLanguageController,
+                                      decoration: InputDecoration(
+                                        hintText: 'Choose your language',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              10.0), // Rounded border
+                                          borderSide: BorderSide
+                                              .none, // No outline border
+                                        ),
+                                        suffixIcon:
+                                            const Icon(Icons.arrow_drop_down),
+                                      ),
                                     ),
+                                    suggestionsCallback: (pattern) async {
+                                      // Assuming names is a List<LanguageData>
+                                      final suggestions = names
+                                          .where((language) => language
+                                              .languageNamesStream
+                                              .toLowerCase()
+                                              .contains(pattern.toLowerCase()))
+                                          .toList(); // Return a list of LanguageData objects
+                                      return suggestions;
+                                    },
+                                    itemBuilder: (context, suggestions) {
+                                      return ListTile(
+                                        title: Text(
+                                          suggestions.languageNamesStream,
+                                          style: const TextStyle(
+                                              color: kColorGrey),
+                                        ), // Access the language name
+                                      );
+                                    },
+                                    onSuggestionSelected: (suggestion) {
+                                      if (tlanguages.contains(
+                                          suggestion.languageNamesStream)) {
+                                        null;
+                                      } else {
+                                        setState(() {
+                                          tlanguages.add(suggestion
+                                              .languageNamesStream
+                                              .toString()); // Add the LanguageData object to tlanguages
+                                        });
+                                      }
+                                    },
                                   ),
-                                  suggestionsCallback: (pattern) async {
-                                    // Assuming names is a List<LanguageData>
-                                    final suggestions = names
-                                        .where((language) => language
-                                            .languageNamesStream
-                                            .toLowerCase()
-                                            .contains(pattern.toLowerCase()))
-                                        .toList(); // Return a list of LanguageData objects
-                                    return suggestions;
-                                  },
-                                  itemBuilder: (context, suggestions) {
-                                    return ListTile(
-                                      title: Text(suggestions
-                                          .languageNamesStream), // Access the language name
-                                    );
-                                  },
-                                  onSuggestionSelected: (suggestion) {
-                                    if (tlanguages.contains(
-                                        suggestion.languageNamesStream)) {
-                                      null;
-                                    } else {
-                                      setState(() {
-                                        tlanguages.add(suggestion
-                                            .languageNamesStream
-                                            .toString()); // Add the LanguageData object to tlanguages
-                                      });
-                                    }
-                                  },
                                 ),
                               )
                             ],
@@ -1549,13 +2092,13 @@ class _InputInfoState extends State<InputInfo> {
                           Visibility(
                             visible: tlanguages.isNotEmpty ? true : false,
                             child: const SizedBox(
-                              height: 5,
+                              height: 10,
                             ),
                           ),
                           Visibility(
                             visible: tlanguages.isNotEmpty ? true : false,
                             child: Container(
-                              width: 600,
+                              width: 680,
                               height: 45,
                               padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                               // decoration: BoxDecoration(
@@ -1564,51 +2107,188 @@ class _InputInfoState extends State<InputInfo> {
                               //     color: Colors.white,
                               //     border: Border.all(
                               //         color: Colors.grey.shade300, width: 1)),
-                              child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: tlanguages.length,
-                                  itemBuilder: (context, index) {
-                                    String language = tlanguages[index];
-                                    Color color = vibrantColors[index %
-                                        vibrantColors
-                                            .length]; // Cycle through colors
-
-                                    return Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10.0, right: 10),
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            5, 0, 5, 0),
-                                        decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(15)),
-                                          color: color,
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width: 600,
+                                    child: Row(
+                                      children: [
+                                        IconButton(
+                                          iconSize: 12,
+                                          padding: EdgeInsets.zero,
+                                          splashRadius: 1,
+                                          icon: const Icon(
+                                            Icons
+                                                .arrow_back_ios, // Left arrow icon
+                                            color: kColorPrimary,
+                                          ),
+                                          onPressed: () {
+                                            // Scroll to the left
+                                            updatescrollController1.animateTo(
+                                              updatescrollController1.offset -
+                                                  100.0, // Adjust the value as needed
+                                              duration: const Duration(
+                                                  milliseconds:
+                                                      500), // Adjust the duration as needed
+                                              curve: Curves.ease,
+                                            );
+                                          },
                                         ),
-                                        child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(language),
-                                              IconButton(
-                                                padding: EdgeInsets.zero,
-                                                visualDensity:
-                                                    const VisualDensity(
-                                                        horizontal: -4,
-                                                        vertical: -4),
-                                                icon: const Icon(Icons
-                                                    .delete_outline_outlined),
-                                                color: Colors.red,
-                                                iconSize: 15,
-                                                onPressed: () {
-                                                  setState(() {
-                                                    tlanguages.removeAt(index);
-                                                  });
-                                                },
-                                              ),
-                                            ]),
-                                      ),
-                                    );
-                                  }),
+                                        Expanded(
+                                          child: ListView.builder(
+                                              shrinkWrap: true,
+                                              scrollDirection: Axis.horizontal,
+                                              controller:
+                                                  updatescrollController1,
+                                              itemCount: tlanguages.length,
+                                              itemBuilder: (context, index) {
+                                                String language =
+                                                    tlanguages[index];
+                                                Color color = vibrantColors[index %
+                                                    vibrantColors
+                                                        .length]; // Cycle through colors
+
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10.0,
+                                                          right: 10),
+                                                  child: InkWell(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        if (tlanguages[index] ==
+                                                            currentLanguage) {
+                                                          currentLanguage = '';
+                                                        } else {
+                                                          currentLanguage =
+                                                              tlanguages[index];
+                                                        }
+                                                      });
+                                                    },
+                                                    child: Card(
+                                                      margin: EdgeInsets.zero,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                      ),
+                                                      elevation: 5,
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                10, 0, 10, 0),
+                                                        decoration: tlanguages[
+                                                                    index] ==
+                                                                currentLanguage
+                                                            ? const BoxDecoration(
+                                                                boxShadow: [
+                                                                  BoxShadow(
+                                                                      color: Colors
+                                                                          .black12,
+                                                                      offset:
+                                                                          Offset(
+                                                                              0,
+                                                                              4),
+                                                                      blurRadius:
+                                                                          5.0)
+                                                                ],
+                                                                gradient:
+                                                                    LinearGradient(
+                                                                  begin: Alignment
+                                                                      .centerLeft,
+                                                                  end: Alignment
+                                                                      .centerRight,
+                                                                  stops: [
+                                                                    0.0,
+                                                                    1.0
+                                                                  ],
+                                                                  colors:
+                                                                      buttonFocuscolors,
+                                                                ),
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            15)),
+                                                              )
+                                                            : const BoxDecoration(
+                                                                boxShadow: [
+                                                                    BoxShadow(
+                                                                        color: Colors
+                                                                            .black12,
+                                                                        offset: Offset(
+                                                                            0,
+                                                                            4),
+                                                                        blurRadius:
+                                                                            5.0)
+                                                                  ],
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            15)),
+                                                                color: Colors
+                                                                    .white),
+                                                        child: Center(
+                                                          child: Text(
+                                                            language,
+                                                            style: TextStyle(
+                                                                color: tlanguages[
+                                                                            index] ==
+                                                                        currentLanguage
+                                                                    ? Colors
+                                                                        .white
+                                                                    : kColorGrey),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              }),
+                                        ),
+                                        IconButton(
+                                          iconSize: 12,
+                                          padding: EdgeInsets.zero,
+                                          splashRadius: 1,
+                                          icon: const Icon(
+                                            Icons
+                                                .arrow_forward_ios, // Right arrow icon
+                                            color: kColorPrimary,
+                                          ),
+                                          onPressed: () {
+                                            // Scroll to the right
+                                            updatescrollController1.animateTo(
+                                              updatescrollController1.offset +
+                                                  100.0, // Adjust the value as needed
+                                              duration: const Duration(
+                                                  milliseconds:
+                                                      500), // Adjust the duration as needed
+                                              curve: Curves.ease,
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  IconButton(
+                                    padding: EdgeInsets.zero,
+                                    visualDensity: const VisualDensity(
+                                        horizontal: -4, vertical: -4),
+                                    icon: const Icon(
+                                        Icons.delete_outline_outlined),
+                                    color: Colors.red,
+                                    iconSize: 18,
+                                    onPressed: () {
+                                      setState(() {
+                                        tlanguages.removeWhere(
+                                            (item) => item == currentLanguage);
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           const SizedBox(
@@ -1617,16 +2297,16 @@ class _InputInfoState extends State<InputInfo> {
                           Row(
                             children: const [
                               Text(
-                                "Subjects you teach and pricing.",
+                                "Subjects you teach and pricing",
                                 style: TextStyle(
-                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  color: kColorLight,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
                                 ),
                                 textAlign: TextAlign.left,
                               ),
                               Text(
-                                "Required*",
+                                " Required*",
                                 style: TextStyle(
                                   color: Colors.redAccent,
                                   fontWeight: FontWeight.normal,
@@ -1643,7 +2323,7 @@ class _InputInfoState extends State<InputInfo> {
                           Visibility(
                             visible: tSubjects.isNotEmpty,
                             child: SizedBox(
-                              width: 600,
+                              width: 680,
                               child: ListView.builder(
                                 shrinkWrap: true,
                                 primary: false,
@@ -1672,7 +2352,7 @@ class _InputInfoState extends State<InputInfo> {
                                       ? Column(
                                           children: [
                                             Container(
-                                              width: 600,
+                                              width: 680,
                                               height: 45,
                                               padding:
                                                   const EdgeInsets.fromLTRB(
@@ -1746,9 +2426,6 @@ class _InputInfoState extends State<InputInfo> {
                                                                   .subjectname =
                                                               value;
                                                         }
-
-                                                        print(tSubjects[index]
-                                                            .subjectname);
                                                       },
                                                       decoration:
                                                           InputDecoration(
@@ -1853,8 +2530,6 @@ class _InputInfoState extends State<InputInfo> {
                                                           // Update the subjectdata when the value changes
                                                           subjectdata.price2 =
                                                               val;
-                                                          print(tSubjects[index]
-                                                              .price2);
                                                         },
                                                       ),
                                                     ),
@@ -1938,8 +2613,6 @@ class _InputInfoState extends State<InputInfo> {
                                                           // Update the subjectdata when the value changes
                                                           subjectdata.price3 =
                                                               val;
-                                                          print(tSubjects[index]
-                                                              .price3);
                                                         },
                                                       ),
                                                     ),
@@ -2023,8 +2696,6 @@ class _InputInfoState extends State<InputInfo> {
                                                           // Update the subjectdata when the value changes
                                                           subjectdata.price5 =
                                                               val;
-                                                          print(tSubjects[index]
-                                                              .price5);
                                                         },
                                                       ),
                                                     ),
@@ -2040,7 +2711,7 @@ class _InputInfoState extends State<InputInfo> {
                                       : Column(
                                           children: [
                                             Container(
-                                              width: 600,
+                                              width: 680,
                                               height: 45,
                                               padding:
                                                   const EdgeInsets.fromLTRB(
@@ -2155,8 +2826,6 @@ class _InputInfoState extends State<InputInfo> {
                                                           // Update the subjectdata when the value changes
                                                           subjectdata.price2 =
                                                               val;
-                                                          print(tSubjects[index]
-                                                              .price2);
                                                         },
                                                       ),
                                                     ),
@@ -2236,8 +2905,6 @@ class _InputInfoState extends State<InputInfo> {
                                                           // Update the subjectdata when the value changes
                                                           subjectdata.price3 =
                                                               val;
-                                                          print(tSubjects[index]
-                                                              .price3);
                                                         },
                                                       ),
                                                     ),
@@ -2317,8 +2984,6 @@ class _InputInfoState extends State<InputInfo> {
                                                           // Update the subjectdata when the value changes
                                                           subjectdata.price5 =
                                                               val;
-                                                          print(tSubjects[index]
-                                                              .price5);
                                                         },
                                                       ),
                                                     ),
@@ -2335,44 +3000,56 @@ class _InputInfoState extends State<InputInfo> {
                               ),
                             ),
                           ),
-                          SizedBox(
-                            width: 600,
-                            height: 45,
-                            child: Container(
-                              width: 600,
+                          Card(
+                            margin: EdgeInsets.zero,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            elevation: 5,
+                            child: SizedBox(
+                              width: 680,
                               height: 45,
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                              decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(5)),
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey.shade300, width: 1)),
-                              child: DropdownButtonFormField(
-                                decoration: const InputDecoration(
-                                  enabledBorder: InputBorder.none,
+                              child: Container(
+                                width: 680,
+                                height: 45,
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                // decoration: BoxDecoration(
+                                //     borderRadius: const BorderRadius.all(
+                                //         Radius.circular(5)),
+                                //     color: Colors.white,
+                                //     border: Border.all(
+                                //         color: Colors.grey.shade300, width: 1)),
+                                child: DropdownButtonFormField(
+                                  decoration: const InputDecoration(
+                                    enabledBorder: InputBorder.none,
+                                    border: InputBorder.none,
+                                  ),
+                                  value: dropdownvaluesubject,
+                                  hint: const Text("Select your subject"),
+                                  isExpanded: true,
+                                  icon: const Icon(
+                                    Icons.arrow_drop_down,
+                                    color: kColorGrey,
+                                  ),
+                                  items: uSubjects.map((String items) {
+                                    return DropdownMenuItem(
+                                      value: items,
+                                      child: Text(items),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      SubjectTeach data = SubjectTeach(
+                                          subjectname: newValue!,
+                                          price2: '',
+                                          price3: '',
+                                          price5: '',
+                                          subjectid: '');
+                                      tSubjects.add(data);
+                                    });
+                                  },
                                 ),
-                                value: dropdownvaluesubject,
-                                hint: const Text("Select your subject"),
-                                isExpanded: true,
-                                icon: const Icon(Icons.arrow_drop_down),
-                                items: uSubjects.map((String items) {
-                                  return DropdownMenuItem(
-                                    value: items,
-                                    child: Text(items),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    SubjectTeach data = SubjectTeach(
-                                        subjectname: newValue!,
-                                        price2: '',
-                                        price3: '',
-                                        price5: '',
-                                        subjectid: '');
-                                    tSubjects.add(data);
-                                  });
-                                },
                               ),
                             ),
                           ),
@@ -2401,14 +3078,14 @@ class _InputInfoState extends State<InputInfo> {
                               Text(
                                 "What services are you able to provide?",
                                 style: TextStyle(
-                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  color: kColorLight,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
                                 ),
                                 textAlign: TextAlign.left,
                               ),
                               Text(
-                                "Required, you can select morethan one.*",
+                                " Required, you can select more than one.*",
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   color: Colors.redAccent,
@@ -2442,7 +3119,10 @@ class _InputInfoState extends State<InputInfo> {
                                       ),
                                       child: ListTileTheme(
                                         child: CheckboxListTile(
-                                          title: const Text('Recovery Lessons'),
+                                          title: const Text(
+                                            'Recovery Lessons',
+                                            style: TextStyle(color: kColorGrey),
+                                          ),
                                           // subtitle: const Text(
                                           //     'A computer science portal for geeks.'),
                                           // secondary: const Icon(Icons.code),
@@ -2491,7 +3171,9 @@ class _InputInfoState extends State<InputInfo> {
                                       child: ListTileTheme(
                                         child: CheckboxListTile(
                                           title: const Text(
-                                              'Kids with Learning Difficulties'),
+                                            'Kids with Learning Difficulties',
+                                            style: TextStyle(color: kColorGrey),
+                                          ),
                                           // subtitle: const Text(
                                           //     'A computer science portal for geeks.'),
                                           // secondary: const Icon(Icons.code),
@@ -2543,7 +3225,10 @@ class _InputInfoState extends State<InputInfo> {
                                       ),
                                       child: ListTileTheme(
                                         child: CheckboxListTile(
-                                          title: const Text('Pre Exam Classes'),
+                                          title: const Text(
+                                            'Pre Exam Classes',
+                                            style: TextStyle(color: kColorGrey),
+                                          ),
                                           // subtitle: const Text(
                                           //     'A computer science portal for geeks.'),
                                           // secondary: const Icon(Icons.code),
@@ -2591,7 +3276,10 @@ class _InputInfoState extends State<InputInfo> {
                                       ),
                                       child: ListTileTheme(
                                         child: CheckboxListTile(
-                                          title: const Text('Deaf Language'),
+                                          title: const Text(
+                                            'Deaf Language',
+                                            style: TextStyle(color: kColorGrey),
+                                          ),
                                           // subtitle: const Text(
                                           //     'A computer science portal for geeks.'),
                                           // secondary: const Icon(Icons.code),
@@ -2643,7 +3331,10 @@ class _InputInfoState extends State<InputInfo> {
                                       ),
                                       child: ListTileTheme(
                                         child: CheckboxListTile(
-                                          title: const Text('Own Program'),
+                                          title: const Text(
+                                            'Own Program',
+                                            style: TextStyle(color: kColorGrey),
+                                          ),
                                           // subtitle: const Text(
                                           //     'A computer science portal for geeks.'),
                                           // secondary: const Icon(Icons.code),
@@ -2789,7 +3480,7 @@ class _InputInfoState extends State<InputInfo> {
                               Text(
                                 "Upload your documents.",
                                 style: TextStyle(
-                                  color: Color.fromRGBO(0, 0, 0, 1),
+                                  color: kColorLight,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
                                 ),
@@ -2814,6 +3505,7 @@ class _InputInfoState extends State<InputInfo> {
                             height: 10,
                           ),
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
                                 padding:
@@ -2821,29 +3513,29 @@ class _InputInfoState extends State<InputInfo> {
                                 width: 180,
                                 height: 55,
                                 child: TextButton(
-                                  style: TextButton.styleFrom(
-                                    textStyle:
-                                        const TextStyle(color: Colors.black),
-                                    backgroundColor:
-                                        const Color.fromRGBO(103, 195, 208, 1),
-                                    shape: RoundedRectangleBorder(
-                                      side: const BorderSide(
-                                        color: Color.fromRGBO(
-                                            1, 118, 132, 1), // your color here
-                                        width: 1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(30.0),
-                                    ),
-                                  ),
+                                  // style: TextButton.styleFrom(
+                                  //   textStyle:
+                                  //       const TextStyle(color: Colors.black),
+                                  //   backgroundColor:
+                                  //       const Color.fromRGBO(103, 195, 208, 1),
+                                  //   shape: RoundedRectangleBorder(
+                                  //     side: const BorderSide(
+                                  //       color: Color.fromRGBO(
+                                  //           1, 118, 132, 1), // your color here
+                                  //       width: 1,
+                                  //     ),
+                                  //     borderRadius: BorderRadius.circular(30.0),
+                                  //   ),
+                                  // ),
                                   onPressed: () async {
                                     selectImagesID();
                                   },
                                   child: const Text(
                                     'Upload ID',
                                     style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                    ),
+                                        color: kColorPrimary,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -2961,7 +3653,9 @@ class _InputInfoState extends State<InputInfo> {
                                           10, 0, 10, 0),
                                       child: const Center(
                                         child: Text(
-                                            '"You can upload front and back of ID."'),
+                                          '"You can upload front and back of ID."',
+                                          style: TextStyle(color: kColorGrey),
+                                        ),
                                       ),
                                     )
                             ],
@@ -2970,6 +3664,7 @@ class _InputInfoState extends State<InputInfo> {
                             height: 10,
                           ),
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
                                 padding:
@@ -2977,29 +3672,29 @@ class _InputInfoState extends State<InputInfo> {
                                 width: 180,
                                 height: 55,
                                 child: TextButton(
-                                  style: TextButton.styleFrom(
-                                    textStyle:
-                                        const TextStyle(color: Colors.black),
-                                    backgroundColor:
-                                        const Color.fromRGBO(103, 195, 208, 1),
-                                    shape: RoundedRectangleBorder(
-                                      side: const BorderSide(
-                                        color: Color.fromRGBO(
-                                            1, 118, 132, 1), // your color here
-                                        width: 1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(30.0),
-                                    ),
-                                  ),
+                                  // style: TextButton.styleFrom(
+                                  //   textStyle:
+                                  //       const TextStyle(color: Colors.black),
+                                  //   backgroundColor:
+                                  //       const Color.fromRGBO(103, 195, 208, 1),
+                                  //   shape: RoundedRectangleBorder(
+                                  //     side: const BorderSide(
+                                  //       color: Color.fromRGBO(
+                                  //           1, 118, 132, 1), // your color here
+                                  //       width: 1,
+                                  //     ),
+                                  //     borderRadius: BorderRadius.circular(30.0),
+                                  //   ),
+                                  // ),
                                   onPressed: () {
                                     selectResumes();
                                   },
                                   child: const Text(
                                     'Upload CV/Resmue',
                                     style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                    ),
+                                        color: kColorPrimary,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -3117,7 +3812,9 @@ class _InputInfoState extends State<InputInfo> {
                                           10, 0, 10, 0),
                                       child: const Center(
                                         child: Text(
-                                            '"You can upload morethan one resume."'),
+                                          '"You can upload more than one resume."',
+                                          style: TextStyle(color: kColorGrey),
+                                        ),
                                       ),
                                     )
                             ],
@@ -3126,6 +3823,7 @@ class _InputInfoState extends State<InputInfo> {
                             height: 10,
                           ),
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
                                 padding:
@@ -3133,29 +3831,29 @@ class _InputInfoState extends State<InputInfo> {
                                 width: 180,
                                 height: 55,
                                 child: TextButton(
-                                  style: TextButton.styleFrom(
-                                    textStyle:
-                                        const TextStyle(color: Colors.black),
-                                    backgroundColor:
-                                        const Color.fromRGBO(103, 195, 208, 1),
-                                    shape: RoundedRectangleBorder(
-                                      side: const BorderSide(
-                                        color: Color.fromRGBO(
-                                            1, 118, 132, 1), // your color here
-                                        width: 1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(30.0),
-                                    ),
-                                  ),
+                                  // style: TextButton.styleFrom(
+                                  //   textStyle:
+                                  //       const TextStyle(color: Colors.black),
+                                  //   backgroundColor:
+                                  //       const Color.fromRGBO(103, 195, 208, 1),
+                                  //   shape: RoundedRectangleBorder(
+                                  //     side: const BorderSide(
+                                  //       color: Color.fromRGBO(
+                                  //           1, 118, 132, 1), // your color here
+                                  //       width: 1,
+                                  //     ),
+                                  //     borderRadius: BorderRadius.circular(30.0),
+                                  //   ),
+                                  // ),
                                   onPressed: () {
                                     selectCertificates();
                                   },
                                   child: const Text(
                                     'Upload Certicates',
                                     style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                    ),
+                                        color: kColorPrimary,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -3275,169 +3973,175 @@ class _InputInfoState extends State<InputInfo> {
                                           10, 0, 10, 0),
                                       child: const Center(
                                         child: Text(
-                                            '"You can upload morethan one certificate."'),
+                                          '"You can upload morethan one certificate."',
+                                          style: TextStyle(color: kColorGrey),
+                                        ),
                                       ),
                                     )
                             ],
                           ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            children: [
-                              Container(
-                                padding:
-                                    const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                                width: 180,
-                                height: 55,
-                                child: TextButton(
-                                  style: TextButton.styleFrom(
-                                    textStyle:
-                                        const TextStyle(color: Colors.black),
-                                    backgroundColor:
-                                        const Color.fromRGBO(103, 195, 208, 1),
-                                    shape: RoundedRectangleBorder(
-                                      side: const BorderSide(
-                                        color: Color.fromRGBO(
-                                            1, 118, 132, 1), // your color here
-                                        width: 1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(30.0),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    selectVideos();
-                                  },
-                                  child: const Text(
-                                    'Upload Video',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const Spacer(),
-                              videoFilenames.isNotEmpty
-                                  ? Container(
-                                      width: 400,
-                                      height: 55,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 0, 10, 0),
-                                      child: Row(
-                                        children: [
-                                          IconButton(
-                                            iconSize: 15,
-                                            icon: const Icon(
-                                              Icons
-                                                  .arrow_back_ios, // Left arrow icon
-                                              color: Colors.blue,
-                                            ),
-                                            onPressed: () {
-                                              // Scroll to the left
-                                              _scrollController3.animateTo(
-                                                _scrollController3.offset -
-                                                    100.0, // Adjust the value as needed
-                                                duration: const Duration(
-                                                    milliseconds:
-                                                        500), // Adjust the duration as needed
-                                                curve: Curves.ease,
-                                              );
-                                            },
-                                          ),
-                                          Expanded(
-                                            child: ListView.builder(
-                                              controller:
-                                                  _scrollController3, // Assign the ScrollController to the ListView
-                                              scrollDirection: Axis.horizontal,
-                                              itemCount: videoFilenames.length,
-                                              itemBuilder: (context, index) {
-                                                Color color = vibrantColors[
-                                                    index %
-                                                        vibrantColors.length];
+                          // const SizedBox(
+                          //   height: 10,
+                          // ),
+                          // Row(
+                          //   crossAxisAlignment: CrossAxisAlignment.start,
+                          //   children: [
+                          //     Container(
+                          //       padding:
+                          //           const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                          //       width: 180,
+                          //       height: 55,
+                          //       child: TextButton(
+                          //         // style: TextButton.styleFrom(
+                          //         //   textStyle:
+                          //         //       const TextStyle(color: Colors.black),
+                          //         //   backgroundColor:
+                          //         //       const Color.fromRGBO(103, 195, 208, 1),
+                          //         //   shape: RoundedRectangleBorder(
+                          //         //     side: const BorderSide(
+                          //         //       color: Color.fromRGBO(
+                          //         //           1, 118, 132, 1), // your color here
+                          //         //       width: 1,
+                          //         //     ),
+                          //         //     borderRadius: BorderRadius.circular(30.0),
+                          //         //   ),
+                          //         // ),
+                          //         onPressed: () {
+                          //           selectVideos();
+                          //         },
+                          //         child: const Text(
+                          //           'Upload Video',
+                          //           style: TextStyle(
+                          //               color: kColorPrimary,
+                          //               fontSize: 16,
+                          //               fontWeight: FontWeight.bold),
+                          //         ),
+                          //       ),
+                          //     ),
+                          //     const Spacer(),
+                          //     videoFilenames.isNotEmpty
+                          //         ? Container(
+                          //             width: 400,
+                          //             height: 55,
+                          //             padding: const EdgeInsets.fromLTRB(
+                          //                 10, 0, 10, 0),
+                          //             child: Row(
+                          //               children: [
+                          //                 IconButton(
+                          //                   iconSize: 15,
+                          //                   icon: const Icon(
+                          //                     Icons
+                          //                         .arrow_back_ios, // Left arrow icon
+                          //                     color: Colors.blue,
+                          //                   ),
+                          //                   onPressed: () {
+                          //                     // Scroll to the left
+                          //                     _scrollController3.animateTo(
+                          //                       _scrollController3.offset -
+                          //                           100.0, // Adjust the value as needed
+                          //                       duration: const Duration(
+                          //                           milliseconds:
+                          //                               500), // Adjust the duration as needed
+                          //                       curve: Curves.ease,
+                          //                     );
+                          //                   },
+                          //                 ),
+                          //                 Expanded(
+                          //                   child: ListView.builder(
+                          //                     controller:
+                          //                         _scrollController3, // Assign the ScrollController to the ListView
+                          //                     scrollDirection: Axis.horizontal,
+                          //                     itemCount: videoFilenames.length,
+                          //                     itemBuilder: (context, index) {
+                          //                       Color color = vibrantColors[
+                          //                           index %
+                          //                               vibrantColors.length];
 
-                                                return Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 10.0,
-                                                          right: 10),
-                                                  child: Container(
-                                                    padding: const EdgeInsets
-                                                        .fromLTRB(5, 0, 5, 0),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          const BorderRadius
-                                                                  .all(
-                                                              Radius.circular(
-                                                                  15)),
-                                                      color: color,
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(videoFilenames[
-                                                            index]),
-                                                        IconButton(
-                                                          iconSize: 15,
-                                                          icon: const Icon(
-                                                            Icons.delete,
-                                                            color: Colors.red,
-                                                          ),
-                                                          onPressed: () {
-                                                            setState(() {
-                                                              videoFilenames
-                                                                  .removeAt(
-                                                                      index);
-                                                              selectedVideos
-                                                                  .removeAt(
-                                                                      index);
-                                                            });
-                                                          },
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                          IconButton(
-                                            iconSize: 15,
-                                            icon: const Icon(
-                                              Icons
-                                                  .arrow_forward_ios, // Right arrow icon
-                                              color: Colors.blue,
-                                            ),
-                                            onPressed: () {
-                                              // Scroll to the right
-                                              _scrollController3.animateTo(
-                                                _scrollController3.offset +
-                                                    100.0, // Adjust the value as needed
-                                                duration: const Duration(
-                                                    milliseconds:
-                                                        500), // Adjust the duration as needed
-                                                curve: Curves.ease,
-                                              );
-                                            },
-                                          ),
-                                        ],
-                                      ))
-                                  : Container(
-                                      width: 400,
-                                      height: 55,
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 0, 10, 0),
-                                      child: const Center(
-                                        child: Text(
-                                            '"You can upload morethan one video."'),
-                                      ),
-                                    )
-                            ],
-                          ),
+                          //                       return Padding(
+                          //                         padding:
+                          //                             const EdgeInsets.only(
+                          //                                 left: 10.0,
+                          //                                 right: 10),
+                          //                         child: Container(
+                          //                           padding: const EdgeInsets
+                          //                               .fromLTRB(5, 0, 5, 0),
+                          //                           decoration: BoxDecoration(
+                          //                             borderRadius:
+                          //                                 const BorderRadius
+                          //                                         .all(
+                          //                                     Radius.circular(
+                          //                                         15)),
+                          //                             color: color,
+                          //                           ),
+                          //                           child: Row(
+                          //                             mainAxisAlignment:
+                          //                                 MainAxisAlignment
+                          //                                     .spaceBetween,
+                          //                             children: [
+                          //                               Text(videoFilenames[
+                          //                                   index]),
+                          //                               IconButton(
+                          //                                 iconSize: 15,
+                          //                                 icon: const Icon(
+                          //                                   Icons.delete,
+                          //                                   color: Colors.red,
+                          //                                 ),
+                          //                                 onPressed: () {
+                          //                                   setState(() {
+                          //                                     videoFilenames
+                          //                                         .removeAt(
+                          //                                             index);
+                          //                                     selectedVideos
+                          //                                         .removeAt(
+                          //                                             index);
+                          //                                   });
+                          //                                 },
+                          //                               ),
+                          //                             ],
+                          //                           ),
+                          //                         ),
+                          //                       );
+                          //                     },
+                          //                   ),
+                          //                 ),
+                          //                 IconButton(
+                          //                   iconSize: 15,
+                          //                   icon: const Icon(
+                          //                     Icons
+                          //                         .arrow_forward_ios, // Right arrow icon
+                          //                     color: Colors.blue,
+                          //                   ),
+                          //                   onPressed: () {
+                          //                     // Scroll to the right
+                          //                     _scrollController3.animateTo(
+                          //                       _scrollController3.offset +
+                          //                           100.0, // Adjust the value as needed
+                          //                       duration: const Duration(
+                          //                           milliseconds:
+                          //                               500), // Adjust the duration as needed
+                          //                       curve: Curves.ease,
+                          //                     );
+                          //                   },
+                          //                 ),
+                          //               ],
+                          //             ))
+                          //         : Container(
+                          //             width: 400,
+                          //             height: 55,
+                          //             padding: const EdgeInsets.fromLTRB(
+                          //                 10, 0, 10, 0),
+                          //             child: const Center(
+                          //               child: Text(
+                          //                 '"You can upload morethan one video."',
+                          //                 style: TextStyle(color: kColorGrey),
+                          //               ),
+                          //             ),
+                          //           )
+                          //   ],
+                          // ),
+
                           const SizedBox(
-                            height: 50,
+                            height: 30,
                           ),
                           Column(
                             children: [
@@ -3446,7 +4150,7 @@ class _InputInfoState extends State<InputInfo> {
                                   Text(
                                     'Describe your skills, your approach, your teaching method, and tell',
                                     style: TextStyle(
-                                      color: Color.fromRGBO(0, 0, 0, 1),
+                                      color: kColorLight,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
                                     ),
@@ -3459,7 +4163,7 @@ class _InputInfoState extends State<InputInfo> {
                                   Text(
                                     'us why a student should choose you! (max 5000 characters)',
                                     style: TextStyle(
-                                      color: Color.fromRGBO(0, 0, 0, 1),
+                                      color: kColorLight,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
                                     ),
@@ -3483,32 +4187,38 @@ class _InputInfoState extends State<InputInfo> {
                           const SizedBox(
                             height: 14,
                           ),
-                          Container(
-                            width: 600,
-                            height: 350,
-                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(5)),
-                                color: Colors.white,
-                                border: Border.all(
-                                    color: Colors.grey.shade300, width: 1)),
-                            child: TextFormField(
-                              controller: aboutme,
-                              textAlignVertical: TextAlignVertical.top,
-                              maxLines: null,
-                              expands: true,
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                fillColor: Colors.grey,
-                                hintText:
-                                    'Describe your self(max 5000 characters)',
-                                hintStyle: TextStyle(
-                                  color: Colors.black,
-                                  inherit: true,
+                          Card(
+                            margin: EdgeInsets.zero,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            elevation: 5,
+                            child: Container(
+                              width: 680,
+                              height: 350,
+                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              // decoration: BoxDecoration(
+                              //     borderRadius:
+                              //         const BorderRadius.all(Radius.circular(5)),
+                              //     color: Colors.white,
+                              //     border: Border.all(
+                              //         color: Colors.grey.shade300, width: 1)),
+                              child: TextFormField(
+                                controller: aboutme,
+                                textAlignVertical: TextAlignVertical.top,
+                                maxLines: null,
+                                expands: true,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  fillColor: Colors.grey,
+                                  hintText: '',
+                                  hintStyle: TextStyle(
+                                    color: kColorGrey,
+                                    inherit: true,
+                                  ),
+                                  alignLabelWithHint: true,
+                                  hintMaxLines: 10,
                                 ),
-                                alignLabelWithHint: true,
-                                hintMaxLines: 10,
                               ),
                             ),
                           ),
@@ -3594,19 +4304,19 @@ class _InputInfoState extends State<InputInfo> {
                             width: 380,
                             height: 75,
                             child: TextButton(
-                              style: TextButton.styleFrom(
-                                textStyle: const TextStyle(color: Colors.black),
-                                backgroundColor:
-                                    const Color.fromRGBO(103, 195, 208, 1),
-                                shape: RoundedRectangleBorder(
-                                  side: const BorderSide(
-                                    color: Color.fromRGBO(
-                                        1, 118, 132, 1), // your color here
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(40.0),
-                                ),
-                              ),
+                              // style: TextButton.styleFrom(
+                              //   textStyle: const TextStyle(color: Colors.black),
+                              //   backgroundColor:
+                              //       const Color.fromRGBO(103, 195, 208, 1),
+                              //   shape: RoundedRectangleBorder(
+                              //     side: const BorderSide(
+                              //       color: Color.fromRGBO(
+                              //           1, 118, 132, 1), // your color here
+                              //       width: 1,
+                              //     ),
+                              //     borderRadius: BorderRadius.circular(40.0),
+                              //   ),
+                              // ),
                               onPressed: () async {
                                 // if (filename == '' ||
                                 //     firstname.text == '' ||
@@ -3640,14 +4350,16 @@ class _InputInfoState extends State<InputInfo> {
                                     type: CoolAlertType.error,
                                     text: "Please input about yourself!",
                                   );
-                                } else if (videoFilenames.isEmpty) {
-                                  CoolAlert.show(
-                                    context: context,
-                                    width: 200,
-                                    type: CoolAlertType.error,
-                                    text: "Video presentations Required!",
-                                  );
-                                } else if (filename.isEmpty) {
+                                }
+                                // else if (videoFilenames.isEmpty) {
+                                //   CoolAlert.show(
+                                //     context: context,
+                                //     width: 200,
+                                //     type: CoolAlertType.error,
+                                //     text: "Video presentations Required!",
+                                //   );
+                                // }
+                                else if (filename.isEmpty) {
                                   CoolAlert.show(
                                     context: context,
                                     width: 200,
@@ -3696,21 +4408,37 @@ class _InputInfoState extends State<InputInfo> {
                                     type: CoolAlertType.error,
                                     text: "Timezone Required!",
                                   );
-                                } else if (birthtCity.text == '') {
+                                } else if (selectedGender == '') {
                                   CoolAlert.show(
                                     context: context,
                                     width: 200,
                                     type: CoolAlertType.error,
-                                    text: "City of birth Required!",
+                                    text: "Gender Required!",
                                   );
-                                } else if (selectedbirthCountry == '') {
+                                } else if (citizenship.isEmpty) {
                                   CoolAlert.show(
                                     context: context,
                                     width: 200,
                                     type: CoolAlertType.error,
-                                    text: "Country of birth Required!",
+                                    text: "Citizenship Required!",
                                   );
-                                } else if (tCity.text == '') {
+                                }
+                                // else if (birthtCity.text == '') {
+                                //   CoolAlert.show(
+                                //     context: context,
+                                //     width: 200,
+                                //     type: CoolAlertType.error,
+                                //     text: "City of birth Required!",
+                                //   );
+                                // } else if (selectedbirthCountry == '') {
+                                //   CoolAlert.show(
+                                //     context: context,
+                                //     width: 200,
+                                //     type: CoolAlertType.error,
+                                //     text: "Country of birth Required!",
+                                //   );
+                                // }
+                                else if (tCity.text == '') {
                                   CoolAlert.show(
                                     context: context,
                                     width: 200,
@@ -3768,7 +4496,7 @@ class _InputInfoState extends State<InputInfo> {
                                     context: context,
                                     width: 200,
                                     type: CoolAlertType.error,
-                                    text: "Servie you provide Required!",
+                                    text: "Service you provide Required!",
                                   );
                                 } else {
                                   CoolAlert.show(
@@ -3797,14 +4525,16 @@ class _InputInfoState extends State<InputInfo> {
                                           'Certificates',
                                           selectedCertificates,
                                           certificatesfilenames);
-                                  List<String?> videolinks =
-                                      await uploadTutorvideoList(
-                                          widget.uid,
-                                          'Videos',
-                                          selectedVideos,
-                                          videoFilenames);
+                                  // List<String?> videolinks =
+                                  //     await uploadTutorvideoList(
+                                  //         widget.uid,
+                                  //         'Videos',
+                                  //         selectedVideos,
+                                  //         videoFilenames);
                                   String? result = await updateTutorInformation(
                                       widget.uid,
+                                      selectedGender,
+                                      citizenship,
                                       tCity.text,
                                       selectedCountry,
                                       selectedbirthCountry,
@@ -3819,7 +4549,7 @@ class _InputInfoState extends State<InputInfo> {
                                       phoneNumber.phoneNumber.toString(),
                                       DateTime.now(),
                                       age.toString(),
-                                      selectedDate.toString(),
+                                      selectedDate,
                                       _selectedTimeZone.text,
                                       applicantsID,
                                       tSubjects,
@@ -3836,7 +4566,8 @@ class _InputInfoState extends State<InputInfo> {
                                       resumefilenamestype.isEmpty
                                           ? []
                                           : resumefilenamestype,
-                                      videolinks.isEmpty ? [] : videolinks,
+                                      [],
+                                      // videolinks.isEmpty ? [] : videolinks,
                                       idlinks.isEmpty ? [] : idlinks,
                                       idfilenamestype.isEmpty
                                           ? []
@@ -3844,7 +4575,11 @@ class _InputInfoState extends State<InputInfo> {
                                       servicesprovided);
                                   if (result == 'success') {
                                     dynamic result = await _auth.signOutAnon();
+                                    SendWelcomeEmailtoUser.sendMail(
+                                          email: widget.email,
+                                          name: firstname.text);
                                     deleteAllData();
+
                                     setState(() {
                                       CoolAlert.show(
                                         context: context,
@@ -3853,11 +4588,9 @@ class _InputInfoState extends State<InputInfo> {
                                         text: 'Sign up succesfully!',
                                         autoCloseDuration:
                                             const Duration(seconds: 1),
-                                      ).then(
-                                          (value) {
-                                            GoRouter.of(context).go(
-                                          '/');
-                                          });
+                                      ).then((value) {
+                                        GoRouter.of(context).go('/');
+                                      });
                                     });
                                   } else {
                                     CoolAlert.show(
@@ -3872,9 +4605,9 @@ class _InputInfoState extends State<InputInfo> {
                               child: const Text(
                                 'Proceed Now',
                                 style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                ),
+                                    color: kColorPrimary,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500),
                               ),
                             ),
                           ),

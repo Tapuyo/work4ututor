@@ -17,6 +17,7 @@ class ClassesData {
   List<StudentInfoClass> studentinfo;
   List<TutorInformation> tutorinfo;
   List<SubjectClass> subjectinfo;
+  double price;
 
   ClassesData({
     required this.classid,
@@ -34,6 +35,7 @@ class ClassesData {
     required this.studentinfo,
     required this.tutorinfo,
     required this.subjectinfo,
+    required this.price,
   });
 }
 
@@ -57,6 +59,9 @@ class Schedule {
   final String timeto;
   final String classstatus;
   final String meetinglink;
+  final String rating;
+  final String studentStatus;
+  final String tutorStatus;
 
   Schedule({
     required this.scheduleID,
@@ -66,6 +71,9 @@ class Schedule {
     required this.timeto,
     required this.classstatus,
     required this.meetinglink,
+    required this.rating,
+      required this.studentStatus,
+    required this.tutorStatus,
   });
 
   // Convert Schedule instance to a map
@@ -78,6 +86,9 @@ class Schedule {
       'timeto': timeto,
       'classstatus': classstatus,
       'meetinglink': meetinglink,
+      'rating': rating,
+      'studentStatus': rating,
+      'tutorStatus': rating,
     };
   }
 }

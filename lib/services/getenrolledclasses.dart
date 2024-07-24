@@ -61,6 +61,8 @@ class EnrolledClass {
 
       StudentInfoClass tempinfo = StudentInfoClass(
         languages: (data['language'] as List<dynamic>).cast<String>(),
+        citizenship: (data['citizenship'] as List<dynamic>).cast<String>(),
+        gender: data['gender'] ?? '',
         address: data['address'] ?? '',
         country: data['country'] ?? '',
         studentFirstname: data['studentFirstName'] ?? '',
@@ -71,7 +73,7 @@ class EnrolledClass {
         contact: data['contact'] ?? '',
         emailadd: data['emailadd'] ?? '',
         profilelink: data['profileurl'] ?? '',
-        dateregistered: data['dateregistered'].toDate() ?? '',
+        dateregistered: (data['dateregistered'] as Timestamp).toDate(),
         age: data['age'] ?? '',
         dateofbirth: data['dateofbirth'] ?? '',
         timezone: data['timezone'] ?? '',
@@ -99,7 +101,7 @@ class EnrolledClass {
           withdrawal: tutordata['withdrawal'] ?? '',
           status: tutordata['status'] ?? '',
           extensionName: tutordata['extensionName'] ?? '',
-          dateSign: tutordata['dateSign']?.toDate() ?? '',
+          dateSign: (tutordata['dateSign'] as Timestamp).toDate(),
           firstName: tutordata['firstName'] ?? '',
           imageID: tutordata['imageID'] ?? '',
           language: (tutordata['language'] as List<dynamic>).cast<String>(),
@@ -111,7 +113,7 @@ class EnrolledClass {
           age: tutordata['age'] ?? '',
           applicationID: tutordata['applicationID'] ?? '',
           birthCity: tutordata['birthCity'] ?? '',
-          birthdate: tutordata['birthdate'] ?? '',
+          birthdate: (tutordata['birthdate'] as Timestamp).toDate(),
           emailadd: tutordata['emailadd'] ?? '',
           city: tutordata['city'] ?? '',
           servicesprovided:
@@ -125,6 +127,9 @@ class EnrolledClass {
               (tutordata['resumetype'] as List<dynamic>).cast<String>(),
           validIDstype:
               (tutordata['validIDstype'] as List<dynamic>).cast<String>(),
+          citizenship:
+              (tutordata['citizenship'] as List<dynamic>).cast<String>(),
+          gender: tutordata['gender'] ?? '',
         );
         tutorinfo.add(temptutorinfo);
       }
@@ -172,6 +177,9 @@ class EnrolledClass {
           timeto: data['timeto'] ?? '',
           classstatus: data['classstatus'] ?? '',
           meetinglink: data['meetinglink'] ?? '',
+          rating: data['rating'] ?? '',
+          studentStatus: data['studentStatus'] ?? '',
+          tutorStatus: data['tutorStatus'] ?? '',
         );
         finalschedule.add(tempschedinfo);
       }
@@ -195,6 +203,7 @@ class EnrolledClass {
       studentinfo: studentinfo,
       tutorinfo: tutorinfo,
       subjectinfo: subjectinfo,
+      price: data['totalPrice'] ?? 0,
     );
   }
 
@@ -266,6 +275,7 @@ class EnrolledClassFuture {
         studentinfo: studentinfo,
         tutorinfo: tutorinfo,
         subjectinfo: subjectinfo,
+        price: data['totalPrice'] ?? 0,
       );
     } catch (error) {
       // Handle errors as needed
@@ -285,6 +295,8 @@ class EnrolledClassFuture {
 
       StudentInfoClass tempinfo = StudentInfoClass(
         languages: (data['language'] as List<dynamic>).cast<String>(),
+        citizenship: (data['citizenship'] as List<dynamic>).cast<String>(),
+        gender: data['gender'] ?? '',
         address: data['address'] ?? '',
         country: data['country'] ?? '',
         studentFirstname: data['studentFirstName'] ?? '',
@@ -295,7 +307,7 @@ class EnrolledClassFuture {
         contact: data['contact'] ?? '',
         emailadd: data['emailadd'] ?? '',
         profilelink: data['profileurl'] ?? '',
-        dateregistered: data['dateregistered'].toDate() ?? '',
+        dateregistered: (data['dateregistered'] as Timestamp).toDate(),
         age: data['age'] ?? '',
         dateofbirth: data['dateofbirth'] ?? '',
         timezone: data['timezone'] ?? '',
@@ -327,7 +339,7 @@ class EnrolledClassFuture {
           withdrawal: tutordata['withdrawal'] ?? '',
           status: tutordata['status'] ?? '',
           extensionName: tutordata['extensionName'] ?? '',
-          dateSign: tutordata['dateSign']?.toDate() ?? '',
+          dateSign: (tutordata['dateSign'] as Timestamp).toDate(),
           firstName: tutordata['firstName'] ?? '',
           imageID: tutordata['imageID'] ?? '',
           language: (tutordata['language'] as List<dynamic>).cast<String>(),
@@ -339,7 +351,7 @@ class EnrolledClassFuture {
           age: tutordata['age'] ?? '',
           applicationID: tutordata['applicationID'] ?? '',
           birthCity: tutordata['birthCity'] ?? '',
-          birthdate: tutordata['birthdate'] ?? '',
+          birthdate: (tutordata['birthdate'] as Timestamp).toDate(),
           emailadd: tutordata['emailadd'] ?? '',
           city: tutordata['city'] ?? '',
           servicesprovided:
@@ -353,6 +365,9 @@ class EnrolledClassFuture {
               (tutordata['resumetype'] as List<dynamic>).cast<String>(),
           validIDstype:
               (tutordata['validIDstype'] as List<dynamic>).cast<String>(),
+          citizenship:
+              (tutordata['citizenship'] as List<dynamic>).cast<String>(),
+          gender: tutordata['gender'] ?? '',
         );
         tutorinfo.add(temptutorinfo);
       }
@@ -410,6 +425,9 @@ class EnrolledClassFuture {
           timeto: data['timeto'] ?? '',
           classstatus: data['classstatus'] ?? '',
           meetinglink: data['meetinglink'] ?? '',
+          rating: data['rating'] ?? '',
+          studentStatus: data['studentStatus'] ?? '',
+          tutorStatus: data['tutorStatus'] ?? '',
         );
         finalschedule.add(tempschedinfo);
       }

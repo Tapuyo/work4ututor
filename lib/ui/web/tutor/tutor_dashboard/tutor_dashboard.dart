@@ -1,4 +1,3 @@
-// ignore_for_file: avoid_print
 
 import 'dart:typed_data';
 
@@ -174,7 +173,6 @@ class _DashboardPageState extends State<DashboardPage> {
             context: context,
           ).getenrolled,
           catchError: (context, error) {
-            print('Error occurred: $error');
             return [];
           },
           initialData: const [],
@@ -185,7 +183,6 @@ class _DashboardPageState extends State<DashboardPage> {
             role: 'student',
           ).getenrolled,
           catchError: (context, error) {
-            print('Error occurred: $error');
             return [];
           },
           initialData: const [],

@@ -25,10 +25,12 @@ import '../../../components/nav_bar.dart';
 import '../../../data_class/studentinfoclass.dart';
 import '../../../services/getlanguages.dart';
 import '../../../services/getstudentinfo.dart';
+import '../../../services/send_email.dart';
 import '../../../shared_components/alphacode3.dart';
 import 'package:http/http.dart' as http;
 import 'dart:html' as html;
 
+import '../../../utils/themes.dart';
 import '../../auth/auth.dart';
 import '../login/login.dart';
 import '../terms/termpage.dart';
@@ -119,6 +121,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
   int subjectcount = 1;
   double subjecthieght = 250;
   double thieght = 45;
+  List<String> genders = ['Male', 'Female', 'Rather not say'];
 
   PhoneNumber phoneNumber = PhoneNumber(isoCode: 'PH');
   TextEditingController phoneNumberController = TextEditingController();
@@ -136,6 +139,12 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
   TextEditingController guardiansemail = TextEditingController();
 
   //new added
+  List<String> citizenship = [];
+
+  String currentLanguage = '';
+  String currentctzship = '';
+  ScrollController updatescrollController1 = ScrollController();
+  ScrollController updatescrollController2 = ScrollController();
 
   TextEditingController _selectedBirthCountryController =
       TextEditingController();
@@ -146,6 +155,8 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
   TextEditingController tCity1 = TextEditingController();
   bool showselectedTimeZoneSuggestions = false;
   TextEditingController _selectedTimeZone1 = TextEditingController();
+  TextEditingController _selectedGenderController = TextEditingController();
+  String selectedGender = "";
 
   void _selectDate(String infodata) async {
     final DateTime? picked = await showDatePicker(
@@ -405,43 +416,50 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                   Container(
                     padding: const EdgeInsets.fromLTRB(5, 0, 15, 5),
                     alignment: Alignment.centerLeft,
-                    width: 600,
+                    width: 680,
                     child: Row(
                       children: [
                         Stack(
                           alignment: Alignment.centerLeft,
                           children: <Widget>[
-                            Container(
-                              width: 350,
-                              height: 350,
-                              decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(20)),
-                                  color: Colors.grey.shade100,
-                                  border:
-                                      Border.all(color: Colors.grey, width: 1)),
-                              child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: FadeInImage(
-                                    fadeInDuration:
-                                        const Duration(milliseconds: 500),
-                                    placeholder: const AssetImage(
-                                        "assets/images/login.png"),
-                                    image: (selectedImage != null)
-                                        ? MemoryImage(selectedImage!)
-                                        : const AssetImage(
-                                                "assets/images/login.png")
-                                            as ImageProvider<
-                                                Object>, // Display image from profileurl
-                                    // imageErrorBuilder:
-                                    //     (context, error, stackTrace) {
-                                    //   return Image.asset(
-                                    //       "assets/images/login.png");
-                                    // },
-                                    fit: BoxFit.cover,
-                                    height: 70,
-                                    width: 70,
-                                  )),
+                            Card(
+                              margin: const EdgeInsets.all(5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              elevation: 5,
+                              child: SizedBox(
+                                width: 350,
+                                height: 350,
+                                // decoration: BoxDecoration(
+                                //     borderRadius: const BorderRadius.all(
+                                //         Radius.circular(20)),
+                                //     color: Colors.grey.shade100,
+                                //     border: Border.all(
+                                //         color: Colors.grey, width: .5)),
+                                child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: FadeInImage(
+                                      fadeInDuration:
+                                          const Duration(milliseconds: 500),
+                                      placeholder: const AssetImage(
+                                          "assets/images/login.png"),
+                                      image: (selectedImage != null)
+                                          ? MemoryImage(selectedImage!)
+                                          : const AssetImage(
+                                                  "assets/images/login.png")
+                                              as ImageProvider<
+                                                  Object>, // Display image from profileurl
+                                      // imageErrorBuilder:
+                                      //     (context, error, stackTrace) {
+                                      //   return Image.asset(
+                                      //       "assets/images/login.png");
+                                      // },
+                                      fit: BoxFit.cover,
+                                      height: 70,
+                                      width: 70,
+                                    )),
+                              ),
                             ),
                             Positioned(
                                 bottom: 12,
@@ -486,10 +504,13 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                       ],
                     ),
                   ),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   Container(
                     padding: const EdgeInsets.fromLTRB(5, 0, 15, 5),
                     alignment: Alignment.centerLeft,
-                    width: 600,
+                    width: 680,
                     child: Column(
                       children: <Widget>[
                         Row(
@@ -497,7 +518,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                             Text(
                               "Student Identification Number",
                               style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
+                                color: kColorLight,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
@@ -506,7 +527,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                             Text(
                               "(Auto Generated once Country is selected!)*",
                               style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
+                                color: Colors.redAccent,
                                 fontWeight: FontWeight.normal,
                                 fontSize: 15,
                                 fontStyle: FontStyle.italic,
@@ -536,7 +557,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                     studentIDNumber.toString(),
                                     style: const TextStyle(
                                         fontSize: 16,
-                                        color: Colors.black,
+                                        color: kColorGrey,
                                         fontWeight: FontWeight.bold),
                                   ),
                                 ],
@@ -545,14 +566,14 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                           ],
                         ),
                         const SizedBox(
-                          height: 10,
+                          height: 15,
                         ),
                         Row(
                           children: const [
                             Text(
                               "Student Information.",
                               style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
+                                color: kColorLight,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
@@ -561,7 +582,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                             Text(
                               "Required*",
                               style: TextStyle(
-                                color: Color.fromRGBO(0, 0, 0, 1),
+                                color: Colors.redAccent,
                                 fontWeight: FontWeight.normal,
                                 fontSize: 15,
                                 fontStyle: FontStyle.italic,
@@ -571,228 +592,54 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                           ],
                         ),
                         const SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              width: 190,
-                              height: 45,
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                              decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(5)),
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey.shade300, width: 1)),
-                              child: TextFormField(
-                                controller: firstname,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  fillColor: Colors.grey,
-                                  hintText: 'Firstname',
-                                  hintStyle: TextStyle(color: Colors.black),
-                                ),
-                                validator: (val) =>
-                                    val!.isEmpty ? 'Enter an firstname' : null,
-                                // onChanged: (val) {
-                                //   setState(() {
-                                //     firstname.text = val;
-                                //   });
-                                // },
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Container(
-                              width: 190,
-                              height: 45,
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                              decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(5)),
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey.shade300, width: 1)),
-                              child: TextFormField(
-                                controller: middlename,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  fillColor: Colors.grey,
-                                  hintText: 'Middlename',
-                                  hintStyle: TextStyle(color: Colors.black),
-                                ),
-                                validator: (val) =>
-                                    val!.isEmpty ? 'Enter an middlename' : null,
-                                // onChanged: (val) {
-                                //   setState(() {
-                                //     middlename.text = val;
-                                //   });
-                                // },
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Container(
-                              width: 190,
-                              height: 45,
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                              decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(5)),
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey.shade300, width: 1)),
-                              child: TextFormField(
-                                controller: lastname,
-                                decoration: const InputDecoration(
-                                  border: InputBorder.none,
-                                  fillColor: Colors.grey,
-                                  hintText: 'Lastname',
-                                  hintStyle: TextStyle(color: Colors.black),
-                                ),
-                                validator: (val) =>
-                                    val!.isEmpty ? 'Enter an lastname' : null,
-                                // onChanged: (val) {
-                                //   setState(() {
-                                //     lastname.text = val;
-                                //   });
-                                // },
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 14,
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              width: 400,
-                              height: 45,
-                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                              decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(5)),
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey.shade300, width: 1)),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    bdate.toString(),
-                                    style: const TextStyle(
-                                        fontSize: 16, color: Colors.black),
-                                  ),
-                                  const Spacer(),
-                                  IconButton(
-                                    tooltip: "Date of Birth",
-                                    hoverColor: Colors.transparent,
-                                    icon: const Icon(
-                                      EvaIcons.calendarOutline,
-                                      color: Colors.blue,
-                                      size: 25,
-                                    ),
-                                    onPressed: () {
-                                      _selectDate('student');
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Spacer(),
-                            Container(
-                              width: 150,
-                              height: 45,
-                              padding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                              decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(5)),
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey.shade300, width: 1)),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    myage.toString(),
-                                    style: const TextStyle(
-                                        fontSize: 16, color: Colors.black),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 10,
+                          height: 15,
                         ),
                         Row(
                           children: [
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  width: 300,
-                                  height: 45,
-                                  decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(5)),
-                                      color: Colors.white,
-                                      border: Border.all(
-                                          color: Colors.grey.shade300,
-                                          width: 1)),
-                                  child: TypeAheadFormField<String>(
-                                    textFieldConfiguration:
-                                        TextFieldConfiguration(
-                                      controller:
-                                          _selectedBirthCountryController,
+                                const Text(
+                                  "First Name",
+                                  style: TextStyle(
+                                      color: kColorLight,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Card(
+                                  margin: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 5,
+                                  child: Container(
+                                    width: 190,
+                                    height: 45,
+                                    padding:
+                                        const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                    // decoration: BoxDecoration(
+                                    //     borderRadius: const BorderRadius.all(
+                                    //         Radius.circular(5)),
+                                    //     color: Colors.white,
+                                    //     border: Border.all(
+                                    //         color: Colors.grey.shade300, width: 1)),
+                                    child: TextFormField(
+                                      controller: firstname,
                                       decoration: const InputDecoration(
-                                        contentPadding: EdgeInsets.all(10),
-                                        hintText: 'Select a Country',
-                                        hintStyle:
-                                            TextStyle(color: Colors.black),
                                         border: InputBorder.none,
-                                        suffixIcon: Icon(Icons.arrow_drop_down),
+                                        fillColor: Colors.grey,
+                                        hintText: 'Firstname',
+                                        hintStyle: TextStyle(color: kColorGrey),
                                       ),
+                                      validator: (val) => val!.isEmpty
+                                          ? 'Enter an firstname'
+                                          : null,
+                                      // onChanged: (val) {
+                                      //   setState(() {
+                                      //     firstname.text = val;
+                                      //   });
+                                      // },
                                     ),
-                                    suggestionsCallback: (String pattern) {
-                                      return countryNames.where((country) =>
-                                          country
-                                              .toLowerCase()
-                                              .contains(pattern.toLowerCase()));
-                                    },
-                                    itemBuilder: (context, String suggestion) {
-                                      return ListTile(
-                                        title: Text(suggestion),
-                                      );
-                                    },
-                                    onSuggestionSelected: (String suggestion) {
-                                      final alpha3Code =
-                                          getAlpha3Code(suggestion);
-                                      Random random = Random();
-
-                                      DateTime datenow = DateTime.now();
-                                      String currenttime =
-                                          DateFormat('HHmmss').format(datenow);
-                                      String randomNumber =
-                                          random.nextInt(1000000).toString() +
-                                              currenttime.toString();
-                                      String currentyear =
-                                          DateFormat('yyyyMMdd')
-                                              .format(datenow);
-                                      //todo please replace the random number with legnth of students enrolled
-                                      setState(() {
-                                        studentIDNumber =
-                                            'STU$alpha3Code$currentyear$currenttime';
-                                        selectedbirthCountry = suggestion;
-                                        _selectedBirthCountryController.text =
-                                            suggestion;
-                                      });
-                                    },
                                   ),
-                                  // country.name
                                 ),
                               ],
                             ),
@@ -800,32 +647,94 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  width: 266,
-                                  height: 45,
-                                  padding:
-                                      const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                  decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(5)),
-                                      color: Colors.white,
-                                      border: Border.all(
-                                          color: Colors.grey.shade300,
-                                          width: 1)),
-                                  child: TextFormField(
-                                    controller: birthtCity,
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                      fillColor: Colors.grey,
-                                      hintText: 'City',
-                                      hintStyle: TextStyle(
-                                          color: Colors.black, fontSize: 15),
+                                const Text(
+                                  "Middlename",
+                                  style: TextStyle(
+                                      color: kColorLight,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Card(
+                                  margin: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 5,
+                                  child: Container(
+                                    width: 190,
+                                    height: 45,
+                                    padding:
+                                        const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                    // decoration: BoxDecoration(
+                                    //     borderRadius: const BorderRadius.all(
+                                    //         Radius.circular(5)),
+                                    //     color: Colors.white,
+                                    //     border: Border.all(
+                                    //         color: Colors.grey.shade300, width: 1)),
+                                    child: TextFormField(
+                                      controller: middlename,
+                                      decoration: const InputDecoration(
+                                        border: InputBorder.none,
+                                        fillColor: Colors.grey,
+                                        hintText: 'Middlename',
+                                        hintStyle: TextStyle(color: kColorGrey),
+                                      ),
+                                      validator: (val) => val!.isEmpty
+                                          ? 'Enter an middlename'
+                                          : null,
+                                      // onChanged: (val) {
+                                      //   setState(() {
+                                      //     middlename.text = val;
+                                      //   });
+                                      // },
                                     ),
-                                    validator: (val) =>
-                                        val!.isEmpty ? 'Enter your City' : null,
-                                    // onChanged: (val) {
-                                    //   tCity = val;
-                                    // },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Spacer(),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Lastname",
+                                  style: TextStyle(
+                                      color: kColorLight,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Card(
+                                  margin: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 5,
+                                  child: Container(
+                                    width: 190,
+                                    height: 45,
+                                    padding:
+                                        const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                    // decoration: BoxDecoration(
+                                    //     borderRadius: const BorderRadius.all(
+                                    //         Radius.circular(5)),
+                                    //     color: Colors.white,
+                                    //     border: Border.all(
+                                    //         color: Colors.grey.shade300, width: 1)),
+                                    child: TextFormField(
+                                      controller: lastname,
+                                      decoration: const InputDecoration(
+                                        border: InputBorder.none,
+                                        fillColor: Colors.grey,
+                                        hintText: 'Lastname',
+                                        hintStyle: TextStyle(color: kColorGrey),
+                                      ),
+                                      validator: (val) => val!.isEmpty
+                                          ? 'Enter an lastname'
+                                          : null,
+                                      // onChanged: (val) {
+                                      //   setState(() {
+                                      //     lastname.text = val;
+                                      //   });
+                                      // },
+                                    ),
                                   ),
                                 ),
                               ],
@@ -833,71 +742,690 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                           ],
                         ),
                         const SizedBox(
-                          height: 10,
+                          height: 15,
+                        ),
+                        Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Date of Birth",
+                                  style: TextStyle(
+                                      color: kColorLight,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Card(
+                                  margin: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 5,
+                                  child: Container(
+                                    width: 400,
+                                    height: 45,
+                                    padding:
+                                        const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                    // decoration: BoxDecoration(
+                                    //     borderRadius: const BorderRadius.all(
+                                    //         Radius.circular(5)),
+                                    //     color: Colors.white,
+                                    //     border: Border.all(
+                                    //         color: Colors.grey.shade300, width: 1)),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          bdate.toString(),
+                                          style: const TextStyle(
+                                              fontSize: 16, color: kColorGrey),
+                                        ),
+                                        const Spacer(),
+                                        IconButton(
+                                          tooltip: "Date of Birth",
+                                          hoverColor: Colors.transparent,
+                                          icon: const Icon(
+                                            EvaIcons.calendarOutline,
+                                            color: Colors.blue,
+                                            size: 25,
+                                          ),
+                                          onPressed: () {
+                                            _selectDate('student');
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Spacer(),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Age",
+                                  style: TextStyle(
+                                      color: kColorLight,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Card(
+                                  margin: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 5,
+                                  child: Container(
+                                    width: 150,
+                                    height: 45,
+                                    padding:
+                                        const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                    // decoration: BoxDecoration(
+                                    //     borderRadius: const BorderRadius.all(
+                                    //         Radius.circular(5)),
+                                    //     color: Colors.white,
+                                    //     border: Border.all(
+                                    //         color: Colors.grey.shade300, width: 1)),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          myage.toString(),
+                                          style: const TextStyle(
+                                              fontSize: 16, color: kColorGrey),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Gender",
+                                  style: TextStyle(
+                                      color: kColorLight,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Card(
+                                  margin: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 5,
+                                  child: SizedBox(
+                                    width: 300,
+                                    height: 45,
+
+                                    child: TypeAheadFormField<String>(
+                                      textFieldConfiguration:
+                                          TextFieldConfiguration(
+                                        controller: _selectedGenderController,
+                                        decoration: InputDecoration(
+                                          hintText: 'Select a Gender',
+                                          hintStyle: const TextStyle(
+                                              color: Colors.grey),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                                10.0), // Rounded border
+                                            borderSide: BorderSide
+                                                .none, // No outline border
+                                          ),
+                                          suffixIcon:
+                                              const Icon(Icons.arrow_drop_down),
+                                        ),
+                                      ),
+                                      suggestionsCallback: (String pattern) {
+                                        return genders.where((country) =>
+                                            country.toLowerCase().contains(
+                                                pattern.toLowerCase()));
+                                      },
+                                      itemBuilder:
+                                          (context, String suggestion) {
+                                        return ListTile(
+                                          title: Text(
+                                            suggestion,
+                                            style: const TextStyle(
+                                                color: kColorGrey),
+                                          ),
+                                        );
+                                      },
+                                      onSuggestionSelected:
+                                          (String suggestion) {
+                                        setState(() {
+                                          selectedGender = suggestion;
+                                          _selectedGenderController.text =
+                                              suggestion;
+                                        });
+                                      },
+                                    ),
+                                    // country.name
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Country of Residence",
+                                  style: TextStyle(
+                                      color: kColorLight,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Card(
+                                  margin: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 5,
+                                  child: SizedBox(
+                                    width: 300,
+                                    height: 45,
+                                    // decoration: BoxDecoration(
+                                    //     borderRadius: const BorderRadius.all(
+                                    //         Radius.circular(5)),
+                                    //     color: Colors.white,
+                                    //     border: Border.all(
+                                    //         color: Colors.grey.shade300,
+                                    //         width: 1)),
+                                    child: TypeAheadFormField<String>(
+                                      textFieldConfiguration:
+                                          TextFieldConfiguration(
+                                        controller:
+                                            _selectedBirthCountryController,
+                                        decoration: const InputDecoration(
+                                          contentPadding: EdgeInsets.all(10),
+                                          hintText: 'Select a Country',
+                                          hintStyle:
+                                              TextStyle(color: kColorGrey),
+                                          border: InputBorder.none,
+                                          suffixIcon:
+                                              Icon(Icons.arrow_drop_down),
+                                        ),
+                                      ),
+                                      suggestionsCallback: (String pattern) {
+                                        return countryNames.where((country) =>
+                                            country.toLowerCase().contains(
+                                                pattern.toLowerCase()));
+                                      },
+                                      itemBuilder:
+                                          (context, String suggestion) {
+                                        return ListTile(
+                                          title: Text(suggestion),
+                                        );
+                                      },
+                                      onSuggestionSelected:
+                                          (String suggestion) {
+                                        final alpha3Code =
+                                            getAlpha3Code(suggestion);
+                                        Random random = Random();
+
+                                        DateTime datenow = DateTime.now();
+                                        String currenttime =
+                                            DateFormat('HHmmss')
+                                                .format(datenow);
+                                        String randomNumber =
+                                            random.nextInt(1000000).toString() +
+                                                currenttime.toString();
+                                        String currentyear =
+                                            DateFormat('yyyyMMdd')
+                                                .format(datenow);
+                                        //todo please replace the random number with legnth of students enrolled
+                                        setState(() {
+                                          studentIDNumber =
+                                              'STU$alpha3Code$currentyear$currenttime';
+                                          selectedbirthCountry = suggestion;
+                                          _selectedBirthCountryController.text =
+                                              suggestion;
+                                        });
+                                      },
+                                    ),
+                                    // country.name
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const Spacer(),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "City of Residence",
+                                  style: TextStyle(
+                                      color: kColorLight,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Card(
+                                  margin: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 5,
+                                  child: Container(
+                                    width: 266,
+                                    height: 45,
+                                    padding:
+                                        const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                    // decoration: BoxDecoration(
+                                    //     borderRadius: const BorderRadius.all(
+                                    //         Radius.circular(5)),
+                                    //     color: Colors.white,
+                                    //     border: Border.all(
+                                    //         color: Colors.grey.shade300,
+                                    //         width: 1)),
+                                    child: TextFormField(
+                                      controller: birthtCity,
+                                      decoration: const InputDecoration(
+                                        border: InputBorder.none,
+                                        fillColor: Colors.grey,
+                                        hintText: 'City',
+                                        hintStyle: TextStyle(
+                                            color: kColorGrey, fontSize: 15),
+                                      ),
+                                      validator: (val) => val!.isEmpty
+                                          ? 'Enter your City'
+                                          : null,
+                                      // onChanged: (val) {
+                                      //   tCity = val;
+                                      // },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Row(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: const [
+                                    Text(
+                                      "Citizenship",
+                                      style: TextStyle(
+                                          color: kColorLight,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    Text(
+                                      "(You can select more than one language.)",
+                                      style: TextStyle(
+                                          color: Colors.redAccent,
+                                          fontWeight: FontWeight.w100,
+                                          fontSize: 12,
+                                          fontStyle: FontStyle.italic),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ],
+                                ),
+                                Card(
+                                  margin: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 5,
+                                  child: SizedBox(
+                                    width: 300,
+                                    height: 45,
+
+                                    child: TypeAheadFormField<String>(
+                                      textFieldConfiguration:
+                                          TextFieldConfiguration(
+                                        // controller:
+                                        //     _selectedBirthCountryController,
+                                        decoration: InputDecoration(
+                                          hintText: 'Select a Citizenship',
+                                          hintStyle: const TextStyle(
+                                              color: Colors.grey),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                                10.0), // Rounded border
+                                            borderSide: BorderSide
+                                                .none, // No outline border
+                                          ),
+                                          suffixIcon:
+                                              const Icon(Icons.arrow_drop_down),
+                                        ),
+                                      ),
+                                      suggestionsCallback: (String pattern) {
+                                        return countryNames.where((country) =>
+                                            country.toLowerCase().contains(
+                                                pattern.toLowerCase()));
+                                      },
+                                      itemBuilder:
+                                          (context, String suggestion) {
+                                        return ListTile(
+                                          title: Text(suggestion),
+                                        );
+                                      },
+                                      onSuggestionSelected:
+                                          (String suggestion) {
+                                        if (citizenship.contains(suggestion)) {
+                                          null;
+                                        } else {
+                                          setState(() {
+                                            citizenship.add(suggestion
+                                                .toString()); // Add the LanguageData object to tlanguages
+                                          });
+                                        }
+                                      },
+                                    ),
+                                    // country.name
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Visibility(
+                          visible: citizenship.isNotEmpty ? true : false,
+                          child: const SizedBox(
+                            height: 10,
+                          ),
+                        ),
+                        Visibility(
+                          visible: citizenship.isNotEmpty ? true : false,
+                          child: Container(
+                            width: 680,
+                            height: 45,
+                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                            // decoration: BoxDecoration(
+                            //     borderRadius: const BorderRadius.all(
+                            //         Radius.circular(5)),
+                            //     color: Colors.white,
+                            //     border: Border.all(
+                            //         color: Colors.grey.shade300, width: 1)),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 600,
+                                  child: Row(
+                                    children: [
+                                      IconButton(
+                                        iconSize: 12,
+                                        padding: EdgeInsets.zero,
+                                        splashRadius: 1,
+                                        icon: const Icon(
+                                          Icons
+                                              .arrow_back_ios, // Left arrow icon
+                                          color: kColorPrimary,
+                                        ),
+                                        onPressed: () {
+                                          // Scroll to the left
+                                          updatescrollController2.animateTo(
+                                            updatescrollController2.offset -
+                                                100.0, // Adjust the value as needed
+                                            duration: const Duration(
+                                                milliseconds:
+                                                    500), // Adjust the duration as needed
+                                            curve: Curves.ease,
+                                          );
+                                        },
+                                      ),
+                                      Expanded(
+                                        child: ListView.builder(
+                                            shrinkWrap: true,
+                                            scrollDirection: Axis.horizontal,
+                                            controller: updatescrollController1,
+                                            itemCount: citizenship.length,
+                                            itemBuilder: (context, index) {
+                                              String language =
+                                                  citizenship[index];
+                                              Color color = vibrantColors[index %
+                                                  vibrantColors
+                                                      .length]; // Cycle through colors
+
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10.0, right: 10),
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      if (citizenship[index] ==
+                                                          currentctzship) {
+                                                        currentctzship = '';
+                                                      } else {
+                                                        currentctzship =
+                                                            citizenship[index];
+                                                      }
+                                                    });
+                                                  },
+                                                  child: Card(
+                                                    margin: EdgeInsets.zero,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15),
+                                                    ),
+                                                    elevation: 5,
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          10, 0, 10, 0),
+                                                      decoration: citizenship[
+                                                                  index] ==
+                                                              currentctzship
+                                                          ? const BoxDecoration(
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                    color: Colors
+                                                                        .black12,
+                                                                    offset:
+                                                                        Offset(
+                                                                            0,
+                                                                            4),
+                                                                    blurRadius:
+                                                                        5.0)
+                                                              ],
+                                                              gradient:
+                                                                  LinearGradient(
+                                                                begin: Alignment
+                                                                    .centerLeft,
+                                                                end: Alignment
+                                                                    .centerRight,
+                                                                stops: [
+                                                                  0.0,
+                                                                  1.0
+                                                                ],
+                                                                colors:
+                                                                    buttonFocuscolors,
+                                                              ),
+                                                              borderRadius: BorderRadius
+                                                                  .all(Radius
+                                                                      .circular(
+                                                                          15)),
+                                                            )
+                                                          : const BoxDecoration(
+                                                              boxShadow: [
+                                                                  BoxShadow(
+                                                                      color: Colors
+                                                                          .black12,
+                                                                      offset:
+                                                                          Offset(
+                                                                              0,
+                                                                              4),
+                                                                      blurRadius:
+                                                                          5.0)
+                                                                ],
+                                                              borderRadius: BorderRadius
+                                                                  .all(Radius
+                                                                      .circular(
+                                                                          15)),
+                                                              color:
+                                                                  Colors.white),
+                                                      child: Center(
+                                                        child: Text(
+                                                          language,
+                                                          style: TextStyle(
+                                                              color: citizenship[
+                                                                          index] ==
+                                                                      currentctzship
+                                                                  ? Colors.white
+                                                                  : kColorGrey),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                      ),
+                                      IconButton(
+                                        iconSize: 12,
+                                        padding: EdgeInsets.zero,
+                                        splashRadius: 1,
+                                        icon: const Icon(
+                                          Icons
+                                              .arrow_forward_ios, // Right arrow icon
+                                          color: kColorPrimary,
+                                        ),
+                                        onPressed: () {
+                                          // Scroll to the right
+                                          updatescrollController2.animateTo(
+                                            updatescrollController2.offset +
+                                                100.0, // Adjust the value as needed
+                                            duration: const Duration(
+                                                milliseconds:
+                                                    500), // Adjust the duration as needed
+                                            curve: Curves.ease,
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Spacer(),
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  visualDensity: const VisualDensity(
+                                      horizontal: -4, vertical: -4),
+                                  icon:
+                                      const Icon(Icons.delete_outline_outlined),
+                                  color: Colors.red,
+                                  iconSize: 18,
+                                  onPressed: () {
+                                    setState(() {
+                                      citizenship.removeWhere(
+                                          (item) => item == currentctzship);
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 15,
                         ),
                         Row(children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                width: 300,
-                                height: 45,
-                                decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(5)),
-                                    color: Colors.white,
-                                    border: Border.all(
-                                        color: Colors.grey.shade300, width: 1)),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    if (_selectedTimeZonefocusNode.hasFocus) {
-                                      _selectedTimeZonefocusNode.unfocus();
-                                      setState(() {
-                                        showselectedTimeZoneSuggestions = false;
-                                      });
-                                    }
-                                  },
-                                  child: TypeAheadFormField<String>(
-                                    textFieldConfiguration:
-                                        TextFieldConfiguration(
-                                      controller: _selectedTimeZone1,
-                                      focusNode: _selectedTimeZonefocusNode,
-                                      onTap: () {
+                              const Text(
+                                "Timezone",
+                                style: TextStyle(
+                                    color: kColorLight,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              Card(
+                                margin: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                elevation: 5,
+                                child: SizedBox(
+                                  width: 300,
+                                  height: 45,
+                                  // decoration: BoxDecoration(
+                                  //     borderRadius: const BorderRadius.all(
+                                  //         Radius.circular(5)),
+                                  //     color: Colors.white,
+                                  //     border: Border.all(
+                                  //         color: Colors.grey.shade300, width: 1)),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      if (_selectedTimeZonefocusNode.hasFocus) {
+                                        _selectedTimeZonefocusNode.unfocus();
                                         setState(() {
                                           showselectedTimeZoneSuggestions =
                                               false;
                                         });
-                                      },
-                                      decoration: const InputDecoration(
-                                        contentPadding: EdgeInsets.all(10),
-                                        hintText: 'Select your Timezone',
-                                        hintStyle:
-                                            TextStyle(color: Colors.black),
-                                        border: InputBorder.none,
-                                        suffixIcon: Icon(Icons.arrow_drop_down),
+                                      }
+                                    },
+                                    child: TypeAheadFormField<String>(
+                                      textFieldConfiguration:
+                                          TextFieldConfiguration(
+                                        controller: _selectedTimeZone1,
+                                        focusNode: _selectedTimeZonefocusNode,
+                                        onTap: () {
+                                          setState(() {
+                                            showselectedTimeZoneSuggestions =
+                                                false;
+                                          });
+                                        },
+                                        decoration: const InputDecoration(
+                                          contentPadding: EdgeInsets.all(10),
+                                          hintText: 'Select your Timezone',
+                                          hintStyle:
+                                              TextStyle(color: kColorGrey),
+                                          border: InputBorder.none,
+                                          suffixIcon:
+                                              Icon(Icons.arrow_drop_down),
+                                        ),
                                       ),
+                                      suggestionsCallback: (String pattern) {
+                                        return timezonesList.where((timezone) =>
+                                            timezone.toLowerCase().contains(
+                                                pattern.toLowerCase()));
+                                      },
+                                      itemBuilder:
+                                          (context, String suggestion) {
+                                        return ListTile(
+                                          title: Text(suggestion),
+                                        );
+                                      },
+                                      onSuggestionSelected:
+                                          (String suggestion) {
+                                        setState(() {
+                                          _selectedTimeZone1.text = suggestion;
+                                          _selectedTimeZone = suggestion;
+                                        });
+                                      },
+                                      hideOnEmpty:
+                                          true, // Hide suggestions when the input is empty.
+                                      hideOnLoading:
+                                          true, // Hide suggestions during loading.
                                     ),
-                                    suggestionsCallback: (String pattern) {
-                                      return timezonesList.where((timezone) =>
-                                          timezone
-                                              .toLowerCase()
-                                              .contains(pattern.toLowerCase()));
-                                    },
-                                    itemBuilder: (context, String suggestion) {
-                                      return ListTile(
-                                        title: Text(suggestion),
-                                      );
-                                    },
-                                    onSuggestionSelected: (String suggestion) {
-                                      setState(() {
-                                        _selectedTimeZone1.text = suggestion;
-                                        _selectedTimeZone = suggestion;
-                                      });
-                                    },
-                                    hideOnEmpty:
-                                        true, // Hide suggestions when the input is empty.
-                                    hideOnLoading:
-                                        true, // Hide suggestions during loading.
                                   ),
                                 ),
                               ),
@@ -907,52 +1435,66 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                width: 266,
-                                height: 45,
-                                padding:
-                                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(5)),
-                                    color: Colors.white,
-                                    border: Border.all(
-                                        color: Colors.grey.shade300, width: 1)),
-                                child: InternationalPhoneNumberInput(
-                                  maxLength: 20,
-                                  onInputChanged: (PhoneNumber number) {
-                                    phoneNumber = number;
-                                  },
-                                  selectorConfig: const SelectorConfig(
-                                    selectorType: PhoneInputSelectorType.DIALOG,
-                                    trailingSpace: false,
-                                    leadingPadding: 0,
-                                    setSelectorButtonAsPrefixIcon: true,
+                              const Text(
+                                "Contact Number",
+                                style: TextStyle(
+                                    color: kColorLight,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              Card(
+                                margin: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                elevation: 5,
+                                child: Container(
+                                  width: 266,
+                                  height: 45,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                  // decoration: BoxDecoration(
+                                  //     borderRadius: const BorderRadius.all(
+                                  //         Radius.circular(5)),
+                                  //     color: Colors.white,
+                                  //     border: Border.all(
+                                  //         color: Colors.grey.shade300, width: 1)),
+                                  child: InternationalPhoneNumberInput(
+                                    maxLength: 20,
+                                    onInputChanged: (PhoneNumber number) {
+                                      phoneNumber = number;
+                                    },
+                                    selectorConfig: const SelectorConfig(
+                                      selectorType:
+                                          PhoneInputSelectorType.DIALOG,
+                                      trailingSpace: false,
+                                      leadingPadding: 0,
+                                      setSelectorButtonAsPrefixIcon: true,
+                                    ),
+                                    ignoreBlank: false,
+                                    autoValidateMode: AutovalidateMode.disabled,
+                                    selectorTextStyle: const TextStyle(
+                                        color: Colors.black, fontSize: 15),
+                                    formatInput: true,
+                                    inputDecoration: const InputDecoration(
+                                        filled: false,
+                                        isCollapsed: false,
+                                        isDense: false,
+                                        border: InputBorder.none,
+                                        contentPadding:
+                                            EdgeInsets.only(bottom: 9)),
+                                    // keyboardType:
+                                    //     const TextInputType.numberWithOptions(
+                                    //         signed: true, decimal: true),
+                                    initialValue: phoneNumber,
+                                    textFieldController: phoneNumberController,
                                   ),
-                                  ignoreBlank: false,
-                                  autoValidateMode: AutovalidateMode.disabled,
-                                  selectorTextStyle: const TextStyle(
-                                      color: Colors.black, fontSize: 15),
-                                  formatInput: true,
-                                  inputDecoration: const InputDecoration(
-                                      filled: false,
-                                      isCollapsed: false,
-                                      isDense: false,
-                                      border: InputBorder.none,
-                                      contentPadding:
-                                          EdgeInsets.only(bottom: 9)),
-                                  // keyboardType:
-                                  //     const TextInputType.numberWithOptions(
-                                  //         signed: true, decimal: true),
-                                  initialValue: phoneNumber,
-                                  textFieldController: phoneNumberController,
                                 ),
                               ),
                             ],
                           ),
                         ]),
                         const SizedBox(
-                          height: 10,
+                          height: 15,
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -961,7 +1503,13 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: const [
                                 Text(
-                                  "(You can select more than one language.)",
+                                  "Language",
+                                  style: TextStyle(
+                                      color: kColorLight,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Text(
+                                  " (You can select more than one language.)",
                                   style: TextStyle(
                                       color: Colors.redAccent,
                                       fontWeight: FontWeight.w100,
@@ -971,56 +1519,64 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                 ),
                               ],
                             ),
-                            Container(
-                              width: 600,
-                              height: 45,
-                              decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(5)),
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey.shade300, width: 1)),
-                              child: TypeAheadFormField<LanguageData>(
-                                // Specify LanguageData as the generic type
-                                textFieldConfiguration:
-                                    const TextFieldConfiguration(
-                                  // controller: _selectedLanguageController,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.all(10),
-                                    hintText: 'Choose your language',
-                                    hintStyle: TextStyle(color: Colors.black),
-                                    border: InputBorder.none,
-                                    suffixIcon: Icon(Icons.arrow_drop_down),
+                            Card(
+                              margin: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              elevation: 5,
+                              child: SizedBox(
+                                width: 680,
+                                height: 45,
+                                child: TypeAheadFormField<LanguageData>(
+                                  // Specify LanguageData as the generic type
+                                  textFieldConfiguration:
+                                      TextFieldConfiguration(
+                                    // controller: _selectedLanguageController,
+                                    decoration: InputDecoration(
+                                      hintText: 'Choose your language',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            10.0), // Rounded border
+                                        borderSide: BorderSide
+                                            .none, // No outline border
+                                      ),
+                                      suffixIcon:
+                                          const Icon(Icons.arrow_drop_down),
+                                    ),
                                   ),
+                                  suggestionsCallback: (pattern) async {
+                                    // Assuming names is a List<LanguageData>
+                                    final suggestions = names
+                                        .where((language) => language
+                                            .languageNamesStream
+                                            .toLowerCase()
+                                            .contains(pattern.toLowerCase()))
+                                        .toList(); // Return a list of LanguageData objects
+                                    return suggestions;
+                                  },
+                                  itemBuilder: (context, suggestions) {
+                                    return ListTile(
+                                      title: Text(
+                                        suggestions.languageNamesStream,
+                                        style:
+                                            const TextStyle(color: kColorGrey),
+                                      ), // Access the language name
+                                    );
+                                  },
+                                  onSuggestionSelected: (suggestion) {
+                                    if (tlanguages.contains(
+                                        suggestion.languageNamesStream)) {
+                                      null;
+                                    } else {
+                                      setState(() {
+                                        tlanguages.add(suggestion
+                                            .languageNamesStream
+                                            .toString()); // Add the LanguageData object to tlanguages
+                                      });
+                                    }
+                                  },
                                 ),
-                                suggestionsCallback: (pattern) async {
-                                  // Assuming names is a List<LanguageData>
-                                  final suggestions = names
-                                      .where((language) => language
-                                          .languageNamesStream
-                                          .toLowerCase()
-                                          .contains(pattern.toLowerCase()))
-                                      .toList(); // Return a list of LanguageData objects
-                                  return suggestions;
-                                },
-                                itemBuilder: (context, suggestions) {
-                                  return ListTile(
-                                    title: Text(suggestions
-                                        .languageNamesStream), // Access the language name
-                                  );
-                                },
-                                onSuggestionSelected: (suggestion) {
-                                  if (tlanguages.contains(
-                                      suggestion.languageNamesStream)) {
-                                    null;
-                                  } else {
-                                    setState(() {
-                                      tlanguages.add(suggestion
-                                          .languageNamesStream
-                                          .toString()); // Add the LanguageData object to tlanguages
-                                    });
-                                  }
-                                },
                               ),
                             )
                           ],
@@ -1028,65 +1584,205 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                         Visibility(
                           visible: tlanguages.isNotEmpty ? true : false,
                           child: const SizedBox(
-                            height: 5,
+                            height: 10,
                           ),
                         ),
                         Visibility(
                           visible: tlanguages.isNotEmpty ? true : false,
                           child: Container(
-                            width: 600,
+                            width: 680,
                             height: 45,
                             padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                            child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: tlanguages.length,
-                                itemBuilder: (context, index) {
-                                  String language = tlanguages[index];
-                                  Color color = vibrantColors[index %
-                                      vibrantColors
-                                          .length]; // Cycle through colors
-
-                                  return Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 10.0, right: 10),
-                                    child: Container(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                                      decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(15)),
-                                        color: color,
+                            // decoration: BoxDecoration(
+                            //     borderRadius: const BorderRadius.all(
+                            //         Radius.circular(5)),
+                            //     color: Colors.white,
+                            //     border: Border.all(
+                            //         color: Colors.grey.shade300, width: 1)),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 600,
+                                  child: Row(
+                                    children: [
+                                      IconButton(
+                                        iconSize: 12,
+                                        padding: EdgeInsets.zero,
+                                        splashRadius: 1,
+                                        icon: const Icon(
+                                          Icons
+                                              .arrow_back_ios, // Left arrow icon
+                                          color: kColorPrimary,
+                                        ),
+                                        onPressed: () {
+                                          // Scroll to the left
+                                          updatescrollController1.animateTo(
+                                            updatescrollController1.offset -
+                                                100.0, // Adjust the value as needed
+                                            duration: const Duration(
+                                                milliseconds:
+                                                    500), // Adjust the duration as needed
+                                            curve: Curves.ease,
+                                          );
+                                        },
                                       ),
-                                      child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(language),
-                                            IconButton(
-                                              padding: EdgeInsets.zero,
-                                              visualDensity:
-                                                  const VisualDensity(
-                                                      horizontal: -4,
-                                                      vertical: -4),
-                                              icon: const Icon(Icons
-                                                  .delete_outline_outlined),
-                                              color: Colors.red,
-                                              iconSize: 15,
-                                              onPressed: () {
-                                                setState(() {
-                                                  tlanguages.removeAt(index);
-                                                });
-                                              },
-                                            ),
-                                          ]),
-                                    ),
-                                  );
-                                }),
+                                      Expanded(
+                                        child: ListView.builder(
+                                            shrinkWrap: true,
+                                            scrollDirection: Axis.horizontal,
+                                            controller: updatescrollController1,
+                                            itemCount: tlanguages.length,
+                                            itemBuilder: (context, index) {
+                                              String language =
+                                                  tlanguages[index];
+                                              Color color = vibrantColors[index %
+                                                  vibrantColors
+                                                      .length]; // Cycle through colors
+
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10.0, right: 10),
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      if (tlanguages[index] ==
+                                                          currentLanguage) {
+                                                        currentLanguage = '';
+                                                      } else {
+                                                        currentLanguage =
+                                                            tlanguages[index];
+                                                      }
+                                                    });
+                                                  },
+                                                  child: Card(
+                                                    margin: EdgeInsets.zero,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15),
+                                                    ),
+                                                    elevation: 5,
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                              .fromLTRB(
+                                                          10, 0, 10, 0),
+                                                      decoration: tlanguages[
+                                                                  index] ==
+                                                              currentLanguage
+                                                          ? const BoxDecoration(
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                    color: Colors
+                                                                        .black12,
+                                                                    offset:
+                                                                        Offset(
+                                                                            0,
+                                                                            4),
+                                                                    blurRadius:
+                                                                        5.0)
+                                                              ],
+                                                              gradient:
+                                                                  LinearGradient(
+                                                                begin: Alignment
+                                                                    .centerLeft,
+                                                                end: Alignment
+                                                                    .centerRight,
+                                                                stops: [
+                                                                  0.0,
+                                                                  1.0
+                                                                ],
+                                                                colors:
+                                                                    buttonFocuscolors,
+                                                              ),
+                                                              borderRadius: BorderRadius
+                                                                  .all(Radius
+                                                                      .circular(
+                                                                          15)),
+                                                            )
+                                                          : const BoxDecoration(
+                                                              boxShadow: [
+                                                                  BoxShadow(
+                                                                      color: Colors
+                                                                          .black12,
+                                                                      offset:
+                                                                          Offset(
+                                                                              0,
+                                                                              4),
+                                                                      blurRadius:
+                                                                          5.0)
+                                                                ],
+                                                              borderRadius: BorderRadius
+                                                                  .all(Radius
+                                                                      .circular(
+                                                                          15)),
+                                                              color:
+                                                                  Colors.white),
+                                                      child: Center(
+                                                        child: Text(
+                                                          language,
+                                                          style: TextStyle(
+                                                              color: tlanguages[
+                                                                          index] ==
+                                                                      currentLanguage
+                                                                  ? Colors.white
+                                                                  : kColorGrey),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                      ),
+                                      IconButton(
+                                        iconSize: 12,
+                                        padding: EdgeInsets.zero,
+                                        splashRadius: 1,
+                                        icon: const Icon(
+                                          Icons
+                                              .arrow_forward_ios, // Right arrow icon
+                                          color: kColorPrimary,
+                                        ),
+                                        onPressed: () {
+                                          // Scroll to the right
+                                          updatescrollController1.animateTo(
+                                            updatescrollController1.offset +
+                                                100.0, // Adjust the value as needed
+                                            duration: const Duration(
+                                                milliseconds:
+                                                    500), // Adjust the duration as needed
+                                            curve: Curves.ease,
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Spacer(),
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  visualDensity: const VisualDensity(
+                                      horizontal: -4, vertical: -4),
+                                  icon:
+                                      const Icon(Icons.delete_outline_outlined),
+                                  color: Colors.red,
+                                  iconSize: 18,
+                                  onPressed: () {
+                                    setState(() {
+                                      tlanguages.removeWhere(
+                                          (item) => item == currentLanguage);
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                         Visibility(
                           visible: age < 18 && age > 0 ? true : false,
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const SizedBox(
                                 height: 50,
@@ -1096,7 +1792,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                   Text(
                                     "Guardians Information.",
                                     style: TextStyle(
-                                      color: Color.fromRGBO(0, 0, 0, 1),
+                                      color: kColorLight,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
                                     ),
@@ -1117,31 +1813,38 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                               const SizedBox(
                                 height: 10,
                               ),
-                              Container(
-                                width: 600,
-                                height: 45,
-                                padding:
-                                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(5)),
-                                    color: Colors.white,
-                                    border: Border.all(
-                                        color: Colors.grey.shade300, width: 1)),
-                                child: TextFormField(
-                                  controller: guardianfullname,
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    fillColor: Colors.grey,
-                                    hintText: 'Full Name',
-                                    hintStyle: TextStyle(color: Colors.black),
+                              Card(
+                                margin: EdgeInsets.zero,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                elevation: 5,
+                                child: Container(
+                                  width: 680,
+                                  height: 45,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                  // decoration: BoxDecoration(
+                                  //     borderRadius: const BorderRadius.all(
+                                  //         Radius.circular(5)),
+                                  //     color: Colors.white,
+                                  //     border: Border.all(
+                                  //         color: Colors.grey.shade300, width: 1)),
+                                  child: TextFormField(
+                                    controller: guardianfullname,
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      fillColor: Colors.grey,
+                                      hintText: 'Full Name',
+                                      hintStyle: TextStyle(color: kColorGrey),
+                                    ),
+                                    validator: (val) => val!.isEmpty
+                                        ? 'Enter an Full Name'
+                                        : null,
+                                    // onChanged: (val) {
+                                    //   guardianfullname = val;
+                                    // },
                                   ),
-                                  validator: (val) => val!.isEmpty
-                                      ? 'Enter an Full Name'
-                                      : null,
-                                  // onChanged: (val) {
-                                  //   guardianfullname = val;
-                                  // },
                                 ),
                               ),
                               const SizedBox(
@@ -1149,69 +1852,83 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                               ),
                               Row(
                                 children: [
-                                  Container(
-                                    width: 400,
-                                    height: 45,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                                    decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(5)),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: Colors.grey.shade300,
-                                            width: 1)),
-                                    child: Row(
-                                      children: [
-                                        InkWell(
-                                          onTap: () {
-                                            _selectDate('guardian');
-                                          },
-                                          child: Text(
-                                            guardianbdate,
-                                            style: const TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.black),
+                                  Card(
+                                    margin: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 5,
+                                    child: Container(
+                                      width: 400,
+                                      height: 45,
+                                      padding:
+                                          const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                      // decoration: BoxDecoration(
+                                      //     borderRadius: const BorderRadius.all(
+                                      //         Radius.circular(5)),
+                                      //     color: Colors.white,
+                                      //     border: Border.all(
+                                      //         color: Colors.grey.shade300,
+                                      //         width: 1)),
+                                      child: Row(
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              _selectDate('guardian');
+                                            },
+                                            child: Text(
+                                              guardianbdate,
+                                              style: const TextStyle(
+                                                  fontSize: 16,
+                                                  color: kColorGrey),
+                                            ),
                                           ),
-                                        ),
-                                        const Spacer(),
-                                        IconButton(
-                                          tooltip: "Date of Birth",
-                                          hoverColor: Colors.transparent,
-                                          icon: const Icon(
-                                            EvaIcons.calendarOutline,
-                                            color: Colors.blue,
-                                            size: 25,
+                                          const Spacer(),
+                                          IconButton(
+                                            tooltip: "Date of Birth",
+                                            hoverColor: Colors.transparent,
+                                            icon: const Icon(
+                                              EvaIcons.calendarOutline,
+                                              color: Colors.blue,
+                                              size: 25,
+                                            ),
+                                            onPressed: () {
+                                              _selectDate('guardian');
+                                            },
                                           ),
-                                          onPressed: () {
-                                            _selectDate('guardian');
-                                          },
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                   const Spacer(),
-                                  Container(
-                                    width: 150,
-                                    height: 45,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                                    decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(5)),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: Colors.grey.shade300,
-                                            width: 1)),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          guardianage.toString(),
-                                          style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black),
-                                        ),
-                                      ],
+                                  Card(
+                                    margin: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 5,
+                                    child: Container(
+                                      width: 150,
+                                      height: 45,
+                                      padding:
+                                          const EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                      // decoration: BoxDecoration(
+                                      //     borderRadius: const BorderRadius.all(
+                                      //         Radius.circular(5)),
+                                      //     color: Colors.white,
+                                      //     border: Border.all(
+                                      //         color: Colors.grey.shade300,
+                                      //         width: 1)),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            guardianage.toString(),
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                color: kColorGrey),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -1221,65 +1938,77 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                               ),
                               Row(
                                 children: [
-                                  Container(
-                                    width: 250,
-                                    height: 45,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                    decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(5)),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: Colors.grey.shade300,
-                                            width: 1)),
-                                    child: TextFormField(
-                                      controller: guardiancontactnumber,
-                                      decoration: const InputDecoration(
-                                        border: InputBorder.none,
-                                        fillColor: Colors.grey,
-                                        hintText: 'Contact',
-                                        hintStyle:
-                                            TextStyle(color: Colors.black),
+                                  Card(
+                                    margin: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 5,
+                                    child: Container(
+                                      width: 250,
+                                      height: 45,
+                                      padding: const EdgeInsets.fromLTRB(
+                                          10, 0, 10, 0),
+                                      // decoration: BoxDecoration(
+                                      //     borderRadius: const BorderRadius.all(
+                                      //         Radius.circular(5)),
+                                      //     color: Colors.white,
+                                      //     border: Border.all(
+                                      //         color: Colors.grey.shade300,
+                                      //         width: 1)),
+                                      child: TextFormField(
+                                        controller: guardiancontactnumber,
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                          fillColor: Colors.grey,
+                                          hintText: 'Contact',
+                                          hintStyle:
+                                              TextStyle(color: kColorGrey),
+                                        ),
+                                        validator: (val) => val!.isEmpty
+                                            ? 'Enter your Contact'
+                                            : null,
+                                        // onChanged: (val) {
+                                        //   guardiancontactnumber = val;
+                                        // },
                                       ),
-                                      validator: (val) => val!.isEmpty
-                                          ? 'Enter your Contact'
-                                          : null,
-                                      // onChanged: (val) {
-                                      //   guardiancontactnumber = val;
-                                      // },
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Container(
-                                    width: 280,
-                                    height: 45,
-                                    padding:
-                                        const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                    decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(5)),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: Colors.grey.shade300,
-                                            width: 1)),
-                                    child: TextFormField(
-                                      controller: guardiansemail,
-                                      decoration: const InputDecoration(
-                                        border: InputBorder.none,
-                                        fillColor: Colors.grey,
-                                        hintText: 'Email',
-                                        hintStyle:
-                                            TextStyle(color: Colors.black),
+                                  const Spacer(),
+                                  Card(
+                                    margin: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 5,
+                                    child: Container(
+                                      width: 280,
+                                      height: 45,
+                                      padding: const EdgeInsets.fromLTRB(
+                                          10, 0, 10, 0),
+                                      // decoration: BoxDecoration(
+                                      //     borderRadius: const BorderRadius.all(
+                                      //         Radius.circular(5)),
+                                      //     color: Colors.white,
+                                      //     border: Border.all(
+                                      //         color: Colors.grey.shade300,
+                                      //         width: 1)),
+                                      child: TextFormField(
+                                        controller: guardiansemail,
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                          fillColor: Colors.grey,
+                                          hintText: 'Email',
+                                          hintStyle:
+                                              TextStyle(color: kColorGrey),
+                                        ),
+                                        validator: (val) => val!.isEmpty
+                                            ? 'Enter your email'
+                                            : null,
+                                        // onChanged: (val) {
+                                        //   guardiansemail = val;
+                                        // },
                                       ),
-                                      validator: (val) => val!.isEmpty
-                                          ? 'Enter your email'
-                                          : null,
-                                      // onChanged: (val) {
-                                      //   guardiansemail = val;
-                                      // },
                                     ),
                                   ),
                                 ],
@@ -1292,7 +2021,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                   Text(
                                     "Upload Guardian documents.",
                                     style: TextStyle(
-                                      color: Color.fromRGBO(0, 0, 0, 1),
+                                      color: kColorLight,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
                                     ),
@@ -1311,30 +2040,15 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                     width: 180,
                                     height: 55,
                                     child: TextButton(
-                                      style: TextButton.styleFrom(
-                                        textStyle: const TextStyle(
-                                            color: Colors.black),
-                                        backgroundColor: const Color.fromRGBO(
-                                            103, 195, 208, 1),
-                                        shape: RoundedRectangleBorder(
-                                          side: const BorderSide(
-                                            color: Color.fromRGBO(1, 118, 132,
-                                                1), // your color here
-                                            width: 1,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(30.0),
-                                        ),
-                                      ),
                                       onPressed: () async {
                                         selectImagesID();
                                       },
                                       child: const Text(
                                         'Upload ID',
                                         style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                        ),
+                                            color: kColorPrimary,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                     ),
                                   ),
@@ -1476,30 +2190,15 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                     width: 180,
                                     height: 55,
                                     child: TextButton(
-                                      style: TextButton.styleFrom(
-                                        textStyle: const TextStyle(
-                                            color: Colors.black),
-                                        backgroundColor: const Color.fromRGBO(
-                                            103, 195, 208, 1),
-                                        shape: RoundedRectangleBorder(
-                                          side: const BorderSide(
-                                            color: Color.fromRGBO(1, 118, 132,
-                                                1), // your color here
-                                            width: 1,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(30.0),
-                                        ),
-                                      ),
                                       onPressed: () async {
                                         selectImage('guardian');
                                       },
                                       child: const Text(
                                         'Upload Picture',
                                         style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 15,
-                                        ),
+                                            color: kColorPrimary,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                     ),
                                   ),
@@ -1574,14 +2273,14 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                           ),
                         ),
                         const SizedBox(
-                          height: 10,
+                          height: 15,
                         ),
                         Container(
                           alignment: Alignment.topLeft,
                           child: CheckboxListTile(
                             title: const Text(
                               'Agree to Work4uTutor Terms & Condition and Privacy Policy.',
-                              style: TextStyle(fontSize: 15),
+                              style: TextStyle(fontSize: 15, color: kColorGrey),
                             ),
                             // subtitle: const Text(
                             //     'A computer science portal for geeks.'),
@@ -1656,19 +2355,6 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                           width: 380,
                           height: 75,
                           child: TextButton(
-                              style: TextButton.styleFrom(
-                                textStyle: const TextStyle(color: Colors.black),
-                                backgroundColor:
-                                    const Color.fromRGBO(103, 195, 208, 1),
-                                shape: RoundedRectangleBorder(
-                                  side: const BorderSide(
-                                    color: Color.fromRGBO(
-                                        1, 118, 132, 1), // your color here
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(40.0),
-                                ),
-                              ),
                               onPressed: () async {
                                 if (age >= 18) {
                                   if (firstname.text.isEmpty) {
@@ -1744,6 +2430,22 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                       type: CoolAlertType.error,
                                       text: "Please Select Language!",
                                     );
+                                  } else if (selectedGender.isEmpty) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Select Gender!",
+                                    );
+                                  } else if (citizenship.isEmpty) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: 'Error',
+                                      type: CoolAlertType.error,
+                                      text: "Please Select Citizenship!",
+                                    );
                                   } else if (studentIDNumber.isNotEmpty &&
                                       studentIDNumber != 'STU*********' &&
                                       firstname.text.isNotEmpty &&
@@ -1762,6 +2464,8 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                         text: 'Uploading your data....');
                                     updateStudentInfo(
                                             widget.uid,
+                                            selectedGender,
+                                            citizenship,
                                             birthtCity.text,
                                             _selectedBirthCountryController
                                                 .text,
@@ -1786,7 +2490,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                         _auth.signOutAnon();
                                         deleteAllData();
                                         {
-                                          GoRouter.of(context).go('/}');
+                                          GoRouter.of(context).go('/');
                                         }
                                       },
                                     );
@@ -1968,7 +2672,6 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                   } else if (studentIDNumber.isNotEmpty &&
                                       studentIDNumber != 'STU*********' &&
                                       firstname.text.isNotEmpty &&
-                                      middlename.text.isNotEmpty &&
                                       lastname.text.isNotEmpty &&
                                       age != 0 &&
                                       _selectedBirthCountryController
@@ -1990,6 +2693,8 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                         text: 'Uploading your data....');
                                     updateStudentInfowGuardian(
                                             widget.uid,
+                                            selectedGender,
+                                            citizenship,
                                             birthtCity.text,
                                             _selectedBirthCountryController
                                                 .text,
@@ -2027,10 +2732,14 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                         .then(
                                       (value) async {
                                         _auth.signOutAnon();
+                                        SendWelcomeEmailtoUser.sendMail(
+                                            email: widget.email,
+                                            name: firstname.text);
                                         deleteAllData();
                                         setState(() {
                                           CoolAlert.show(
                                             context: context,
+                                            width: 200,
                                             type: CoolAlertType.success,
                                             text: 'Sign up succesfully!',
                                             autoCloseDuration:
@@ -2109,82 +2818,11 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                 }
                               },
                               child: const Text(
-                                // age >= 18 &&
-                                //         studentIDNumber.isNotEmpty &&
-                                //         studentIDNumber != 'STU*********' &&
-                                //         firstname.text.isNotEmpty &&
-                                //         middlename.text.isNotEmpty &&
-                                //         lastname.text.isNotEmpty &&
-                                //         age != 0 &&
-                                //         selectedCountry.isNotEmpty &&
-                                //         tCity.isNotEmpty &&
-                                //         _selectedTimeZone.isNotEmpty &&
-                                //         tlanguages.isNotEmpty
-                                //     ? 'Proceed Now'
-                                //     : age >= 18 && studentIDNumber.isEmpty ||
-                                //             studentIDNumber == 'STU*********' ||
-                                //             firstname.text.isEmpty ||
-                                //             middlename.text.isEmpty ||
-                                //             lastname.text.isEmpty ||
-                                //             age == 0 ||
-                                //             selectedCountry.isEmpty ||
-                                //             tCity.isEmpty ||
-                                //             _selectedTimeZone.isEmpty ||
-                                //             tlanguages.isEmpty
-                                //         ? 'Save Temporarily'
-                                //         : age < 18 ||
-                                //                 age == 0 &&
-                                //                     studentIDNumber.isEmpty ||
-                                //                 studentIDNumber ==
-                                //                     'STU*********' ||
-                                //                 firstname.text.isEmpty ||
-                                //                 middlename.text.isEmpty ||
-                                //                 lastname.text.isEmpty ||
-                                //                 age == 0 ||
-                                //                 selectedCountry.isEmpty ||
-                                //                 tCity.isEmpty ||
-                                //                 _selectedTimeZone.isEmpty ||
-                                //                 tlanguages.isEmpty ||
-                                //                 guardianfullname.text.isEmpty ||
-                                //                 // ignore: unrelated_type_equality_checks
-                                //                 guardianage == 0 ||
-                                //                 guardiancontactnumber
-                                //                     .text.isEmpty ||
-                                //                 guardiansemail.text.isEmpty ||
-                                //                 guardianbdate.isEmpty
-                                //             ? 'Save Temporarily'
-                                //             : age >= 18 &&
-                                //                     studentIDNumber
-                                //                         .isNotEmpty &&
-                                //                     studentIDNumber !=
-                                //                         'STU*********' &&
-                                //                     firstname.text.isNotEmpty &&
-                                //                     middlename
-                                //                         .text.isNotEmpty &&
-                                //                     lastname.text.isNotEmpty &&
-                                //                     age != 0 &&
-                                //                     selectedCountry
-                                //                         .isNotEmpty &&
-                                //                     tCity.isNotEmpty &&
-                                //                     _selectedTimeZone
-                                //                         .isNotEmpty &&
-                                //                     tlanguages.isNotEmpty &&
-                                //                     guardianfullname
-                                //                         .text.isNotEmpty &&
-                                //                     // ignore: unrelated_type_equality_checks
-                                //                     guardianage == 0 &&
-                                //                     guardiancontactnumber
-                                //                         .text.isNotEmpty &&
-                                //                     guardiansemail
-                                //                         .text.isNotEmpty &&
-                                //                     guardianbdate.isNotEmpty
-                                //                 ? 'Proceed Now'
-                                //                 :
                                 'Proceed Now',
                                 style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                ),
+                                    color: kColorPrimary,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500),
                               )),
                         ),
                       ],

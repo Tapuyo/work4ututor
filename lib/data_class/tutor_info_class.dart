@@ -2,13 +2,15 @@ class TutorInformation {
   final String age;
   final String applicationID;
   final String birthCity;
-  final String birthdate;
+  final DateTime birthdate;
   final String birthPlace;
   List<dynamic> certificates;
   List<dynamic> certificatestype;
   final String city;
   final String country;
+  final String gender;
   List<dynamic> language;
+  List<dynamic> citizenship;
   final DateTime dateSign;
   final String emailadd;
   final String extensionName;
@@ -43,6 +45,8 @@ class TutorInformation {
     required this.emailadd,
     required this.timezone,
     required this.language,
+    required this.gender,
+    required this.citizenship,
     required this.validIds,
     required this.servicesprovided,
     required this.birthPlace,

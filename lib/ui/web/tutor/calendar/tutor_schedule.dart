@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -3022,13 +3023,16 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                     // const VideoCall videoCall = VideoCall(chatID: '123', uID: '456');
 
                                                                     // Replace 'your_flutter_app_port' with the actual port your Flutter web app is running on
-                                                                    String url =
-                                                                        'http://localhost:58586/tutorsList';
+                                                                    // String url =
+                                                                    //     'http://localhost:58586/tutorsList';
 
                                                                     // Open the URL in a new tab
                                                                     // html.window.open('/videoCall', "");
                                                                     // html.window.open('/tutorslist', "");
                                                                     //  const VideoCall(chatID: '', uID: '',);
+                                                                    GoRouter.of(
+                                                                            context)
+                                                                        .go('/videocall/${widget.uID.toString()}&${filtereddata[index].scheduleID}&${filtereddata[index].meetinglink}');
                                                                   },
                                                                   child: Text(
                                                                     'work4ututor/${filtereddata[index].meetinglink}',
@@ -4703,8 +4707,8 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                   // const VideoCall videoCall = VideoCall(chatID: '123', uID: '456');
 
                                                                   // Replace 'your_flutter_app_port' with the actual port your Flutter web app is running on
-                                                                  String url =
-                                                                      'http://localhost:58586/tutorsList';
+                                                                  // String url =
+                                                                  //     'http://localhost:58586/tutorsList';
                                                                   // html.window.open(
                                                                   //     '/#/studentdiary/${widget.uid.toString()}/tutors',
                                                                   //     '_blank');
@@ -4712,6 +4716,9 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                   // html.window.open('/videoCall', "");
                                                                   // html.window.open('/tutorslist', "");
                                                                   //  const VideoCall(chatID: '', uID: '',);
+                                                                  GoRouter.of(
+                                                                          context)
+                                                                      .go('/videocall/${widget.uID.toString()}&${filtereddata[index].scheduleID}&${filtereddata[index].meetinglink}');
                                                                 },
                                                                 child: Text(
                                                                   'work4ututor/${filtereddata[index].meetinglink}',

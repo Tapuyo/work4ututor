@@ -1,11 +1,11 @@
-// ignore_for_file: unused_local_variable, avoid_print, unused_element, avoid_web_libraries_in_flutter
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html' as html;
 import 'dart:js' as js;
 import 'dart:io';
 import 'dart:math';
+import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as rtc_local_view;
@@ -18,8 +18,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:work4ututor/ui/web/communication.dart/whiteboard.dart';
 
+import '../../../services/getchatcall.dart';
 import '../../../utils/themes.dart';
 import 'package:http/http.dart' as http;
 
@@ -68,7 +70,6 @@ class _VideoCallState extends State<VideoCall> {
   bool viewChat = true;
   bool isVirtualBackGroundEnabled = false;
   bool _isEnabledVirtualBackgroundImage = false;
-  // ignore: prefer_final_fields
   TextEditingController _textEditingController = TextEditingController();
   ScrollController _scrollController = ScrollController();
   TextEditingController messageContent = TextEditingController();
@@ -196,7 +197,7 @@ class _VideoCallState extends State<VideoCall> {
     if (defaultTargetPlatform == TargetPlatform.android) {
       await [Permission.microphone, Permission.camera].request();
     }
-    await _engine.joinChannel(token, channelId, null, 123456789);
+    await _engine.joinChannel(token, widget.chatID, null, 01);
   }
 
   _leaveChannel() async {
@@ -285,7 +286,7 @@ class _VideoCallState extends State<VideoCall> {
     }
   }
 
-  void uploadfiledata() async {
+  void uploadfiledata(String uid) async {
     // // Get the download URL of the uploaded file from Firebase Storage.
     dynamic url = await uploadFile();
     String downloadUrl =
@@ -295,18 +296,12 @@ class _VideoCallState extends State<VideoCall> {
     });
 
     if (downloadUrl.isEmpty) {
-      setState(() {
-        print(downloadUrl);
-      });
     } else {
       FirebaseFirestore.instance.collection('files').add({
         'name': DateTime.now(),
+        'chatId': uid,
         'downloadUrl': downloadUrl,
         'type': "image",
-        // Other information related to the file.
-      });
-      setState(() {
-        print(downloadUrl);
       });
     }
     // FirebaseFirestore.instance
@@ -324,16 +319,20 @@ class _VideoCallState extends State<VideoCall> {
     js.context.callMethod('addEventListener', ['keydown', handleKeyDown]);
 
     // Add an event listener to detect visibility change
-    html.document.onVisibilityChange.listen(handleVisibilityChange);
+    // html.document.onVisibilityChange.listen(handleVisibilityChange);
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   final notifier = Provider.of<CallChatNotifier>(context, listen: false);
+    //   notifier.getChats('0CDVn2OwJv3eQW6ajZFU');
+    // });
   }
 
-  void handleVisibilityChange(dynamic event) {
-    if (html.document.visibilityState == 'visible') {
-      setState(() {
-        isFullScreen = html.document.fullscreenElement != null;
-      });
-    }
-  }
+  // void handleVisibilityChange(dynamic event) {
+  //   if (html.document.visibilityState == 'visible') {
+  //     setState(() {
+  //       isFullScreen = html.document.fullscreenElement != null;
+  //     });
+  //   }
+  // }
 
   void handleKeyDown(dynamic event) {
     if (event is js.JsObject && event['keyCode'] == 27) {
@@ -346,6 +345,8 @@ class _VideoCallState extends State<VideoCall> {
   void _onEndCallButtonPressed() async {
     _engine = await RtcEngine.create(appId);
     _engine.leaveChannel();
+    // ignore: use_build_context_synchronously
+    GoRouter.of(context).go('/');
   }
 
   void _toggleScreenSharing() async {
@@ -735,6 +736,8 @@ class _VideoCallState extends State<VideoCall> {
     //     messagedata.sort((a, b) => a.dateSent.compareTo(b.dateSent));
     //   });
     // }
+    Provider.of<CallChatNotifier>(context, listen: false)
+        .getChats(widget.classId);
     return RawKeyboardListener(
       autofocus: true,
       focusNode: FocusNode(),
@@ -749,9 +752,9 @@ class _VideoCallState extends State<VideoCall> {
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [kColorSecondary, kColorPrimary, kColorLight],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [kColorLight, kColorSecondary],
             ),
           ),
           child: Row(
@@ -768,42 +771,44 @@ class _VideoCallState extends State<VideoCall> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Container(
-                              padding:
-                                  const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                              width: 50,
-                              child: Image.asset(
-                                "assets/images/videologo.png",
-                                alignment: Alignment.topCenter,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const Text(
-                              'Work4uTutor',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 30,
-                                  color: Colors.white),
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
+                            // Container(
+                            //   padding:
+                            //       const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                            //   width: 50,
+                            //   child: Image.asset(
+                            //     "assets/images/videologo.png",
+                            //     alignment: Alignment.topCenter,
+                            //     fit: BoxFit.cover,
+                            //   ),
+                            // ),
+                            // const Text(
+                            //   'Work4uTutor',
+                            //   textAlign: TextAlign.center,
+                            //   style: TextStyle(
+                            //       fontWeight: FontWeight.bold,
+                            //       fontSize: 30,
+                            //       color: Colors.white),
+                            // ),
+                            // const SizedBox(
+                            //   width: 5,
+                            // ),
                             Expanded(
                               flex: 15,
                               child: Padding(
                                 padding:
                                     const EdgeInsets.only(left: 10, bottom: 0),
                                 child: Card(
+                                  color: Colors.transparent,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20)),
-                                  elevation: 4,
+                                  elevation: 0,
                                   child: Container(
                                       // decoration: BoxDecoration(
                                       //   borderRadius: BorderRadius.circular(20),
                                       //   color:
                                       //       const Color.fromARGB(95, 155, 176, 194),
                                       // ),
+                                      color: Colors.transparent,
                                       padding: const EdgeInsets.all(10),
                                       child: Row(
                                         children: [
@@ -819,7 +824,7 @@ class _VideoCallState extends State<VideoCall> {
                                                       fontWeight:
                                                           FontWeight.w700,
                                                       fontSize: 20,
-                                                      color: kColorPrimary),
+                                                      color: Colors.white),
                                                 ),
                                                 Text(
                                                   '50 minutes per class session',
@@ -827,7 +832,7 @@ class _VideoCallState extends State<VideoCall> {
                                                       fontWeight:
                                                           FontWeight.normal,
                                                       fontSize: 16,
-                                                      color: kColorPrimaryDark),
+                                                      color: Colors.white),
                                                 ),
                                               ]),
                                           const Spacer(),
@@ -855,168 +860,201 @@ class _VideoCallState extends State<VideoCall> {
                         children: [
                           Column(
                             children: [
-                              Card(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20)),
-                                elevation: 4,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: SizedBox(
-                                    // decoration: const BoxDecoration(
-                                    //   gradient: LinearGradient(
-                                    //     begin: Alignment.topLeft,
-                                    //     end: Alignment.bottomRight,
-                                    //     colors: [kColorPrimary, kColorLight],
-                                    //   ),
-                                    // ),
-                                    height: isFullScreen
-                                        ? MediaQuery.of(context).size.height -
-                                            130
-                                        : MediaQuery.of(context).size.height -
-                                            190,
+                              Stack(
+                                children: [
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    elevation: 4,
                                     child: Padding(
                                       padding: const EdgeInsets.all(5.0),
                                       child: SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        child: Center(
-                                          child: screenSharing
-                                              ? const Expanded(
-                                                  flex: 1,
-                                                  child: kIsWeb
-                                                      ? rtc_local_view
-                                                              .SurfaceView
-                                                          .screenShare()
-                                                      : rtc_local_view
-                                                              .TextureView
-                                                          .screenShare())
-                                              : _remoteVideo(),
+                                        height: isFullScreen
+                                            ? MediaQuery.of(context)
+                                                    .size
+                                                    .height -
+                                                55
+                                            : MediaQuery.of(context)
+                                                    .size
+                                                    .height -
+                                                120,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(5.0),
+                                          child: SizedBox(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            child: Center(
+                                              child: screenSharing
+                                                  ? kIsWeb
+                                                      ? const rtc_local_view
+                                                          .SurfaceView.screenShare()
+                                                      : const rtc_local_view
+                                                          .TextureView.screenShare()
+                                                  : _remoteVideo(),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              Card(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20)),
-                                elevation: 4,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: SizedBox(
-                                    height: 55,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(5.0),
-                                      child: Center(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            FloatingActionButton(
-                                              backgroundColor: kColorPrimary,
-                                              onPressed: screenSharing
-                                                  ? _stopScreenShare
-                                                  : _startScreenShare,
-                                              child: Icon(screenSharing
-                                                  ? Icons.stop_screen_share
-                                                  : Icons.screen_share),
-                                            ),
-                                            FloatingActionButton(
-                                              backgroundColor: kColorPrimary,
-                                              onPressed: () {
-                                                switchMicrophone();
-                                              },
-                                              child: isMute
-                                                  ? Icon(
-                                                      Icons.mic,
-                                                      color:
-                                                          Colors.red.shade200,
-                                                    )
-                                                  : const Icon(Icons.mic),
-                                            ),
-                                            // FloatingActionButton(
-                                            //   backgroundColor: kColorPrimary,
-                                            //   onPressed: () =>
-                                            //       {_enableVirtualBackground()},
-                                            //   child: const Icon(Icons.image),
-                                            // ),
-                                            FloatingActionButton(
-                                              backgroundColor: kColorPrimary,
-                                              onPressed: () {
-                                                cameraView();
-                                              },
-                                              child: isPreview
-                                                  ? const Icon(Icons.camera)
-                                                  : Icon(
-                                                      Icons.camera,
-                                                      color:
-                                                          Colors.red.shade200,
+                                  SizedBox(
+                                    height: isFullScreen
+                                        ? MediaQuery.of(context).size.height -
+                                            55
+                                        : MediaQuery.of(context).size.height -
+                                            120,
+                                    child: Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(5.0),
+                                        child: SizedBox(
+                                          height: 55,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(5.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Tooltip(
+                                                  message: 'Screen share',
+                                                  preferBelow: false,
+                                                  child: FloatingActionButton(
+                                                    backgroundColor:
+                                                        Colors.grey.shade300,
+                                                    onPressed: screenSharing
+                                                        ? _stopScreenShare
+                                                        : _startScreenShare,
+                                                    child: Icon(screenSharing
+                                                        ? Icons
+                                                            .stop_screen_share
+                                                        : Icons.screen_share),
+                                                  ),
+                                                ),
+                                                Tooltip(
+                                                  message: 'Switch Mic',
+                                                  preferBelow: false,
+                                                  child: FloatingActionButton(
+                                                    backgroundColor:
+                                                        Colors.grey.shade300,
+                                                    onPressed: () {
+                                                      switchMicrophone();
+                                                    },
+                                                    child: isMute
+                                                        ? Icon(
+                                                            Icons.mic,
+                                                            color: Colors
+                                                                .red.shade200,
+                                                          )
+                                                        : const Icon(Icons.mic),
+                                                  ),
+                                                ),
+                                                // FloatingActionButton(
+                                                //   backgroundColor: kColorPrimary,
+                                                //   onPressed: () =>
+                                                //       {_enableVirtualBackground()},
+                                                //   child: const Icon(Icons.image),
+                                                // ),
+                                                Tooltip(
+                                                  message: 'Camera',
+                                                  preferBelow: false,
+                                                  child: FloatingActionButton(
+                                                    backgroundColor:
+                                                        Colors.grey.shade300,
+                                                    onPressed: () {
+                                                      cameraView();
+                                                    },
+                                                    child: isPreview
+                                                        ? const Icon(
+                                                            Icons.camera)
+                                                        : Icon(
+                                                            Icons.camera,
+                                                            color: Colors
+                                                                .red.shade200,
+                                                          ),
+                                                  ),
+                                                ),
+                                                Tooltip(
+                                                  message: 'End Call',
+                                                  preferBelow: false,
+                                                  child: FloatingActionButton(
+                                                    backgroundColor:
+                                                        Colors.grey.shade300,
+                                                    onPressed:
+                                                        _onEndCallButtonPressed,
+                                                    child: const Icon(
+                                                      Icons.call_end,
+                                                      color: Colors.white,
                                                     ),
+                                                  ),
+                                                ),
+                                                // FloatingActionButton(
+                                                //   backgroundColor:
+                                                //       Colors.grey.shade300,
+                                                //   onPressed: () {
+                                                //     showWhiteboard(context);
+                                                //   },
+                                                //   child: const Icon(Icons.edit),
+                                                // ),
+                                                // FloatingActionButton(
+                                                //   onPressed: () {
+                                                //     setState(() {
+                                                //       if (isRecording) {
+                                                //         stopRecording();
+                                                //       } else {
+                                                //         startRecording();
+                                                //       }
+                                                //       isRecording = !isRecording;
+                                                //     });
+                                                //   },
+                                                //   backgroundColor: isRecording
+                                                //       ? Colors.red
+                                                //       : kColorPrimary,
+                                                //   child: Icon(
+                                                //     isRecording
+                                                //         ? Icons.stop
+                                                //         : Icons.fiber_manual_record,
+                                                //     color: Colors.white,
+                                                //   ),
+                                                // ),
+                                                Tooltip(
+                                                  message: 'Chat',
+                                                  preferBelow: false,
+                                                  child: FloatingActionButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        viewChat = !viewChat;
+                                                      });
+                                                    },
+                                                    backgroundColor: viewChat
+                                                        ? Colors.grey.shade300
+                                                        : kColorPrimary,
+                                                    child: const Icon(
+                                                      Icons.message_outlined,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Tooltip(
+                                                  preferBelow: false,
+                                                  message: 'Full Screen',
+                                                  child: FloatingActionButton(
+                                                    backgroundColor:
+                                                        Colors.grey.shade300,
+                                                    onPressed: goFullscreen,
+                                                    child: const Icon(
+                                                        Icons.fullscreen),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            FloatingActionButton(
-                                              backgroundColor: kColorPrimary,
-                                              onPressed:
-                                                  _onEndCallButtonPressed,
-                                              child: const Icon(
-                                                Icons.call_end,
-                                                color: Colors.red,
-                                                size: 40,
-                                              ),
-                                            ),
-                                            FloatingActionButton(
-                                              backgroundColor: kColorPrimary,
-                                              onPressed: () {
-                                                showWhiteboard(context);
-                                              },
-                                              child: const Icon(Icons.edit),
-                                            ),
-                                            // FloatingActionButton(
-                                            //   onPressed: () {
-                                            //     setState(() {
-                                            //       if (isRecording) {
-                                            //         stopRecording();
-                                            //       } else {
-                                            //         startRecording();
-                                            //       }
-                                            //       isRecording = !isRecording;
-                                            //     });
-                                            //   },
-                                            //   backgroundColor: isRecording
-                                            //       ? Colors.red
-                                            //       : kColorPrimary,
-                                            //   child: Icon(
-                                            //     isRecording
-                                            //         ? Icons.stop
-                                            //         : Icons.fiber_manual_record,
-                                            //     color: Colors.white,
-                                            //   ),
-                                            // ),
-                                            FloatingActionButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  viewChat = !viewChat;
-                                                });
-                                              },
-                                              backgroundColor: viewChat
-                                                  ? kColorPrimary
-                                                  : kColorSecondary,
-                                              child: const Icon(
-                                                Icons.message_outlined,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            FloatingActionButton(
-                                              backgroundColor: kColorPrimary,
-                                              onPressed: goFullscreen,
-                                              child:
-                                                  const Icon(Icons.fullscreen),
-                                            ),
-                                          ],
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
                             ],
                           ),
@@ -1053,7 +1091,7 @@ class _VideoCallState extends State<VideoCall> {
                                           width: 160,
                                           height: 160,
                                           child: Padding(
-                                            padding: const EdgeInsets.all(5.0),
+                                            padding: const EdgeInsets.all(2.0),
                                             child: Center(
                                               child: _localuserVideo(),
                                             ),
@@ -1136,22 +1174,15 @@ class _VideoCallState extends State<VideoCall> {
                                     style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 20,
-                                        color: Colors.black),
+                                        color: kColorPrimary),
                                   ),
                                   const Spacer(),
                                   IconButton(
                                     icon: const Icon(
-                                      Icons.info_outline_rounded,
-                                      color: Colors.blue,
+                                      Icons.chat_outlined,
+                                      color: kColorLight,
                                     ),
-                                    onPressed: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const InteractiveWhiteboard(),
-                                        ),
-                                      );
-                                    },
+                                    onPressed: () {},
                                   ),
                                 ],
                               ),
@@ -1159,41 +1190,37 @@ class _VideoCallState extends State<VideoCall> {
                             Expanded(
                               child: Stack(
                                 children: <Widget>[
-                                  StreamBuilder<QuerySnapshot>(
-                                    stream: FirebaseFirestore.instance
-                                        .collection('files')
-                                        .snapshots(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasError) {
-                                        return Center(
-                                            child: Text(
-                                                'Error: ${snapshot.error}'));
-                                      }
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const Center(
-                                            child: CircularProgressIndicator());
-                                      }
-                                      if (snapshot.data!.docs.isEmpty) {
-                                        return Center(
-                                            child: Column(
+                                  Consumer<CallChatNotifier>(
+                                    builder:
+                                        (context, cardDetailsNotifier, child) {
+                                      if (cardDetailsNotifier.chats.isEmpty) {
+                                        return Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
-                                          children: const [
-                                            Icon(
-                                              Icons.message_outlined,
-                                              color: kColorPrimary,
-                                            ),
-                                            Text(
-                                              'No message found.',
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  color: Colors.black54),
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Center(
+                                              child: Column(
+                                                children: const [
+                                                  Icon(
+                                                    Icons.message_outlined,
+                                                    color: kColorPrimary,
+                                                  ),
+                                                  Text(
+                                                    'No message found.',
+                                                    style: TextStyle(
+                                                        fontSize: 15,
+                                                        color: Colors.black54),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ],
-                                        ));
+                                        );
                                       } else {
-                                        dynamic message = snapshot.data!.docs;
+                                        dynamic message =
+                                            cardDetailsNotifier.chats;
 
                                         message.sort((a, b) {
                                           Timestamp aTimestamp = a['name'];
@@ -1225,8 +1252,8 @@ class _VideoCallState extends State<VideoCall> {
                                                     children: [
                                                       const Center(
                                                         child: Align(
-                                                          alignment:
-                                                              Alignment.topLeft,
+                                                          alignment: Alignment
+                                                              .bottomLeft,
                                                           child: CircleAvatar(
                                                             backgroundColor:
                                                                 Colors.black12,
@@ -1234,6 +1261,7 @@ class _VideoCallState extends State<VideoCall> {
                                                               Icons.person,
                                                               color:
                                                                   Colors.grey,
+                                                              size: 15,
                                                             ),
                                                           ),
                                                         ),
@@ -1247,8 +1275,9 @@ class _VideoCallState extends State<VideoCall> {
                                                                 minWidth: 0,
                                                                 maxWidth: 260),
                                                         decoration:
-                                                            const BoxDecoration(
-                                                          borderRadius: BorderRadius.only(
+                                                            BoxDecoration(
+                                                          borderRadius: const BorderRadius
+                                                                  .only(
                                                               topRight: Radius
                                                                   .circular(20),
                                                               bottomLeft: Radius
@@ -1256,20 +1285,30 @@ class _VideoCallState extends State<VideoCall> {
                                                               bottomRight:
                                                                   Radius
                                                                       .circular(
-                                                                          20)),
-                                                          color: kColorLight,
+                                                                          20),
+                                                              topLeft: Radius
+                                                                  .circular(
+                                                                      20)),
+                                                          border: Border.all(
+                                                              width: 2,
+                                                              color:
+                                                                  kColorPrimary),
+                                                          // color: (messagedata[index]
+                                                          //             .userID ==
+                                                          //         widget.userID
+                                                          //     ? Colors.white
+                                                          //     : Colors.grey.shade200),
                                                         ),
                                                         padding:
                                                             const EdgeInsets
                                                                 .all(16),
-                                                        child: Text(
+                                                        child: SelectableText(
                                                           messagedata[
                                                               'downloadUrl'],
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize: 15,
-                                                                  color: Colors
-                                                                      .white),
+                                                          style: const TextStyle(
+                                                              fontSize: 15,
+                                                              color:
+                                                                  kColorGrey),
                                                         ),
                                                       ),
                                                     ],
@@ -1300,6 +1339,7 @@ class _VideoCallState extends State<VideoCall> {
                                                                 Icons.person,
                                                                 color:
                                                                     Colors.grey,
+                                                                size: 15,
                                                               ),
                                                             ),
                                                           ),
@@ -1307,12 +1347,19 @@ class _VideoCallState extends State<VideoCall> {
                                                         const SizedBox(
                                                           width: 10,
                                                         ),
-                                                        SizedBox(
-                                                          width: 250,
-                                                          height: 250,
-                                                          child: Image.network(
-                                                              messagedata[
-                                                                  'downloadUrl']),
+                                                        InkWell(
+                                                          onTap: () async {
+                                                            await openInNewTab(
+                                                                messagedata[
+                                                                    'downloadUrl']);
+                                                          },
+                                                          child: SizedBox(
+                                                            width: 250,
+                                                            height: 250,
+                                                            child: Image.network(
+                                                                messagedata[
+                                                                    'downloadUrl']),
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
@@ -1345,6 +1392,7 @@ class _VideoCallState extends State<VideoCall> {
                                                                 Icons.person,
                                                                 color:
                                                                     Colors.grey,
+                                                                size: 15,
                                                               ),
                                                             ),
                                                           ),
@@ -1359,23 +1407,37 @@ class _VideoCallState extends State<VideoCall> {
                                                                   maxWidth:
                                                                       260),
                                                           decoration:
-                                                              const BoxDecoration(
-                                                            borderRadius: BorderRadius.only(
-                                                                topRight: Radius
-                                                                    .circular(
-                                                                        20),
+                                                              BoxDecoration(
+                                                            borderRadius: const BorderRadius
+                                                                    .only(
+                                                                topRight:
+                                                                    Radius
+                                                                        .circular(
+                                                                            20),
                                                                 bottomLeft: Radius
                                                                     .circular(
                                                                         20),
-                                                                bottomRight: Radius
+                                                                bottomRight:
+                                                                    Radius
+                                                                        .circular(
+                                                                            20),
+                                                                topLeft: Radius
                                                                     .circular(
                                                                         20)),
-                                                            color: kColorLight,
+                                                            border: Border.all(
+                                                                width: 2,
+                                                                color:
+                                                                    kColorPrimary),
+                                                            // color: (messagedata[index]
+                                                            //             .userID ==
+                                                            //         widget.userID
+                                                            //     ? Colors.white
+                                                            //     : Colors.grey.shade200),
                                                           ),
                                                           padding:
                                                               const EdgeInsets
                                                                   .all(16),
-                                                          child: Text(
+                                                          child: SelectableText(
                                                             messagedata[
                                                                 'downloadUrl'],
                                                             style:
@@ -1421,7 +1483,8 @@ class _VideoCallState extends State<VideoCall> {
                                             children: <Widget>[
                                               FloatingActionButton(
                                                 onPressed: () {
-                                                  uploadfiledata();
+                                                  uploadfiledata(
+                                                      widget.classId);
                                                 },
                                                 backgroundColor: kColorPrimary,
                                                 elevation: 0,
@@ -1448,10 +1511,11 @@ class _VideoCallState extends State<VideoCall> {
                                                               InputBorder.none),
                                                   onSubmitted: (value) {
                                                     FirebaseFirestore.instance
-                                                        .collection('files')
-                                                        .doc(
-                                                            '1') // Set the document ID to classID
-                                                        .set({
+                                                        .collection(
+                                                            'files') // Set the document ID to classID
+                                                        .add({
+                                                      'chatId': widget.classId,
+
                                                       'name': DateTime.now(),
                                                       'downloadUrl':
                                                           messageContent.text,
@@ -1469,6 +1533,7 @@ class _VideoCallState extends State<VideoCall> {
                                                   FirebaseFirestore.instance
                                                       .collection('files')
                                                       .add({
+                                                    'chatId': widget.classId,
                                                     'name': DateTime.now(),
                                                     'downloadUrl':
                                                         messageContent.text,
@@ -1715,6 +1780,21 @@ class WhiteboardPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
   }
+}
+
+Future<void> openInNewTab(String url) async {
+  if (await canLaunch(url)) {
+    await launch(
+      url,
+      webOnlyWindowName: '_blank',
+    );
+  } else {
+    throw 'Could not launch $url';
+  }
+}
+
+void openInNewTabHtml(String url) {
+  html.window.open(url, '_blank');
 }
 
 class DrawUpdate {

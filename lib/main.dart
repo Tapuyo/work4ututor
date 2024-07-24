@@ -10,21 +10,30 @@ import 'package:provider/provider.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:work4ututor/data_class/studentsEnrolledclass.dart';
+import 'package:work4ututor/provider/datarangenotifier.dart';
+import 'package:work4ututor/provider/displaycount.dart';
 import 'package:work4ututor/provider/displaystarred.dart';
 import 'package:work4ututor/provider/init_provider.dart';
 import 'package:work4ututor/provider/performacefilter.dart';
 import 'package:work4ututor/provider/schedulenotifier.dart';
 import 'package:work4ututor/provider/search_provider.dart';
+import 'package:work4ututor/provider/selectnotifier.dart';
 import 'package:work4ututor/provider/update_tutor_provider.dart';
 import 'package:work4ututor/provider/user_id_provider.dart';
 import 'package:work4ututor/routes/routes.dart';
 import 'package:work4ututor/services/addgetstarmessages.dart';
 import 'package:work4ututor/services/addpreftutor.dart';
+import 'package:work4ututor/services/getPaymentHistory.dart';
+import 'package:work4ututor/services/getcarddetails.dart';
 import 'package:work4ututor/services/getcart.dart';
+import 'package:work4ututor/services/getchatcall.dart';
 import 'package:work4ututor/services/getcountries.dart';
 import 'package:work4ututor/services/getlanguages.dart';
 import 'package:work4ututor/services/getmyrating.dart';
 import 'package:work4ututor/services/getstudentinfo.dart';
+import 'package:work4ututor/services/gettutorpayments.dart';
+import 'package:work4ututor/services/getunreadmessages.dart';
+import 'package:work4ututor/services/getvouchers.dart';
 import 'package:work4ututor/services/services.dart';
 import 'package:work4ututor/services/subjectServices.dart';
 import 'package:work4ututor/splash_page.dart';
@@ -130,10 +139,17 @@ void main() async {
       ChangeNotifierProvider(create: (_) => ScheduleListNotifier()),
       ChangeNotifierProvider(create: (_) => StarMessagesNotifier()),
       ChangeNotifierProvider(create: (_) => StarDisplayProvider()),
+      ChangeNotifierProvider(create: (_) => SelectionNotifier()),
+      ChangeNotifierProvider(create: (_) => CardDetailsNotifier()),
       ChangeNotifierProvider(create: (_) => RatingNotifier()),
+      ChangeNotifierProvider(create: (_) => ClaimableNotifier()),
+
       StreamProvider<List<TutorInformation>>.value(
         value: DatabaseService(uid: '').tutorlist,
         initialData: const [],
+        catchError: (context, error) {
+          return [];
+        },
       ),
       StreamProvider<List<Subjects>>.value(
         value: SubjectServices().subjectList,
@@ -143,10 +159,10 @@ void main() async {
         value: HelpService().helplist,
         initialData: const [],
       ),
-      StreamProvider<List<StudentsList>>.value(
-        value: DatabaseService(uid: '').enrolleelist,
-        initialData: const [],
-      ),
+      // StreamProvider<List<StudentsList>>.value(
+      //   value: DatabaseService(uid: '').enrolleelist,
+      //   initialData: const [],
+      // ),
       StreamProvider<List<StudentInfoClass>>.value(
         value: AllStudentInfoData().getallstudentinfo,
         catchError: (context, error) {
@@ -167,6 +183,13 @@ void main() async {
       ChangeNotifierProvider(create: (_) => MaterialNotifier()),
       ChangeNotifierProvider(create: (_) => CartNotifier()),
       ChangeNotifierProvider(create: (_) => FilterPerformanceProvider()),
+      ChangeNotifierProvider(create: (_) => DisplayedItemCountProvider()),
+      ChangeNotifierProvider(create: (_) => DateRangeNotifier()),
+      ChangeNotifierProvider(create: (_) => VoucherProvider()),
+      ChangeNotifierProvider(create: (_) => CallChatNotifier()),
+      ChangeNotifierProvider(create: (_) => PaymentHistoryNotifier()),
+      ChangeNotifierProvider(create: (_) => MessageNotifier()),
+      ChangeNotifierProvider(create: (_) => SelectedClassInfoProvider()),
     ],
     child: const MyApp(),
   ));
@@ -179,6 +202,11 @@ final GoRouter _router = GoRouter(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
         return const LoginPage();
+        // return const VideoCall(
+        //   uID: '',
+        //   chatID: '',
+        //   classId: '',
+        // );
       },
       routes: <RouteBase>[
         GoRoute(
@@ -258,18 +286,18 @@ final GoRouter _router = GoRouter(
             );
           },
         ),
-        GoRoute(
-          path: 'videocall/:uid&:cId&:chatId', // Define route with parameters
-          builder: (context, state) {
-            final Map<String, String> params =
-                state.pathParameters; // Retrieve parameters
-            return VideoCall(
-              uID: params['uid'] ?? '',
-              chatID: '',
-              classId: '',
-            );
-          },
-        ),
+        // GoRoute(
+        //   path: 'videocall/:uid&:cId&:chatId', // Define route with parameters
+        //   builder: (context, state) {
+        //     final Map<String, String> params =
+        //         state.pathParameters; // Retrieve parameters
+        //     return VideoCall(
+        //       uID: params['uid'] ?? '',
+        //       chatID: '',
+        //       classId: '',
+        //     );
+        //   },
+        // ),
         GoRoute(
           path: 'webmain', // Define route with parameters
           builder: (context, state) {
@@ -287,6 +315,18 @@ final GoRouter _router = GoRouter(
           },
         ),
       ],
+    ),
+    GoRoute(
+      path: '/videocall/:uid&:cId&:chatId',
+      builder: (context, state) {
+        final Map<String, String> params =
+            state.pathParameters; // Retrieve parameters
+        return VideoCall(
+          uID: params['uid'] ?? '',
+          chatID: params['chatId'] ?? '',
+          classId: params['cId'] ?? '',
+        );
+      },
     ),
   ],
 );

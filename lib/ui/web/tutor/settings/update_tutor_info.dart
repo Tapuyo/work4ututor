@@ -54,6 +54,8 @@ class UpdateTutorState extends State<UpdateTutor> {
       'firstName': tutorData.firstName,
       'imageID': tutorData.imageID,
       'language': tutorData.language,
+      'gender': tutorData.gender,
+      'citizenship': tutorData.citizenship,
       'lastname': tutorData.lastname,
       'middleName': tutorData.middleName,
       'presentation': tutorData.presentation,
@@ -105,7 +107,7 @@ class UpdateTutorState extends State<UpdateTutor> {
     tutorfirstname.text = tutorDataMap['firstName'];
     tutorlastname.text = tutorDataMap['lastname'];
     tutormiddleName.text = tutorDataMap['middleName'];
-    birthdate = DateTime.parse(tutorDataMap['birthdate']);
+    birthdate = tutorDataMap['birthdate'];
     newage = int.parse(tutorDataMap['age']);
     country.text = tutorDataMap['country'];
     city.text = tutorDataMap['city'];
@@ -113,7 +115,7 @@ class UpdateTutorState extends State<UpdateTutor> {
     birthcity.text = tutorDataMap['birthCity'];
     timezone.text = tutorDataMap['timezone'];
     contactnumber.text = tutorDataMap['contact'];
-    selectedDate = DateTime.parse(tutorDataMap['birthdate']);
+    selectedDate = tutorDataMap['birthdate'];
     for (var language in tutorDataMap['language']) {
       // You can process each language here if needed
       // For example, you can check if it's already in newlanguages before adding
@@ -2349,7 +2351,7 @@ class UpdateTutorState extends State<UpdateTutor> {
             TextSpan(
               children: <TextSpan>[
                 const TextSpan(
-                  text: 'Birthdate:',
+                  text: 'Date of Birth:',
                   style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -2357,8 +2359,7 @@ class UpdateTutorState extends State<UpdateTutor> {
                 ),
                 const TextSpan(text: '     '),
                 TextSpan(
-                  text: DateFormat("MMMM dd, yyyy")
-                      .format(DateTime.parse(data.birthdate)),
+                  text: DateFormat("MMMM dd, yyyy").format(data.birthdate),
                   style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w400,
@@ -2390,11 +2391,11 @@ class UpdateTutorState extends State<UpdateTutor> {
           const SizedBox(
             height: 12,
           ),
-          SelectableText.rich(
+           SelectableText.rich(
             TextSpan(
               children: <TextSpan>[
                 const TextSpan(
-                  text: 'Country of Birth:',
+                  text: 'Gender:',
                   style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -2402,7 +2403,36 @@ class UpdateTutorState extends State<UpdateTutor> {
                 ),
                 const TextSpan(text: '     '),
                 TextSpan(
-                  text: data.birthPlace,
+                  text: data.gender,
+                  //  text: '${data.birthCity}, ${data.birthPlace}',
+                  style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: kColorGrey),
+                ),
+              ],
+            ),
+            textAlign: TextAlign.center,
+            onTap: () {
+              // Add any onTap behavior if needed
+            },
+          ),
+          const SizedBox(
+            height: 12,
+          ),
+          SelectableText.rich(
+            TextSpan(
+              children: <TextSpan>[
+                const TextSpan(
+                  text: 'Citizenship:',
+                  style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: kColorGrey),
+                ),
+                const TextSpan(text: '     '),
+                TextSpan(
+                  text:  data.citizenship.join(', '),
                   //  text: '${data.birthCity}, ${data.birthPlace}',
                   style: const TextStyle(
                       fontSize: 15,

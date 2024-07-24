@@ -734,7 +734,8 @@ class _SetNowState extends State<SetNow> {
                                           1,
                                           selectedTimeschedto.hour,
                                           selectedTimeschedto.minute)),
-                                      selectedDatesched);
+                                      selectedDatesched,
+                                      widget.data!.subjectID);
                                   if (result == null) {
                                     CoolAlert.show(
                                       context: context,

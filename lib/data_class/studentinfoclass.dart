@@ -12,6 +12,8 @@ class StudentInfoClass {
   final String userID;
   final String emailadd;
   final List<String> languages;
+  final String gender;
+  final List<String> citizenship;
   final String profilelink;
   final String timezone;
 
@@ -19,6 +21,8 @@ class StudentInfoClass {
     required this.contact,
     required this.emailadd,
     required this.languages,
+    required this.gender,
+    required this.citizenship,
     required this.address,
     required this.country,
     required this.studentFirstname,
@@ -38,18 +42,21 @@ class StudentGuardianClass {
   final String docID;
   final String address;
   final String contact;
-  final String guardianFirstname;
-  final String guardianMiddlename;
-  final String guardianLastname;
+  final String guardianFullname;
   final String email;
   final String country;
+  final String guardianBday;
+  final String picture;
+  final List<String> ids;
+
   StudentGuardianClass({
+    required this.picture,
+    required this.ids,
+    required this.guardianBday,
     required this.docID,
     required this.address,
     required this.country,
-    required this.guardianFirstname,
-    required this.guardianMiddlename,
-    required this.guardianLastname,
+    required this.guardianFullname,
     required this.email,
     required this.contact,
   });

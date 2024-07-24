@@ -386,12 +386,12 @@ class _NewadminState extends State<Newadmin> {
                               adminlastname: adminlastname,
                               dateofbirth: selectedDate,
                             );
-                            SendEmailtoadmin.sendMail(
-                              email: personalemail,
-                              message:
-                                  'Your UserID: $adminID and Password: $password',
-                              name: 'MJ Amles',
-                            );
+                            // SendEmailtoadmin.sendMail(
+                            //   email: personalemail,
+                            //   message:
+                            //       'Your UserID: $adminID and Password: $password',
+                            //   name: 'MJ Amles',
+                            // );
                             print('Admin data saved successfully');
                             CoolAlert.show(
                               context: currentContext,

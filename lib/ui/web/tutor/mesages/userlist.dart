@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -12,7 +14,6 @@ import '../../../../provider/chatmessagedisplay.dart';
 import '../../../../services/addgetstarmessages.dart';
 import '../../../../services/getmessages.dart';
 import '../../../../utils/themes.dart';
-import '../calendar/tutor_schedule.dart';
 
 class UserList extends StatefulWidget {
   const UserList({super.key});
@@ -24,62 +25,7 @@ class UserList extends StatefulWidget {
 class _UserListState extends State<UserList> {
   final FocusNode _searchFocusNode = FocusNode();
 
-  final List<Map<String, String>> users = [
-    {
-      'name': 'John',
-      'description': 'Software Developer',
-      'avatar': 'https://via.placeholder.com/150',
-      'isFavorite': 'false'
-    },
-    {
-      'name': 'Jane',
-      'description': 'Graphic Designer',
-      'avatar': 'https://via.placeholder.com/150',
-      'isFavorite': 'false'
-    },
-    {
-      'name': 'Alex',
-      'description': 'Product Manager',
-      'avatar': 'https://via.placeholder.com/150',
-      'isFavorite': 'false'
-    },
-    {
-      'name': 'Mary',
-      'description': 'Data Analyst',
-      'avatar': 'https://via.placeholder.com/150',
-      'isFavorite': 'false'
-    },
-    {
-      'name': 'Tom',
-      'description': 'Marketing Specialist',
-      'avatar': 'https://via.placeholder.com/150',
-      'isFavorite': 'false'
-    },
-  ];
-
-  void toggleFavorite(int index) {
-    setState(() {
-      users[index]['isFavorite'] =
-          users[index]['isFavorite'] == 'true' ? 'false' : 'true';
-    });
-  }
-
-  void deleteUser(int index) {
-    setState(() {
-      users.removeAt(index);
-    });
-  }
-
   List<Map<String, dynamic>> filteredUsers = [];
-
-  void filterUsers(String query) {
-    setState(() {
-      filteredUsers = users
-          .where((user) =>
-              user['name']!.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    });
-  }
 
   final _userinfo = Hive.box('userID');
   List<Map<String, dynamic>> _items = [];
@@ -189,7 +135,6 @@ class _UserListState extends State<UserList> {
     List<TutorInformation> tutorsList =
         Provider.of<List<TutorInformation>>(context);
     final studentinfodata = Provider.of<List<StudentInfoClass>>(context);
-
     Size size = MediaQuery.of(context).size;
     final bool openChat =
         context.select((ChatDisplayProvider p) => p.openMessage);
@@ -216,8 +161,6 @@ class _UserListState extends State<UserList> {
           messagelist = tempmessage.where((message) {
             bool matches = selectedStudent.contains(message.studentID);
             if (matches) {
-              print(
-                  "Matching message: ${message.studentID}"); // Print the matching message
             }
             return matches;
           }).toList();
@@ -283,10 +226,12 @@ class _UserListState extends State<UserList> {
                         ),
                         width: 250,
                         child: TextField(
-                          decoration:  InputDecoration(
+                          decoration: InputDecoration(
                             fillColor: Colors.white,
                             border: InputBorder.none,
-                            hintText: _items.first['role'] == 'tutor' ?'Search student' : 'Search tutor',
+                            hintText: _items.first['role'] == 'tutor'
+                                ? 'Search student'
+                                : 'Search tutor',
                           ),
                           focusNode: _searchFocusNode, // Assign the focus node
 
@@ -361,13 +306,20 @@ class _UserListState extends State<UserList> {
                                   studentinfodata.firstWhere((student) =>
                                       student.userID ==
                                       messagelist[index].studentID);
-
                               return Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: currentconvo != null && currentconvo!.chatID == messagelist[index].chatID ? kColorPrimary : Colors.grey.shade400, // Border color
-                                    width: currentconvo != null && currentconvo!.chatID == messagelist[index].chatID ? 2.0: 1.0, // Border width
+                                    color: currentconvo != null &&
+                                            currentconvo!.chatID ==
+                                                messagelist[index].chatID
+                                        ? kColorPrimary
+                                        : Colors.grey.shade400, // Border color
+                                    width: currentconvo != null &&
+                                            currentconvo!.chatID ==
+                                                messagelist[index].chatID
+                                        ? 2.0
+                                        : 1.0, // Border width
                                   ),
                                 ),
                                 child: LayoutBuilder(
@@ -520,13 +472,13 @@ class _UserListState extends State<UserList> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const Icon(
+                            children: const [
+                              Icon(
                                 Icons.wechat_rounded,
                                 color: kColorPrimary,
                                 size: 75,
                               ),
-                              const Text(
+                              Text(
                                 'Select a conversation to display messages',
                                 style: TextStyle(
                                   fontSize: 16,
@@ -534,18 +486,18 @@ class _UserListState extends State<UserList> {
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                              const Text(
-                                'or',
-                                style:
-                                    TextStyle(fontSize: 16, color: kColorGrey),
-                              ),
-                              InkWell(
-                                  onTap: () {},
-                                  child: const Text(
-                                    'Start a new conversation',
-                                    style: TextStyle(
-                                        fontSize: 16, color: kColorPrimary),
-                                  ))
+                              // const Text(
+                              //   'or',
+                              //   style:
+                              //       TextStyle(fontSize: 16, color: kColorGrey),
+                              // ),
+                              // InkWell(
+                              //     onTap: () {},
+                              //     child: const Text(
+                              //       'Start a new conversation',
+                              //       style: TextStyle(
+                              //           fontSize: 16, color: kColorPrimary),
+                              //     ))
                             ],
                           ),
                         )

@@ -6,15 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:work4ututor/ui/web/signup/student_information_signup.dart';
-import 'package:work4ututor/ui/web/signup/tutor_signup.dart';
 
 import '../../../components/nav_bar.dart';
 import '../../../constant/constant.dart';
-import '../../../services/services.dart';
 import '../../../shared_components/responsive_builder.dart';
 import '../../../utils/themes.dart';
 import '../../auth/auth.dart';
-import '../login/login.dart';
 import '../terms/termpage.dart';
 
 class StudentSignup extends StatefulWidget {
@@ -38,7 +35,7 @@ final scafoldKey = GlobalKey<ScaffoldState>();
 final AuthService _auth = AuthService();
 
 class _StudentSignupState extends State<StudentSignup> {
-    final _userinfo = Hive.box('userID');
+  final _userinfo = Hive.box('userID');
   List<Map<String, dynamic>> _items = [];
   _refreshItems() {
     final data = _userinfo.keys.map((key) {
@@ -54,36 +51,37 @@ class _StudentSignupState extends State<StudentSignup> {
       _items = data.toList();
     });
   }
+
   @override
   void initState() {
     _refreshItems();
-     final index = _items.length;
-      if (index == 0) {
-        // GoRouter.of(context).go('/');
+    final index = _items.length;
+    if (index == 0) {
+      // GoRouter.of(context).go('/');
+    } else {
+      debugPrint(index.toString());
+      if (_items[0]['role'].toString() == 'student' &&
+          _items[0]['userStatus'].toString() == 'unfinished') {
+        GoRouter.of(context)
+            .go('/studentsignup/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'student' &&
+          _items[0]['userStatus'].toString() == 'completed') {
+        GoRouter.of(context)
+            .go('/studentdiary/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'tutor' &&
+          _items[0]['userStatus'].toString() == 'completed') {
+        GoRouter.of(context).go('/tutordesk/${_items[0]['userID'].toString()}');
+      } else if (_items[0]['role'].toString() == 'tutor' &&
+          _items[0]['userStatus'].toString() == 'unfinished') {
+        GoRouter.of(context)
+            .go('/tutorsignup/${_items[0]['userID'].toString()}');
       } else {
-        debugPrint(index.toString());
-        if (_items[0]['role'].toString() == 'student' &&
-            _items[0]['userStatus'].toString() == 'unfinished') {
-          GoRouter.of(context)
-              .go('/studentsignup/${_items[0]['userID'].toString()}');
-        } else if (_items[0]['role'].toString() == 'student' &&
-            _items[0]['userStatus'].toString() == 'completed') {
-          GoRouter.of(context)
-              .go('/studentdiary/${_items[0]['userID'].toString()}');
-        } else if (_items[0]['role'].toString() == 'tutor' &&
-            _items[0]['userStatus'].toString() == 'completed') {
-          GoRouter.of(context)
-              .go('/tutordesk/${_items[0]['userID'].toString()}');
-        } else if (_items[0]['role'].toString() == 'tutor' &&
-            _items[0]['userStatus'].toString() == 'unfinished') {
-          GoRouter.of(context)
-              .go('/tutorsignup/${_items[0]['userID'].toString()}');
-        } else {
-          GoRouter.of(context).go('/');
-        }
+        GoRouter.of(context).go('/');
       }
+    }
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -613,27 +611,21 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                         backgroundColor: Colors.black,
                                       );
                                     } else {
-                                      result =
+                                      String resultdata =
                                           "Account succesfully registered! Click okay to continue.";
-                                      print(result.uid);
-                                      CoolAlert.show(
-                                        context: context,
-                                        width: 200,
-                                        type: CoolAlertType.success,
-                                        text: result,
-                                        confirmBtnText: 'Okay',
-                                        onConfirmBtnTap: () {
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    StudentInfo(
-                                                      uid: result.uid,
-                                                      email: result.email,
-                                                    )),
-                                          );
-                                        },
-                                      );
+                                      setState(() {
+                                        CoolAlert.show(
+                                          context: context,
+                                          width: 200,
+                                          type: CoolAlertType.success,
+                                          text: resultdata,
+                                          autoCloseDuration:
+                                              const Duration(seconds: 1),
+                                        ).then((value) {
+                                          GoRouter.of(context).go(
+                                              '/studentsignup/${result.uid.toString()}');
+                                        });
+                                      });
                                     }
                                   });
                                 }
@@ -937,25 +929,21 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                     backgroundColor: Colors.black,
                                   );
                                 } else {
-                                  result =
+                                  String resultdata =
                                       "Account succesfully registered! Click okay to continue.";
-                                  print(result.uid);
-                                  CoolAlert.show(
-                                    context: context,
-                                    type: CoolAlertType.success,
-                                    text: result,
-                                    confirmBtnText: 'Okay',
-                                    onConfirmBtnTap: () {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => StudentInfo(
-                                                  uid: result.uid,
-                                                  email: result.email,
-                                                )),
-                                      );
-                                    },
-                                  );
+                                  setState(() {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      type: CoolAlertType.success,
+                                      text: resultdata,
+                                      autoCloseDuration:
+                                          const Duration(seconds: 1),
+                                    ).then((value) {
+                                      GoRouter.of(context).go(
+                                          '/studentsignup/${result.uid.toString()}');
+                                    });
+                                  });
                                 }
                               });
                             }
@@ -1239,8 +1227,6 @@ class _StudentSignUpState extends State<StudentSignUp> {
                               });
                             } else {
                               setState(() {
-                                print(result.uid);
-                                print(result.role);
                                 _auth.adduserInfo({
                                   "userID": result.uid,
                                   "role": result.role,
@@ -1262,7 +1248,6 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                 } else {
                                   String resultdata =
                                       "Account succesfully registered! Click okay to continue.";
-                                  print(result.uid);
                                   setState(() {
                                     CoolAlert.show(
                                       context: context,

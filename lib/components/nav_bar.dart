@@ -17,6 +17,7 @@ import 'package:work4ututor/ui/web/signup/tutor_signup.dart';
 import '../provider/chatmessagedisplay.dart';
 import '../provider/classinfo_provider.dart';
 import '../provider/init_provider.dart';
+import '../services/getunreadmessages.dart';
 import '../ui/auth/auth.dart';
 import '../ui/web/search_tutor/find_tutors.dart';
 import '../ui/web/terms/termpage.dart';
@@ -200,36 +201,36 @@ class CustomAppBarLog extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          Center(
-            child: Container(
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.person),
-                iconSize: 30,
-                color: const Color.fromARGB(255, 9, 93, 116),
-                tooltip: 'Log Out',
-                onPressed: () async {
-                  List<String> countryNames = getCountries();
+          // Center(
+          //   child: Container(
+          //     decoration: const BoxDecoration(
+          //       shape: BoxShape.circle,
+          //       color: Colors.white,
+          //     ),
+          //     child: IconButton(
+          //       icon: const Icon(Icons.person),
+          //       iconSize: 30,
+          //       color: const Color.fromARGB(255, 9, 93, 116),
+          //       tooltip: 'Log Out',
+          //       onPressed: () async {
+          //         List<String> countryNames = getCountries();
 
-                  // Call the function to save the country names to Firestore
-                  saveCountryNamesToFirestore(countryNames);
-                  // const url =
-                  //     'https://www.facebook.com'; // Replace with the URL you want to navigate to
-                  // if (await canLaunchUrl(Uri.parse(url))) {
-                  //   await launchUrl(Uri.parse(url));
-                  // } else {
-                  //   throw 'Could not launch $url';
-                  // }
-                },
-              ),
-            ),
-          ),
-          const SizedBox(
-            width: 100,
-          )
+          //         // Call the function to save the country names to Firestore
+          //         saveCountryNamesToFirestore(countryNames);
+          //         // const url =
+          //         //     'https://www.facebook.com'; // Replace with the URL you want to navigate to
+          //         // if (await canLaunchUrl(Uri.parse(url))) {
+          //         //   await launchUrl(Uri.parse(url));
+          //         // } else {
+          //         //   throw 'Could not launch $url';
+          //         // }
+          //       },
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(
+          //   width: 100,
+          // )
         ],
       ),
     );
@@ -264,7 +265,7 @@ Widget navbarmenu(BuildContext context, String uID) {
   //   // final provider = context.read<GotMessageProvider>();
   //   // provider.setGotMessage(false);
   // }
-
+  Provider.of<MessageNotifier>(context, listen: false).getHistory(uID, 'tutor');
   final int menuIndex = context.select((InitProvider p) => p.menuIndex);
   final AuthService _auth = AuthService();
   return Column(
@@ -635,17 +636,11 @@ Widget navbarmenu(BuildContext context, String uID) {
                               color:
                                   menuIndex == 2 ? Colors.white : kColorGrey),
                         ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Visibility(
-                          visible: totalMessage > 0 ? true : false,
-                          child: Icon(
-                            Icons.mark_email_unread_outlined,
-                            size: 30,
-                            color: menuIndex == 2 ? Colors.white : kColorGrey,
-                          ),
-                        ),
+                        const Spacer(),
+                        Consumer<MessageNotifier>(
+                            builder: (context, messagedetails, child) {
+                          return _buildNotif(messagedetails.messages.length);
+                        }),
                       ],
                     ),
                   ),
@@ -1082,6 +1077,33 @@ Widget navbarmenu(BuildContext context, String uID) {
       ),
     ],
   );
+}
+
+_buildNotif(int data) {
+  return (data == null || data <= 0)
+      ? Container()
+      : Container(
+          width: 30,
+          padding: const EdgeInsets.all(5),
+          decoration: const BoxDecoration(
+            color: kSecondarybuttonblue,
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10),
+              topRight: Radius.circular(10),
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            (data >= 100) ? "99+" : "${data}",
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        );
 }
 
 void deleteAllData() async {
