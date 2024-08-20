@@ -25,7 +25,7 @@ class _ViewScheduleDataState extends State<ViewScheduleData> {
     return MultiProvider(
       providers: [
         StreamProvider<List<ClassesData>>.value(
-          value: EnrolledClass(uid: widget.data['userId'], role: 'tutor')
+          value: EnrolledClass(uid: widget.data['userId'], role: 'tutor', targetTimezone: '',)
               .getenrolled,
           catchError: (context, error) {
             return [];

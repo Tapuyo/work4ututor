@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:work4ututor/ui/web/communication.dart/uploadrecording.dart';
 import 'package:work4ututor/ui/web/tutor/tutor_profile/viewschedule.dart';
 
+import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/subject_class.dart';
 import '../../../../services/addtocart.dart';
 import '../../../../services/getmyrating.dart';
@@ -25,8 +26,9 @@ import 'view_file.dart';
 class TutorProfileFloat extends StatefulWidget {
   final dynamic tutorsinfo;
   final String studentdata;
+  final String studenttinfo;
   const TutorProfileFloat(
-      {super.key, required this.tutorsinfo, required this.studentdata});
+      {super.key, required this.tutorsinfo, required this.studentdata, required this.studenttinfo});
 
   @override
   State<TutorProfileFloat> createState() => _TutorProfileFloatState();
@@ -1798,7 +1800,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                                                 width - 400,
                                                                             child:
                                                                                 ViewScheduleData(
-                                                                              data: widget.tutorsinfo,
+                                                                              data: widget.tutorsinfo, studentdata: widget.studenttinfo,
                                                                             ),
                                                                           ),
                                                                           Positioned(
@@ -2001,7 +2003,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                               ],
                                             ),
                                             const SizedBox(
-                                              height: 20,
+                                              height: 40,
                                             ),
                                             const Align(
                                               alignment: Alignment.centerLeft,

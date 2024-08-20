@@ -10,38 +10,53 @@ Future<void> updateStarredMessagesInFirestore(
     await starredMessagesCollection.doc(userId).set({
       'messageIds': FieldValue.arrayUnion(starredMessageIds),
     });
-    print('List updated in Firestore');
   } catch (e) {
     print('Error updating list: $e');
   }
 }
 
-
 class StarMessagesNotifier with ChangeNotifier {
-  final CollectionReference starredMessagesCollection =
-      FirebaseFirestore.instance.collection('starredmessages');
+  // final CollectionReference starredMessagesCollection =
+  //     FirebaseFirestore.instance.collection('starredmessages');
 
   List<String> _starMessages = [];
-  bool _isFetching = false;
 
   List<String> get starMessages => _starMessages;
-  bool get isFetching => _isFetching;
 
-  Future<void> fetchPreferredTutors(String userID) async {
+  // void fetchPreferredTutors(String userID) async {
+  //   try {
+  //     DocumentSnapshot messageDoc =
+  //         await starredMessagesCollection.doc(userID).get();
+
+  //     if (messageDoc.exists) {
+  //       _starMessages = List<String>.from(messageDoc['messageIds']);
+  //       notifyListeners(); // Notify listeners again to update the UI
+  //     } else {
+  //       _starMessages = [];
+  //       notifyListeners(); // Notify listeners again to update the UI
+  //     }
+  //   } catch (e) {
+  //     _starMessages = [];
+  //     notifyListeners(); // Notify listeners again to update the UI
+  //   }
+  // }
+
+  void fetchPreferredTutors(String uid) async {
     try {
-      _isFetching = true; // Set the flag to true before fetching
-      notifyListeners();
-
-      DocumentSnapshot messageDoc = await starredMessagesCollection.doc(userID).get();
-
-      if (messageDoc.exists) {
-        _starMessages = List<String>.from(messageDoc['messageIds']);
-      } else {
-      }
+      FirebaseFirestore.instance
+          .collection('starredmessages')
+          .doc(uid)
+          .snapshots()
+          .listen((DocumentSnapshot doc) {
+        if (doc.exists) {
+          _starMessages = List<String>.from(doc['messageIds']);
+        } else {
+          _starMessages = [];
+        }
+        notifyListeners();
+      });
     } catch (e) {
-      print('Error getting starred messages: $e');
-    } finally {
-      _isFetching = false; // Set the flag back to false after fetching
+      _starMessages;
       notifyListeners();
     }
   }

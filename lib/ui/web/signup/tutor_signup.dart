@@ -1243,6 +1243,7 @@ class _SignUpState extends State<SignUp> {
                                     context: context,
                                     type: CoolAlertType.error,
                                     title: 'Oops...',
+                                    width: 200,
                                     text: error,
                                     backgroundColor: Colors.black,
                                   );
@@ -1277,9 +1278,9 @@ class _SignUpState extends State<SignUp> {
                                       CoolAlert.show(
                                         context: context,
                                         type: CoolAlertType.success,
-                                      width: 200,
-                                          text: resultdata,
-                                          confirmBtnText: 'Okay',
+                                        width: 200,
+                                        text: resultdata,
+                                        confirmBtnText: 'Okay',
                                         autoCloseDuration:
                                             const Duration(seconds: 1),
                                       ).then((value) => GoRouter.of(context).go(

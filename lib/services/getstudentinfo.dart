@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:file_picker/file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -359,30 +360,39 @@ Future<String?> uploadTutorProfile(
   if (selectedImage == null) {
     return "";
   }
+  try {
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child("$uid/$filename");
 
-  Reference storageReference =
-      FirebaseStorage.instance.ref().child("$uid/$filename");
+    UploadTask uploadTask = storageReference.putData(selectedImage);
 
-  UploadTask uploadTask = storageReference.putData(selectedImage);
+    Completer<String?> completer = Completer<String?>(); // Create a Completer
 
-  Completer<String?> completer = Completer<String?>(); // Create a Completer
+    await uploadTask.whenComplete(() async {
+      if (uploadTask.snapshot.state == TaskState.success) {
+        // File uploaded successfully, get the download URL
+        String downloadURL = await storageReference.getDownloadURL();
+        completer.complete(downloadURL); // Set the Completer's value
+      } else {
+        // Handle the upload failure
+        completer.complete(null); // Set the Completer's value
+      }
+    });
 
-  await uploadTask.whenComplete(() async {
-    if (uploadTask.snapshot.state == TaskState.success) {
-      // File uploaded successfully, get the download URL
-      String downloadURL = await storageReference.getDownloadURL();
-      completer.complete(downloadURL); // Set the Completer's value
-    } else {
-      // Handle the upload failure
-      completer.complete(null); // Set the Completer's value
-    }
-  });
-
-  return completer.future; // Return the Future from the Completer
+    return completer.future;
+  } catch (e) {
+    print(e.toString());
+  }
+  // Return the Future from the Completer
 }
 
-Future<List<String?>> uploadTutorProfileList(String uid, String type,
-    List<Uint8List?> selectedImages, List<String> filenames) async {
+Future<List<String?>> uploadTutorProfileList(
+  String uid,
+  String type,
+  List<Uint8List?> selectedImages,
+  List<String> filenames,
+  StreamController<double> progressController,
+) async {
   List<String?> downloadURLs = [];
 
   for (int i = 0; i < selectedImages.length; i++) {
@@ -411,6 +421,54 @@ Future<List<String?>> uploadTutorProfileList(String uid, String type,
   }
 
   return downloadURLs; // Return a list of download URLs
+}
+
+Future<List<String>> uploadTutorProfileNew(
+  String uid,
+  String type,
+  List<Uint8List?> selectedImages,
+  List<String> filenames,
+  StreamController<double> progressController,
+  ValueNotifier<String> currentFileNotifier,
+) async {
+  List<Future<void>> uploadTasks = [];
+  List<String> storageReferences = [];
+
+  int totalBytes = selectedImages.fold(0, (sum, image) => sum + image!.length);
+  int bytesTransferred = 0;
+
+  for (int i = 0; i < selectedImages.length; i++) {
+    Uint8List selectedImage = selectedImages[i]!;
+    String filename = filenames[i];
+
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child("$uid/$type/$filename");
+    storageReferences.add(storageReference.fullPath.toString());
+
+    UploadTask uploadTask = storageReference.putData(selectedImage);
+
+    uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+      if (snapshot.state == TaskState.running) {
+        bytesTransferred += snapshot.bytesTransferred - bytesTransferred;
+        double progress = bytesTransferred / totalBytes;
+        progressController.add(progress); // Broadcast the progress update
+      } else if (snapshot.state == TaskState.success) {
+        currentFileNotifier.value =
+            filename; // Update the current filename on success
+      }
+    });
+
+    uploadTasks.add(uploadTask.whenComplete(() {}));
+  }
+
+  // Wait for all upload tasks to complete
+  await Future.wait(uploadTasks);
+
+  // Close the progress controller after the uploads are complete
+  progressController.close();
+
+  // Return the list of storage references
+  return storageReferences;
 }
 
 Future<List<String?>> uploadTutorcertificateList(String uid, String type,
@@ -445,6 +503,55 @@ Future<List<String?>> uploadTutorcertificateList(String uid, String type,
   return downloadURLs; // Return a list of download URLs
 }
 
+Future<List<String>> uploadTutorcertificateNew(
+  String uid,
+  String type,
+  List<Uint8List?> selectedImages,
+  List<String> filenames,
+  StreamController<double> progressController,
+  ValueNotifier<String> currentFileNotifier,
+) async {
+  List<Future<void>> uploadTasks = [];
+  List<String> storageReferences = [];
+
+  int totalBytes = selectedImages.fold(0, (sum, image) => sum + image!.length);
+  int bytesTransferred = 0;
+
+  for (int i = 0; i < selectedImages.length; i++) {
+    Uint8List selectedImage = selectedImages[i]!;
+    String filename = filenames[i];
+
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child("$uid/$type/$filename");
+    storageReferences.add(storageReference.fullPath.toString());
+
+    UploadTask uploadTask = storageReference.putData(selectedImage);
+
+    uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+      if (snapshot.state == TaskState.running) {
+        bytesTransferred += snapshot.bytesTransferred - bytesTransferred;
+        double progress = bytesTransferred / totalBytes;
+        progressController.add(progress);
+        currentFileNotifier.value = filename; // Broadcast the progress update
+      } else if (snapshot.state == TaskState.success) {
+        currentFileNotifier.value =
+            filename; // Update the current filename on success
+      }
+    });
+
+    uploadTasks.add(uploadTask.whenComplete(() {}));
+  }
+
+  // Wait for all upload tasks to complete
+  await Future.wait(uploadTasks);
+
+  // Close the progress controller after the uploads are complete
+  progressController.close();
+
+  // Return the list of storage references
+  return storageReferences;
+}
+
 Future<List<String?>> uploadTutorresumeList(String uid, String type,
     List<Uint8List?> selectedImages, List<String> filenames) async {
   List<String?> downloadURLs = [];
@@ -475,6 +582,55 @@ Future<List<String?>> uploadTutorresumeList(String uid, String type,
   }
 
   return downloadURLs; // Return a list of download URLs
+}
+
+Future<List<String>> uploadTutorresumeNew(
+  String uid,
+  String type,
+  List<Uint8List?> selectedImages,
+  List<String> filenames,
+  StreamController<double> progressController,
+  ValueNotifier<String> currentFileNotifier,
+) async {
+  List<Future<void>> uploadTasks = [];
+  List<String> storageReferences = [];
+
+  int totalBytes = selectedImages.fold(0, (sum, image) => sum + image!.length);
+  int bytesTransferred = 0;
+
+  for (int i = 0; i < selectedImages.length; i++) {
+    Uint8List selectedImage = selectedImages[i]!;
+    String filename = filenames[i];
+
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child("$uid/$type/$filename");
+    storageReferences.add(storageReference.fullPath.toString());
+
+    UploadTask uploadTask = storageReference.putData(selectedImage);
+
+    uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+      if (snapshot.state == TaskState.running) {
+        bytesTransferred += snapshot.bytesTransferred - bytesTransferred;
+        double progress = bytesTransferred / totalBytes;
+        progressController.add(progress);
+        currentFileNotifier.value = filename; // Broadcast the progress update
+      } else if (snapshot.state == TaskState.success) {
+        currentFileNotifier.value =
+            filename; // Update the current filename on success
+      }
+    });
+
+    uploadTasks.add(uploadTask.whenComplete(() {}));
+  }
+
+  // Wait for all upload tasks to complete
+  await Future.wait(uploadTasks);
+
+  // Close the progress controller after the uploads are complete
+  progressController.close();
+
+  // Return the list of storage references
+  return storageReferences;
 }
 
 Future<List<String?>> uploadTutorvideoList(String uid, String type,
@@ -509,6 +665,56 @@ Future<List<String?>> uploadTutorvideoList(String uid, String type,
   return downloadURLs; // Return a list of download URLs
 }
 
+Future<List<String?>> uploadTutorvideoListNew(
+  String uid,
+  String type,
+  List<Uint8List?> selectedImages,
+  List<String> filenames,
+  StreamController<double> progressController,
+  ValueNotifier<String> currentFileNotifier,
+) async {
+  List<Future<void>> uploadTasks = [];
+  List<String> storageReferences = [];
+
+  int totalBytes = selectedImages.fold(0, (sum, image) => sum + image!.length);
+  int bytesTransferred = 0;
+
+  for (int i = 0; i < selectedImages.length; i++) {
+    Uint8List selectedImage = selectedImages[i]!;
+    String filename = filenames[i];
+
+    Reference storageReference =
+        FirebaseStorage.instance.ref().child("$uid/$type/$filename");
+    storageReferences.add(storageReference.fullPath.toString());
+
+    UploadTask uploadTask = storageReference.putData(selectedImage);
+
+    uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
+      if (snapshot.state == TaskState.running) {
+        bytesTransferred += snapshot.bytesTransferred - bytesTransferred;
+        double progress = bytesTransferred / totalBytes;
+        progressController.add(progress);
+        currentFileNotifier.value = filename; // Broadcast the progress update
+      } else if (snapshot.state == TaskState.success) {
+        currentFileNotifier.value =
+            filename; 
+            // Update the current filename on success
+      }
+    });
+
+    uploadTasks.add(uploadTask.whenComplete(() {}));
+  }
+
+  // Wait for all upload tasks to complete
+  await Future.wait(uploadTasks);
+
+  // Close the progress controller after the uploads are complete
+  progressController.close();
+
+  // Return the list of storage references
+  return storageReferences;
+}
+
 Future<void> updateStudentInfowGuardian(
     String uid,
     String gender,
@@ -538,7 +744,7 @@ Future<void> updateStudentInfowGuardian(
   try {
     // Update the main student document
     await FirebaseFirestore.instance.collection('students').doc(uid).set({
-     "language": language,
+      "language": language,
       "gender": gender,
       "citizenship": citizenship,
       "address": address,
@@ -714,7 +920,7 @@ Future<String?> updateTutorInformation(
       }
     }
 
-    await updateUserStatus(uid, 'pending');
+    await updateUserStatus(uid, status);
     return 'success';
   } catch (error) {
     return error.toString();
@@ -975,8 +1181,8 @@ Future<String?> updateTutorInfoOffer(
       "promotionalMessage": promotionalMessage,
       "servicesprovided": servicesprovided,
       "presentation": updatedVideo,
-      "resume": updatedResume,
-      "resumetype": updatedType,
+      // "resume": updatedResume,
+      // "resumetype": updatedType,
       "certificates": updatedCertificates,
       "certificatestype": updatedCertificateTypes,
     });
@@ -984,6 +1190,80 @@ Future<String?> updateTutorInfoOffer(
     return 'success';
   } catch (error) {
     return error.toString();
+  }
+}
+
+Future<bool> deleteCertificate(String uid, String path) async {
+  try {
+    // Delete the file from Firebase Storage
+    if (path != null && path.isNotEmpty) {
+      await FirebaseStorage.instance.ref().child(path).delete();
+    }
+
+    // Get the current document from Firestore
+    final docSnapshot =
+        await FirebaseFirestore.instance.collection('tutor').doc(uid).get();
+
+    // Get the current certificates and certificate types
+    List<String> currentCertificates =
+        List<String>.from(docSnapshot.data()?['certificates'] ?? []);
+    List<String> currentCertificateTypes =
+        List<String>.from(docSnapshot.data()?['certificatestype'] ?? []);
+
+    // Find the index of the certificate path
+    int indexToRemove = currentCertificates.indexOf(path);
+
+    // If the path exists in currentCertificates, remove it and its corresponding certificate type
+    if (indexToRemove != -1) {
+      currentCertificates.removeAt(indexToRemove);
+      currentCertificateTypes.removeAt(indexToRemove);
+
+      // Update the Firestore document with the modified lists
+      await FirebaseFirestore.instance.collection('tutor').doc(uid).update({
+        'certificates': currentCertificates,
+        'certificatestype': currentCertificateTypes,
+      });
+    }
+
+    return true;
+  } catch (e) {
+    print('Error: $e');
+    return false;
+  }
+}
+
+Future<bool> deleteVideo(String uid, String path) async {
+  try {
+    String newpath = path;
+    // Delete the file from Firebase Storage
+    if (path != null && path.isNotEmpty) {
+      await FirebaseStorage.instance.ref().child(path).delete();
+    }
+
+    // Get the current document from Firestore
+    final docSnapshot =
+        await FirebaseFirestore.instance.collection('tutor').doc(uid).get();
+
+    // Get the current certificates and certificate types
+    List<String> currentVideos =
+        List<String>.from(docSnapshot.data()?['presentation'] ?? []);
+    // Find the index of the certificate path
+    int indexToRemove = currentVideos.indexOf(newpath);
+
+    // If the path exists in currentCertificates, remove it and its corresponding certificate type
+    if (indexToRemove != -1) {
+      currentVideos.removeAt(indexToRemove);
+
+      // Update the Firestore document with the modified lists
+      await FirebaseFirestore.instance.collection('tutor').doc(uid).update({
+        'presentation': currentVideos,
+      });
+    }
+
+    return true;
+  } catch (e) {
+    print('Error: $e');
+    return false;
   }
 }
 
@@ -1032,13 +1312,10 @@ Future<void> deleteFileCertificate(
             'certificates': certificates,
             'certificatestype': certificatestype,
           });
-
-        } catch (e) {
-        }
+        } catch (e) {}
       });
     }
-  } catch (e) {
-  }
+  } catch (e) {}
 }
 
 Future<void> deleteFileResume(
@@ -1085,13 +1362,10 @@ Future<void> deleteFileResume(
             'resume': resume,
             'resumetype': resumetype,
           });
-
-        } catch (e) {
-        }
+        } catch (e) {}
       });
     }
-  } catch (e) {
-  }
+  } catch (e) {}
 }
 
 Future<void> deleteFileVideo(
@@ -1133,11 +1407,122 @@ Future<void> deleteFileVideo(
           await docRef.update({
             'presentation': presentation,
           });
-
-        } catch (e) {
-        }
+        } catch (e) {}
       });
     }
-  } catch (e) {
+  } catch (e) {}
+}
+
+Future<String?> addNewCert(
+  String uid,
+  List<String?> certificates,
+  List<String?> certificatestype,
+) async {
+  try {
+    // Check if the incoming lists are empty
+    if ((certificates == null || certificates.isEmpty) &&
+        (certificatestype == null || certificatestype.isEmpty)) {
+      return 'No certificates to add';
+    }
+
+    final docSnapshot =
+        await FirebaseFirestore.instance.collection('tutor').doc(uid).get();
+
+    List<String?> currentCertificates = [];
+    List<String?> currentCertificateTypes = [];
+
+    // If the document exists, get the current lists from Firestore
+    if (docSnapshot.exists) {
+      currentCertificates =
+          List<String?>.from(docSnapshot.data()?['certificates'] ?? []);
+      currentCertificateTypes =
+          List<String?>.from(docSnapshot.data()?['certificatestype'] ?? []);
+    }
+
+    // Combine the current and new certificates and certificate types
+    if (certificates != null && certificates.isNotEmpty) {
+      currentCertificates.addAll(certificates);
+    }
+    if (certificatestype != null && certificatestype.isNotEmpty) {
+      currentCertificateTypes.addAll(certificatestype);
+    }
+
+    await FirebaseFirestore.instance.collection('tutor').doc(uid).update({
+      "certificates": currentCertificates,
+      "certificatestype": currentCertificateTypes,
+    });
+
+    return 'success';
+  } catch (error) {
+    return error.toString();
+  }
+}
+
+Future<String?> addNewVideo(
+  String uid,
+  List<String?> video,
+) async {
+  try {
+    // Check if the incoming lists are empty
+    if (video == null || video.isEmpty) {
+      return 'No video to add';
+    }
+    //
+    final docSnapshot =
+        await FirebaseFirestore.instance.collection('tutor').doc(uid).get();
+    List<String?> currentVideos = [];
+    if (docSnapshot.exists) {
+      currentVideos =
+          List<String?>.from(docSnapshot.data()?['presentation'] ?? []);
+    }
+    if (video != null && video.isNotEmpty) {
+      currentVideos.addAll(video);
+    }
+    //
+    await FirebaseFirestore.instance.collection('tutor').doc(uid).update({
+      "presentation": currentVideos,
+    });
+
+    return 'success';
+  } catch (error) {
+    return error.toString();
+  }
+}
+
+Future<String?> updateDescr(
+  String uid,
+  String promotionalMessage,
+) async {
+  try {
+    //
+    final docSnapshot =
+        await FirebaseFirestore.instance.collection('tutor').doc(uid).get();
+
+    await FirebaseFirestore.instance.collection('tutor').doc(uid).update({
+      "promotionalMessage": promotionalMessage,
+    });
+
+    return 'success';
+  } catch (error) {
+    return error.toString();
+  }
+}
+
+Future<String?> updateServices(
+  String uid,
+  List<String?> servicesprovided,
+) async {
+  try {
+    //
+    final docSnapshot =
+        await FirebaseFirestore.instance.collection('tutor').doc(uid).get();
+
+    await FirebaseFirestore.instance.collection('tutor').doc(uid).update({
+      "servicesprovided": servicesprovided,
+    });
+
+    return 'success';
+  } catch (error) {
+    return error.toString();
   }
 }

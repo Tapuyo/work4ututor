@@ -2,24 +2,18 @@
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:work4ututor/services/getcart.dart';
-import 'package:work4ututor/ui/web/student/book_classes/cancelclasses.dart';
-import 'package:work4ututor/ui/web/student/book_classes/student_view_classinfo.dart';
 import '../../../../data_class/classesdataclass.dart';
-import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../provider/classinfo_provider.dart';
 
-import 'dart:html' as html;
 
 import '../../../../utils/themes.dart';
 import '../../../data_class/subject_class.dart';
 import '../../../services/gettutor.dart';
 import '../../../shared_components/responsive_builder.dart';
-import '../admin/admin_sharedcomponents/header_text.dart';
+import '../tutor/tutor_profile/book_lesson.dart';
 import '../tutor/tutor_profile/view_file.dart';
 
 class MyCart extends StatefulWidget {
@@ -144,6 +138,41 @@ class _MyCartState extends State<MyCart> {
 
   ScrollController alllistscroll = ScrollController();
   List<String> rowData = List.generate(20, (index) => 'Item $index');
+  Map<String, dynamic> tutorInformationToJson(TutorInformation tutorData) {
+    return {
+      // Add other properties as needed
+      'contact': tutorData.contact,
+      'birthPlace': tutorData.birthPlace,
+      'country': tutorData.country,
+      'certificates': tutorData.certificates,
+      'resume': tutorData.resume,
+      'promotionalMessage': tutorData.promotionalMessage,
+      'withdrawal': tutorData.withdrawal,
+      'status': tutorData.status,
+      'extensionName': tutorData.extensionName,
+      'dateSign': tutorData.dateSign,
+      'firstName': tutorData.firstName,
+      'imageID': tutorData.imageID,
+      'language': tutorData.language,
+      'lastname': tutorData.lastname,
+      'middleName': tutorData.middleName,
+      'presentation': tutorData.presentation,
+      'tutorID': tutorData.tutorID,
+      'userId': tutorData.userId,
+      'age': tutorData.age,
+      'applicationID': tutorData.applicationID,
+      'birthCity': tutorData.birthCity,
+      'birthdate': tutorData.birthdate,
+      'emailadd': tutorData.emailadd,
+      'city': tutorData.city,
+      'servicesprovided': tutorData.servicesprovided,
+      'timezone': tutorData.timezone,
+      'validIds': tutorData.validIds,
+      'certificatestype': tutorData.certificatestype,
+      'resumelinktype': tutorData.resumelinktype,
+      'validIDstype': tutorData.validIDstype,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -237,7 +266,7 @@ class _MyCartState extends State<MyCart> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: const [
                     Text(
-                      "Classes",
+                      "My Cart",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
@@ -514,11 +543,22 @@ class _MyCartState extends State<MyCart> {
                                                                               TextButton(
                                                                             onPressed:
                                                                                 () {
-                                                                              // setState(() {
-                                                                              //   selectedclass = enrolledClass;
-                                                                              // });
-                                                                              // final provider = context.read<ViewClassDisplayProvider>();
-                                                                              // provider.setViewClassinfo(true);
+                                                                              Map<String, dynamic> tutorDataMap = tutorInformationToJson(tutorinfo);
+                                                                              showDialog(
+                                                                                context: context,
+                                                                                builder: (BuildContext context) {
+                                                                                  return BookLesson(
+                                                                                    studentdata: cart[index]['studentid'],
+                                                                                    tutordata: tutorDataMap,
+                                                                                    tutorteach: const [],
+                                                                                    noofclasses: cart[firstColumnIndex]['classno'],
+                                                                                    subject: subjectid.subjectName,
+                                                                                    currentprice: cart[firstColumnIndex]['classPrice'],
+                                                                                  );
+                                                                                },
+                                                                              ).then((selectedDate) {
+                                                                                deleteCartItem(cart[firstColumnIndex]['docid']);
+                                                                              });
                                                                             },
                                                                             child:
                                                                                 const Text(
@@ -534,11 +574,7 @@ class _MyCartState extends State<MyCart> {
                                                                               TextButton(
                                                                             onPressed:
                                                                                 () {
-                                                                              // setState(() {
-                                                                              //   selectedclass = enrolledClass;
-                                                                              // });
-                                                                              // final provider = context.read<ViewClassDisplayProvider>();
-                                                                              // provider.setViewClassinfo(true);
+                                                                              deleteCartItem(cart[firstColumnIndex]['docid']);
                                                                             },
                                                                             child:
                                                                                 const Text(
@@ -794,11 +830,22 @@ class _MyCartState extends State<MyCart> {
                                                                             child:
                                                                                 TextButton(
                                                                               onPressed: () {
-                                                                                // setState(() {
-                                                                                //   selectedclass = enrolledClass;
-                                                                                // });
-                                                                                // final provider = context.read<ViewClassDisplayProvider>();
-                                                                                // provider.setViewClassinfo(true);
+                                                                                Map<String, dynamic> tutorDataMap = tutorInformationToJson(tutorinfo);
+                                                                                showDialog(
+                                                                                  context: context,
+                                                                                  builder: (BuildContext context) {
+                                                                                    return BookLesson(
+                                                                                      studentdata: cart[index]['studentid'],
+                                                                                      tutordata: tutorDataMap,
+                                                                                      tutorteach: const [],
+                                                                                      noofclasses: cart[secondColumnIndex]['classno'],
+                                                                                      subject: subjectid.subjectName,
+                                                                                      currentprice: cart[secondColumnIndex]['classPrice'],
+                                                                                    );
+                                                                                  },
+                                                                                ).then((selectedDate) {
+                                                                                  deleteCartItem(cart[secondColumnIndex]['docid']);
+                                                                                });
                                                                               },
                                                                               child: const Text(
                                                                                 'Buy Now',
@@ -812,11 +859,7 @@ class _MyCartState extends State<MyCart> {
                                                                             child:
                                                                                 TextButton(
                                                                               onPressed: () {
-                                                                                // setState(() {
-                                                                                //   selectedclass = enrolledClass;
-                                                                                // });
-                                                                                // final provider = context.read<ViewClassDisplayProvider>();
-                                                                                // provider.setViewClassinfo(true);
+                                                                                deleteCartItem(cart[secondColumnIndex]['docid']);
                                                                               },
                                                                               child: const Text(
                                                                                 'Cancel',
@@ -1373,11 +1416,22 @@ class _MyCartState extends State<MyCart> {
                                                                               message: 'Buy Class',
                                                                               child: TextButton(
                                                                                 onPressed: () {
-                                                                                  // setState(() {
-                                                                                  //   selectedclass = enrolledClass;
-                                                                                  // });
-                                                                                  // final provider = context.read<ViewClassDisplayProvider>();
-                                                                                  // provider.setViewClassinfo(true);
+                                                                                  Map<String, dynamic> tutorDataMap = tutorInformationToJson(tutorinfo);
+                                                                                  showDialog(
+                                                                                    context: context,
+                                                                                    builder: (BuildContext context) {
+                                                                                      return BookLesson(
+                                                                                        studentdata: cart[index]['studentid'],
+                                                                                        tutordata: tutorDataMap,
+                                                                                        tutorteach: const [],
+                                                                                        noofclasses: cart[firstColumnIndex]['classno'],
+                                                                                        subject: subjectid.subjectName,
+                                                                                        currentprice: cart[firstColumnIndex]['classPrice'],
+                                                                                      );
+                                                                                    },
+                                                                                  ).then((selectedDate) {
+                                                                                    deleteCartItem(cart[firstColumnIndex]['docid']);
+                                                                                  });
                                                                                 },
                                                                                 child: const Text(
                                                                                   'Buy Now',
@@ -1389,11 +1443,7 @@ class _MyCartState extends State<MyCart> {
                                                                               message: 'Cancel',
                                                                               child: TextButton(
                                                                                 onPressed: () {
-                                                                                  // setState(() {
-                                                                                  //   selectedclass = enrolledClass;
-                                                                                  // });
-                                                                                  // final provider = context.read<ViewClassDisplayProvider>();
-                                                                                  // provider.setViewClassinfo(true);
+                                                                                  deleteCartItem(cart[firstColumnIndex]['docid']);
                                                                                 },
                                                                                 child: const Text(
                                                                                   'Cancel',
@@ -1636,11 +1686,22 @@ class _MyCartState extends State<MyCart> {
                                                                                 message: 'Buy Class',
                                                                                 child: TextButton(
                                                                                   onPressed: () {
-                                                                                    // setState(() {
-                                                                                    //   selectedclass = enrolledClass;
-                                                                                    // });
-                                                                                    // final provider = context.read<ViewClassDisplayProvider>();
-                                                                                    // provider.setViewClassinfo(true);
+                                                                                    Map<String, dynamic> tutorDataMap = tutorInformationToJson(tutorinfo);
+                                                                                    showDialog(
+                                                                                      context: context,
+                                                                                      builder: (BuildContext context) {
+                                                                                        return BookLesson(
+                                                                                          studentdata: cart[index]['studentid'],
+                                                                                          tutordata: tutorDataMap,
+                                                                                          tutorteach: const [],
+                                                                                          noofclasses: cart[secondColumnIndex]['classno'],
+                                                                                          subject: subjectid.subjectName,
+                                                                                          currentprice: cart[secondColumnIndex]['classPrice'],
+                                                                                        );
+                                                                                      },
+                                                                                    ).then((selectedDate) {
+                                                                                      deleteCartItem(cart[secondColumnIndex]['docid']);
+                                                                                    });
                                                                                   },
                                                                                   child: const Text(
                                                                                     'Buy Now',
@@ -1652,11 +1713,7 @@ class _MyCartState extends State<MyCart> {
                                                                                 message: 'Cancel',
                                                                                 child: TextButton(
                                                                                   onPressed: () {
-                                                                                    // setState(() {
-                                                                                    //   selectedclass = enrolledClass;
-                                                                                    // });
-                                                                                    // final provider = context.read<ViewClassDisplayProvider>();
-                                                                                    // provider.setViewClassinfo(true);
+                                                                                    deleteCartItem(cart[secondColumnIndex]['docid']);
                                                                                   },
                                                                                   child: const Text(
                                                                                     'Cancel',
@@ -1890,11 +1947,22 @@ class _MyCartState extends State<MyCart> {
                                                                             child:
                                                                                 TextButton(
                                                                               onPressed: () {
-                                                                                // setState(() {
-                                                                                //   selectedclass = enrolledClass;
-                                                                                // });
-                                                                                // final provider = context.read<ViewClassDisplayProvider>();
-                                                                                // provider.setViewClassinfo(true);
+                                                                                Map<String, dynamic> tutorDataMap = tutorInformationToJson(tutorinfo);
+                                                                                showDialog(
+                                                                                  context: context,
+                                                                                  builder: (BuildContext context) {
+                                                                                    return BookLesson(
+                                                                                      studentdata: cart[index]['studentid'],
+                                                                                      tutordata: tutorDataMap,
+                                                                                      tutorteach: const [],
+                                                                                      noofclasses: cart[index]['classno'],
+                                                                                      subject: subjectid.subjectName,
+                                                                                      currentprice: cart[index]['classPrice'],
+                                                                                    );
+                                                                                  },
+                                                                                ).then((selectedDate) {
+                                                                                  deleteCartItem(cart[index]['docid']);
+                                                                                });
                                                                               },
                                                                               child: const Text(
                                                                                 'Buy Now',
@@ -1908,11 +1976,7 @@ class _MyCartState extends State<MyCart> {
                                                                             child:
                                                                                 TextButton(
                                                                               onPressed: () {
-                                                                                // setState(() {
-                                                                                //   selectedclass = enrolledClass;
-                                                                                // });
-                                                                                // final provider = context.read<ViewClassDisplayProvider>();
-                                                                                // provider.setViewClassinfo(true);
+                                                                                deleteCartItem(cart[index]['docid']);
                                                                               },
                                                                               child: const Text(
                                                                                 'Cancel',

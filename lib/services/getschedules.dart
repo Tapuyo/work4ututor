@@ -209,7 +209,10 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:work4ututor/services/timefromtimestamp.dart';
+import 'package:work4ututor/services/timestampconverter.dart';
 
 import '../data_class/classesdataclass.dart';
 import '../data_class/studentinfoclass.dart';
@@ -219,8 +222,8 @@ import '../provider/schedulenotifier.dart';
 class ScheduleEnrolledClass {
   final String uid;
   final String role;
-
-  ScheduleEnrolledClass({required this.uid, required this.role});
+final String targetTimezone;
+  ScheduleEnrolledClass( {required this.uid, required this.role, required this.targetTimezone,});
 
   Stream<List<Schedule>> get getenrolled {
     return FirebaseFirestore.instance
@@ -233,14 +236,20 @@ class ScheduleEnrolledClass {
     return snapshot.docs.map((subdata) {
       String session = subdata['session'] ?? '';
       String scheduleID = subdata['scheduleID'] ?? '';
-      String timefrom = subdata['timefrom'] ?? '';
-      String timeto = subdata['timeto'] ?? '';
-      DateTime schedule = subdata['schedule'].toDate() ?? DateTime.now();
+      // String timefrom = subdata['timefrom'] ?? '';
+      // String timeto = subdata['timeto'] ?? '';
+      // DateTime schedule = subdata['schedule'].toDate() ?? DateTime.now();
       String classstatus = subdata['classstatus'] ?? '';
       String meetinglink = subdata['meetinglink'] ?? '';
       String rating = subdata['rating'] ?? '';
       String studentStatus = subdata['studentStatus'] ?? '';
       String tutorStatus = subdata['tutorStatus'] ?? '';
+      DateTime schedule = formatTimewDatewZone(
+          DateFormat('MMMM d, yyyy h:mm a')
+              .format(DateTime.parse(subdata['schedule']).toLocal()),
+          targetTimezone);
+      String timefrom = updateTime(targetTimezone, subdata['timefrom']);
+      String timeto = updateTime(targetTimezone, subdata['timeto']);
 
       return Schedule(
         scheduleID: scheduleID,
@@ -274,7 +283,7 @@ class ScheduleEnrolledClassData {
           EventSink<List<ScheduleData>> sink) async {
         List<ScheduleData> studentInfoList = [];
         for (var doc in snapshot.docs) {
-          var classesData = await _createClassesDataFromDocument(doc);
+          var classesData = _createClassesDataFromDocument(doc);
           studentInfoList.addAll(classesData);
         }
         sink.add(studentInfoList);

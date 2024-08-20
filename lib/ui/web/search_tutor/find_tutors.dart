@@ -103,6 +103,7 @@ class _FindTutorState extends State<FindTutor> {
   String lastname = '';
   String fullName = '';
   String studentID = '';
+  String timezone = '';
   String? profileurl;
 
   GlobalKey buttonKey = GlobalKey();
@@ -164,7 +165,7 @@ class _FindTutorState extends State<FindTutor> {
     // Add more valid URLs as needed
   ];
   bool isSearchIconClicked = true;
-
+StudentInfoClass? tempinfo;
   @override
   Widget build(BuildContext context) {
     final List<TutorInformation> temptutorsinfo =
@@ -199,7 +200,10 @@ class _FindTutorState extends State<FindTutor> {
                 ? '$firstname $lastname'
                 : '$firstname $middlename $lastname';
             studentID = studentdata.first.studentID;
+            timezone= studentdata.first.timezone;
             profileurl = studentdata.first.profilelink;
+            tempinfo = studentdata.first;
+
           }
           return Scaffold(
             key: studentdeskkey,
@@ -1999,7 +2003,7 @@ class _FindTutorState extends State<FindTutor> {
                                     subject: subjectuids,
                                     tutorsinfo: tutorsinfo,
                                     temppreffered:
-                                        prefferedTutor.preferredTutors,
+                                        prefferedTutor.preferredTutors, studenttzone: timezone,
                                   );
                                 });
                               }),

@@ -1,20 +1,15 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:work4ututor/ui/web/tutor/tutor_profile/viewschedule.dart';
 
 import '../../../../components/nav_bar.dart';
 import '../../../../data_class/subject_class.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../utils/themes.dart';
-import '../../admin/executive_dashboard.dart';
-import 'book_lesson.dart';
-import 'contact_teacher.dart';
+import '../tutor_dashboard/tutor_dashboard.dart';
 import 'view_file.dart';
 class TutorProfile extends StatefulWidget {
   final TutorInformation data;
@@ -29,12 +24,6 @@ class _TutorProfileState extends State<TutorProfile> {
 
   @override
   Widget build(BuildContext context) {
-    // final helpcategorylistx = Provider.of<List<HelpCategory>>(context);
-    // debugPrint(helpcategorylistx.length.toString());
-    // var tutorname = context.select((SearchTutorProvider p) => p.tName);
-    // final subjectInfo = Provider.of<List<Subjects>>(context);
-    // subjectInfox = subjectInfo;
-    // debugPrint('${subjectInfo.length}11111111111111111111111111111111111');
 
     dynamic langx = List<String>;
     var tutorsinfo = Provider.of<List<TutorInformation>>(context);
@@ -48,7 +37,6 @@ class _TutorProfileState extends State<TutorProfile> {
     } catch (a) {
       tutorsinfo = [];
     }
-    print(tutorsinfo);
     final CollectionReference subjectCollection =
         FirebaseFirestore.instance.collection('subjects');
 
@@ -832,17 +820,17 @@ class _TutorProfileState extends State<TutorProfile> {
                                                 ),
                                               ),
                                               onPressed: () {
-                                                showDialog<DateTime>(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return CalendarDialog(data: widget.data,);
-                                                  },
-                                                ).then((selectedDate) {
-                                                  if (selectedDate != null) {
-                                                    // Do something with the selected date
-                                                  }
-                                                });
+                                                // showDialog<DateTime>(
+                                                //   context: context,
+                                                //   builder:
+                                                //       (BuildContext context) {
+                                                //     return CalendarDialog(data: widget.data, studentdata: null,);
+                                                //   },
+                                                // ).then((selectedDate) {
+                                                //   if (selectedDate != null) {
+                                                //     // Do something with the selected date
+                                                //   }
+                                                // });
                                               },
                                               child: const Text(
                                                 'View Schedule',

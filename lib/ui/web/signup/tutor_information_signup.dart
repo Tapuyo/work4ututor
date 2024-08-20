@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, unused_local_variable, unused_field, prefer_final_fields, unused_element, use_build_context_synchronously
 
+import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -203,13 +204,44 @@ class _InputInfoState extends State<InputInfo> {
   String tutorIDNumber = 'TTR*********';
   String applicantsID = '';
   final tutorformKey = GlobalKey<FormState>();
+  late StreamController<double> _progressController;
+  late StreamController<double> _progressController1;
+
+  late StreamController<double> _progressController2;
+
+  late Stream<double> _progressStream;
+  late ValueNotifier<String> _currentFileNotifier;
+  late ValueNotifier<String> _currentFileNotifier1;
+
+  late ValueNotifier<String> _currentFileNotifier2;
+
+  double _progress = 0.0;
+  double _progress1 = 0.0;
+  double _progress2 = 0.0;
+
   @override
   void initState() {
     super.initState();
+    _progressController = StreamController<double>();
+    _currentFileNotifier = ValueNotifier<String>("");
+    _progressController1 = StreamController<double>();
+    _currentFileNotifier1 = ValueNotifier<String>("");
+    _progressController2 = StreamController<double>();
+    _currentFileNotifier2 = ValueNotifier<String>("");
+
     // _initData();
     getTimezones();
     getCountries();
     // _timeZones = tz.timeZoneDatabase.locations;
+  }
+
+  @override
+  void dispose() {
+    _progressController.close();
+    _progressController1.close();
+    _progressController2.close();
+
+    super.dispose();
   }
 
   // Future<void> _initData() async {
@@ -471,27 +503,27 @@ class _InputInfoState extends State<InputInfo> {
     {"isoCode": "zu", "name": "Zulu"}
   ];
 
-  void saveNamesToFirestore(List<Map<String, String>> languages) async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
+  // void saveNamesToFirestore(List<Map<String, String>> languages) async {
+  //   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-    try {
-      // Reference the Firestore collection where you want to save the data
-      CollectionReference namesCollection = firestore.collection('languages');
+  //   try {
+  //     // Reference the Firestore collection where you want to save the data
+  //     CollectionReference namesCollection = firestore.collection('languages');
 
-      // Extract only the names from the list of languages
-      List<String> names = languages.map((language) {
-        return language['name'] ??
-            ''; // Replace '' with a default value if 'name' is missing
-      }).toList();
+  //     // Extract only the names from the list of languages
+  //     List<String> names = languages.map((language) {
+  //       return language['name'] ??
+  //           ''; // Replace '' with a default value if 'name' is missing
+  //     }).toList();
 
-      // Add the list of names to the Firestore collection
-      await namesCollection.add({'names': names});
+  //     // Add the list of names to the Firestore collection
+  //     await namesCollection.add({'names': names});
 
-      print('Names saved to Firestore.');
-    } catch (e) {
-      print('Error saving names to Firestore: $e');
-    }
-  }
+  //     print('Names saved to Firestore.');
+  //   } catch (e) {
+  //     print('Error saving names to Firestore: $e');
+  //   }
+  // }
 
   List<Color> vibrantColors = [
     const Color.fromRGBO(185, 237, 221, 1),
@@ -686,7 +718,7 @@ class _InputInfoState extends State<InputInfo> {
                       height: 130,
                       child: GestureDetector(
                         onTap: () {
-                          saveNamesToFirestore(languages);
+                          // saveNamesToFirestore(languages);
                         },
                         child: const Text(
                           "Subscribe with your information",
@@ -1250,7 +1282,7 @@ class _InputInfoState extends State<InputInfo> {
                                             fontWeight: FontWeight.w600),
                                       ),
                                       Text(
-                                        "(You can select more than one language.)",
+                                        "(You can select more than one citizenship.)",
                                         style: TextStyle(
                                             color: Colors.redAccent,
                                             fontWeight: FontWeight.w100,
@@ -1308,8 +1340,8 @@ class _InputInfoState extends State<InputInfo> {
                                             null;
                                           } else {
                                             setState(() {
-                                              citizenship.add(suggestion
-                                                  .toString()); // Add the LanguageData object to tlanguages
+                                              citizenship
+                                                  .add(suggestion.toString());
                                             });
                                           }
                                         },
@@ -2040,7 +2072,7 @@ class _InputInfoState extends State<InputInfo> {
                                     // Specify LanguageData as the generic type
                                     textFieldConfiguration:
                                         TextFieldConfiguration(
-                                      // controller: _selectedLanguageController,
+                                      controller: _selectedLanguageController,
                                       decoration: InputDecoration(
                                         hintText: 'Choose your language',
                                         border: OutlineInputBorder(
@@ -2083,6 +2115,7 @@ class _InputInfoState extends State<InputInfo> {
                                               .toString()); // Add the LanguageData object to tlanguages
                                         });
                                       }
+                                      _selectedLanguageController.clear();
                                     },
                                   ),
                                 ),
@@ -2438,7 +2471,7 @@ class _InputInfoState extends State<InputInfo> {
                                                         ),
                                                         fillColor: Colors.grey,
                                                         hintText:
-                                                            '(Input subject name)',
+                                                            'Input subject name',
                                                         hintStyle:
                                                             const TextStyle(
                                                                 color:
@@ -3020,13 +3053,13 @@ class _InputInfoState extends State<InputInfo> {
                                 //     color: Colors.white,
                                 //     border: Border.all(
                                 //         color: Colors.grey.shade300, width: 1)),
-                                child: DropdownButtonFormField(
-                                  decoration: const InputDecoration(
-                                    enabledBorder: InputBorder.none,
-                                    border: InputBorder.none,
-                                  ),
+                                child: DropdownButton(
+                                  underline: const SizedBox
+                                      .shrink(), // Remove the underline
                                   value: dropdownvaluesubject,
-                                  hint: const Text("Select your subject"),
+                                  hint: tSubjects.isNotEmpty
+                                      ? const Text("Add more subject")
+                                      : const Text("Select your subject"),
                                   isExpanded: true,
                                   icon: const Icon(
                                     Icons.arrow_drop_down,
@@ -3047,6 +3080,7 @@ class _InputInfoState extends State<InputInfo> {
                                           price5: '',
                                           subjectid: '');
                                       tSubjects.add(data);
+                                      dropdownvaluesubject = null;
                                     });
                                   },
                                 ),
@@ -4187,22 +4221,16 @@ class _InputInfoState extends State<InputInfo> {
                           const SizedBox(
                             height: 14,
                           ),
-                          Card(
-                            margin: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            elevation: 5,
-                            child: Container(
-                              width: 680,
-                              height: 350,
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                              // decoration: BoxDecoration(
-                              //     borderRadius:
-                              //         const BorderRadius.all(Radius.circular(5)),
-                              //     color: Colors.white,
-                              //     border: Border.all(
-                              //         color: Colors.grey.shade300, width: 1)),
+                          Container(
+                            width: 680,
+                            height: 350,
+                            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                            child: Card(
+                              margin: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              elevation: 5,
                               child: TextFormField(
                                 controller: aboutme,
                                 textAlignVertical: TextAlignVertical.top,
@@ -4229,9 +4257,6 @@ class _InputInfoState extends State<InputInfo> {
                                 'Agree to Work4uTutor Terms & Condition and Privacy Policy.',
                                 style: TextStyle(fontSize: 15),
                               ),
-                              // subtitle: const Text(
-                              //     'A computer science portal for geeks.'),
-                              // secondary: const Icon(Icons.code),
                               autofocus: false,
                               activeColor: Colors.green,
                               checkColor: Colors.white,
@@ -4299,6 +4324,7 @@ class _InputInfoState extends State<InputInfo> {
                               },
                             ),
                           ),
+                          // LinearProgressIndicator(value: _progress),
                           Container(
                             padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                             width: 380,
@@ -4499,32 +4525,270 @@ class _InputInfoState extends State<InputInfo> {
                                     text: "Service you provide Required!",
                                   );
                                 } else {
-                                  CoolAlert.show(
-                                      context: context,
-                                      width: 200,
-                                      barrierDismissible: false,
-                                      type: CoolAlertType.loading,
-                                      text: 'Uploading your data....');
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('Uploading...'),
+                                        content: SizedBox(
+                                          height: 140,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text('ID uploading:'),
+                                              StreamBuilder<double>(
+                                                stream:
+                                                    _progressController.stream,
+                                                builder: (context, snapshot) {
+                                                  return Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      if (snapshot.hasData)
+                                                        Row(
+                                                          children: [
+                                                            SizedBox(
+                                                              width: 150,
+                                                              child: LinearProgressIndicator(
+                                                                  minHeight: 8,
+                                                                  valueColor: const AlwaysStoppedAnimation<
+                                                                          Color>(
+                                                                      Colors
+                                                                          .greenAccent),
+                                                                  semanticsValue:
+                                                                      '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                                  semanticsLabel:
+                                                                      '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                                  value: snapshot
+                                                                      .data),
+                                                            ),
+                                                            Text(
+                                                              '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                              style: const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  color:
+                                                                      kColorGrey),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      if (snapshot
+                                                              .connectionState ==
+                                                          ConnectionState
+                                                              .waiting)
+                                                        Row(
+                                                          children: [
+                                                            const SizedBox(
+                                                              width: 150,
+                                                              child: LinearProgressIndicator(
+                                                                  minHeight: 8,
+                                                                  valueColor: AlwaysStoppedAnimation<
+                                                                          Color>(
+                                                                      Colors
+                                                                          .greenAccent),
+                                                                  value: 0),
+                                                            ),
+                                                            Text(
+                                                              '${(0 * 100).toStringAsFixed(2)}%',
+                                                              style: const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  color:
+                                                                      kColorGrey),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                    ],
+                                                  );
+                                                },
+                                              ),
+                                              const Text('Resume uploading:'),
+                                              StreamBuilder<double>(
+                                                stream:
+                                                    _progressController1.stream,
+                                                builder: (context, snapshot) {
+                                                  return Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      if (snapshot.hasData)
+                                                        Row(
+                                                          children: [
+                                                            SizedBox(
+                                                              width: 150,
+                                                              child: LinearProgressIndicator(
+                                                                  minHeight: 8,
+                                                                  valueColor: const AlwaysStoppedAnimation<
+                                                                          Color>(
+                                                                      Colors
+                                                                          .greenAccent),
+                                                                  semanticsValue:
+                                                                      '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                                  semanticsLabel:
+                                                                      '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                                  value: snapshot
+                                                                      .data),
+                                                            ),
+                                                            Text(
+                                                              '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                              style: const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  color:
+                                                                      kColorGrey),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      if (snapshot
+                                                              .connectionState ==
+                                                          ConnectionState
+                                                              .waiting)
+                                                        Row(
+                                                          children: [
+                                                            const SizedBox(
+                                                              width: 150,
+                                                              child: LinearProgressIndicator(
+                                                                  minHeight: 8,
+                                                                  valueColor: AlwaysStoppedAnimation<
+                                                                          Color>(
+                                                                      Colors
+                                                                          .greenAccent),
+                                                                  value: 0),
+                                                            ),
+                                                            Text(
+                                                              '${(0 * 100).toStringAsFixed(2)}%',
+                                                              style: const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  color:
+                                                                      kColorGrey),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                    ],
+                                                  );
+                                                },
+                                              ),
+                                              const Text(
+                                                  'Certificates uploading:'),
+                                              StreamBuilder<double>(
+                                                stream:
+                                                    _progressController2.stream,
+                                                builder: (context, snapshot) {
+                                                  return Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      if (snapshot.hasData)
+                                                        Row(
+                                                          children: [
+                                                            SizedBox(
+                                                              width: 150,
+                                                              child: LinearProgressIndicator(
+                                                                  minHeight: 8,
+                                                                  valueColor: const AlwaysStoppedAnimation<
+                                                                          Color>(
+                                                                      Colors
+                                                                          .greenAccent),
+                                                                  semanticsValue:
+                                                                      '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                                  semanticsLabel:
+                                                                      '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                                  value: snapshot
+                                                                      .data),
+                                                            ),
+                                                            Text(
+                                                              '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                              style: const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  color:
+                                                                      kColorGrey),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      if (snapshot
+                                                              .connectionState ==
+                                                          ConnectionState
+                                                              .waiting)
+                                                        Row(
+                                                          children: [
+                                                            const SizedBox(
+                                                              width: 150,
+                                                              child: LinearProgressIndicator(
+                                                                  minHeight: 8,
+                                                                  valueColor: AlwaysStoppedAnimation<
+                                                                          Color>(
+                                                                      Colors
+                                                                          .greenAccent),
+                                                                  value: 0),
+                                                            ),
+                                                            Text(
+                                                              '${(0 * 100).toStringAsFixed(2)}%',
+                                                              style: const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  color:
+                                                                      kColorGrey),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                    ],
+                                                  );
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ).then((value) {
+                                    _currentFileNotifier.dispose();
+                                    _currentFileNotifier1.dispose();
+                                    _currentFileNotifier2.dispose();
+                                  });
                                   String? data = await uploadTutorProfile(
                                     widget.uid,
                                     selectedImage!,
                                     filename,
                                   );
-                                  List<String?> idlinks =
-                                      await uploadTutorProfileList(widget.uid,
-                                          'ID', selectedIDfiles, idfilenames);
-                                  List<String?> resumelinks =
-                                      await uploadTutorresumeList(
-                                          widget.uid,
-                                          'Resume',
-                                          selectedresume,
-                                          resumefilenames);
-                                  List<String?> certificatelinks =
-                                      await uploadTutorcertificateList(
-                                          widget.uid,
-                                          'Certificates',
-                                          selectedCertificates,
-                                          certificatesfilenames);
+
+                                  // List<String?> idlinks =
+                                  //     await uploadTutorProfileNew(
+                                  //         widget.uid,
+                                  //         'ID',
+                                  //         selectedIDfiles,
+                                  //         idfilenames,
+                                  //         _progressController,
+                                  //         _currentFileNotifier);
+
+                                  // List<String?> resumelinks =
+                                  //     await uploadTutorresumeNew(
+                                  //         widget.uid,
+                                  //         'Resume',
+                                  //         selectedresume,
+                                  //         resumefilenames,
+                                  //         _progressController1,
+                                  //         _currentFileNotifier1);
+                                  // List<String?> certificatelinks =
+                                  //     await uploadTutorcertificateNew(
+                                  //         widget.uid,
+                                  //         'Certificates',
+                                  //         selectedCertificates,
+                                  //         certificatesfilenames,
+                                  //         _progressController2,
+                                  //         _currentFileNotifier2);
+
                                   // List<String?> videolinks =
                                   //     await uploadTutorvideoList(
                                   //         widget.uid,
@@ -4556,41 +4820,64 @@ class _InputInfoState extends State<InputInfo> {
                                       'completed',
                                       aboutme.text,
                                       data!,
-                                      certificatelinks.isEmpty
-                                          ? []
-                                          : certificatelinks,
+                                      await uploadTutorcertificateNew(
+                                          widget.uid,
+                                          'Certificates',
+                                          selectedCertificates,
+                                          certificatesfilenames,
+                                          _progressController2,
+                                          _currentFileNotifier2,),
                                       certificatesfilenamestype.isEmpty
                                           ? []
                                           : certificatesfilenamestype,
-                                      resumelinks.isEmpty ? [] : resumelinks,
+                                      await uploadTutorresumeNew(
+                                          widget.uid,
+                                          'Resume',
+                                          selectedresume,
+                                          resumefilenames,
+                                          _progressController1,
+                                          _currentFileNotifier1),
                                       resumefilenamestype.isEmpty
                                           ? []
                                           : resumefilenamestype,
                                       [],
                                       // videolinks.isEmpty ? [] : videolinks,
-                                      idlinks.isEmpty ? [] : idlinks,
+                                      await uploadTutorProfileNew(
+                                          widget.uid,
+                                          'ID',
+                                          selectedIDfiles,
+                                          idfilenames,
+                                          _progressController,
+                                          _currentFileNotifier),
                                       idfilenamestype.isEmpty
                                           ? []
                                           : idfilenamestype,
                                       servicesprovided);
+                                  if (mounted) {
+                                    _progressController.close();
+                                    _progressController1.close();
+                                    _progressController2.close();
+
+                                    Navigator.of(context).pop();
+                                  }
                                   if (result == 'success') {
                                     dynamic result = await _auth.signOutAnon();
                                     SendWelcomeEmailtoUser.sendMail(
-                                          email: widget.email,
-                                          name: firstname.text);
+                                        email: widget.email,
+                                        name: firstname.text);
                                     deleteAllData();
 
                                     setState(() {
-                                      CoolAlert.show(
-                                        context: context,
-                                        width: 200,
-                                        type: CoolAlertType.success,
-                                        text: 'Sign up succesfully!',
-                                        autoCloseDuration:
-                                            const Duration(seconds: 1),
-                                      ).then((value) {
-                                        GoRouter.of(context).go('/');
-                                      });
+                                      //   CoolAlert.show(
+                                      //     context: context,
+                                      //     width: 200,
+                                      //     type: CoolAlertType.success,
+                                      //     text: 'Sign up succesfully!',
+                                      //     autoCloseDuration:
+                                      //         const Duration(seconds: 1),
+                                      //   ).then((value) {
+                                      GoRouter.of(context).go('/');
+                                      //   });
                                     });
                                   } else {
                                     CoolAlert.show(

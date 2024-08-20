@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:universal_html/html.dart' as html;
-import 'dart:typed_data';
 import 'package:video_player/video_player.dart';
 import 'package:work4ututor/utils/themes.dart';
 
-import '../admin/admin_sharedcomponents/header_text.dart';
+import '../../../shared_components/header_text.dart';
 
 class VideoUploadWidget extends StatefulWidget {
   final String videolink;

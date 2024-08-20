@@ -7,8 +7,8 @@ import 'package:intl/intl.dart';
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../services/bookingfunctions/setscheduletime.dart';
 import '../../../../services/notificationfunctions/sendnotifications.dart';
+import '../../../../shared_components/header_text.dart';
 import '../../../../utils/themes.dart';
-import '../../admin/admin_sharedcomponents/header_text.dart';
 
 class ReSchedNow extends StatefulWidget {
   final Schedule currentschedule;
@@ -89,7 +89,6 @@ class _ReSchedNowState extends State<ReSchedNow> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),

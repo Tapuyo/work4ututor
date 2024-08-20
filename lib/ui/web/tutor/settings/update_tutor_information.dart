@@ -1,9 +1,11 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_final_fields
 
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:cool_alert/cool_alert.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -65,6 +67,14 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
   ScrollController _scrollController1 = ScrollController();
   ScrollController _scrollController2 = ScrollController();
   ScrollController _scrollController3 = ScrollController();
+  StreamController<double> _progressController = StreamController<double>();
+  StreamController<double> _progressController1 = StreamController<double>();
+
+  ValueNotifier<String> _currentFileNotifier = ValueNotifier<String>('');
+  ValueNotifier<String> _currentFileNotifier1 = ValueNotifier<String>('');
+  ValueNotifier<bool> _isUploading = ValueNotifier<bool>(false);
+  ValueNotifier<bool> _isUploading1 = ValueNotifier<bool>(false);
+
   String uID = "Upload your ID";
   bool selection1 = false;
   bool selection2 = false;
@@ -103,6 +113,13 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
   void initState() {
     super.initState();
     initializeWidget(widget.tutordata);
+  }
+
+  @override
+  void dispose() {
+    _progressController.close();
+    _progressController1.close();
+    super.dispose();
   }
 
   void initializeWidget(TutorInformation tutordata) {
@@ -290,7 +307,7 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
   List<String> certificatesfilenamestype = [];
   void selectCertificates(String uid) async {
     FilePickerResult? result =
-        await FilePicker.platform.pickFiles(allowMultiple: true);
+        await FilePicker.platform.pickFiles(allowMultiple: false);
 
     if (result != null && result.files.isNotEmpty) {
       setState(() {
@@ -321,39 +338,34 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
           }
         }));
       });
+      String? output = await addNewCert(
+          uid,
+          await uploadTutorcertificateNew(
+            uid,
+            'Certificates',
+            selectedCertificates,
+            certificatesfilenames,
+            _progressController,
+            _currentFileNotifier,
+          ),
+          certificatesfilenamestype);
+
+      if (output == 'success') {
+        selectedCertificates = [];
+        certificatesfilenames = [];
+        certificatesfilenamestype = [];
+        _currentFileNotifier = ValueNotifier('');
+      } else {
+        CoolAlert.show(
+          context: context,
+          width: 200,
+          type: CoolAlertType.error,
+          titleTextStyle:
+              const TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
+          title: output.toString(),
+        );
+      }
     }
-    // List<String?> certificatelinks = await uploadTutorcertificateList(
-    //     uid, 'Certificates', selectedCertificates, certificatesfilenames);
-    // String? output = await updateTutorCertificates(
-    //   uid,
-    //   certificatelinks.isEmpty ? [] : certificatelinks,
-    //   certificatesfilenamestype.isEmpty ? [] : certificatesfilenamestype,
-    // );
-    // if (output == 'success') {
-    //   setState(() {
-    //     CoolAlert.show(
-    //       context: context,
-    //       width: 200,
-    //       type: CoolAlertType.success,
-    //       title: 'File added!',
-    //       titleTextStyle:
-    //           const TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
-    //       autoCloseDuration: const Duration(seconds: 1),
-    //     );
-    //   });
-    // } else {
-    //   CoolAlert.show(
-    //     context: context,
-    //     width: 200,
-    //     type: CoolAlertType.error,
-    //     titleTextStyle:
-    //         const TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
-    //     title: output.toString(),
-    //   );
-    // }
-    // setState(() {
-    //   initializeWidget();
-    // });
   }
 
   List<Uint8List?> selectedVideos = [];
@@ -361,7 +373,7 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
 
   void selectVideos(String uid) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
-      allowMultiple: true,
+      allowMultiple: false,
       type: FileType.video, // Specify that only video files should be allowed.
     );
 
@@ -371,37 +383,32 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
         videoFilenames.addAll(result.files.map((file) => file.name));
       });
     }
-    // List<String?> videolinks = await uploadTutorvideoList(
-    //     uid, 'Videos', selectedVideos, videoFilenames);
-    // String? output = await updateTutorVideo(
-    //   uid,
-    //   videolinks.isEmpty ? [] : videolinks,
-    // );
-    // if (output == 'success') {
-    //   setState(() {
-    //     CoolAlert.show(
-    //       context: context,
-    //       width: 200,
-    //       type: CoolAlertType.success,
-    //       title: 'File added!',
-    //       titleTextStyle:
-    //           const TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
-    //       autoCloseDuration: const Duration(seconds: 1),
-    //     );
-    //   });
-    // } else {
-    //   CoolAlert.show(
-    //     context: context,
-    //     width: 200,
-    //     type: CoolAlertType.error,
-    //     titleTextStyle:
-    //         const TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
-    //     title: output.toString(),
-    //   );
-    // }
-    // setState(() {
-    //   initializeWidget();
-    // });
+    String? output = await addNewVideo(
+      uid,
+      await uploadTutorvideoListNew(
+        uid,
+        'Videos',
+        selectedVideos,
+        videoFilenames,
+        _progressController1,
+        _currentFileNotifier1,
+      ),
+    );
+
+    if (output == 'success') {
+      selectedVideos = [];
+      videoFilenames = [];
+      _currentFileNotifier1 = ValueNotifier('');
+    } else {
+      CoolAlert.show(
+        context: context,
+        width: 200,
+        type: CoolAlertType.error,
+        titleTextStyle:
+            const TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
+        title: output.toString(),
+      );
+    }
   }
 
   bool areListsEqual(List<dynamic> dynamicList, List<String> stringList) {
@@ -576,32 +583,56 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                   //         ],
                   //       )
                   //     :
-                  Visibility(
-                    visible: model == false,
-                    child: TextButton.icon(
-                      onPressed: () {
-                        final provider =
-                            context.read<TutorInformationProvider>();
-                        provider.updateBoolValue(true);
-                      },
-                      icon: const Icon(
-                        Icons.edit_document,
-                        color: kColorPrimary, // Set the icon color to white
-                      ),
-                      label: const Text(
-                        'Edit',
-                        style: TextStyle(
-                          color: kColorPrimary, // Set the text color to white
+                  model == false
+                      ? TextButton.icon(
+                          onPressed: () {
+                            final provider =
+                                context.read<TutorInformationProvider>();
+                            provider.updateBoolValue(true);
+                          },
+                          icon: const Icon(
+                            Icons.edit_document,
+                            color: kColorPrimary, // Set the icon color to white
+                          ),
+                          label: const Text(
+                            'Edit',
+                            style: TextStyle(
+                              color:
+                                  kColorPrimary, // Set the text color to white
+                            ),
+                          ))
+                      : Align(
+                          alignment: Alignment.centerRight,
+                          child: SizedBox(
+                            width: 100,
+                            height: 40,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(20))),
+                                  elevation: 0),
+                              onPressed: () {
+                                final provider =
+                                    context.read<TutorInformationProvider>();
+                                provider.updateBoolValue(false);
+                              },
+                              child: const Text(
+                                'Cancel',
+                                style: TextStyle(
+                                    color: kCalendarColorB,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  )
                 ],
               ),
             ),
             Consumer<List<TutorInformation>>(builder: (context, tutordata, _) {
               return model
-                  ? tutorInformationUpdate(
+                  ? tutorInformation(
                       tutorinfodata.first.userId, tutordata.first)
                   : tutorInformationDisplay(tutorinfodata);
             })
@@ -612,6 +643,11 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
   }
 
   Widget tutorInformationUpdate(String tutorID, TutorInformation tutor) {
+    List<dynamic> tutorcertificates = tutor.certificates;
+    List<dynamic> tutorcertificatestype = tutor.certificatestype;
+
+    List<dynamic> tutorvideos = tutor.presentation;
+
     Size size = MediaQuery.of(context).size;
     return Container(
       alignment: Alignment.center,
@@ -700,68 +736,99 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                         scrollDirection: Axis.horizontal,
                                         itemCount: tutor.validIds.length,
                                         itemBuilder: (context, index) {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10.0, right: 10),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    showDialog(
-                                                        barrierDismissible:
-                                                            false,
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return ViewFile(
-                                                              imageURL: tutor
-                                                                      .validIds[
-                                                                  index]);
-                                                        });
-                                                  },
-                                                  child: Container(
-                                                    height: 80,
-                                                    width: 80,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: Colors.grey
-                                                          .shade200, // You can adjust the fit as needed.
-                                                    ),
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
-                                                      child: Image.network(
-                                                        tutor.validIds[index],
-                                                        fit: BoxFit
-                                                            .cover, // You can adjust the fit as needed.
+                                          return FutureBuilder(
+                                              future: FirebaseStorage.instance
+                                                  .ref(tutor.validIds[index])
+                                                  .getDownloadURL(),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState ==
+                                                    ConnectionState.waiting) {
+                                                  return const SizedBox(
+                                                      height: 25,
+                                                      width: 25,
+                                                      child: Center(
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                        color: Color.fromRGBO(
+                                                            1, 118, 132, 1),
+                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                } else if (snapshot.hasError) {
+                                                  return Text(
+                                                      'Error: ${snapshot.error}');
+                                                }
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10.0,
+                                                          right: 10),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      InkWell(
+                                                        onTap: () {
+                                                          showDialog(
+                                                              barrierDismissible:
+                                                                  false,
+                                                              context: context,
+                                                              builder:
+                                                                  (BuildContext
+                                                                      context) {
+                                                                return ViewFile(
+                                                                    imageURL:
+                                                                        snapshot
+                                                                            .data
+                                                                            .toString());
+                                                              });
+                                                        },
+                                                        child: Container(
+                                                          height: 80,
+                                                          width: 80,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            color: Colors.grey
+                                                                .shade200, // You can adjust the fit as needed.
+                                                          ),
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10.0),
+                                                            child:
+                                                                Image.network(
+                                                              snapshot.data
+                                                                  .toString(),
+                                                              fit: BoxFit
+                                                                  .cover, // You can adjust the fit as needed.
+                                                            ),
+                                                          ),
+                                                        ),
                                                       ),
-                                                    ),
+                                                      // IconButton(
+                                                      //   iconSize: 15,
+                                                      //   splashRadius: 2,
+                                                      //   icon: const Icon(
+                                                      //     Icons.delete,
+                                                      //     color: Colors.red,
+                                                      //   ),
+                                                      //   onPressed: () {
+                                                      //     setState(() {
+                                                      //       validIds.removeAt(index);
+                                                      //       validIDstype
+                                                      //           .removeAt(index);
+                                                      //     });
+                                                      //   },
+                                                      // ),
+                                                    ],
                                                   ),
-                                                ),
-                                                // IconButton(
-                                                //   iconSize: 15,
-                                                //   splashRadius: 2,
-                                                //   icon: const Icon(
-                                                //     Icons.delete,
-                                                //     color: Colors.red,
-                                                //   ),
-                                                //   onPressed: () {
-                                                //     setState(() {
-                                                //       validIds.removeAt(index);
-                                                //       validIDstype
-                                                //           .removeAt(index);
-                                                //     });
-                                                //   },
-                                                // ),
-                                              ],
-                                            ),
-                                          );
+                                                );
+                                              });
                                         },
                                       ),
                                     ),
@@ -878,73 +945,105 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                           if (certificatesfilenamestype[
                                                   currentindex] ==
                                               'Image') {
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10.0, right: 10),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () {
-                                                      // showDialog(
-                                                      //     barrierDismissible:
-                                                      //         false,
-                                                      //     context: context,
-                                                      //     builder: (BuildContext
-                                                      //         context) {
-                                                      //       return ViewFile(
-                                                      //           imageURL:
-                                                      //               certificates[
-                                                      //                   index]);
-                                                      //     });
-                                                    },
-                                                    child: Container(
-                                                      height: 80,
-                                                      width: 80,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        color: Colors
-                                                            .grey.shade200,
-                                                      ),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10.0),
-                                                        child: Image.memory(
-                                                          selectedCertificates[
-                                                              currentindex]!,
-                                                          fit: BoxFit.cover,
-                                                          height: 70,
-                                                          width: 70,
+                                            return FutureBuilder(
+                                                future: FirebaseStorage.instance
+                                                    .ref(tutor
+                                                        .certificates[index])
+                                                    .getDownloadURL(),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return const SizedBox(
+                                                        height: 25,
+                                                        width: 25,
+                                                        child: Center(
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                          strokeWidth: 2,
+                                                          color: Color.fromRGBO(
+                                                              1, 118, 132, 1),
+                                                        ))); // Display a loading indicator while waiting for the file to download
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return Text(
+                                                        'Error: ${snapshot.error}');
+                                                  }
+                                                  return Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10.0,
+                                                            right: 10),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        InkWell(
+                                                          onTap: () {
+                                                            // showDialog(
+                                                            //     barrierDismissible:
+                                                            //         false,
+                                                            //     context: context,
+                                                            //     builder: (BuildContext
+                                                            //         context) {
+                                                            //       return ViewFile(
+                                                            //           imageURL:
+                                                            //               certificates[
+                                                            //                   index]);
+                                                            //     });
+                                                          },
+                                                          child: Container(
+                                                            height: 80,
+                                                            width: 80,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                              color: Colors.grey
+                                                                  .shade200,
+                                                            ),
+                                                            child: ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10.0),
+                                                              child:
+                                                                  Image.network(
+                                                                snapshot.data
+                                                                    .toString(),
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                                height: 70,
+                                                                width: 70,
+                                                              ),
+                                                            ),
+                                                          ),
                                                         ),
-                                                      ),
+                                                        IconButton(
+                                                          iconSize: 15,
+                                                          splashRadius: 2,
+                                                          icon: const Icon(
+                                                            Icons.delete,
+                                                            color: Colors.red,
+                                                          ),
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              selectedCertificates
+                                                                  .removeAt(
+                                                                      currentindex);
+                                                              certificatesfilenamestype
+                                                                  .removeAt(
+                                                                      currentindex);
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ),
-                                                  IconButton(
-                                                    iconSize: 15,
-                                                    splashRadius: 2,
-                                                    icon: const Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        selectedCertificates
-                                                            .removeAt(
-                                                                currentindex);
-                                                        certificatesfilenamestype
-                                                            .removeAt(
-                                                                currentindex);
-                                                      });
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            );
+                                                  );
+                                                });
                                           } else if (certificatesfilenamestype[
                                                   currentindex] ==
                                               'pdf') {
@@ -1014,145 +1113,213 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                               ),
                                             );
                                           } else {
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10.0, right: 10),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () {
-                                                      // showDialog(
-                                                      //     barrierDismissible:
-                                                      //         false,
-                                                      //     context: context,
-                                                      //     builder: (BuildContext
-                                                      //         context) {
-                                                      //       return ViewFile(
-                                                      //           imageURL:
-                                                      //               certificates[
-                                                      //                   index]);
-                                                      //     });
-                                                    },
-                                                    child: Container(
-                                                      height: 80,
-                                                      width: 80,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        color: Colors.grey
-                                                            .shade200, // You can adjust the fit as needed.
-                                                      ),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10.0),
-                                                        child: const Icon(
-                                                          Icons
-                                                              .file_present_sharp,
-                                                          size: 48,
-                                                          color: Colors.blue,
+                                            return FutureBuilder(
+                                                future: FirebaseStorage.instance
+                                                    .ref(tutor
+                                                        .certificates[index])
+                                                    .getDownloadURL(),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return Container(
+                                                        height: 25,
+                                                        width: 25,
+                                                        child: const Center(
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                          strokeWidth: 2,
+                                                          color: Color.fromRGBO(
+                                                              1, 118, 132, 1),
+                                                        ))); // Display a loading indicator while waiting for the file to download
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return Text(
+                                                        'Error: ${snapshot.error}');
+                                                  }
+                                                  return Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10.0,
+                                                            right: 10),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        InkWell(
+                                                          onTap: () {
+                                                            // showDialog(
+                                                            //     barrierDismissible:
+                                                            //         false,
+                                                            //     context: context,
+                                                            //     builder: (BuildContext
+                                                            //         context) {
+                                                            //       return ViewFile(
+                                                            //           imageURL:
+                                                            //               certificates[
+                                                            //                   index]);
+                                                            //     });
+                                                          },
+                                                          child: Container(
+                                                            height: 80,
+                                                            width: 80,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                              color: Colors.grey
+                                                                  .shade200, // You can adjust the fit as needed.
+                                                            ),
+                                                            child: ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10.0),
+                                                              child: const Icon(
+                                                                Icons
+                                                                    .file_present_sharp,
+                                                                size: 48,
+                                                                color:
+                                                                    Colors.blue,
+                                                              ),
+                                                            ),
+                                                          ),
                                                         ),
-                                                      ),
+                                                        IconButton(
+                                                          iconSize: 15,
+                                                          splashRadius: 2,
+                                                          icon: const Icon(
+                                                            Icons.delete,
+                                                            color: Colors.red,
+                                                          ),
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              selectedCertificates
+                                                                  .removeAt(
+                                                                      currentindex);
+                                                              certificatesfilenamestype
+                                                                  .removeAt(
+                                                                      currentindex);
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ),
-                                                  IconButton(
-                                                    iconSize: 15,
-                                                    splashRadius: 2,
-                                                    icon: const Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        selectedCertificates
-                                                            .removeAt(
-                                                                currentindex);
-                                                        certificatesfilenamestype
-                                                            .removeAt(
-                                                                currentindex);
-                                                      });
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            );
+                                                  );
+                                                });
                                           }
                                         } else {
                                           if (tutor.certificatestype[index] ==
                                               'Image') {
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10.0, right: 10),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () {
-                                                      showDialog(
-                                                          barrierDismissible:
-                                                              false,
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return ViewFile(
-                                                                imageURL: tutor
-                                                                        .certificates[
-                                                                    index]);
-                                                          });
-                                                    },
-                                                    child: Container(
-                                                      height: 80,
-                                                      width: 80,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        color: Colors.grey
-                                                            .shade200, // You can adjust the fit as needed.
-                                                      ),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10.0),
-                                                        child: Image.network(
-                                                          tutor.certificates[
-                                                              index],
-                                                          fit: BoxFit
-                                                              .cover, // You can adjust the fit as needed.
+                                            return FutureBuilder(
+                                                future: FirebaseStorage.instance
+                                                    .ref(tutor
+                                                        .certificates[index])
+                                                    .getDownloadURL(),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return Container(
+                                                        height: 25,
+                                                        width: 25,
+                                                        child: const Center(
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                          strokeWidth: 2,
+                                                          color: Color.fromRGBO(
+                                                              1, 118, 132, 1),
+                                                        ))); // Display a loading indicator while waiting for the file to download
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return Text(
+                                                        'Error: ${snapshot.error}');
+                                                  }
+                                                  return Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10.0,
+                                                            right: 10),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        InkWell(
+                                                          onTap: () {
+                                                            showDialog(
+                                                                barrierDismissible:
+                                                                    false,
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  return ViewFile(
+                                                                      imageURL:
+                                                                          tutor.certificates[
+                                                                              index]);
+                                                                });
+                                                          },
+                                                          child: Container(
+                                                            height: 80,
+                                                            width: 80,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                              color: Colors.grey
+                                                                  .shade200, // You can adjust the fit as needed.
+                                                            ),
+                                                            child: ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10.0),
+                                                              child:
+                                                                  Image.network(
+                                                                snapshot.data
+                                                                    .toString(),
+                                                                fit: BoxFit
+                                                                    .cover, // You can adjust the fit as needed.
+                                                              ),
+                                                            ),
+                                                          ),
                                                         ),
-                                                      ),
+                                                        IconButton(
+                                                          iconSize: 15,
+                                                          splashRadius: 2,
+                                                          icon: const Icon(
+                                                            Icons.delete,
+                                                            color: Colors.red,
+                                                          ),
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              certificatesdelete
+                                                                  .add(tutor
+                                                                          .certificates[
+                                                                      index]);
+                                                              certificatesindexdelete
+                                                                  .add(index);
+                                                              tutor.certificates
+                                                                  .removeAt(
+                                                                      index);
+                                                              tutor
+                                                                  .certificatestype
+                                                                  .removeAt(
+                                                                      index);
+                                                            });
+                                                          },
+                                                        ),
+                                                      ],
                                                     ),
-                                                  ),
-                                                  IconButton(
-                                                    iconSize: 15,
-                                                    splashRadius: 2,
-                                                    icon: const Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        certificatesdelete.add(
-                                                            tutor.certificates[
-                                                                index]);
-                                                        certificatesindexdelete
-                                                            .add(index);
-                                                        tutor.certificates
-                                                            .removeAt(index);
-                                                        tutor.certificatestype
-                                                            .removeAt(index);
-                                                      });
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            );
+                                                  );
+                                                });
                                           } else if (tutor
                                                   .certificatestype[index] ==
                                               'pdf') {
@@ -1324,531 +1491,532 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                               )),
                         ],
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        height: 50,
-                        width: 500,
-                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.list_alt_outlined,
-                              color: kColorLight,
-                              size: 24.0,
-                            ),
-                            const SizedBox(width: 10.0),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const <Widget>[
-                                Text(
-                                  'Resume/s',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: kColorLight),
-                                ),
-                              ],
-                            ),
-                            const Spacer(),
-                            IconButton(
-                              iconSize: 15,
-                              icon: const Icon(
-                                Icons.add,
-                                color: kColorPrimary,
-                              ),
-                              onPressed: () {
-                                selectResumes(tutorID);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Row(
-                        children: [
-                          Container(
-                              width: 600,
-                              height: 120,
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                    iconSize: 15,
-                                    icon: const Icon(
-                                      Icons.arrow_back_ios, // Left arrow icon
-                                      color: Colors.blue,
-                                    ),
-                                    onPressed: () {
-                                      // Scroll to the left
-                                      updatescrollController2.animateTo(
-                                        updatescrollController2.offset -
-                                            100.0, // Adjust the value as needed
-                                        duration: const Duration(
-                                            milliseconds:
-                                                500), // Adjust the duration as needed
-                                        curve: Curves.ease,
-                                      );
-                                    },
-                                  ),
-                                  Expanded(
-                                    child: ListView.builder(
-                                      controller:
-                                          updatescrollController2, // Assign the ScrollController to the ListView
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: tutor.resume.length +
-                                          selectedresume.length,
-                                      itemBuilder: (context, index) {
-                                        if (index > (tutor.resume.length - 1)) {
-                                          int currentindex =
-                                              index - tutor.resume.length;
-                                          if (resumefilenamestype[
-                                                  currentindex] ==
-                                              'Image') {
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10.0, right: 10),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () {
-                                                      // showDialog(
-                                                      //     barrierDismissible:
-                                                      //         false,
-                                                      //     context: context,
-                                                      //     builder: (BuildContext
-                                                      //         context) {
-                                                      //       return ViewFile(
-                                                      //           imageURL:
-                                                      //               resume[
-                                                      //                   index]);
-                                                      //     });
-                                                    },
-                                                    child: Container(
-                                                      height: 80,
-                                                      width: 80,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        color: Colors.grey
-                                                            .shade200, // You can adjust the fit as needed.
-                                                      ),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10.0),
-                                                        child: Image.memory(
-                                                          selectedresume[
-                                                              currentindex]!,
-                                                          fit: BoxFit.cover,
-                                                          height: 70,
-                                                          width: 70,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  IconButton(
-                                                    iconSize: 15,
-                                                    splashRadius: 2,
-                                                    icon: const Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        selectedresume.removeAt(
-                                                            currentindex);
-                                                        resumefilenamestype
-                                                            .removeAt(
-                                                                currentindex);
-                                                      });
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          } else if (resumefilenamestype[
-                                                  currentindex] ==
-                                              'pdf') {
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10.0, right: 10),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () {
-                                                      // showDialog(
-                                                      //     barrierDismissible:
-                                                      //         false,
-                                                      //     context: context,
-                                                      //     builder: (BuildContext
-                                                      //         context) {
-                                                      //       return ViewFile(
-                                                      //           imageURL:
-                                                      //               resume[
-                                                      //                   index]);
-                                                      //     });
-                                                    },
-                                                    child: Container(
-                                                      height: 80,
-                                                      width: 80,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        color: Colors.grey
-                                                            .shade200, // You can adjust the fit as needed.
-                                                      ),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10.0),
-                                                        child: const Icon(
-                                                          Icons.picture_as_pdf,
-                                                          size:
-                                                              48, // Adjust the size as needed
-                                                          color: Colors
-                                                              .red, // Change the color as needed
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  IconButton(
-                                                    iconSize: 15,
-                                                    splashRadius: 2,
-                                                    icon: const Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        selectedresume.removeAt(
-                                                            currentindex);
-                                                        resumefilenamestype
-                                                            .removeAt(
-                                                                currentindex);
-                                                      });
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          } else {
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10.0, right: 10),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () {
-                                                      // showDialog(
-                                                      //     barrierDismissible:
-                                                      //         false,
-                                                      //     context: context,
-                                                      //     builder: (BuildContext
-                                                      //         context) {
-                                                      //       return ViewFile(
-                                                      //           imageURL:
-                                                      //               resume[
-                                                      //                   index]);
-                                                      //     });
-                                                    },
-                                                    child: Container(
-                                                      height: 80,
-                                                      width: 80,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        color: Colors.grey
-                                                            .shade200, // You can adjust the fit as needed.
-                                                      ),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10.0),
-                                                        child: const Icon(
-                                                          Icons
-                                                              .file_present_sharp,
-                                                          size: 48,
-                                                          color: Colors.blue,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  IconButton(
-                                                    iconSize: 15,
-                                                    splashRadius: 2,
-                                                    icon: const Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        selectedresume.removeAt(
-                                                            currentindex);
-                                                        resumefilenamestype
-                                                            .removeAt(
-                                                                currentindex);
-                                                      });
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          }
-                                        } else {
-                                          if (tutor.resumelinktype[index] ==
-                                              'Image') {
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10.0, right: 10),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () {
-                                                      showDialog(
-                                                          barrierDismissible:
-                                                              false,
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return ViewFile(
-                                                                imageURL: tutor
-                                                                        .resume[
-                                                                    index]);
-                                                          });
-                                                    },
-                                                    child: Container(
-                                                      height: 80,
-                                                      width: 80,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        color: Colors.grey
-                                                            .shade200, // You can adjust the fit as needed.
-                                                      ),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10.0),
-                                                        child: Image.network(
-                                                          tutor.resume[index],
-                                                          fit: BoxFit
-                                                              .cover, // You can adjust the fit as needed.
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  IconButton(
-                                                    iconSize: 15,
-                                                    splashRadius: 2,
-                                                    icon: const Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        resumedelete.add(tutor
-                                                            .resume[index]);
-                                                        resumeindexdelete
-                                                            .add(index);
-                                                        tutor.resume
-                                                            .removeAt(index);
-                                                        tutor.resumelinktype
-                                                            .removeAt(index);
-                                                      });
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          } else if (tutor
-                                                  .resumelinktype[index] ==
-                                              'pdf') {
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10.0, right: 10),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () {
-                                                      showDialog(
-                                                          barrierDismissible:
-                                                              false,
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return ViewFile(
-                                                                imageURL: tutor
-                                                                        .resume[
-                                                                    index]);
-                                                          });
-                                                    },
-                                                    child: Container(
-                                                      height: 80,
-                                                      width: 80,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        color: Colors.grey
-                                                            .shade200, // You can adjust the fit as needed.
-                                                      ),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10.0),
-                                                        child: const Icon(
-                                                          Icons.picture_as_pdf,
-                                                          size:
-                                                              48, // Adjust the size as needed
-                                                          color: Colors
-                                                              .red, // Change the color as needed
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  IconButton(
-                                                    iconSize: 15,
-                                                    splashRadius: 2,
-                                                    icon: const Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        resumedelete.add(tutor
-                                                            .resume[index]);
-                                                        resumeindexdelete
-                                                            .add(index);
-                                                        tutor.resume
-                                                            .removeAt(index);
-                                                        tutor.resumelinktype
-                                                            .removeAt(index);
-                                                      });
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          } else {
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10.0, right: 10),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () {
-                                                      showDialog(
-                                                          barrierDismissible:
-                                                              false,
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return ViewFile(
-                                                                imageURL: tutor
-                                                                        .resume[
-                                                                    index]);
-                                                          });
-                                                    },
-                                                    child: Container(
-                                                      height: 80,
-                                                      width: 80,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        color: Colors.grey
-                                                            .shade200, // You can adjust the fit as needed.
-                                                      ),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10.0),
-                                                        child: const Icon(
-                                                          Icons
-                                                              .file_present_sharp,
-                                                          size: 48,
-                                                          color: Colors.blue,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  IconButton(
-                                                    iconSize: 15,
-                                                    splashRadius: 2,
-                                                    icon: const Icon(
-                                                      Icons.delete,
-                                                      color: Colors.red,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        resumedelete.add(tutor
-                                                            .resume[index]);
-                                                        resumeindexdelete
-                                                            .add(index);
-                                                        tutor.resume
-                                                            .removeAt(index);
-                                                        resumelinktype
-                                                            .removeAt(index);
-                                                      });
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          }
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                  IconButton(
-                                    iconSize: 15,
-                                    icon: const Icon(
-                                      Icons
-                                          .arrow_forward_ios, // Right arrow icon
-                                      color: Colors.blue,
-                                    ),
-                                    onPressed: () {
-                                      // Scroll to the right
-                                      updatescrollController2.animateTo(
-                                        updatescrollController2.offset +
-                                            100.0, // Adjust the value as needed
-                                        duration: const Duration(
-                                            milliseconds:
-                                                500), // Adjust the duration as needed
-                                        curve: Curves.ease,
-                                      );
-                                    },
-                                  ),
-                                ],
-                              )),
-                        ],
-                      ),
+                      // const SizedBox(
+                      //   height: 10,
+                      // ),
+                      // Container(
+                      //   height: 50,
+                      //   width: 500,
+                      //   padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                      //   child: Row(
+                      //     children: [
+                      //       const Icon(
+                      //         Icons.list_alt_outlined,
+                      //         color: kColorLight,
+                      //         size: 24.0,
+                      //       ),
+                      //       const SizedBox(width: 10.0),
+                      //       Column(
+                      //         mainAxisAlignment: MainAxisAlignment.center,
+                      //         children: const <Widget>[
+                      //           Text(
+                      //             'Resume/s',
+                      //             style: TextStyle(
+                      //                 fontSize: 16,
+                      //                 fontWeight: FontWeight.bold,
+                      //                 color: kColorLight),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //       const Spacer(),
+                      //       IconButton(
+                      //         iconSize: 15,
+                      //         icon: const Icon(
+                      //           Icons.add,
+                      //           color: kColorPrimary,
+                      //         ),
+                      //         onPressed: () {
+                      //           selectResumes(tutorID);
+                      //         },
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      // const SizedBox(
+                      //   height: 20,
+                      // ),
+                      // Row(
+                      //   children: [
+                      //     Container(
+                      //         width: 600,
+                      //         height: 120,
+                      //         padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      //         child: Row(
+                      //           children: [
+                      //             IconButton(
+                      //               iconSize: 15,
+                      //               icon: const Icon(
+                      //                 Icons.arrow_back_ios, // Left arrow icon
+                      //                 color: Colors.blue,
+                      //               ),
+                      //               onPressed: () {
+                      //                 // Scroll to the left
+                      //                 updatescrollController2.animateTo(
+                      //                   updatescrollController2.offset -
+                      //                       100.0, // Adjust the value as needed
+                      //                   duration: const Duration(
+                      //                       milliseconds:
+                      //                           500), // Adjust the duration as needed
+                      //                   curve: Curves.ease,
+                      //                 );
+                      //               },
+                      //             ),
+                      //             Expanded(
+                      //               child: ListView.builder(
+                      //                 controller:
+                      //                     updatescrollController2, // Assign the ScrollController to the ListView
+                      //                 scrollDirection: Axis.horizontal,
+                      //                 itemCount: tutor.resume.length +
+                      //                     selectedresume.length,
+                      //                 itemBuilder: (context, index) {
+                      //                   if (index > (tutor.resume.length - 1)) {
+                      //                     int currentindex =
+                      //                         index - tutor.resume.length;
+                      //                     if (resumefilenamestype[
+                      //                             currentindex] ==
+                      //                         'Image') {
+                      //                       return Padding(
+                      //                         padding: const EdgeInsets.only(
+                      //                             left: 10.0, right: 10),
+                      //                         child: Row(
+                      //                           mainAxisAlignment:
+                      //                               MainAxisAlignment
+                      //                                   .spaceBetween,
+                      //                           children: [
+                      //                             InkWell(
+                      //                               onTap: () {
+                      //                                 // showDialog(
+                      //                                 //     barrierDismissible:
+                      //                                 //         false,
+                      //                                 //     context: context,
+                      //                                 //     builder: (BuildContext
+                      //                                 //         context) {
+                      //                                 //       return ViewFile(
+                      //                                 //           imageURL:
+                      //                                 //               resume[
+                      //                                 //                   index]);
+                      //                                 //     });
+                      //                               },
+                      //                               child: Container(
+                      //                                 height: 80,
+                      //                                 width: 80,
+                      //                                 decoration: BoxDecoration(
+                      //                                   borderRadius:
+                      //                                       BorderRadius
+                      //                                           .circular(10),
+                      //                                   color: Colors.grey
+                      //                                       .shade200, // You can adjust the fit as needed.
+                      //                                 ),
+                      //                                 child: ClipRRect(
+                      //                                   borderRadius:
+                      //                                       BorderRadius
+                      //                                           .circular(10.0),
+                      //                                   child: Image.memory(
+                      //                                     selectedresume[
+                      //                                         currentindex]!,
+                      //                                     fit: BoxFit.cover,
+                      //                                     height: 70,
+                      //                                     width: 70,
+                      //                                   ),
+                      //                                 ),
+                      //                               ),
+                      //                             ),
+                      //                             IconButton(
+                      //                               iconSize: 15,
+                      //                               splashRadius: 2,
+                      //                               icon: const Icon(
+                      //                                 Icons.delete,
+                      //                                 color: Colors.red,
+                      //                               ),
+                      //                               onPressed: () {
+                      //                                 setState(() {
+                      //                                   selectedresume.removeAt(
+                      //                                       currentindex);
+                      //                                   resumefilenamestype
+                      //                                       .removeAt(
+                      //                                           currentindex);
+                      //                                 });
+                      //                               },
+                      //                             ),
+                      //                           ],
+                      //                         ),
+                      //                       );
+                      //                     } else if (resumefilenamestype[
+                      //                             currentindex] ==
+                      //                         'pdf') {
+                      //                       return Padding(
+                      //                         padding: const EdgeInsets.only(
+                      //                             left: 10.0, right: 10),
+                      //                         child: Row(
+                      //                           mainAxisAlignment:
+                      //                               MainAxisAlignment
+                      //                                   .spaceBetween,
+                      //                           children: [
+                      //                             InkWell(
+                      //                               onTap: () {
+                      //                                 // showDialog(
+                      //                                 //     barrierDismissible:
+                      //                                 //         false,
+                      //                                 //     context: context,
+                      //                                 //     builder: (BuildContext
+                      //                                 //         context) {
+                      //                                 //       return ViewFile(
+                      //                                 //           imageURL:
+                      //                                 //               resume[
+                      //                                 //                   index]);
+                      //                                 //     });
+                      //                               },
+                      //                               child: Container(
+                      //                                 height: 80,
+                      //                                 width: 80,
+                      //                                 decoration: BoxDecoration(
+                      //                                   borderRadius:
+                      //                                       BorderRadius
+                      //                                           .circular(10),
+                      //                                   color: Colors.grey
+                      //                                       .shade200, // You can adjust the fit as needed.
+                      //                                 ),
+                      //                                 child: ClipRRect(
+                      //                                   borderRadius:
+                      //                                       BorderRadius
+                      //                                           .circular(10.0),
+                      //                                   child: const Icon(
+                      //                                     Icons.picture_as_pdf,
+                      //                                     size:
+                      //                                         48, // Adjust the size as needed
+                      //                                     color: Colors
+                      //                                         .red, // Change the color as needed
+                      //                                   ),
+                      //                                 ),
+                      //                               ),
+                      //                             ),
+                      //                             IconButton(
+                      //                               iconSize: 15,
+                      //                               splashRadius: 2,
+                      //                               icon: const Icon(
+                      //                                 Icons.delete,
+                      //                                 color: Colors.red,
+                      //                               ),
+                      //                               onPressed: () {
+                      //                                 setState(() {
+                      //                                   selectedresume.removeAt(
+                      //                                       currentindex);
+                      //                                   resumefilenamestype
+                      //                                       .removeAt(
+                      //                                           currentindex);
+                      //                                 });
+                      //                               },
+                      //                             ),
+                      //                           ],
+                      //                         ),
+                      //                       );
+                      //                     } else {
+                      //                       return Padding(
+                      //                         padding: const EdgeInsets.only(
+                      //                             left: 10.0, right: 10),
+                      //                         child: Row(
+                      //                           mainAxisAlignment:
+                      //                               MainAxisAlignment
+                      //                                   .spaceBetween,
+                      //                           children: [
+                      //                             InkWell(
+                      //                               onTap: () {
+                      //                                 // showDialog(
+                      //                                 //     barrierDismissible:
+                      //                                 //         false,
+                      //                                 //     context: context,
+                      //                                 //     builder: (BuildContext
+                      //                                 //         context) {
+                      //                                 //       return ViewFile(
+                      //                                 //           imageURL:
+                      //                                 //               resume[
+                      //                                 //                   index]);
+                      //                                 //     });
+                      //                               },
+                      //                               child: Container(
+                      //                                 height: 80,
+                      //                                 width: 80,
+                      //                                 decoration: BoxDecoration(
+                      //                                   borderRadius:
+                      //                                       BorderRadius
+                      //                                           .circular(10),
+                      //                                   color: Colors.grey
+                      //                                       .shade200, // You can adjust the fit as needed.
+                      //                                 ),
+                      //                                 child: ClipRRect(
+                      //                                   borderRadius:
+                      //                                       BorderRadius
+                      //                                           .circular(10.0),
+                      //                                   child: const Icon(
+                      //                                     Icons
+                      //                                         .file_present_sharp,
+                      //                                     size: 48,
+                      //                                     color: Colors.blue,
+                      //                                   ),
+                      //                                 ),
+                      //                               ),
+                      //                             ),
+                      //                             IconButton(
+                      //                               iconSize: 15,
+                      //                               splashRadius: 2,
+                      //                               icon: const Icon(
+                      //                                 Icons.delete,
+                      //                                 color: Colors.red,
+                      //                               ),
+                      //                               onPressed: () {
+                      //                                 setState(() {
+                      //                                   selectedresume.removeAt(
+                      //                                       currentindex);
+                      //                                   resumefilenamestype
+                      //                                       .removeAt(
+                      //                                           currentindex);
+                      //                                 });
+                      //                               },
+                      //                             ),
+                      //                           ],
+                      //                         ),
+                      //                       );
+                      //                     }
+                      //                   } else {
+                      //                     if (tutor.resumelinktype[index] ==
+                      //                         'Image') {
+                      //                       return Padding(
+                      //                         padding: const EdgeInsets.only(
+                      //                             left: 10.0, right: 10),
+                      //                         child: Row(
+                      //                           mainAxisAlignment:
+                      //                               MainAxisAlignment
+                      //                                   .spaceBetween,
+                      //                           children: [
+                      //                             InkWell(
+                      //                               onTap: () {
+                      //                                 showDialog(
+                      //                                     barrierDismissible:
+                      //                                         false,
+                      //                                     context: context,
+                      //                                     builder: (BuildContext
+                      //                                         context) {
+                      //                                       return ViewFile(
+                      //                                           imageURL: tutor
+                      //                                                   .resume[
+                      //                                               index]);
+                      //                                     });
+                      //                               },
+                      //                               child: Container(
+                      //                                 height: 80,
+                      //                                 width: 80,
+                      //                                 decoration: BoxDecoration(
+                      //                                   borderRadius:
+                      //                                       BorderRadius
+                      //                                           .circular(10),
+                      //                                   color: Colors.grey
+                      //                                       .shade200, // You can adjust the fit as needed.
+                      //                                 ),
+                      //                                 child: ClipRRect(
+                      //                                   borderRadius:
+                      //                                       BorderRadius
+                      //                                           .circular(10.0),
+                      //                                   child: Image.network(
+                      //                                     tutor.resume[index],
+                      //                                     fit: BoxFit
+                      //                                         .cover, // You can adjust the fit as needed.
+                      //                                   ),
+                      //                                 ),
+                      //                               ),
+                      //                             ),
+                      //                             IconButton(
+                      //                               iconSize: 15,
+                      //                               splashRadius: 2,
+                      //                               icon: const Icon(
+                      //                                 Icons.delete,
+                      //                                 color: Colors.red,
+                      //                               ),
+                      //                               onPressed: () {
+                      //                                 setState(() {
+                      //                                   resumedelete.add(tutor
+                      //                                       .resume[index]);
+                      //                                   resumeindexdelete
+                      //                                       .add(index);
+                      //                                   tutor.resume
+                      //                                       .removeAt(index);
+                      //                                   tutor.resumelinktype
+                      //                                       .removeAt(index);
+                      //                                 });
+                      //                               },
+                      //                             ),
+                      //                           ],
+                      //                         ),
+                      //                       );
+                      //                     } else if (tutor
+                      //                             .resumelinktype[index] ==
+                      //                         'pdf') {
+                      //                       return Padding(
+                      //                         padding: const EdgeInsets.only(
+                      //                             left: 10.0, right: 10),
+                      //                         child: Row(
+                      //                           mainAxisAlignment:
+                      //                               MainAxisAlignment
+                      //                                   .spaceBetween,
+                      //                           children: [
+                      //                             InkWell(
+                      //                               onTap: () {
+                      //                                 showDialog(
+                      //                                     barrierDismissible:
+                      //                                         false,
+                      //                                     context: context,
+                      //                                     builder: (BuildContext
+                      //                                         context) {
+                      //                                       return ViewFile(
+                      //                                           imageURL: tutor
+                      //                                                   .resume[
+                      //                                               index]);
+                      //                                     });
+                      //                               },
+                      //                               child: Container(
+                      //                                 height: 80,
+                      //                                 width: 80,
+                      //                                 decoration: BoxDecoration(
+                      //                                   borderRadius:
+                      //                                       BorderRadius
+                      //                                           .circular(10),
+                      //                                   color: Colors.grey
+                      //                                       .shade200, // You can adjust the fit as needed.
+                      //                                 ),
+                      //                                 child: ClipRRect(
+                      //                                   borderRadius:
+                      //                                       BorderRadius
+                      //                                           .circular(10.0),
+                      //                                   child: const Icon(
+                      //                                     Icons.picture_as_pdf,
+                      //                                     size:
+                      //                                         48, // Adjust the size as needed
+                      //                                     color: Colors
+                      //                                         .red, // Change the color as needed
+                      //                                   ),
+                      //                                 ),
+                      //                               ),
+                      //                             ),
+                      //                             IconButton(
+                      //                               iconSize: 15,
+                      //                               splashRadius: 2,
+                      //                               icon: const Icon(
+                      //                                 Icons.delete,
+                      //                                 color: Colors.red,
+                      //                               ),
+                      //                               onPressed: () {
+                      //                                 setState(() {
+                      //                                   resumedelete.add(tutor
+                      //                                       .resume[index]);
+                      //                                   resumeindexdelete
+                      //                                       .add(index);
+                      //                                   tutor.resume
+                      //                                       .removeAt(index);
+                      //                                   tutor.resumelinktype
+                      //                                       .removeAt(index);
+                      //                                 });
+                      //                               },
+                      //                             ),
+                      //                           ],
+                      //                         ),
+                      //                       );
+                      //                     } else {
+                      //                       return Padding(
+                      //                         padding: const EdgeInsets.only(
+                      //                             left: 10.0, right: 10),
+                      //                         child: Row(
+                      //                           mainAxisAlignment:
+                      //                               MainAxisAlignment
+                      //                                   .spaceBetween,
+                      //                           children: [
+                      //                             InkWell(
+                      //                               onTap: () {
+                      //                                 showDialog(
+                      //                                     barrierDismissible:
+                      //                                         false,
+                      //                                     context: context,
+                      //                                     builder: (BuildContext
+                      //                                         context) {
+                      //                                       return ViewFile(
+                      //                                           imageURL: tutor
+                      //                                                   .resume[
+                      //                                               index]);
+                      //                                     });
+                      //                               },
+                      //                               child: Container(
+                      //                                 height: 80,
+                      //                                 width: 80,
+                      //                                 decoration: BoxDecoration(
+                      //                                   borderRadius:
+                      //                                       BorderRadius
+                      //                                           .circular(10),
+                      //                                   color: Colors.grey
+                      //                                       .shade200, // You can adjust the fit as needed.
+                      //                                 ),
+                      //                                 child: ClipRRect(
+                      //                                   borderRadius:
+                      //                                       BorderRadius
+                      //                                           .circular(10.0),
+                      //                                   child: const Icon(
+                      //                                     Icons
+                      //                                         .file_present_sharp,
+                      //                                     size: 48,
+                      //                                     color: Colors.blue,
+                      //                                   ),
+                      //                                 ),
+                      //                               ),
+                      //                             ),
+                      //                             IconButton(
+                      //                               iconSize: 15,
+                      //                               splashRadius: 2,
+                      //                               icon: const Icon(
+                      //                                 Icons.delete,
+                      //                                 color: Colors.red,
+                      //                               ),
+                      //                               onPressed: () {
+                      //                                 setState(() {
+                      //                                   resumedelete.add(tutor
+                      //                                       .resume[index]);
+                      //                                   resumeindexdelete
+                      //                                       .add(index);
+                      //                                   tutor.resume
+                      //                                       .removeAt(index);
+                      //                                   resumelinktype
+                      //                                       .removeAt(index);
+                      //                                 });
+                      //                               },
+                      //                             ),
+                      //                           ],
+                      //                         ),
+                      //                       );
+                      //                     }
+                      //                   }
+                      //                 },
+                      //               ),
+                      //             ),
+                      //             IconButton(
+                      //               iconSize: 15,
+                      //               icon: const Icon(
+                      //                 Icons
+                      //                     .arrow_forward_ios, // Right arrow icon
+                      //                 color: Colors.blue,
+                      //               ),
+                      //               onPressed: () {
+                      //                 // Scroll to the right
+                      //                 updatescrollController2.animateTo(
+                      //                   updatescrollController2.offset +
+                      //                       100.0, // Adjust the value as needed
+                      //                   duration: const Duration(
+                      //                       milliseconds:
+                      //                           500), // Adjust the duration as needed
+                      //                   curve: Curves.ease,
+                      //                 );
+                      //               },
+                      //             ),
+                      //           ],
+                      //         )),
+                      //   ],
+                      // ),
+
                       const SizedBox(
                         height: 10,
                       ),
@@ -1924,152 +2092,176 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                       controller:
                                           updatescrollController3, // Assign the ScrollController to the ListView
                                       scrollDirection: Axis.horizontal,
-                                      itemCount: tutor.presentation.length +
-                                          selectedVideos.length,
+                                      itemCount: tutor.presentation.length,
                                       itemBuilder: (context, index) {
-                                        if (index >
-                                            (tutor.presentation.length - 1)) {
-                                          int currentindex = (index -
-                                              tutor.presentation.length);
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10.0, right: 10),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    // showDialog(
-                                                    //     barrierDismissible:
-                                                    //         false,
-                                                    //     context: context,
-                                                    //     builder: (BuildContext
-                                                    //         context) {
-                                                    //       return ViewFile(
-                                                    //           imageURL:
-                                                    //               presentation[
-                                                    //                   index]);
-                                                    //     });
-                                                  },
-                                                  child: Container(
-                                                    height: 80,
-                                                    width: 80,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: Colors.grey
-                                                          .shade200, // You can adjust the fit as needed.
-                                                    ),
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
-                                                      child: const Icon(
-                                                        Icons
-                                                            .video_library_sharp,
-                                                        size: 48,
-                                                        color: Colors.blue,
+                                        // if (index >
+                                        //     (tutor.presentation.length - 1)) {
+                                        //   int currentindex = (index -
+                                        //       tutor.presentation.length);
+                                        //   return FutureBuilder(
+                                        //       future: FirebaseStorage.instance
+                                        //           .ref(
+                                        //               tutor.presentation[index])
+                                        //           .getDownloadURL(),
+                                        //       builder: (context, snapshot) {
+                                        //         if (snapshot.connectionState ==
+                                        //             ConnectionState.waiting) {
+                                        //           return Container(
+                                        //               height: 25,
+                                        //               width: 25,
+                                        //               child: const Center(
+                                        //                   child:
+                                        //                       CircularProgressIndicator(
+                                        //                 strokeWidth: 2,
+                                        //                 color: Color.fromRGBO(
+                                        //                     1, 118, 132, 1),
+                                        //               ))); // Display a loading indicator while waiting for the file to download
+                                        //         } else if (snapshot.hasError) {
+                                        //           return Text(
+                                        //               'Error: ${snapshot.error}');
+                                        //         }
+                                        //         return Padding(
+                                        //           padding:
+                                        //               const EdgeInsets.only(
+                                        //                   left: 10.0,
+                                        //                   right: 10),
+                                        //           child: Row(
+                                        //             mainAxisAlignment:
+                                        //                 MainAxisAlignment
+                                        //                     .spaceBetween,
+                                        //             children: [
+                                        //               InkWell(
+                                        //                 onTap: () {
+                                        //                   // showDialog(
+                                        //                   //     barrierDismissible:
+                                        //                   //         false,
+                                        //                   //     context: context,
+                                        //                   //     builder: (BuildContext
+                                        //                   //         context) {
+                                        //                   //       return ViewFile(
+                                        //                   //           imageURL:
+                                        //                   //               presentation[
+                                        //                   //                   index]);
+                                        //                   //     });
+                                        //                 },
+                                        //                 child: Container(
+                                        //                   height: 80,
+                                        //                   width: 80,
+                                        //                   decoration:
+                                        //                       BoxDecoration(
+                                        //                     borderRadius:
+                                        //                         BorderRadius
+                                        //                             .circular(
+                                        //                                 10),
+                                        //                     color: Colors.grey
+                                        //                         .shade200, // You can adjust the fit as needed.
+                                        //                   ),
+                                        //                   child: ClipRRect(
+                                        //                     borderRadius:
+                                        //                         BorderRadius
+                                        //                             .circular(
+                                        //                                 10.0),
+                                        //                     child: const Icon(
+                                        //                       Icons
+                                        //                           .video_library_sharp,
+                                        //                       size: 48,
+                                        //                       color:
+                                        //                           Colors.blue,
+                                        //                     ),
+                                        //                   ),
+                                        //                 ),
+                                        //               ),
+                                        //               IconButton(
+                                        //                 iconSize: 15,
+                                        //                 icon: const Icon(
+                                        //                   Icons.delete,
+                                        //                   color: Colors.red,
+                                        //                 ),
+                                        //                 onPressed: () {
+                                        //                   setState(() {
+                                        //                     selectedVideos
+                                        //                         .removeAt(
+                                        //                             currentindex);
+                                        //                   });
+                                        //                 },
+                                        //               ),
+                                        //             ],
+                                        //           ),
+                                        //         );
+                                        //       });
+                                        // } else {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 10.0, right: 10),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              InkWell(
+                                                onTap: () {
+                                                  showDialog(
+                                                      barrierDismissible: false,
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return ViewFile(
+                                                            imageURL: tutor
+                                                                    .presentation[
+                                                                index]);
+                                                      });
+                                                },
+                                                child: Container(
+                                                  height: 80,
+                                                  width: 80,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color: Colors.grey
+                                                        .shade200, // You can adjust the fit as needed.
+                                                  ),
+                                                  child: Stack(
+                                                    alignment: Alignment.center,
+                                                    children: [
+                                                      ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10.0),
+                                                        child: Image.network(
+                                                          tutor.imageID,
+                                                          fit: BoxFit
+                                                              .cover, // You can adjust the fit as needed.
+                                                        ),
                                                       ),
-                                                    ),
+                                                      const Icon(
+                                                        Icons.play_arrow,
+                                                        size: 48,
+                                                        color: kColorPrimary,
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                                IconButton(
-                                                  iconSize: 15,
-                                                  icon: const Icon(
-                                                    Icons.delete,
-                                                    color: Colors.red,
-                                                  ),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      selectedVideos.removeAt(
-                                                          currentindex);
-                                                    });
-                                                  },
+                                              ),
+                                              IconButton(
+                                                iconSize: 15,
+                                                icon: const Icon(
+                                                  Icons.delete,
+                                                  color: Colors.red,
                                                 ),
-                                              ],
-                                            ),
-                                          );
-                                        } else {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10.0, right: 10),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    showDialog(
-                                                        barrierDismissible:
-                                                            false,
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return ViewFile(
-                                                              imageURL: tutor
-                                                                      .presentation[
-                                                                  index]);
-                                                        });
-                                                  },
-                                                  child: Container(
-                                                    height: 80,
-                                                    width: 80,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: Colors.grey
-                                                          .shade200, // You can adjust the fit as needed.
-                                                    ),
-                                                    child: Stack(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      children: [
-                                                        ClipRRect(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      10.0),
-                                                          child: Image.network(
-                                                            tutor.imageID,
-                                                            fit: BoxFit
-                                                                .cover, // You can adjust the fit as needed.
-                                                          ),
-                                                        ),
-                                                        const Icon(
-                                                          Icons.play_arrow,
-                                                          size: 48,
-                                                          color: kColorPrimary,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                                IconButton(
-                                                  iconSize: 15,
-                                                  icon: const Icon(
-                                                    Icons.delete,
-                                                    color: Colors.red,
-                                                  ),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      videodelete.add(tutor
-                                                          .presentation[index]);
-                                                      videoindexdelete
-                                                          .add(index);
-                                                      tutor.presentation
-                                                          .removeAt(index);
-                                                    });
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        }
+                                                onPressed: () {
+                                                  setState(() {
+                                                    videodelete.add(tutor
+                                                        .presentation[index]);
+                                                    videoindexdelete.add(index);
+                                                    tutor.presentation
+                                                        .removeAt(index);
+                                                  });
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                        // }
                                       },
                                     ),
                                   ),
@@ -2110,10 +2302,6 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                         height: 50,
                         width: 500,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                        // decoration: BoxDecoration(
-                        //   color: const Color.fromRGBO(55, 116, 135, 1),
-                        //   borderRadius: BorderRadius.circular(5),
-                        // ),
                         child: Row(
                           children: [
                             const Icon(
@@ -2482,38 +2670,6 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                     BorderRadius.all(Radius.circular(20))),
                             elevation: 0),
                         onPressed: () async {
-                          // if (updateselection1) {
-                          //   if (servicesprovided.contains('Recovery Lessons')) {
-                          //   } else {
-                          //     servicesprovided.add('Recovery Lessons');
-                          //   }
-                          // }
-                          // if (updateselection2) {
-                          //   if (servicesprovided
-                          //       .contains('Kids with Learning Difficulties')) {
-                          //   } else {
-                          //     servicesprovided
-                          //         .add('Kids with Learning Difficulties');
-                          //   }
-                          // }
-                          // if (updateselection3) {
-                          //   if (servicesprovided.contains('Pre Exam Classes')) {
-                          //   } else {
-                          //     servicesprovided.add('Pre Exam Classes');
-                          //   }
-                          // }
-                          // if (updateselection4) {
-                          //   if (servicesprovided.contains('Deaf Language')) {
-                          //   } else {
-                          //     servicesprovided.add('Deaf Language');
-                          //   }
-                          // }
-                          // if (updateselection5) {
-                          //   if (servicesprovided.contains('Own Program')) {
-                          //   } else {
-                          //     servicesprovided.add('Own Program');
-                          //   }
-                          // }
                           if (tutor.promotionalMessage ==
                                   updateaboutmecontroller.text &&
                               areListsEqual(
@@ -2524,14 +2680,6 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                               certificatesdelete.isEmpty &&
                               resumedelete.isEmpty &&
                               videodelete.isEmpty) {
-                            // CoolAlert.show(
-                            //   context: context,
-                            //   width: 200,
-                            //   type: CoolAlertType.error,
-                            //   titleTextStyle: const TextStyle(
-                            //       fontSize: 15, fontWeight: FontWeight.normal),
-                            //   title: 'Nothing to update',
-                            // );
                           } else {
                             if (certificatesdelete.isNotEmpty) {
                               deleteFileCertificate(certificatesdelete, tutorID,
@@ -2545,49 +2693,181 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                               deleteFileVideo(
                                   videodelete, tutorID, videoindexdelete);
                             } else {}
-
-                            // if (selectedVideos.isNotEmpty)
-                            List<String?> videolinks =
-                                await uploadTutorvideoList(tutorID, 'Videos',
-                                    selectedVideos, videoFilenames);
-                            // }
-                            // if (selectedresume.isNotEmpty) {
-                            List<String?> resumelinks =
-                                await uploadTutorresumeList(tutorID, 'Resume',
-                                    selectedresume, resumefilenames);
-                            // }
-                            // if (selectedCertificates.isNotEmpty) {
-                            List<String?> certificatelinks =
-                                await uploadTutorcertificateList(
-                                    tutorID,
-                                    'Certificates',
-                                    selectedCertificates,
-                                    certificatesfilenames);
-                            // }
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Uploading...'),
+                                  content: SizedBox(
+                                    height: 140,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text('Video uploading:'),
+                                        StreamBuilder<double>(
+                                          stream: _progressController1.stream,
+                                          builder: (context, snapshot) {
+                                            return Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                if (snapshot.hasData)
+                                                  Row(
+                                                    children: [
+                                                      SizedBox(
+                                                        width: 150,
+                                                        child: LinearProgressIndicator(
+                                                            minHeight: 8,
+                                                            valueColor:
+                                                                const AlwaysStoppedAnimation<
+                                                                        Color>(
+                                                                    Colors
+                                                                        .greenAccent),
+                                                            semanticsValue:
+                                                                '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                            semanticsLabel:
+                                                                '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                            value:
+                                                                snapshot.data),
+                                                      ),
+                                                      Text(
+                                                        '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            color: kColorGrey),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                if (snapshot.connectionState ==
+                                                    ConnectionState.waiting)
+                                                  Row(
+                                                    children: [
+                                                      const SizedBox(
+                                                        width: 150,
+                                                        child: LinearProgressIndicator(
+                                                            minHeight: 8,
+                                                            valueColor:
+                                                                AlwaysStoppedAnimation<
+                                                                        Color>(
+                                                                    Colors
+                                                                        .greenAccent),
+                                                            value: 0),
+                                                      ),
+                                                      Text(
+                                                        '${(0 * 100).toStringAsFixed(2)}%',
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            color: kColorGrey),
+                                                      ),
+                                                    ],
+                                                  ),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                        const Text('Certificates uploading:'),
+                                        StreamBuilder<double>(
+                                          stream: _progressController.stream,
+                                          builder: (context, snapshot) {
+                                            return Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                if (snapshot.hasData)
+                                                  Row(
+                                                    children: [
+                                                      SizedBox(
+                                                        width: 150,
+                                                        child: LinearProgressIndicator(
+                                                            minHeight: 8,
+                                                            valueColor:
+                                                                const AlwaysStoppedAnimation<
+                                                                        Color>(
+                                                                    Colors
+                                                                        .greenAccent),
+                                                            semanticsValue:
+                                                                '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                            semanticsLabel:
+                                                                '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                            value:
+                                                                snapshot.data),
+                                                      ),
+                                                      Text(
+                                                        '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            color: kColorGrey),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                if (snapshot.connectionState ==
+                                                    ConnectionState.waiting)
+                                                  Row(
+                                                    children: [
+                                                      const SizedBox(
+                                                        width: 150,
+                                                        child: LinearProgressIndicator(
+                                                            minHeight: 8,
+                                                            valueColor:
+                                                                AlwaysStoppedAnimation<
+                                                                        Color>(
+                                                                    Colors
+                                                                        .greenAccent),
+                                                            value: 0),
+                                                      ),
+                                                      Text(
+                                                        '${(0 * 100).toStringAsFixed(2)}%',
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            color: kColorGrey),
+                                                      ),
+                                                    ],
+                                                  ),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ).then((value) {
+                              _currentFileNotifier.dispose();
+                              _currentFileNotifier1.dispose();
+                              Navigator.pop(context);
+                            });
 
                             String? output = await updateTutorInfoOffer(
                                 tutorID,
                                 updateaboutmecontroller.text,
                                 servicesprovided,
-                                videolinks,
-                                resumelinks,
+                                await uploadTutorvideoListNew(
+                                    tutorID,
+                                    'Videos',
+                                    selectedVideos,
+                                    videoFilenames,
+                                    _progressController1,
+                                    _currentFileNotifier1),
+                                [],
                                 resumefilenamestype,
-                                certificatelinks,
+                                await uploadTutorcertificateNew(
+                                  tutorID,
+                                  'Certificates',
+                                  selectedCertificates,
+                                  certificatesfilenames,
+                                  _progressController,
+                                  _currentFileNotifier,
+                                ),
                                 certificatesfilenamestype);
 
                             if (output == 'success') {
-                              setState(() {
-                                CoolAlert.show(
-                                  context: context,
-                                  width: 200,
-                                  type: CoolAlertType.success,
-                                  title: 'Data Updated!',
-                                  titleTextStyle: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.normal),
-                                  autoCloseDuration: const Duration(seconds: 1),
-                                );
-                              });
                             } else {
                               CoolAlert.show(
                                 context: context,
@@ -2751,54 +3031,80 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                       itemCount:
                                           tutorinfodata.first.validIds.length,
                                       itemBuilder: (context, index) {
-                                        return Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 10.0, right: 10),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              InkWell(
-                                                onTap: () {
-                                                  showDialog(
-                                                      barrierDismissible: false,
-                                                      context: context,
-                                                      builder: (BuildContext
-                                                          context) {
-                                                        return ViewFile(
-                                                            imageURL:
-                                                                tutorinfodata
-                                                                        .first
-                                                                        .validIds[
-                                                                    index]);
-                                                      });
-                                                },
-                                                child: Container(
-                                                  height: 80,
-                                                  width: 80,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    color: Colors.grey
-                                                        .shade200, // You can adjust the fit as needed.
-                                                  ),
-                                                  child: ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10.0),
-                                                    child: Image.network(
-                                                      tutorinfodata.first
-                                                          .validIds[index],
-                                                      fit: BoxFit
-                                                          .cover, // You can adjust the fit as needed.
+                                        return FutureBuilder(
+                                            future: FirebaseStorage.instance
+                                                .ref(tutorinfodata
+                                                    .first.validIds[index])
+                                                .getDownloadURL(),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const SizedBox(
+                                                    height: 25,
+                                                    width: 25,
+                                                    child: Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      color: Color.fromRGBO(
+                                                          1, 118, 132, 1),
+                                                    ))); // Display a loading indicator while waiting for the file to download
+                                              } else if (snapshot.hasError) {
+                                                return Text(
+                                                    'Error: ${snapshot.error}');
+                                              }
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10.0, right: 10),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    InkWell(
+                                                      onTap: () {
+                                                        showDialog(
+                                                            barrierDismissible:
+                                                                false,
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return ViewFile(
+                                                                  imageURL: snapshot
+                                                                      .data
+                                                                      .toString());
+                                                            });
+                                                      },
+                                                      child: Container(
+                                                        height: 80,
+                                                        width: 80,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          color: Colors.grey
+                                                              .shade200, // You can adjust the fit as needed.
+                                                        ),
+                                                        child: ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      10.0),
+                                                          child: Image.network(
+                                                            snapshot.data
+                                                                .toString(),
+                                                            fit: BoxFit
+                                                                .cover, // You can adjust the fit as needed.
+                                                          ),
+                                                        ),
+                                                      ),
                                                     ),
-                                                  ),
+                                                  ],
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
+                                              );
+                                            });
                                       },
                                     ),
                                   ),
@@ -2903,160 +3209,248 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                         if (tutorinfodata.first
                                                 .certificatestype[index] ==
                                             'Image') {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10.0, right: 10),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    showDialog(
-                                                        barrierDismissible:
-                                                            false,
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return ViewFile(
-                                                              imageURL:
-                                                                  tutorinfodata
-                                                                          .first
-                                                                          .certificates[
-                                                                      index]);
-                                                        });
-                                                  },
-                                                  child: Container(
-                                                    height: 80,
-                                                    width: 80,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: Colors.grey
-                                                          .shade200, // You can adjust the fit as needed.
-                                                    ),
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
-                                                      child: Image.network(
-                                                        tutorinfodata.first
-                                                                .certificates[
-                                                            index],
-                                                        fit: BoxFit
-                                                            .cover, // You can adjust the fit as needed.
+                                          return FutureBuilder(
+                                              future: FirebaseStorage.instance
+                                                  .ref(tutorinfodata.first
+                                                      .certificates[index])
+                                                  .getDownloadURL(),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState ==
+                                                    ConnectionState.waiting) {
+                                                  return const SizedBox(
+                                                      height: 25,
+                                                      width: 25,
+                                                      child: Center(
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                        color: Color.fromRGBO(
+                                                            1, 118, 132, 1),
+                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                } else if (snapshot.hasError) {
+                                                  return Text(
+                                                      'Error: ${snapshot.error}');
+                                                }
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10.0,
+                                                          right: 10),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      InkWell(
+                                                        onTap: () {
+                                                          showDialog(
+                                                              barrierDismissible:
+                                                                  false,
+                                                              context: context,
+                                                              builder:
+                                                                  (BuildContext
+                                                                      context) {
+                                                                return ViewFile(
+                                                                    imageURL:
+                                                                        snapshot
+                                                                            .data
+                                                                            .toString());
+                                                              });
+                                                        },
+                                                        child: Container(
+                                                          height: 80,
+                                                          width: 80,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            color: Colors.grey
+                                                                .shade200, // You can adjust the fit as needed.
+                                                          ),
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10.0),
+                                                            child:
+                                                                Image.network(
+                                                              snapshot.data
+                                                                  .toString(),
+                                                              fit: BoxFit
+                                                                  .cover, // You can adjust the fit as needed.
+                                                            ),
+                                                          ),
+                                                        ),
                                                       ),
-                                                    ),
+                                                    ],
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
+                                                );
+                                              });
                                         } else if (tutorinfodata.first
                                                 .certificatestype[index] ==
                                             'pdf') {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10.0, right: 10),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    showDialog(
-                                                        barrierDismissible:
-                                                            false,
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return ViewFile(
-                                                              imageURL:
-                                                                  tutorinfodata
-                                                                          .first
-                                                                          .certificates[
-                                                                      index]);
-                                                        });
-                                                  },
-                                                  child: Container(
-                                                    height: 80,
-                                                    width: 80,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: Colors.grey
-                                                          .shade200, // You can adjust the fit as needed.
-                                                    ),
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
-                                                      child: const Icon(
-                                                        Icons.picture_as_pdf,
-                                                        size: 48,
-                                                        color: Colors.red,
+                                          return FutureBuilder(
+                                              future: FirebaseStorage.instance
+                                                  .ref(tutorinfodata.first
+                                                      .certificates[index])
+                                                  .getDownloadURL(),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState ==
+                                                    ConnectionState.waiting) {
+                                                  return const SizedBox(
+                                                      height: 25,
+                                                      width: 25,
+                                                      child: Center(
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                        color: Color.fromRGBO(
+                                                            1, 118, 132, 1),
+                                                      )));
+
+                                                  /// Display a loading indicator while waiting for the file to download
+                                                } else if (snapshot.hasError) {
+                                                  return Text(
+                                                      'Error: ${snapshot.error}');
+                                                }
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10.0,
+                                                          right: 10),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      InkWell(
+                                                        onTap: () {
+                                                          showDialog(
+                                                              barrierDismissible:
+                                                                  false,
+                                                              context: context,
+                                                              builder:
+                                                                  (BuildContext
+                                                                      context) {
+                                                                return ViewFile(
+                                                                    imageURL:
+                                                                        snapshot
+                                                                            .data
+                                                                            .toString());
+                                                              });
+                                                        },
+                                                        child: Container(
+                                                          height: 80,
+                                                          width: 80,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            color: Colors.grey
+                                                                .shade200, // You can adjust the fit as needed.
+                                                          ),
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10.0),
+                                                            child: const Icon(
+                                                              Icons
+                                                                  .picture_as_pdf,
+                                                              size: 48,
+                                                              color: Colors.red,
+                                                            ),
+                                                          ),
+                                                        ),
                                                       ),
-                                                    ),
+                                                    ],
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
+                                                );
+                                              });
                                         } else {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10.0, right: 10),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    showDialog(
-                                                        barrierDismissible:
-                                                            false,
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return ViewFile(
-                                                              imageURL:
-                                                                  tutorinfodata
-                                                                          .first
-                                                                          .certificates[
-                                                                      index]);
-                                                        });
-                                                  },
-                                                  child: Container(
-                                                    height: 80,
-                                                    width: 80,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: Colors.grey
-                                                          .shade200, // You can adjust the fit as needed.
-                                                    ),
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
-                                                      child: const Icon(
-                                                        Icons
-                                                            .file_present_sharp,
-                                                        size: 48,
-                                                        color: Colors.blue,
+                                          return FutureBuilder(
+                                              future: FirebaseStorage.instance
+                                                  .ref(tutorinfodata.first
+                                                      .certificates[index])
+                                                  .getDownloadURL(),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState ==
+                                                    ConnectionState.waiting) {
+                                                  return const SizedBox(
+                                                      height: 25,
+                                                      width: 25,
+                                                      child: Center(
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                        strokeWidth: 2,
+                                                        color: Color.fromRGBO(
+                                                            1, 118, 132, 1),
+                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                } else if (snapshot.hasError) {
+                                                  return Text(
+                                                      'Error: ${snapshot.error}');
+                                                }
+                                                return Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10.0,
+                                                          right: 10),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      InkWell(
+                                                        onTap: () {
+                                                          showDialog(
+                                                              barrierDismissible:
+                                                                  false,
+                                                              context: context,
+                                                              builder:
+                                                                  (BuildContext
+                                                                      context) {
+                                                                return ViewFile(
+                                                                    imageURL:
+                                                                        snapshot
+                                                                            .data
+                                                                            .toString());
+                                                              });
+                                                        },
+                                                        child: Container(
+                                                          height: 80,
+                                                          width: 80,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            color: Colors.grey
+                                                                .shade200, // You can adjust the fit as needed.
+                                                          ),
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10.0),
+                                                            child: const Icon(
+                                                              Icons
+                                                                  .file_present_sharp,
+                                                              size: 48,
+                                                              color:
+                                                                  Colors.blue,
+                                                            ),
+                                                          ),
+                                                        ),
                                                       ),
-                                                    ),
+                                                    ],
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
+                                                );
+                                              });
                                         }
                                       },
                                     ),
@@ -3089,270 +3483,266 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                       const SizedBox(
                         height: 10,
                       ),
+                      // Container(
+                      //   height: 50,
+                      //   width: 500,
+                      //   padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                      //   // decoration: BoxDecoration(
+                      //   //   color: const Color.fromRGBO(55, 116, 135, 1),
+                      //   //   borderRadius: BorderRadius.circular(5),
+                      //   // ),
+                      //   child: Row(
+                      //     children: [
+                      //       const Icon(
+                      //         Icons.list_alt_outlined,
+                      //         color: kColorLight,
+                      //         size: 24.0,
+                      //       ),
+                      //       const SizedBox(width: 10.0),
+                      //       Column(
+                      //         mainAxisAlignment: MainAxisAlignment.center,
+                      //         children: const <Widget>[
+                      //           Text(
+                      //             'Resume/s',
+                      //             style: TextStyle(
+                      //                 fontSize: 16,
+                      //                 fontWeight: FontWeight.bold,
+                      //                 color: kColorLight),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      // const SizedBox(
+                      //   height: 20,
+                      // ),
+                      // Row(
+                      //   children: [
+                      //     Container(
+                      //         width: 600,
+                      //         height: 120,
+                      //         padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      //         child: Row(
+                      //           children: [
+                      //             IconButton(
+                      //               iconSize: 15,
+                      //               icon: const Icon(
+                      //                 Icons.arrow_back_ios, // Left arrow icon
+                      //                 color: Colors.blue,
+                      //               ),
+                      //               onPressed: () {
+                      //                 // Scroll to the left
+                      //                 _scrollController2.animateTo(
+                      //                   _scrollController2.offset -
+                      //                       100.0, // Adjust the value as needed
+                      //                   duration: const Duration(
+                      //                       milliseconds:
+                      //                           500), // Adjust the duration as needed
+                      //                   curve: Curves.ease,
+                      //                 );
+                      //               },
+                      //             ),
+                      //             Expanded(
+                      //               child: ListView.builder(
+                      //                 controller:
+                      //                     _scrollController2, // Assign the ScrollController to the ListView
+                      //                 scrollDirection: Axis.horizontal,
+                      //                 itemCount:
+                      //                     tutorinfodata.first.resume.length,
+                      //                 itemBuilder: (context, index) {
+                      //                   if (tutorinfodata
+                      //                           .first.resumelinktype[index] ==
+                      //                       'Image') {
+                      //                     return Padding(
+                      //                       padding: const EdgeInsets.only(
+                      //                           left: 10.0, right: 10),
+                      //                       child: Row(
+                      //                         mainAxisAlignment:
+                      //                             MainAxisAlignment
+                      //                                 .spaceBetween,
+                      //                         children: [
+                      //                           InkWell(
+                      //                             onTap: () {
+                      //                               showDialog(
+                      //                                   barrierDismissible:
+                      //                                       false,
+                      //                                   context: context,
+                      //                                   builder: (BuildContext
+                      //                                       context) {
+                      //                                     return ViewFile(
+                      //                                         imageURL:
+                      //                                             tutorinfodata
+                      //                                                     .first
+                      //                                                     .resume[
+                      //                                                 index]);
+                      //                                   });
+                      //                             },
+                      //                             child: Container(
+                      //                               height: 80,
+                      //                               width: 80,
+                      //                               decoration: BoxDecoration(
+                      //                                 borderRadius:
+                      //                                     BorderRadius.circular(
+                      //                                         10),
+                      //                                 color: Colors.grey
+                      //                                     .shade200, // You can adjust the fit as needed.
+                      //                               ),
+                      //                               child: ClipRRect(
+                      //                                 borderRadius:
+                      //                                     BorderRadius.circular(
+                      //                                         10.0),
+                      //                                 child: Image.network(
+                      //                                   tutorinfodata.first
+                      //                                       .resume[index],
+                      //                                   fit: BoxFit
+                      //                                       .cover, // You can adjust the fit as needed.
+                      //                                 ),
+                      //                               ),
+                      //                             ),
+                      //                           ),
+                      //                         ],
+                      //                       ),
+                      //                     );
+                      //                   } else if (tutorinfodata
+                      //                           .first.resumelinktype[index] ==
+                      //                       'pdf') {
+                      //                     return Padding(
+                      //                       padding: const EdgeInsets.only(
+                      //                           left: 10.0, right: 10),
+                      //                       child: Row(
+                      //                         mainAxisAlignment:
+                      //                             MainAxisAlignment
+                      //                                 .spaceBetween,
+                      //                         children: [
+                      //                           InkWell(
+                      //                             onTap: () {
+                      //                               showDialog(
+                      //                                   barrierDismissible:
+                      //                                       false,
+                      //                                   context: context,
+                      //                                   builder: (BuildContext
+                      //                                       context) {
+                      //                                     return ViewFile(
+                      //                                         imageURL:
+                      //                                             tutorinfodata
+                      //                                                     .first
+                      //                                                     .resume[
+                      //                                                 index]);
+                      //                                   });
+                      //                             },
+                      //                             child: Container(
+                      //                               height: 80,
+                      //                               width: 80,
+                      //                               decoration: BoxDecoration(
+                      //                                 borderRadius:
+                      //                                     BorderRadius.circular(
+                      //                                         10),
+                      //                                 color: Colors.grey
+                      //                                     .shade200, // You can adjust the fit as needed.
+                      //                               ),
+                      //                               child: ClipRRect(
+                      //                                 borderRadius:
+                      //                                     BorderRadius.circular(
+                      //                                         10.0),
+                      //                                 child: const Icon(
+                      //                                   Icons.picture_as_pdf,
+                      //                                   size:
+                      //                                       48, // Adjust the size as needed
+                      //                                   color: Colors
+                      //                                       .red, // Change the color as needed
+                      //                                 ),
+                      //                               ),
+                      //                             ),
+                      //                           ),
+                      //                         ],
+                      //                       ),
+                      //                     );
+                      //                   } else {
+                      //                     return Padding(
+                      //                       padding: const EdgeInsets.only(
+                      //                           left: 10.0, right: 10),
+                      //                       child: Row(
+                      //                         mainAxisAlignment:
+                      //                             MainAxisAlignment
+                      //                                 .spaceBetween,
+                      //                         children: [
+                      //                           InkWell(
+                      //                             onTap: () {
+                      //                               showDialog(
+                      //                                   barrierDismissible:
+                      //                                       false,
+                      //                                   context: context,
+                      //                                   builder: (BuildContext
+                      //                                       context) {
+                      //                                     return ViewFile(
+                      //                                         imageURL:
+                      //                                             tutorinfodata
+                      //                                                     .first
+                      //                                                     .resume[
+                      //                                                 index]);
+                      //                                   });
+                      //                             },
+                      //                             child: Container(
+                      //                               height: 80,
+                      //                               width: 80,
+                      //                               decoration: BoxDecoration(
+                      //                                 borderRadius:
+                      //                                     BorderRadius.circular(
+                      //                                         10),
+                      //                                 color: Colors.grey
+                      //                                     .shade200, // You can adjust the fit as needed.
+                      //                               ),
+                      //                               child: ClipRRect(
+                      //                                 borderRadius:
+                      //                                     BorderRadius.circular(
+                      //                                         10.0),
+                      //                                 child: const Icon(
+                      //                                   Icons
+                      //                                       .file_present_sharp,
+                      //                                   size: 48,
+                      //                                   color: Colors.blue,
+                      //                                 ),
+                      //                               ),
+                      //                             ),
+                      //                           ),
+                      //                         ],
+                      //                       ),
+                      //                     );
+                      //                   }
+                      //                 },
+                      //               ),
+                      //             ),
+                      //             IconButton(
+                      //               iconSize: 15,
+                      //               icon: const Icon(
+                      //                 Icons
+                      //                     .arrow_forward_ios, // Right arrow icon
+                      //                 color: Colors.blue,
+                      //               ),
+                      //               onPressed: () {
+                      //                 // Scroll to the right
+                      //                 _scrollController2.animateTo(
+                      //                   _scrollController2.offset +
+                      //                       100.0, // Adjust the value as needed
+                      //                   duration: const Duration(
+                      //                       milliseconds:
+                      //                           500), // Adjust the duration as needed
+                      //                   curve: Curves.ease,
+                      //                 );
+                      //               },
+                      //             ),
+                      //           ],
+                      //         )),
+                      //   ],
+                      // ),
+                      // const SizedBox(
+                      //   height: 10,
+                      // ),
                       Container(
                         height: 50,
                         width: 500,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                        // decoration: BoxDecoration(
-                        //   color: const Color.fromRGBO(55, 116, 135, 1),
-                        //   borderRadius: BorderRadius.circular(5),
-                        // ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.list_alt_outlined,
-                              color: kColorLight,
-                              size: 24.0,
-                            ),
-                            const SizedBox(width: 10.0),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const <Widget>[
-                                Text(
-                                  'Resume/s',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: kColorLight),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Row(
-                        children: [
-                          Container(
-                              width: 600,
-                              height: 120,
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                    iconSize: 15,
-                                    icon: const Icon(
-                                      Icons.arrow_back_ios, // Left arrow icon
-                                      color: Colors.blue,
-                                    ),
-                                    onPressed: () {
-                                      // Scroll to the left
-                                      _scrollController2.animateTo(
-                                        _scrollController2.offset -
-                                            100.0, // Adjust the value as needed
-                                        duration: const Duration(
-                                            milliseconds:
-                                                500), // Adjust the duration as needed
-                                        curve: Curves.ease,
-                                      );
-                                    },
-                                  ),
-                                  Expanded(
-                                    child: ListView.builder(
-                                      controller:
-                                          _scrollController2, // Assign the ScrollController to the ListView
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount:
-                                          tutorinfodata.first.resume.length,
-                                      itemBuilder: (context, index) {
-                                        if (tutorinfodata
-                                                .first.resumelinktype[index] ==
-                                            'Image') {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10.0, right: 10),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    showDialog(
-                                                        barrierDismissible:
-                                                            false,
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return ViewFile(
-                                                              imageURL:
-                                                                  tutorinfodata
-                                                                          .first
-                                                                          .resume[
-                                                                      index]);
-                                                        });
-                                                  },
-                                                  child: Container(
-                                                    height: 80,
-                                                    width: 80,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: Colors.grey
-                                                          .shade200, // You can adjust the fit as needed.
-                                                    ),
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
-                                                      child: Image.network(
-                                                        tutorinfodata.first
-                                                            .resume[index],
-                                                        fit: BoxFit
-                                                            .cover, // You can adjust the fit as needed.
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        } else if (tutorinfodata
-                                                .first.resumelinktype[index] ==
-                                            'pdf') {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10.0, right: 10),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    showDialog(
-                                                        barrierDismissible:
-                                                            false,
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return ViewFile(
-                                                              imageURL:
-                                                                  tutorinfodata
-                                                                          .first
-                                                                          .resume[
-                                                                      index]);
-                                                        });
-                                                  },
-                                                  child: Container(
-                                                    height: 80,
-                                                    width: 80,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: Colors.grey
-                                                          .shade200, // You can adjust the fit as needed.
-                                                    ),
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
-                                                      child: const Icon(
-                                                        Icons.picture_as_pdf,
-                                                        size:
-                                                            48, // Adjust the size as needed
-                                                        color: Colors
-                                                            .red, // Change the color as needed
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        } else {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10.0, right: 10),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    showDialog(
-                                                        barrierDismissible:
-                                                            false,
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return ViewFile(
-                                                              imageURL:
-                                                                  tutorinfodata
-                                                                          .first
-                                                                          .resume[
-                                                                      index]);
-                                                        });
-                                                  },
-                                                  child: Container(
-                                                    height: 80,
-                                                    width: 80,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: Colors.grey
-                                                          .shade200, // You can adjust the fit as needed.
-                                                    ),
-                                                    child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10.0),
-                                                      child: const Icon(
-                                                        Icons
-                                                            .file_present_sharp,
-                                                        size: 48,
-                                                        color: Colors.blue,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                  IconButton(
-                                    iconSize: 15,
-                                    icon: const Icon(
-                                      Icons
-                                          .arrow_forward_ios, // Right arrow icon
-                                      color: Colors.blue,
-                                    ),
-                                    onPressed: () {
-                                      // Scroll to the right
-                                      _scrollController2.animateTo(
-                                        _scrollController2.offset +
-                                            100.0, // Adjust the value as needed
-                                        duration: const Duration(
-                                            milliseconds:
-                                                500), // Adjust the duration as needed
-                                        curve: Curves.ease,
-                                      );
-                                    },
-                                  ),
-                                ],
-                              )),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        height: 50,
-                        width: 500,
-                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                        // decoration: BoxDecoration(
-                        //   color: const Color.fromRGBO(55, 116, 135, 1),
-                        //   borderRadius: BorderRadius.circular(5),
-                        // ),
                         child: Row(
                           children: [
                             const Icon(
@@ -3427,11 +3817,47 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                       context: context,
                                                       builder: (BuildContext
                                                           context) {
-                                                        return ViewFile(
-                                                            imageURL: tutorinfodata
-                                                                    .first
-                                                                    .presentation[
-                                                                index]);
+                                                        return FutureBuilder(
+                                                            future: FirebaseStorage
+                                                                .instance
+                                                                .ref(tutorinfodata
+                                                                        .first
+                                                                        .presentation[
+                                                                    index])
+                                                                .getDownloadURL(),
+                                                            builder: (context,
+                                                                snapshot) {
+                                                              if (snapshot
+                                                                      .connectionState ==
+                                                                  ConnectionState
+                                                                      .waiting) {
+                                                                return const SizedBox(
+                                                                    height: 25,
+                                                                    width: 25,
+                                                                    child: Center(
+                                                                        child: CircularProgressIndicator(
+                                                                      strokeWidth:
+                                                                          2,
+                                                                      color: Color
+                                                                          .fromRGBO(
+                                                                              1,
+                                                                              118,
+                                                                              132,
+                                                                              1),
+                                                                    )));
+
+                                                                /// Display a loading indicator while waiting for the file to download
+                                                              } else if (snapshot
+                                                                  .hasError) {
+                                                                return Text(
+                                                                    'Error: ${snapshot.error}');
+                                                              }
+                                                              return ViewFile(
+                                                                  imageURL: tutorinfodata
+                                                                          .first
+                                                                          .presentation[
+                                                                      index]);
+                                                            });
                                                       });
                                                 },
                                                 child: Container(
@@ -3826,6 +4252,2141 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                   ),
                 ],
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget tutorInformation(String tutorID, TutorInformation tutor) {
+    List<dynamic> tutorcertificates = tutor.certificates;
+    List<dynamic> tutorcertificatestype = tutor.certificatestype;
+
+    List<dynamic> tutorvideos = tutor.presentation;
+
+    Size size = MediaQuery.of(context).size;
+    return Container(
+      alignment: Alignment.center,
+      width: size.width - 320,
+      height: size.height - 240,
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 0),
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+        child: SingleChildScrollView(
+          controller: ScrollController(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Column(
+                children: [
+                  Container(
+                    height: 50,
+                    width: (size.width - 360) / 2,
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment(-0.1, 0),
+                        end: Alignment.centerRight,
+                        colors: secondaryHeadercolors,
+                      ),
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        children: [
+                          const Text(
+                            'Certificates',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.white),
+                          ),
+                          const Spacer(),
+                          Row(
+                            children: [
+                              StreamBuilder<double>(
+                                stream: _progressController.stream,
+                                builder: (context, snapshot) {
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (snapshot.hasData)
+                                        Visibility(
+                                          visible: snapshot.data! > 0,
+                                          child: Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 150,
+                                                child: LinearProgressIndicator(
+                                                    minHeight: 8,
+                                                    valueColor:
+                                                        const AlwaysStoppedAnimation<
+                                                                Color>(
+                                                            Colors.greenAccent),
+                                                    semanticsValue:
+                                                        '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                    semanticsLabel:
+                                                        '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                    value: snapshot.data),
+                                              ),
+                                              Text(
+                                                '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.w400,
+                                                    color: kColorGrey),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting)
+                                        Row(
+                                          children: [
+                                            const SizedBox(
+                                              width: 150,
+                                              child: LinearProgressIndicator(
+                                                  minHeight: 8,
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                              Color>(
+                                                          Colors.greenAccent),
+                                                  value: 0),
+                                            ),
+                                            Text(
+                                              '${(0 * 100).toStringAsFixed(2)}%',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  color: kColorGrey),
+                                            ),
+                                          ],
+                                        ),
+                                    ],
+                                  );
+                                },
+                              ),
+                              Tooltip(
+                                message: 'Add Certificate', // The hint text
+                                child: IconButton(
+                                  icon: const Icon(Icons.file_upload),
+                                  color: Colors
+                                      .white, // Replace with your desired icon
+                                  onPressed: () async {
+                                    selectCertificates(tutorID);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                          width: 600,
+                          height: 120,
+                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                iconSize: 15,
+                                padding: EdgeInsets.zero,
+                                splashRadius: 1,
+                                icon: const Icon(
+                                  Icons.arrow_back_ios, // Left arrow icon
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () {
+                                  // Scroll to the left
+                                  updatescrollController1.animateTo(
+                                    updatescrollController1.offset -
+                                        100.0, // Adjust the value as needed
+                                    duration: const Duration(
+                                        milliseconds:
+                                            500), // Adjust the duration as needed
+                                    curve: Curves.ease,
+                                  );
+                                },
+                              ),
+                              Expanded(
+                                child: ListView.builder(
+                                  controller:
+                                      updatescrollController1, // Assign the ScrollController to the ListView
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: tutor.certificates.length,
+                                  itemBuilder: (context, index) {
+                                    // if (index >
+                                    //     (tutor.certificates.length - 1)) {
+                                    //   int currentindex =
+                                    //       index - tutor.certificates.length;
+                                    //   if (certificatesfilenamestype[
+                                    //           currentindex] ==
+                                    //       'Image') {
+                                    //     return FutureBuilder(
+                                    //         future: FirebaseStorage.instance
+                                    //             .ref(tutor.certificates[index])
+                                    //             .getDownloadURL(),
+                                    //         builder: (context, snapshot) {
+                                    //           if (snapshot.connectionState ==
+                                    //               ConnectionState.waiting) {
+                                    //             return const SizedBox(
+                                    //                 height: 25,
+                                    //                 width: 25,
+                                    //                 child: Center(
+                                    //                     child:
+                                    //                         CircularProgressIndicator(
+                                    //                   strokeWidth: 2,
+                                    //                   color: Color.fromRGBO(
+                                    //                       1, 118, 132, 1),
+                                    //                 ))); // Display a loading indicator while waiting for the file to download
+                                    //           } else if (snapshot.hasError) {
+                                    //             return Text(
+                                    //                 'Error: ${snapshot.error}');
+                                    //           }
+                                    //           return Padding(
+                                    //             padding: const EdgeInsets.only(
+                                    //                 left: 10.0, right: 10),
+                                    //             child: Row(
+                                    //               mainAxisAlignment:
+                                    //                   MainAxisAlignment
+                                    //                       .spaceBetween,
+                                    //               children: [
+                                    //                 InkWell(
+                                    //                   onTap: () {
+                                    //                     // showDialog(
+                                    //                     //     barrierDismissible:
+                                    //                     //         false,
+                                    //                     //     context: context,
+                                    //                     //     builder: (BuildContext
+                                    //                     //         context) {
+                                    //                     //       return ViewFile(
+                                    //                     //           imageURL:
+                                    //                     //               certificates[
+                                    //                     //                   index]);
+                                    //                     //     });
+                                    //                   },
+                                    //                   child: Container(
+                                    //                     height: 80,
+                                    //                     width: 80,
+                                    //                     decoration:
+                                    //                         BoxDecoration(
+                                    //                       borderRadius:
+                                    //                           BorderRadius
+                                    //                               .circular(10),
+                                    //                       color: Colors
+                                    //                           .grey.shade200,
+                                    //                     ),
+                                    //                     child: ClipRRect(
+                                    //                       borderRadius:
+                                    //                           BorderRadius
+                                    //                               .circular(
+                                    //                                   10.0),
+                                    //                       child: Image.network(
+                                    //                         snapshot.data
+                                    //                             .toString(),
+                                    //                         fit: BoxFit.cover,
+                                    //                         height: 70,
+                                    //                         width: 70,
+                                    //                       ),
+                                    //                     ),
+                                    //                   ),
+                                    //                 ),
+                                    //                 IconButton(
+                                    //                   iconSize: 15,
+                                    //                   splashRadius: 2,
+                                    //                   icon: const Icon(
+                                    //                     Icons.delete,
+                                    //                     color: Colors.red,
+                                    //                   ),
+                                    //                   onPressed: () {},
+                                    //                 ),
+                                    //               ],
+                                    //             ),
+                                    //           );
+                                    //         });
+                                    //   } else if (certificatesfilenamestype[
+                                    //           currentindex] ==
+                                    //       'pdf') {
+                                    //     return Padding(
+                                    //       padding: const EdgeInsets.only(
+                                    //           left: 10.0, right: 10),
+                                    //       child: Row(
+                                    //         mainAxisAlignment:
+                                    //             MainAxisAlignment.spaceBetween,
+                                    //         children: [
+                                    //           InkWell(
+                                    //             onTap: () {
+                                    //               // showDialog(
+                                    //               //     barrierDismissible:
+                                    //               //         false,
+                                    //               //     context: context,
+                                    //               //     builder: (BuildContext
+                                    //               //         context) {
+                                    //               //       return ViewFile(
+                                    //               //           imageURL:
+                                    //               //               certificates[
+                                    //               //                   index]);
+                                    //               //     });
+                                    //             },
+                                    //             child: Container(
+                                    //               height: 80,
+                                    //               width: 80,
+                                    //               decoration: BoxDecoration(
+                                    //                 borderRadius:
+                                    //                     BorderRadius.circular(
+                                    //                         10),
+                                    //                 color: Colors.grey
+                                    //                     .shade200, // You can adjust the fit as needed.
+                                    //               ),
+                                    //               child: ClipRRect(
+                                    //                 borderRadius:
+                                    //                     BorderRadius.circular(
+                                    //                         10.0),
+                                    //                 child: const Icon(
+                                    //                   Icons.picture_as_pdf,
+                                    //                   size: 48,
+                                    //                   color: Colors.red,
+                                    //                 ),
+                                    //               ),
+                                    //             ),
+                                    //           ),
+                                    //           IconButton(
+                                    //             iconSize: 15,
+                                    //             splashRadius: 2,
+                                    //             icon: const Icon(
+                                    //               Icons.delete,
+                                    //               color: Colors.red,
+                                    //             ),
+                                    //             onPressed: () {
+                                    //               setState(() {
+                                    //                 selectedCertificates
+                                    //                     .removeAt(currentindex);
+                                    //                 certificatesfilenamestype
+                                    //                     .removeAt(currentindex);
+                                    //               });
+                                    //             },
+                                    //           ),
+                                    //         ],
+                                    //       ),
+                                    //     );
+                                    //   } else {
+                                    //     return FutureBuilder(
+                                    //         future: FirebaseStorage.instance
+                                    //             .ref(tutor.certificates[index])
+                                    //             .getDownloadURL(),
+                                    //         builder: (context, snapshot) {
+                                    //           if (snapshot.connectionState ==
+                                    //               ConnectionState.waiting) {
+                                    //             return Container(
+                                    //                 height: 25,
+                                    //                 width: 25,
+                                    //                 child: const Center(
+                                    //                     child:
+                                    //                         CircularProgressIndicator(
+                                    //                   strokeWidth: 2,
+                                    //                   color: Color.fromRGBO(
+                                    //                       1, 118, 132, 1),
+                                    //                 ))); // Display a loading indicator while waiting for the file to download
+                                    //           } else if (snapshot.hasError) {
+                                    //             return Text(
+                                    //                 'Error: ${snapshot.error}');
+                                    //           }
+                                    //           return Padding(
+                                    //             padding: const EdgeInsets.only(
+                                    //                 left: 10.0, right: 10),
+                                    //             child: Row(
+                                    //               mainAxisAlignment:
+                                    //                   MainAxisAlignment
+                                    //                       .spaceBetween,
+                                    //               children: [
+                                    //                 InkWell(
+                                    //                   onTap: () {
+                                    //                     // showDialog(
+                                    //                     //     barrierDismissible:
+                                    //                     //         false,
+                                    //                     //     context: context,
+                                    //                     //     builder: (BuildContext
+                                    //                     //         context) {
+                                    //                     //       return ViewFile(
+                                    //                     //           imageURL:
+                                    //                     //               certificates[
+                                    //                     //                   index]);
+                                    //                     //     });
+                                    //                   },
+                                    //                   child: Container(
+                                    //                     height: 80,
+                                    //                     width: 80,
+                                    //                     decoration:
+                                    //                         BoxDecoration(
+                                    //                       borderRadius:
+                                    //                           BorderRadius
+                                    //                               .circular(10),
+                                    //                       color: Colors.grey
+                                    //                           .shade200, // You can adjust the fit as needed.
+                                    //                     ),
+                                    //                     child: ClipRRect(
+                                    //                       borderRadius:
+                                    //                           BorderRadius
+                                    //                               .circular(
+                                    //                                   10.0),
+                                    //                       child: const Icon(
+                                    //                         Icons
+                                    //                             .file_present_sharp,
+                                    //                         size: 48,
+                                    //                         color: Colors.blue,
+                                    //                       ),
+                                    //                     ),
+                                    //                   ),
+                                    //                 ),
+                                    //                 IconButton(
+                                    //                   iconSize: 15,
+                                    //                   splashRadius: 2,
+                                    //                   icon: const Icon(
+                                    //                     Icons.delete,
+                                    //                     color: Colors.red,
+                                    //                   ),
+                                    //                   onPressed: () {
+                                    //                     setState(() {
+                                    //                       selectedCertificates
+                                    //                           .removeAt(
+                                    //                               currentindex);
+                                    //                       certificatesfilenamestype
+                                    //                           .removeAt(
+                                    //                               currentindex);
+                                    //                     });
+                                    //                   },
+                                    //                 ),
+                                    //               ],
+                                    //             ),
+                                    //           );
+                                    //         });
+                                    //   }
+                                    // } else {
+                                    if (tutor.certificatestype[index] ==
+                                        'Image') {
+                                      return FutureBuilder(
+                                          future: FirebaseStorage.instance
+                                              .ref(tutor.certificates[index])
+                                              .getDownloadURL(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return Container(
+                                                  height: 25,
+                                                  width: 25,
+                                                  child: const Center(
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                    color: Color.fromRGBO(
+                                                        1, 118, 132, 1),
+                                                  ))); // Display a loading indicator while waiting for the file to download
+                                            } else if (snapshot.hasError) {
+                                              return Text(
+                                                  'Error: ${snapshot.error}');
+                                            }
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10.0, right: 10),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () {
+                                                      showDialog(
+                                                          barrierDismissible:
+                                                              false,
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return ViewFile(
+                                                                imageURL: tutor
+                                                                        .certificates[
+                                                                    index]);
+                                                          });
+                                                    },
+                                                    child: Container(
+                                                      height: 80,
+                                                      width: 80,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        color: Colors.grey
+                                                            .shade200, // You can adjust the fit as needed.
+                                                      ),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10.0),
+                                                        child: Image.network(
+                                                          snapshot.data
+                                                              .toString(),
+                                                          fit: BoxFit
+                                                              .cover, // You can adjust the fit as needed.
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    iconSize: 15,
+                                                    splashRadius: 2,
+                                                    icon: const Icon(
+                                                      Icons.delete,
+                                                      color: Colors.red,
+                                                    ),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        deleteCertificate(
+                                                            tutor.userId,
+                                                            tutor.certificates[
+                                                                index]);
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          });
+                                    } else if (tutor.certificatestype[index] ==
+                                        'pdf') {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 10.0, right: 10),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            InkWell(
+                                              onTap: () {
+                                                showDialog(
+                                                    barrierDismissible: false,
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return ViewFile(
+                                                          imageURL: tutor
+                                                                  .certificates[
+                                                              index]);
+                                                    });
+                                              },
+                                              child: Container(
+                                                height: 80,
+                                                width: 80,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  color: Colors.grey
+                                                      .shade200, // You can adjust the fit as needed.
+                                                ),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                  child: const Icon(
+                                                    Icons.picture_as_pdf,
+                                                    size: 48,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            IconButton(
+                                              iconSize: 15,
+                                              splashRadius: 2,
+                                              icon: const Icon(
+                                                Icons.delete,
+                                                color: Colors.red,
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  deleteCertificate(
+                                                      tutor.tutorID,
+                                                      tutor
+                                                          .certificates[index]);
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 10.0, right: 10),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            InkWell(
+                                              onTap: () {
+                                                showDialog(
+                                                    barrierDismissible: false,
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return ViewFile(
+                                                          imageURL: tutor
+                                                                  .certificates[
+                                                              index]);
+                                                    });
+                                              },
+                                              child: Container(
+                                                height: 80,
+                                                width: 80,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  color: Colors.grey
+                                                      .shade200, // You can adjust the fit as needed.
+                                                ),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                  child: const Icon(
+                                                    Icons.file_present_sharp,
+                                                    size: 48,
+                                                    color: Colors.blue,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            IconButton(
+                                              iconSize: 15,
+                                              splashRadius: 2,
+                                              icon: const Icon(
+                                                Icons.delete,
+                                                color: Colors.red,
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  deleteCertificate(
+                                                      tutor.tutorID,
+                                                      tutor
+                                                          .certificates[index]);
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }
+                                    // }
+                                  },
+                                ),
+                              ),
+                              IconButton(
+                                iconSize: 15,
+                                padding: EdgeInsets.zero,
+                                splashRadius: 1,
+                                icon: const Icon(
+                                  Icons.arrow_forward_ios, // Right arrow icon
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () {
+                                  // Scroll to the right
+                                  updatescrollController1.animateTo(
+                                    updatescrollController1.offset +
+                                        100.0, // Adjust the value as needed
+                                    duration: const Duration(
+                                        milliseconds:
+                                            500), // Adjust the duration as needed
+                                    curve: Curves.ease,
+                                  );
+                                },
+                              ),
+                            ],
+                          )),
+                    ],
+                  ),
+                  // const SizedBox(
+                  //   height: 10,
+                  // ),
+                  // Container(
+                  //   height: 50,
+                  //   width: 500,
+                  //   padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                  //   child: Row(
+                  //     children: [
+                  //       const Icon(
+                  //         Icons.list_alt_outlined,
+                  //         color: kColorLight,
+                  //         size: 24.0,
+                  //       ),
+                  //       const SizedBox(width: 10.0),
+                  //       Column(
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         children: const <Widget>[
+                  //           Text(
+                  //             'Resume/s',
+                  //             style: TextStyle(
+                  //                 fontSize: 16,
+                  //                 fontWeight: FontWeight.bold,
+                  //                 color: kColorLight),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //       const Spacer(),
+                  //       IconButton(
+                  //         iconSize: 15,
+                  //         icon: const Icon(
+                  //           Icons.add,
+                  //           color: kColorPrimary,
+                  //         ),
+                  //         onPressed: () {
+                  //           selectResumes(tutorID);
+                  //         },
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  // const SizedBox(
+                  //   height: 20,
+                  // ),
+                  // Row(
+                  //   children: [
+                  //     Container(
+                  //         width: 600,
+                  //         height: 120,
+                  //         padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  //         child: Row(
+                  //           children: [
+                  //             IconButton(
+                  //               iconSize: 15,
+                  //               icon: const Icon(
+                  //                 Icons.arrow_back_ios, // Left arrow icon
+                  //                 color: Colors.blue,
+                  //               ),
+                  //               onPressed: () {
+                  //                 // Scroll to the left
+                  //                 updatescrollController2.animateTo(
+                  //                   updatescrollController2.offset -
+                  //                       100.0, // Adjust the value as needed
+                  //                   duration: const Duration(
+                  //                       milliseconds:
+                  //                           500), // Adjust the duration as needed
+                  //                   curve: Curves.ease,
+                  //                 );
+                  //               },
+                  //             ),
+                  //             Expanded(
+                  //               child: ListView.builder(
+                  //                 controller:
+                  //                     updatescrollController2, // Assign the ScrollController to the ListView
+                  //                 scrollDirection: Axis.horizontal,
+                  //                 itemCount: tutor.resume.length +
+                  //                     selectedresume.length,
+                  //                 itemBuilder: (context, index) {
+                  //                   if (index > (tutor.resume.length - 1)) {
+                  //                     int currentindex =
+                  //                         index - tutor.resume.length;
+                  //                     if (resumefilenamestype[
+                  //                             currentindex] ==
+                  //                         'Image') {
+                  //                       return Padding(
+                  //                         padding: const EdgeInsets.only(
+                  //                             left: 10.0, right: 10),
+                  //                         child: Row(
+                  //                           mainAxisAlignment:
+                  //                               MainAxisAlignment
+                  //                                   .spaceBetween,
+                  //                           children: [
+                  //                             InkWell(
+                  //                               onTap: () {
+                  //                                 // showDialog(
+                  //                                 //     barrierDismissible:
+                  //                                 //         false,
+                  //                                 //     context: context,
+                  //                                 //     builder: (BuildContext
+                  //                                 //         context) {
+                  //                                 //       return ViewFile(
+                  //                                 //           imageURL:
+                  //                                 //               resume[
+                  //                                 //                   index]);
+                  //                                 //     });
+                  //                               },
+                  //                               child: Container(
+                  //                                 height: 80,
+                  //                                 width: 80,
+                  //                                 decoration: BoxDecoration(
+                  //                                   borderRadius:
+                  //                                       BorderRadius
+                  //                                           .circular(10),
+                  //                                   color: Colors.grey
+                  //                                       .shade200, // You can adjust the fit as needed.
+                  //                                 ),
+                  //                                 child: ClipRRect(
+                  //                                   borderRadius:
+                  //                                       BorderRadius
+                  //                                           .circular(10.0),
+                  //                                   child: Image.memory(
+                  //                                     selectedresume[
+                  //                                         currentindex]!,
+                  //                                     fit: BoxFit.cover,
+                  //                                     height: 70,
+                  //                                     width: 70,
+                  //                                   ),
+                  //                                 ),
+                  //                               ),
+                  //                             ),
+                  //                             IconButton(
+                  //                               iconSize: 15,
+                  //                               splashRadius: 2,
+                  //                               icon: const Icon(
+                  //                                 Icons.delete,
+                  //                                 color: Colors.red,
+                  //                               ),
+                  //                               onPressed: () {
+                  //                                 setState(() {
+                  //                                   selectedresume.removeAt(
+                  //                                       currentindex);
+                  //                                   resumefilenamestype
+                  //                                       .removeAt(
+                  //                                           currentindex);
+                  //                                 });
+                  //                               },
+                  //                             ),
+                  //                           ],
+                  //                         ),
+                  //                       );
+                  //                     } else if (resumefilenamestype[
+                  //                             currentindex] ==
+                  //                         'pdf') {
+                  //                       return Padding(
+                  //                         padding: const EdgeInsets.only(
+                  //                             left: 10.0, right: 10),
+                  //                         child: Row(
+                  //                           mainAxisAlignment:
+                  //                               MainAxisAlignment
+                  //                                   .spaceBetween,
+                  //                           children: [
+                  //                             InkWell(
+                  //                               onTap: () {
+                  //                                 // showDialog(
+                  //                                 //     barrierDismissible:
+                  //                                 //         false,
+                  //                                 //     context: context,
+                  //                                 //     builder: (BuildContext
+                  //                                 //         context) {
+                  //                                 //       return ViewFile(
+                  //                                 //           imageURL:
+                  //                                 //               resume[
+                  //                                 //                   index]);
+                  //                                 //     });
+                  //                               },
+                  //                               child: Container(
+                  //                                 height: 80,
+                  //                                 width: 80,
+                  //                                 decoration: BoxDecoration(
+                  //                                   borderRadius:
+                  //                                       BorderRadius
+                  //                                           .circular(10),
+                  //                                   color: Colors.grey
+                  //                                       .shade200, // You can adjust the fit as needed.
+                  //                                 ),
+                  //                                 child: ClipRRect(
+                  //                                   borderRadius:
+                  //                                       BorderRadius
+                  //                                           .circular(10.0),
+                  //                                   child: const Icon(
+                  //                                     Icons.picture_as_pdf,
+                  //                                     size:
+                  //                                         48, // Adjust the size as needed
+                  //                                     color: Colors
+                  //                                         .red, // Change the color as needed
+                  //                                   ),
+                  //                                 ),
+                  //                               ),
+                  //                             ),
+                  //                             IconButton(
+                  //                               iconSize: 15,
+                  //                               splashRadius: 2,
+                  //                               icon: const Icon(
+                  //                                 Icons.delete,
+                  //                                 color: Colors.red,
+                  //                               ),
+                  //                               onPressed: () {
+                  //                                 setState(() {
+                  //                                   selectedresume.removeAt(
+                  //                                       currentindex);
+                  //                                   resumefilenamestype
+                  //                                       .removeAt(
+                  //                                           currentindex);
+                  //                                 });
+                  //                               },
+                  //                             ),
+                  //                           ],
+                  //                         ),
+                  //                       );
+                  //                     } else {
+                  //                       return Padding(
+                  //                         padding: const EdgeInsets.only(
+                  //                             left: 10.0, right: 10),
+                  //                         child: Row(
+                  //                           mainAxisAlignment:
+                  //                               MainAxisAlignment
+                  //                                   .spaceBetween,
+                  //                           children: [
+                  //                             InkWell(
+                  //                               onTap: () {
+                  //                                 // showDialog(
+                  //                                 //     barrierDismissible:
+                  //                                 //         false,
+                  //                                 //     context: context,
+                  //                                 //     builder: (BuildContext
+                  //                                 //         context) {
+                  //                                 //       return ViewFile(
+                  //                                 //           imageURL:
+                  //                                 //               resume[
+                  //                                 //                   index]);
+                  //                                 //     });
+                  //                               },
+                  //                               child: Container(
+                  //                                 height: 80,
+                  //                                 width: 80,
+                  //                                 decoration: BoxDecoration(
+                  //                                   borderRadius:
+                  //                                       BorderRadius
+                  //                                           .circular(10),
+                  //                                   color: Colors.grey
+                  //                                       .shade200, // You can adjust the fit as needed.
+                  //                                 ),
+                  //                                 child: ClipRRect(
+                  //                                   borderRadius:
+                  //                                       BorderRadius
+                  //                                           .circular(10.0),
+                  //                                   child: const Icon(
+                  //                                     Icons
+                  //                                         .file_present_sharp,
+                  //                                     size: 48,
+                  //                                     color: Colors.blue,
+                  //                                   ),
+                  //                                 ),
+                  //                               ),
+                  //                             ),
+                  //                             IconButton(
+                  //                               iconSize: 15,
+                  //                               splashRadius: 2,
+                  //                               icon: const Icon(
+                  //                                 Icons.delete,
+                  //                                 color: Colors.red,
+                  //                               ),
+                  //                               onPressed: () {
+                  //                                 setState(() {
+                  //                                   selectedresume.removeAt(
+                  //                                       currentindex);
+                  //                                   resumefilenamestype
+                  //                                       .removeAt(
+                  //                                           currentindex);
+                  //                                 });
+                  //                               },
+                  //                             ),
+                  //                           ],
+                  //                         ),
+                  //                       );
+                  //                     }
+                  //                   } else {
+                  //                     if (tutor.resumelinktype[index] ==
+                  //                         'Image') {
+                  //                       return Padding(
+                  //                         padding: const EdgeInsets.only(
+                  //                             left: 10.0, right: 10),
+                  //                         child: Row(
+                  //                           mainAxisAlignment:
+                  //                               MainAxisAlignment
+                  //                                   .spaceBetween,
+                  //                           children: [
+                  //                             InkWell(
+                  //                               onTap: () {
+                  //                                 showDialog(
+                  //                                     barrierDismissible:
+                  //                                         false,
+                  //                                     context: context,
+                  //                                     builder: (BuildContext
+                  //                                         context) {
+                  //                                       return ViewFile(
+                  //                                           imageURL: tutor
+                  //                                                   .resume[
+                  //                                               index]);
+                  //                                     });
+                  //                               },
+                  //                               child: Container(
+                  //                                 height: 80,
+                  //                                 width: 80,
+                  //                                 decoration: BoxDecoration(
+                  //                                   borderRadius:
+                  //                                       BorderRadius
+                  //                                           .circular(10),
+                  //                                   color: Colors.grey
+                  //                                       .shade200, // You can adjust the fit as needed.
+                  //                                 ),
+                  //                                 child: ClipRRect(
+                  //                                   borderRadius:
+                  //                                       BorderRadius
+                  //                                           .circular(10.0),
+                  //                                   child: Image.network(
+                  //                                     tutor.resume[index],
+                  //                                     fit: BoxFit
+                  //                                         .cover, // You can adjust the fit as needed.
+                  //                                   ),
+                  //                                 ),
+                  //                               ),
+                  //                             ),
+                  //                             IconButton(
+                  //                               iconSize: 15,
+                  //                               splashRadius: 2,
+                  //                               icon: const Icon(
+                  //                                 Icons.delete,
+                  //                                 color: Colors.red,
+                  //                               ),
+                  //                               onPressed: () {
+                  //                                 setState(() {
+                  //                                   resumedelete.add(tutor
+                  //                                       .resume[index]);
+                  //                                   resumeindexdelete
+                  //                                       .add(index);
+                  //                                   tutor.resume
+                  //                                       .removeAt(index);
+                  //                                   tutor.resumelinktype
+                  //                                       .removeAt(index);
+                  //                                 });
+                  //                               },
+                  //                             ),
+                  //                           ],
+                  //                         ),
+                  //                       );
+                  //                     } else if (tutor
+                  //                             .resumelinktype[index] ==
+                  //                         'pdf') {
+                  //                       return Padding(
+                  //                         padding: const EdgeInsets.only(
+                  //                             left: 10.0, right: 10),
+                  //                         child: Row(
+                  //                           mainAxisAlignment:
+                  //                               MainAxisAlignment
+                  //                                   .spaceBetween,
+                  //                           children: [
+                  //                             InkWell(
+                  //                               onTap: () {
+                  //                                 showDialog(
+                  //                                     barrierDismissible:
+                  //                                         false,
+                  //                                     context: context,
+                  //                                     builder: (BuildContext
+                  //                                         context) {
+                  //                                       return ViewFile(
+                  //                                           imageURL: tutor
+                  //                                                   .resume[
+                  //                                               index]);
+                  //                                     });
+                  //                               },
+                  //                               child: Container(
+                  //                                 height: 80,
+                  //                                 width: 80,
+                  //                                 decoration: BoxDecoration(
+                  //                                   borderRadius:
+                  //                                       BorderRadius
+                  //                                           .circular(10),
+                  //                                   color: Colors.grey
+                  //                                       .shade200, // You can adjust the fit as needed.
+                  //                                 ),
+                  //                                 child: ClipRRect(
+                  //                                   borderRadius:
+                  //                                       BorderRadius
+                  //                                           .circular(10.0),
+                  //                                   child: const Icon(
+                  //                                     Icons.picture_as_pdf,
+                  //                                     size:
+                  //                                         48, // Adjust the size as needed
+                  //                                     color: Colors
+                  //                                         .red, // Change the color as needed
+                  //                                   ),
+                  //                                 ),
+                  //                               ),
+                  //                             ),
+                  //                             IconButton(
+                  //                               iconSize: 15,
+                  //                               splashRadius: 2,
+                  //                               icon: const Icon(
+                  //                                 Icons.delete,
+                  //                                 color: Colors.red,
+                  //                               ),
+                  //                               onPressed: () {
+                  //                                 setState(() {
+                  //                                   resumedelete.add(tutor
+                  //                                       .resume[index]);
+                  //                                   resumeindexdelete
+                  //                                       .add(index);
+                  //                                   tutor.resume
+                  //                                       .removeAt(index);
+                  //                                   tutor.resumelinktype
+                  //                                       .removeAt(index);
+                  //                                 });
+                  //                               },
+                  //                             ),
+                  //                           ],
+                  //                         ),
+                  //                       );
+                  //                     } else {
+                  //                       return Padding(
+                  //                         padding: const EdgeInsets.only(
+                  //                             left: 10.0, right: 10),
+                  //                         child: Row(
+                  //                           mainAxisAlignment:
+                  //                               MainAxisAlignment
+                  //                                   .spaceBetween,
+                  //                           children: [
+                  //                             InkWell(
+                  //                               onTap: () {
+                  //                                 showDialog(
+                  //                                     barrierDismissible:
+                  //                                         false,
+                  //                                     context: context,
+                  //                                     builder: (BuildContext
+                  //                                         context) {
+                  //                                       return ViewFile(
+                  //                                           imageURL: tutor
+                  //                                                   .resume[
+                  //                                               index]);
+                  //                                     });
+                  //                               },
+                  //                               child: Container(
+                  //                                 height: 80,
+                  //                                 width: 80,
+                  //                                 decoration: BoxDecoration(
+                  //                                   borderRadius:
+                  //                                       BorderRadius
+                  //                                           .circular(10),
+                  //                                   color: Colors.grey
+                  //                                       .shade200, // You can adjust the fit as needed.
+                  //                                 ),
+                  //                                 child: ClipRRect(
+                  //                                   borderRadius:
+                  //                                       BorderRadius
+                  //                                           .circular(10.0),
+                  //                                   child: const Icon(
+                  //                                     Icons
+                  //                                         .file_present_sharp,
+                  //                                     size: 48,
+                  //                                     color: Colors.blue,
+                  //                                   ),
+                  //                                 ),
+                  //                               ),
+                  //                             ),
+                  //                             IconButton(
+                  //                               iconSize: 15,
+                  //                               splashRadius: 2,
+                  //                               icon: const Icon(
+                  //                                 Icons.delete,
+                  //                                 color: Colors.red,
+                  //                               ),
+                  //                               onPressed: () {
+                  //                                 setState(() {
+                  //                                   resumedelete.add(tutor
+                  //                                       .resume[index]);
+                  //                                   resumeindexdelete
+                  //                                       .add(index);
+                  //                                   tutor.resume
+                  //                                       .removeAt(index);
+                  //                                   resumelinktype
+                  //                                       .removeAt(index);
+                  //                                 });
+                  //                               },
+                  //                             ),
+                  //                           ],
+                  //                         ),
+                  //                       );
+                  //                     }
+                  //                   }
+                  //                 },
+                  //               ),
+                  //             ),
+                  //             IconButton(
+                  //               iconSize: 15,
+                  //               icon: const Icon(
+                  //                 Icons
+                  //                     .arrow_forward_ios, // Right arrow icon
+                  //                 color: Colors.blue,
+                  //               ),
+                  //               onPressed: () {
+                  //                 // Scroll to the right
+                  //                 updatescrollController2.animateTo(
+                  //                   updatescrollController2.offset +
+                  //                       100.0, // Adjust the value as needed
+                  //                   duration: const Duration(
+                  //                       milliseconds:
+                  //                           500), // Adjust the duration as needed
+                  //                   curve: Curves.ease,
+                  //                 );
+                  //               },
+                  //             ),
+                  //           ],
+                  //         )),
+                  //   ],
+                  // ),
+
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    height: 50,
+                    width: (size.width - 360) / 2,
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment(-0.1, 0),
+                        end: Alignment.centerRight,
+                        colors: secondaryHeadercolors,
+                      ),
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        children: [
+                          const Text(
+                            'Videos',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.white),
+                          ),
+                          const Spacer(),
+                          Row(
+                            children: [
+                              StreamBuilder<double>(
+                                stream: _progressController1.stream,
+                                builder: (context, snapshot) {
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (snapshot.hasData)
+                                        Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 150,
+                                              child: LinearProgressIndicator(
+                                                  minHeight: 8,
+                                                  valueColor:
+                                                      const AlwaysStoppedAnimation<
+                                                              Color>(
+                                                          Colors.greenAccent),
+                                                  semanticsValue:
+                                                      '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                  semanticsLabel:
+                                                      '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                                  value: snapshot.data),
+                                            ),
+                                            Text(
+                                              '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  color: kColorGrey),
+                                            ),
+                                          ],
+                                        ),
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting)
+                                        Row(
+                                          children: [
+                                            const SizedBox(
+                                              width: 150,
+                                              child: LinearProgressIndicator(
+                                                  minHeight: 8,
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                              Color>(
+                                                          Colors.greenAccent),
+                                                  value: 0),
+                                            ),
+                                            Text(
+                                              '${(0 * 100).toStringAsFixed(2)}%',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  color: kColorGrey),
+                                            ),
+                                          ],
+                                        ),
+                                    ],
+                                  );
+                                },
+                              ),
+                              Tooltip(
+                                message: 'Add Video', // The hint text
+                                child: IconButton(
+                                  icon: const Icon(Icons.file_upload),
+                                  color: Colors
+                                      .white, // Replace with your desired icon
+                                  onPressed: () async {
+                                    selectVideos(tutorID);
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                          width: 600,
+                          height: 120,
+                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                iconSize: 15,
+                                icon: const Icon(
+                                  Icons.arrow_back_ios, // Left arrow icon
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () {
+                                  // Scroll to the left
+                                  updatescrollController3.animateTo(
+                                    updatescrollController3.offset -
+                                        100.0, // Adjust the value as needed
+                                    duration: const Duration(
+                                        milliseconds:
+                                            500), // Adjust the duration as needed
+                                    curve: Curves.ease,
+                                  );
+                                },
+                              ),
+                              Expanded(
+                                child: ListView.builder(
+                                    controller:
+                                        updatescrollController3, // Assign the ScrollController to the ListView
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: tutor.presentation.length,
+                                    itemBuilder: (context, index) {
+                                      return FutureBuilder(
+                                          future: FirebaseStorage.instance
+                                              .ref(tutor.presentation[index])
+                                              .getDownloadURL(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return Container(
+                                                  height: 25,
+                                                  width: 25,
+                                                  child: const Center(
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                    color: Color.fromRGBO(
+                                                        1, 118, 132, 1),
+                                                  ))); // Display a loading indicator while waiting for the file to download
+                                            } else if (snapshot.hasError) {
+                                              return Text(
+                                                  'Error: ${snapshot.error}');
+                                            }
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10.0, right: 10),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () {
+                                                      // showDialog(
+                                                      //     barrierDismissible:
+                                                      //         false,
+                                                      //     context: context,
+                                                      //     builder: (BuildContext
+                                                      //         context) {
+                                                      //       return ViewFile(
+                                                      //           imageURL:
+                                                      //               presentation[
+                                                      //                   index]);
+                                                      //     });
+                                                    },
+                                                    child: Container(
+                                                      height: 80,
+                                                      width: 80,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        color: Colors.grey
+                                                            .shade200, // You can adjust the fit as needed.
+                                                      ),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10.0),
+                                                        child: const Icon(
+                                                          Icons
+                                                              .video_library_sharp,
+                                                          size: 48,
+                                                          color: Colors.blue,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    iconSize: 15,
+                                                    icon: const Icon(
+                                                      Icons.delete,
+                                                      color: Colors.red,
+                                                    ),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        deleteVideo(
+                                                            tutor.userId,
+                                                            tutor.presentation[
+                                                                index]);
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          });
+                                    }),
+                              ),
+                              IconButton(
+                                iconSize: 15,
+                                icon: const Icon(
+                                  Icons.arrow_forward_ios, // Right arrow icon
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () {
+                                  // Scroll to the right
+                                  updatescrollController3.animateTo(
+                                    updatescrollController3.offset +
+                                        100.0, // Adjust the value as needed
+                                    duration: const Duration(
+                                        milliseconds:
+                                            500), // Adjust the duration as needed
+                                    curve: Curves.ease,
+                                  );
+                                },
+                              ),
+                            ],
+                          )),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Column(
+                children: [
+                  Container(
+                    height: 50,
+                    width: (size.width - 360) / 2,
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment(-0.1, 0),
+                        end: Alignment.centerRight,
+                        colors: secondaryHeadercolors,
+                      ),
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        children: [
+                          const Text(
+                            'About Me',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.white),
+                          ),
+                          const Spacer(),
+                          Row(
+                            children: [
+                              Tooltip(
+                                message: 'Update Description', // The hint text
+                                child: IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  color: Colors
+                                      .white, // Replace with your desired icon
+                                  onPressed: () async {
+                                    String? output = await updateDescr(
+                                      tutorID,
+                                      updateaboutmecontroller.text,
+                                    );
+
+                                    if (output == 'success') {
+                                    } else {
+                                      CoolAlert.show(
+                                        context: context,
+                                        width: 200,
+                                        type: CoolAlertType.error,
+                                        titleTextStyle: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.normal),
+                                        title: output.toString(),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Card(
+                    elevation: 5,
+                    child: Container(
+                      width: 500,
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      height: 350,
+                      child: TextField(
+                        controller: updateaboutmecontroller,
+                        textAlignVertical: TextAlignVertical.top,
+                        maxLines: null,
+                        expands: true,
+                        style: const TextStyle(color: kColorGrey),
+                        decoration: const InputDecoration(
+                          fillColor: Colors.white,
+                          filled: true,
+                          disabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide.none, // Set your desired color here
+                          ),
+                          hintText:
+                              'Describe your skills, your approach, your teaching method, and tell us why a student should you! (max 5000 characters)',
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    height: 50,
+                    width: (size.width - 360) / 2,
+                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment(-0.1, 0),
+                        end: Alignment.centerRight,
+                        colors: secondaryHeadercolors,
+                      ),
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        children: [
+                          const Text(
+                            'Service Provided',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.white),
+                          ),
+                          const Spacer(),
+                          Row(
+                            children: [
+                              Tooltip(
+                                message: 'Update Services', // The hint text
+                                child: IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  color: Colors
+                                      .white, // Replace with your desired icon
+                                  onPressed: () async {
+                                    String? output = await updateServices(
+                                      tutorID,
+                                      servicesprovided,
+                                    );
+
+                                    if (output == 'success') {
+                                    } else {
+                                      CoolAlert.show(
+                                        context: context,
+                                        width: 200,
+                                        type: CoolAlertType.error,
+                                        titleTextStyle: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.normal),
+                                        title: output.toString(),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    width: 500,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Row(
+                          children: [
+                            Container(
+                              width: 250,
+                              height: 45,
+                              alignment: Alignment.centerLeft,
+                              child: Theme(
+                                data: ThemeData(
+                                  checkboxTheme: CheckboxThemeData(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                child: ListTileTheme(
+                                  child: CheckboxListTile(
+                                    title: const Text('Recovery Lessons'),
+                                    // subtitle: const Text(
+                                    //     'A computer science portal for geeks.'),
+                                    // secondary: const Icon(Icons.code),
+                                    autofocus: false,
+                                    activeColor: Colors.green,
+                                    checkColor: Colors.white,
+                                    selected: updateselection1,
+                                    value: updateselection1,
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    onChanged: (value) {
+                                      if (updateselection1 == true) {
+                                        if (servicesprovided
+                                            .contains('Recovery Lessons')) {
+                                          servicesprovided
+                                              .remove('Recovery Lessons');
+                                          setState(() {
+                                            updateselection1 = value!;
+                                          });
+                                        }
+                                      } else {
+                                        setState(() {
+                                          servicesprovided
+                                              .add('Recovery Lessons');
+                                          updateselection1 = value!;
+                                        });
+                                      }
+                                      print(servicesprovided);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 250,
+                              height: 45,
+                              alignment: Alignment.centerLeft,
+                              child: Theme(
+                                data: ThemeData(
+                                  checkboxTheme: CheckboxThemeData(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                child: ListTileTheme(
+                                  child: CheckboxListTile(
+                                    title: const Text(
+                                        'Kids with Learning Difficulties'),
+                                    autofocus: false,
+                                    activeColor: Colors.green,
+                                    checkColor: Colors.white,
+                                    selected: updateselection2,
+                                    value: updateselection2,
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    onChanged: (value) {
+                                      if (updateselection2 == true) {
+                                        if (servicesprovided.contains(
+                                            'Kids with Learning Difficulties')) {
+                                          servicesprovided.remove(
+                                              'Kids with Learning Difficulties');
+                                          setState(() {
+                                            updateselection2 = value!;
+                                          });
+                                        }
+                                      } else {
+                                        setState(() {
+                                          servicesprovided.add(
+                                              'Kids with Learning Difficulties');
+                                          updateselection2 = value!;
+                                        });
+                                      }
+                                      print(servicesprovided);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              width: 250,
+                              height: 45,
+                              alignment: Alignment.centerLeft,
+                              child: Theme(
+                                data: ThemeData(
+                                  checkboxTheme: CheckboxThemeData(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                child: ListTileTheme(
+                                  child: CheckboxListTile(
+                                    title: const Text('Pre Exam Classes'),
+                                    autofocus: false,
+                                    activeColor: Colors.green,
+                                    checkColor: Colors.white,
+                                    selected: updateselection3,
+                                    value: updateselection3,
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    onChanged: (value) {
+                                      if (updateselection3 == true) {
+                                        if (servicesprovided
+                                            .contains('Pre Exam Classes')) {
+                                          servicesprovided
+                                              .remove('Pre Exam Classes');
+                                          setState(() {
+                                            updateselection3 = value!;
+                                          });
+                                        }
+                                      } else {
+                                        setState(() {
+                                          servicesprovided
+                                              .add('Pre Exam Classes');
+                                          updateselection3 = value!;
+                                        });
+                                      }
+                                      print(servicesprovided);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 250,
+                              height: 45,
+                              alignment: Alignment.centerLeft,
+                              child: Theme(
+                                data: ThemeData(
+                                  checkboxTheme: CheckboxThemeData(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                child: ListTileTheme(
+                                  child: CheckboxListTile(
+                                    title: const Text('Deaf Language'),
+                                    // subtitle: const Text(
+                                    //     'A computer science portal for geeks.'),
+                                    // secondary: const Icon(Icons.code),
+                                    autofocus: false,
+                                    activeColor: Colors.green,
+                                    checkColor: Colors.white,
+                                    selected: updateselection4,
+                                    value: updateselection4,
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    onChanged: (value) {
+                                      if (updateselection4 == true) {
+                                        if (servicesprovided
+                                            .contains('Deaf Language')) {
+                                          servicesprovided
+                                              .remove('Deaf Language');
+                                          setState(() {
+                                            updateselection4 = value!;
+                                          });
+                                        }
+                                      } else {
+                                        setState(() {
+                                          servicesprovided.add('Deaf Language');
+                                          updateselection4 = value!;
+                                        });
+                                      }
+                                      print(servicesprovided);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              width: 250,
+                              height: 45,
+                              alignment: Alignment.centerLeft,
+                              child: Theme(
+                                data: ThemeData(
+                                  checkboxTheme: CheckboxThemeData(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                child: ListTileTheme(
+                                  child: CheckboxListTile(
+                                    title: const Text('Own Program'),
+                                    // subtitle: const Text(
+                                    //     'A computer science portal for geeks.'),
+                                    // secondary: const Icon(Icons.code),
+                                    autofocus: false,
+                                    activeColor: Colors.green,
+                                    checkColor: Colors.white,
+                                    selected: updateselection5,
+                                    value: updateselection5,
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    onChanged: (value) {
+                                      if (updateselection5 == true) {
+                                        if (servicesprovided
+                                            .contains('Own Program')) {
+                                          servicesprovided
+                                              .remove('Own Program');
+                                          setState(() {
+                                            updateselection5 = value!;
+                                          });
+                                        }
+                                      } else {
+                                        setState(() {
+                                          servicesprovided.add('Own Program');
+                                          updateselection5 = value!;
+                                        });
+                                      }
+                                      print(servicesprovided);
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              // const SizedBox(
+              //   height: 10,
+              // ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.start,
+              //   children: [
+              //     Align(
+              //       alignment: Alignment.centerRight,
+              //       child: SizedBox(
+              //         width: 100,
+              //         height: 40,
+              //         child: ElevatedButton(
+              //           style: ElevatedButton.styleFrom(
+              //               backgroundColor: Colors.white,
+              //               shape: const RoundedRectangleBorder(
+              //                   borderRadius:
+              //                       BorderRadius.all(Radius.circular(20))),
+              //               elevation: 0),
+              //           onPressed: () async {
+              //             if (tutor.promotionalMessage ==
+              //                     updateaboutmecontroller.text &&
+              //                 areListsEqual(
+              //                     tutor.servicesprovided, servicesprovided) &&
+              //                 selectedCertificates.isEmpty &&
+              //                 selectedVideos.isEmpty &&
+              //                 selectedresume.isEmpty &&
+              //                 certificatesdelete.isEmpty &&
+              //                 resumedelete.isEmpty &&
+              //                 videodelete.isEmpty) {
+              //             } else {
+              //               if (certificatesdelete.isNotEmpty) {
+              //                 deleteFileCertificate(certificatesdelete, tutorID,
+              //                     certificatesindexdelete);
+              //               } else {}
+              //               if (resumedelete.isNotEmpty) {
+              //                 deleteFileResume(
+              //                     resumedelete, tutorID, resumeindexdelete);
+              //               } else {}
+              //               if (videodelete.isNotEmpty) {
+              //                 deleteFileVideo(
+              //                     videodelete, tutorID, videoindexdelete);
+              //               } else {}
+              //               showDialog(
+              //                 context: context,
+              //                 barrierDismissible: false,
+              //                 builder: (BuildContext context) {
+              //                   return AlertDialog(
+              //                     title: const Text('Uploading...'),
+              //                     content: SizedBox(
+              //                       height: 140,
+              //                       child: Column(
+              //                         mainAxisAlignment:
+              //                             MainAxisAlignment.start,
+              //                         crossAxisAlignment:
+              //                             CrossAxisAlignment.start,
+              //                         children: [
+              //                           const Text('Video uploading:'),
+              //                           StreamBuilder<double>(
+              //                             stream: _progressController1.stream,
+              //                             builder: (context, snapshot) {
+              //                               return Column(
+              //                                 mainAxisSize: MainAxisSize.min,
+              //                                 children: [
+              //                                   if (snapshot.hasData)
+              //                                     Row(
+              //                                       children: [
+              //                                         SizedBox(
+              //                                           width: 150,
+              //                                           child: LinearProgressIndicator(
+              //                                               minHeight: 8,
+              //                                               valueColor:
+              //                                                   const AlwaysStoppedAnimation<
+              //                                                           Color>(
+              //                                                       Colors
+              //                                                           .greenAccent),
+              //                                               semanticsValue:
+              //                                                   '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+              //                                               semanticsLabel:
+              //                                                   '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+              //                                               value:
+              //                                                   snapshot.data),
+              //                                         ),
+              //                                         Text(
+              //                                           '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+              //                                           style: const TextStyle(
+              //                                               fontWeight:
+              //                                                   FontWeight.w400,
+              //                                               color: kColorGrey),
+              //                                         ),
+              //                                       ],
+              //                                     ),
+              //                                   if (snapshot.connectionState ==
+              //                                       ConnectionState.waiting)
+              //                                     Row(
+              //                                       children: [
+              //                                         const SizedBox(
+              //                                           width: 150,
+              //                                           child: LinearProgressIndicator(
+              //                                               minHeight: 8,
+              //                                               valueColor:
+              //                                                   AlwaysStoppedAnimation<
+              //                                                           Color>(
+              //                                                       Colors
+              //                                                           .greenAccent),
+              //                                               value: 0),
+              //                                         ),
+              //                                         Text(
+              //                                           '${(0 * 100).toStringAsFixed(2)}%',
+              //                                           style: const TextStyle(
+              //                                               fontWeight:
+              //                                                   FontWeight.w400,
+              //                                               color: kColorGrey),
+              //                                         ),
+              //                                       ],
+              //                                     ),
+              //                                 ],
+              //                               );
+              //                             },
+              //                           ),
+              //                           const Text('Certificates uploading:'),
+              //                           StreamBuilder<double>(
+              //                             stream: _progressController.stream,
+              //                             builder: (context, snapshot) {
+              //                               return Column(
+              //                                 mainAxisSize: MainAxisSize.min,
+              //                                 children: [
+              //                                   if (snapshot.hasData)
+              //                                     Row(
+              //                                       children: [
+              //                                         SizedBox(
+              //                                           width: 150,
+              //                                           child: LinearProgressIndicator(
+              //                                               minHeight: 8,
+              //                                               valueColor:
+              //                                                   const AlwaysStoppedAnimation<
+              //                                                           Color>(
+              //                                                       Colors
+              //                                                           .greenAccent),
+              //                                               semanticsValue:
+              //                                                   '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+              //                                               semanticsLabel:
+              //                                                   '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+              //                                               value:
+              //                                                   snapshot.data),
+              //                                         ),
+              //                                         Text(
+              //                                           '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+              //                                           style: const TextStyle(
+              //                                               fontWeight:
+              //                                                   FontWeight.w400,
+              //                                               color: kColorGrey),
+              //                                         ),
+              //                                       ],
+              //                                     ),
+              //                                   if (snapshot.connectionState ==
+              //                                       ConnectionState.waiting)
+              //                                     Row(
+              //                                       children: [
+              //                                         const SizedBox(
+              //                                           width: 150,
+              //                                           child: LinearProgressIndicator(
+              //                                               minHeight: 8,
+              //                                               valueColor:
+              //                                                   AlwaysStoppedAnimation<
+              //                                                           Color>(
+              //                                                       Colors
+              //                                                           .greenAccent),
+              //                                               value: 0),
+              //                                         ),
+              //                                         Text(
+              //                                           '${(0 * 100).toStringAsFixed(2)}%',
+              //                                           style: const TextStyle(
+              //                                               fontWeight:
+              //                                                   FontWeight.w400,
+              //                                               color: kColorGrey),
+              //                                         ),
+              //                                       ],
+              //                                     ),
+              //                                 ],
+              //                               );
+              //                             },
+              //                           ),
+              //                         ],
+              //                       ),
+              //                     ),
+              //                   );
+              //                 },
+              //               ).then((value) {
+              //                 _currentFileNotifier.dispose();
+              //                 _currentFileNotifier1.dispose();
+              //                 Navigator.pop(context);
+              //               });
+
+              //               String? output = await updateTutorInfoOffer(
+              //                   tutorID,
+              //                   updateaboutmecontroller.text,
+              //                   servicesprovided,
+              //                   await uploadTutorvideoListNew(
+              //                       tutorID,
+              //                       'Videos',
+              //                       selectedVideos,
+              //                       videoFilenames,
+              //                       _progressController1,
+              //                       _currentFileNotifier1),
+              //                   [],
+              //                   resumefilenamestype,
+              //                   await uploadTutorcertificateNew(
+              //                       tutorID,
+              //                       'Certificates',
+              //                       selectedCertificates,
+              //                       certificatesfilenames,
+              //                       _progressController,
+              //                       _currentFileNotifier,_isUploading),
+              //                   certificatesfilenamestype);
+
+              //               if (output == 'success') {
+              //               } else {
+              //                 CoolAlert.show(
+              //                   context: context,
+              //                   width: 200,
+              //                   type: CoolAlertType.error,
+              //                   titleTextStyle: const TextStyle(
+              //                       fontSize: 15,
+              //                       fontWeight: FontWeight.normal),
+              //                   title: output.toString(),
+              //                 );
+              //               }
+              //               setState(() {
+              //                 selectedCertificates = [];
+              //                 selectedresume = [];
+              //                 selectedVideos = [];
+              //                 certificatesfilenames = [];
+              //                 certificatesfilenamestype = [];
+              //                 resumefilenames = [];
+              //                 resumefilenamestype = [];
+              //                 videoFilenames = [];
+              //                 certificatesdelete = [];
+              //                 resumedelete = [];
+              //                 videodelete = [];
+              //               });
+              //             }
+              //           },
+              //           child: const Text(
+              //             'Update',
+              //             style: TextStyle(
+              //                 color: kColorPrimary,
+              //                 fontWeight: FontWeight.bold),
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //     Align(
+              //       alignment: Alignment.centerRight,
+              //       child: SizedBox(
+              //         width: 100,
+              //         height: 40,
+              //         child: ElevatedButton(
+              //           style: ElevatedButton.styleFrom(
+              //               backgroundColor: Colors.white,
+              //               shape: const RoundedRectangleBorder(
+              //                   borderRadius:
+              //                       BorderRadius.all(Radius.circular(20))),
+              //               elevation: 0),
+              //           onPressed: () {
+              //             final provider =
+              //                 context.read<TutorInformationProvider>();
+              //             provider.updateBoolValue(false);
+              //           },
+              //           child: const Text(
+              //             'Cancel',
+              //             style: TextStyle(
+              //                 color: kCalendarColorB,
+              //                 fontWeight: FontWeight.bold),
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(
+              //   height: 10,
+              // ),
             ],
           ),
         ),

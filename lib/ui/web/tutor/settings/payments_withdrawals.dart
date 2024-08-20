@@ -494,7 +494,7 @@ class _AddBankDetailsDialogState extends State<AddBankDetailsDialog> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Tooltip(
-                message: 'Save Card',
+                message: 'Save Account',
                 child: Container(
                   width: 120,
                   height: 30,
@@ -547,7 +547,7 @@ class _AddBankDetailsDialogState extends State<AddBankDetailsDialog> {
                     icon: const Icon(Icons.add_card_outlined,
                         size: 16, color: kColorPrimary),
                     label: const Text(
-                      'Save Card',
+                      'Save Account',
                       style: TextStyle(fontSize: 14, color: kColorPrimary),
                     ),
                   ),

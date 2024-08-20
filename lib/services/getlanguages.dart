@@ -6,10 +6,13 @@ Stream<List<LanguageData>> streamLanguageNamesFromFirestore() {
     CollectionReference languagesCollection =
         FirebaseFirestore.instance.collection('languages');
 
-    // Listen for changes in the documents
-    return languagesCollection.doc('YHkWYzGhH7HWgGR91WKL').snapshots().map(
-      (documentSnapshot) {
-        if (documentSnapshot.exists) {
+    // Listen for changes in the documents and limit the query to 1 document
+    return languagesCollection.limit(1).snapshots().map(
+      (querySnapshot) {
+        if (querySnapshot.docs.isNotEmpty) {
+          // Get the first document snapshot
+          DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
+
           // Extract the list of country names from the document as List<String>
           List<String> namesList = List<String>.from(documentSnapshot['names']);
 

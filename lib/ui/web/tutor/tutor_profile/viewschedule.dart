@@ -8,13 +8,17 @@ import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../provider/init_provider.dart';
+import '../../../../services/getcalendardata.dart';
 import '../../../../services/getenrolledclasses.dart';
+import '../../../../services/timefromtimestamp.dart';
 import '../../../../utils/themes.dart';
 import '../calendar/setup_calendar.dart';
 
 class ViewScheduleData extends StatefulWidget {
   final dynamic data;
-  const ViewScheduleData({super.key, required this.data});
+  final String studentdata;
+  const ViewScheduleData(
+      {super.key, required this.data, required this.studentdata});
   @override
   State<ViewScheduleData> createState() => _ViewScheduleDataState();
 }
@@ -25,7 +29,7 @@ class _ViewScheduleDataState extends State<ViewScheduleData> {
     return MultiProvider(
       providers: [
         StreamProvider<List<ClassesData>>.value(
-          value: EnrolledClass(uid: widget.data['userId'], role: 'tutor')
+          value: EnrolledClass(uid: widget.data['userId'], role: 'tutor', targetTimezone: 'Asia/Dubai',)
               .getenrolled,
           catchError: (context, error) {
             return [];
@@ -35,6 +39,7 @@ class _ViewScheduleDataState extends State<ViewScheduleData> {
       ],
       child: CalendarDialog(
         data: widget.data,
+        studentdata: widget.studentdata,
       ),
     );
   }
@@ -42,8 +47,9 @@ class _ViewScheduleDataState extends State<ViewScheduleData> {
 
 class CalendarDialog extends StatefulWidget {
   final dynamic data;
-
-  const CalendarDialog({super.key, required this.data});
+  final String studentdata;
+  const CalendarDialog(
+      {super.key, required this.data, required this.studentdata});
 
   @override
   State<CalendarDialog> createState() => _CalendarDialogState();
@@ -84,18 +90,33 @@ class _CalendarDialogState extends State<CalendarDialog> {
   @override
   void initState() {
     super.initState();
-    getDataFromTutorScheduleCollection(
-      widget.data['userId'],
-    );
-    getDataFromTutorScheduleCollectionavilableTime(
-      widget.data['userId'],
-    );
-    getDataFromTutorScheduleCollectionBlockDateTime(
-      widget.data['userId'],
-    );
-    getDataFromTutorScheduleCollectionAvailableDateTime(
-      widget.data['userId'],
-    );
+    // getDataFromTutorScheduleCollection(
+    //   widget.data['userId'],
+    // );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cartNotifier =
+          Provider.of<TutorScheduleProvider>(context, listen: false);
+      cartNotifier.getDataFromTutorScheduleCollectionAvailableTime(
+          widget.data['userId']);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final timedatenotifier =
+          Provider.of<TutorScheduleProvider>(context, listen: false);
+      timedatenotifier.getDataFromTutorScheduleCollectionAvailableDateTime(
+          widget.data['userId'], widget.studentdata);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final blocktimedatenotifier =
+          Provider.of<TutorScheduleProvider>(context, listen: false);
+      blocktimedatenotifier.getDataFromTutorScheduleCollectionBlockDateTime(
+          widget.data['userId'], widget.studentdata);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final dayofftimedatenotifier =
+          Provider.of<TutorScheduleProvider>(context, listen: false);
+      dayofftimedatenotifier.getDataFromTutorScheduleCollection(
+          widget.data['userId'], widget.studentdata);
+    });
     _controller1.addListener(() {
       _controller2.jumpTo(_controller1.offset);
     });
@@ -105,202 +126,12 @@ class _CalendarDialogState extends State<CalendarDialog> {
     });
   }
 
-  Future<void> getTimeAvailableForSpecificUID(String uid) async {
-    try {
-      // Query the "tutorSchedule" collection where 'uid' is equal to the provided UID
-      QuerySnapshot tutorScheduleQuerySnapshot = await FirebaseFirestore
-          .instance
-          .collection('tutorSchedule')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      // Loop through the documents in the "tutorSchedule" collection
-      tutorScheduleQuerySnapshot.docs.forEach((tutorScheduleDoc) async {
-        // Access the 'timeavailable' subcollection for this specific document
-        QuerySnapshot timeAvailableQuerySnapshot =
-            await tutorScheduleDoc.reference.collection('timeavailable').get();
-
-        // Now, you can work with the documents in the "timeavailable" subcollection
-        timeAvailableQuerySnapshot.docs.forEach((timeAvailableDoc) {
-          // Access the data within each document in the subcollection
-          Map<String, dynamic> data =
-              timeAvailableDoc.data() as Map<String, dynamic>;
-          // Do something with the data...
-          setState(() {
-            // Extract the "timefrom" and "timeend" fields
-            String timefrom = data['timeAvailableFrom'];
-            String timeend = data['timeAvailableTo'];
-          });
-        });
-      });
-    } catch (e) {
-      print('Error fetching data from Firestore: $e');
-    }
-  }
-
-  Future<void> getDataFromTutorScheduleCollection(String uid) async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('tutorSchedule')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      // Loop through the documents in the collection
-      querySnapshot.docs.forEach((doc) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-        // Access the data fields you need
-        String uid = data['uid'] ?? [];
-        List<dynamic> dateoffselected = data['dateoffselected'] != null
-            ? List<dynamic>.from(data['dateoffselected'])
-            : [];
-
-        // Convert the timestamp strings to DateTime objects
-        setState(() {
-          dayOffs = List<String>.from(data['dayoffs'] ?? []);
-
-          if (dateoffselected != null) {
-            dayOffsdate = dateoffselected
-                .map((dateString) => DateTime.tryParse(dateString))
-                .where((date) => date != null)
-                .cast<DateTime>()
-                .toList();
-          }
-        });
-      });
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
-
   String timeFrom = '12:00 AM';
   String timeTo = '11:59 PM';
-  Future<void> getDataFromTutorScheduleCollectionavilableTime(
-      String uid) async {
-    try {
-      // Get the tutorSchedule document for the specified UID
-      QuerySnapshot tutorScheduleQuerySnapshot = await FirebaseFirestore
-          .instance
-          .collection('tutorSchedule')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      // Loop through the documents in the tutorSchedule collection
-      tutorScheduleQuerySnapshot.docs.forEach((doc) async {
-        // Get the reference to the "timeavailable" subcollection
-        CollectionReference timeAvailableCollection =
-            doc.reference.collection('timeavailable');
-
-        // Query documents within the "timeavailable" subcollection
-        QuerySnapshot timeAvailableQuerySnapshot =
-            await timeAvailableCollection.get();
-
-        // Loop through the documents in the "timeavailable" subcollection
-        timeAvailableQuerySnapshot.docs.forEach((timeDoc) {
-          Map<String, dynamic> timeData =
-              timeDoc.data() as Map<String, dynamic>;
-
-          // Create a TimeAvailability instance from the map
-          TimeAvailability timeAvailability =
-              TimeAvailability.fromMap(timeData);
-
-          setState(() {
-            timeFrom = timeAvailability.timeAvailableFrom;
-            timeTo = timeAvailability.timeAvailableTo;
-          });
-        });
-      });
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
 
   List<BlockDate> blocktime = [];
-  Future<void> getDataFromTutorScheduleCollectionBlockDateTime(
-      String uid) async {
-    List<BlockDate> dateTimeAvailabilities = [];
-
-    try {
-      // Get the tutorSchedule document for the specified UID
-      QuerySnapshot tutorScheduleQuerySnapshot = await FirebaseFirestore
-          .instance
-          .collection('tutorSchedule')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      // Loop through the documents in the tutorSchedule collection
-      for (QueryDocumentSnapshot doc in tutorScheduleQuerySnapshot.docs) {
-        // Get the reference to the "timeavailable" subcollection
-        CollectionReference timeAvailableCollection =
-            doc.reference.collection('blockdatetime');
-
-        // Query documents within the "timeavailable" subcollection
-        QuerySnapshot timeAvailableQuerySnapshot =
-            await timeAvailableCollection.get();
-
-        // Loop through the documents in the "timeavailable" subcollection
-        for (QueryDocumentSnapshot timeDoc in timeAvailableQuerySnapshot.docs) {
-          Map<String, dynamic> timeData =
-              timeDoc.data() as Map<String, dynamic>;
-
-          // Create a TimeAvailability instance from the map
-          BlockDate timeAvailability = BlockDate.fromMap(timeData);
-
-          dateTimeAvailabilities.add(timeAvailability);
-        }
-      }
-
-      setState(() {
-        blocktime = dateTimeAvailabilities;
-      });
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
 
   List<DateTimeAvailability> dateavailabledateselected = [];
-  Future<void> getDataFromTutorScheduleCollectionAvailableDateTime(
-      String uid) async {
-    List<DateTimeAvailability> dateTimeAvailabilities = [];
-
-    try {
-      // Get the tutorSchedule document for the specified UID
-      QuerySnapshot tutorScheduleQuerySnapshot = await FirebaseFirestore
-          .instance
-          .collection('tutorSchedule')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      // Loop through the documents in the tutorSchedule collection
-      for (QueryDocumentSnapshot doc in tutorScheduleQuerySnapshot.docs) {
-        // Get the reference to the "timeavailable" subcollection
-        CollectionReference timeAvailableCollection =
-            doc.reference.collection('timedateavailable');
-
-        // Query documents within the "timeavailable" subcollection
-        QuerySnapshot timeAvailableQuerySnapshot =
-            await timeAvailableCollection.get();
-
-        // Loop through the documents in the "timeavailable" subcollection
-        for (QueryDocumentSnapshot timeDoc in timeAvailableQuerySnapshot.docs) {
-          Map<String, dynamic> timeData =
-              timeDoc.data() as Map<String, dynamic>;
-
-          // Create a TimeAvailability instance from the map
-          DateTimeAvailability timeAvailability =
-              DateTimeAvailability.fromMap(timeData);
-
-          dateTimeAvailabilities.add(timeAvailability);
-        }
-      }
-
-      setState(() {
-        dateavailabledateselected = dateTimeAvailabilities;
-      });
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
 
   List<ScheduleData> filteredSchedules = [];
   ScheduleData? selectedbooking;
@@ -486,333 +317,402 @@ class _CalendarDialogState extends State<CalendarDialog> {
     for (var schedule in filteredSchedules) {
       isHovered.add(false);
     }
-    return Scaffold(
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Flexible(
-            flex: 12,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 10, bottom: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 5, 5, 0),
-                    child: Row(
-                      children: const [
-                        Text(
-                          'Tutor Calendar',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: kColorGrey,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ],
+    return Consumer<TutorScheduleProvider>(builder: (context, scheduletime, _) {
+      if (scheduletime.availableDateSelected != null) {
+        timeFrom = updateTime(widget.studentdata,
+            scheduletime.availableDateSelected!.timeAvailableFrom);
+        timeTo = updateTime(widget.studentdata,
+            scheduletime.availableDateSelected!.timeAvailableTo);
+      }
+      if (scheduletime.dateavailabledateselected != null) {
+        dateavailabledateselected = scheduletime.dateavailabledateselected!;
+      }
+      if (scheduletime.blockdateselected != null) {
+        blocktime = scheduletime.blockdateselected!;
+      }
+      if (scheduletime.dayOffs != null || scheduletime.dayOffsdate != null) {
+        dayOffs = scheduletime.dayOffs!;
+        dayOffsdate = scheduletime.dayOffsdate!;
+      }
+      return Scaffold(
+        body: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Flexible(
+              flex: 12,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 20,
                     ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  SizedBox(
-                    width: size.width - 160,
-                    height: 500,
-                    child: Card(
-                      margin: const EdgeInsets.fromLTRB(10, 5, 5, 0),
-                      elevation: 4,
-                      // shape: const RoundedRectangleBorder(
-                      //   borderRadius: BorderRadius.all(
-                      //     Radius.circular(5),
-                      //   ),
-                      //   side: BorderSide(color: kColorPrimary, width: 2),
-                      // ),
-                      child: MouseRegion(
-                        onHover: (event) {},
-                        cursor: SystemMouseCursors.click,
-                        child: TableCalendar(
-                          shouldFillViewport: false,
-                          firstDay: DateTime(1950, 8),
-                          lastDay: DateTime(5000),
-                          focusedDay: _focusedDay,
-                          calendarFormat: _calendarFormat,
-                          daysOfWeekHeight: 60,
-                          rowHeight: 60,
-                          headerStyle: HeaderStyle(
-                            titleTextStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.w400),
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment(
-                                    -0.1, 0), // 0% from the top center
-                                end: Alignment
-                                    .centerRight, // 86% to the bottom center
-                                // transform: GradientRotation(1.57), // 90 degrees rotation
-                                colors:
-                                    secondaryHeadercolors, // Add your desired colors here
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 5, 5, 0),
+                      child: Row(
+                        children: const [
+                          Text(
+                            'Tutor Calendar',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: kColorGrey,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    SizedBox(
+                      width: size.width - 160,
+                      height: 500,
+                      child: Card(
+                        margin: const EdgeInsets.fromLTRB(10, 5, 5, 0),
+                        elevation: 4,
+                        // shape: const RoundedRectangleBorder(
+                        //   borderRadius: BorderRadius.all(
+                        //     Radius.circular(5),
+                        //   ),
+                        //   side: BorderSide(color: kColorPrimary, width: 2),
+                        // ),
+                        child: MouseRegion(
+                          onHover: (event) {},
+                          cursor: SystemMouseCursors.click,
+                          child: TableCalendar(
+                            shouldFillViewport: false,
+                            firstDay: DateTime(1950, 8),
+                            lastDay: DateTime(5000),
+                            focusedDay: _focusedDay,
+                            calendarFormat: _calendarFormat,
+                            daysOfWeekHeight: 60,
+                            rowHeight: 60,
+                            headerStyle: HeaderStyle(
+                              titleTextStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.w400),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  begin: Alignment(
+                                      -0.1, 0), // 0% from the top center
+                                  end: Alignment
+                                      .centerRight, // 86% to the bottom center
+                                  // transform: GradientRotation(1.57), // 90 degrees rotation
+                                  colors:
+                                      secondaryHeadercolors, // Add your desired colors here
+                                ),
+                                borderRadius: BorderRadius.circular(5.0),
                               ),
-                              borderRadius: BorderRadius.circular(5.0),
+                              formatButtonVisible: false,
+                              leftChevronIcon: const Icon(
+                                Icons.arrow_left_outlined,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                              rightChevronIcon: const Icon(
+                                Icons.arrow_right_outlined,
+                                color: Colors.white,
+                                size: 28,
+                              ),
                             ),
-                            formatButtonVisible: false,
-                            leftChevronIcon: const Icon(
-                              Icons.arrow_left_outlined,
-                              color: Colors.white,
-                              size: 28,
+                            // Calendar Dates styling
+                            daysOfWeekStyle: const DaysOfWeekStyle(
+                              // Weekend days color (Sat,Sun)
+                              weekendStyle: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20),
+                              weekdayStyle: TextStyle(
+                                  color: kColorGrey,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20),
                             ),
-                            rightChevronIcon: const Icon(
-                              Icons.arrow_right_outlined,
-                              color: Colors.white,
-                              size: 28,
-                            ),
-                          ),
-                          // Calendar Dates styling
-                          daysOfWeekStyle: const DaysOfWeekStyle(
-                            // Weekend days color (Sat,Sun)
-                            weekendStyle: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
-                            weekdayStyle: TextStyle(
-                                color: kColorGrey,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
-                          ),
-                          calendarStyle: CalendarStyle(
-                            // Weekend dates color (Sat & Sun Column)
-                            weekendTextStyle: const TextStyle(
+                            calendarStyle: CalendarStyle(
+                              // Weekend dates color (Sat & Sun Column)
+                              weekendTextStyle: const TextStyle(
+                                  color: kColorGrey,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.normal),
+                              outsideDaysVisible: true,
+                              cellMargin: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                              rowDecoration: const BoxDecoration(
+                                color: Colors.white,
+                              ),
+                              defaultDecoration: BoxDecoration(
+                                color: Colors.transparent,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                    color: const Color(0xFF616161), width: .5),
+                              ),
+                              weekendDecoration: BoxDecoration(
+                                color: Colors.transparent,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                    color: const Color(0xFF616161), width: .5),
+                              ),
+                              defaultTextStyle: const TextStyle(
                                 color: kColorGrey,
                                 fontSize: 16,
-                                fontWeight: FontWeight.normal),
-                            outsideDaysVisible: true,
-                            cellMargin: const EdgeInsets.fromLTRB(5, 5, 5, 0),
-                            rowDecoration: const BoxDecoration(
-                              color: Colors.white,
-                            ),
-                            defaultDecoration: BoxDecoration(
-                              color: Colors.transparent,
-                              shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(
-                                  color: const Color(0xFF616161), width: .5),
-                            ),
-                            weekendDecoration: BoxDecoration(
-                              color: Colors.transparent,
-                              shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(
-                                  color: const Color(0xFF616161), width: .5),
-                            ),
-                            defaultTextStyle: const TextStyle(
-                              color: kColorGrey,
-                              fontSize: 16,
-                              fontWeight: FontWeight.normal,
-                            ),
-                            // highlighted color for today
-                            todayDecoration: BoxDecoration(
-                              color: kSecondarybuttonblue,
-                              shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(
-                                color: const Color(0xFF616161),
+                                fontWeight: FontWeight.normal,
+                              ),
+                              // highlighted color for today
+                              todayDecoration: BoxDecoration(
+                                color: kSecondarybuttonblue,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                  color: const Color(0xFF616161),
+                                ),
+                              ),
+                              // highlighted color for selected day
+                              selectedDecoration: BoxDecoration(
+                                color: kSecondarybuttonblue,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                  color: const Color(0xFF616161),
+                                ),
                               ),
                             ),
-                            // highlighted color for selected day
-                            selectedDecoration: BoxDecoration(
-                              color: kSecondarybuttonblue,
-                              shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.circular(5),
-                              border: Border.all(
-                                color: const Color(0xFF616161),
-                              ),
-                            ),
-                          ),
-                          selectedDayPredicate: (day) {
-                            // Use `selectedDayPredicate` to determine which day is currently selected.
-                            // If this returns true, then `day` will be marked as selected.
+                            selectedDayPredicate: (day) {
+                              // Use `selectedDayPredicate` to determine which day is currently selected.
+                              // If this returns true, then `day` will be marked as selected.
 
-                            // Using `isSameDay` is recommended to disregard
-                            // the time-part of compared DateTime objects.
-                            return isSameDay(_selectedDay, day);
-                          },
-                          onDaySelected: (selectedDay, focusedDay) {
-                            if (!isSameDay(_selectedDay, selectedDay)) {
-                              // Call `setState()` when updating the selected day
-                              setState(() {
-                                _selectedDay = selectedDay;
-                                _focusedDay = focusedDay;
-                                if (isDayOff(focusedDay)) {
-                                  daystatus = true;
-                                } else if (isDayOffdate(focusedDay)) {
-                                  daystatus = true;
+                              // Using `isSameDay` is recommended to disregard
+                              // the time-part of compared DateTime objects.
+                              return isSameDay(_selectedDay, day);
+                            },
+                            onDaySelected: (selectedDay, focusedDay) {
+                              if (!isSameDay(_selectedDay, selectedDay)) {
+                                // Call `setState()` when updating the selected day
+                                setState(() {
+                                  _selectedDay = selectedDay;
+                                  _focusedDay = focusedDay;
+                                  if (isDayOff(focusedDay)) {
+                                    daystatus = true;
+                                  } else if (isDayOffdate(focusedDay)) {
+                                    daystatus = true;
+                                  } else {
+                                    daystatus = false;
+                                  }
+                                });
+                              }
+                            },
+
+                            calendarBuilders: CalendarBuilders(
+                              markerBuilder: (context, date, _) {
+                                int count = 0;
+                                for (var highlightedDate in scheduleList) {
+                                  if (isSameDay(
+                                          date, highlightedDate.scheduledate) &&
+                                      highlightedDate.type == 'class') {
+                                    count++;
+                                  }
+                                }
+                                int blockcount = 0;
+                                for (var blockdata in blocktime) {
+                                  if (isSameDay(date, blockdata.blockDate)) {
+                                    blockcount++;
+                                  }
+                                }
+                                if (count > 0 && blockcount > 0) {
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        width: 15,
+                                        height: 15,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            color: kCalendarColorFB,
+                                            borderRadius:
+                                                BorderRadius.circular(7)),
+                                        child: Center(
+                                          child: Text(
+                                            '$count',
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 8),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 15,
+                                        height: 15,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            color: kCalendarColorAB,
+                                            borderRadius:
+                                                BorderRadius.circular(7)),
+                                        child: null,
+                                      ),
+                                      Container(
+                                        width: 15,
+                                        height: 15,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            color: kCalendarColorB,
+                                            borderRadius:
+                                                BorderRadius.circular(7)),
+                                        child: null,
+                                      ),
+                                    ],
+                                  );
+                                } else if (count > 0 && blockcount == 0) {
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        width: 15,
+                                        height: 15,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            color: kCalendarColorFB,
+                                            borderRadius:
+                                                BorderRadius.circular(7)),
+                                        child: Center(
+                                          child: Text(
+                                            '$count',
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 8),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 15,
+                                        height: 15,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            color: kCalendarColorAB,
+                                            borderRadius:
+                                                BorderRadius.circular(7)),
+                                        child: null,
+                                      ),
+                                    ],
+                                  );
+                                } else if (isDayOff(date)) {
+                                  return null;
+                                } else if (isDayOffdate(date)) {
+                                  return null;
+                                } else if (isDayOffdate(date) == false &&
+                                    count == 0 &&
+                                    blockcount == 0) {
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        width: 15,
+                                        height: 15,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            color: kCalendarColorAB,
+                                            borderRadius:
+                                                BorderRadius.circular(7)),
+                                        child: null,
+                                      ),
+                                    ],
+                                  );
+                                } else if (isDayOffdate(date) == false &&
+                                    count == 0 &&
+                                    blockcount > 0) {
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        width: 15,
+                                        height: 15,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            color: kCalendarColorAB,
+                                            borderRadius:
+                                                BorderRadius.circular(7)),
+                                        child: null,
+                                      ),
+                                      Container(
+                                        width: 15,
+                                        height: 15,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            color: kCalendarColorB,
+                                            borderRadius:
+                                                BorderRadius.circular(7)),
+                                        child: null,
+                                      ),
+                                    ],
+                                  );
+                                }
+
+                                return null;
+                              },
+                              defaultBuilder: (context, date, events) {
+                                // Check if the date is a day off
+                                if (isDayOff(date)) {
+                                  return Container(
+                                    margin: const EdgeInsets.only(
+                                        top: 5, left: 5, right: 5),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: Colors.redAccent[100],
+                                      shape: BoxShape.rectangle,
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        color: const Color(0xFF616161),
+                                        width: 0.5,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '${date.day}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  );
+                                } else if (isDayOffdate(date)) {
+                                  return Container(
+                                    margin: const EdgeInsets.only(
+                                        top: 5, left: 5, right: 5),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: Colors.redAccent[100],
+                                      shape: BoxShape.rectangle,
+                                      borderRadius: BorderRadius.circular(5),
+                                      border: Border.all(
+                                        color: const Color(0xFF616161),
+                                        width: 0.5,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '${date.day}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  );
                                 } else {
-                                  daystatus = false;
+                                  return null;
                                 }
-                              });
-                            }
-                          },
-
-                          calendarBuilders: CalendarBuilders(
-                            markerBuilder: (context, date, _) {
-                              int count = 0;
-                              for (var highlightedDate in scheduleList) {
-                                if (isSameDay(
-                                        date, highlightedDate.scheduledate) &&
-                                    highlightedDate.type == 'class') {
-                                  count++;
-                                }
-                              }
-                              int blockcount = 0;
-                              for (var blockdata in blocktime) {
-                                if (isSameDay(date, blockdata.blockDate)) {
-                                  blockcount++;
-                                }
-                              }
-                              if (count > 0 && blockcount > 0) {
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      width: 15,
-                                      height: 15,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                          color: kCalendarColorFB,
-                                          borderRadius:
-                                              BorderRadius.circular(7)),
-                                      child: Center(
-                                        child: Text(
-                                          '$count',
-                                          style: const TextStyle(
-                                              color: Colors.black, fontSize: 8),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 15,
-                                      height: 15,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                          color: kCalendarColorAB,
-                                          borderRadius:
-                                              BorderRadius.circular(7)),
-                                      child: null,
-                                    ),
-                                    Container(
-                                      width: 15,
-                                      height: 15,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                          color: kCalendarColorB,
-                                          borderRadius:
-                                              BorderRadius.circular(7)),
-                                      child: null,
-                                    ),
-                                  ],
-                                );
-                              } else if (count > 0 && blockcount == 0) {
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      width: 15,
-                                      height: 15,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                          color: kCalendarColorFB,
-                                          borderRadius:
-                                              BorderRadius.circular(7)),
-                                      child: Center(
-                                        child: Text(
-                                          '$count',
-                                          style: const TextStyle(
-                                              color: Colors.black, fontSize: 8),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 15,
-                                      height: 15,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                          color: kCalendarColorAB,
-                                          borderRadius:
-                                              BorderRadius.circular(7)),
-                                      child: null,
-                                    ),
-                                  ],
-                                );
-                              } else if (isDayOff(date)) {
-                                return null;
-                              } else if (isDayOffdate(date)) {
-                                return null;
-                              } else if (isDayOffdate(date) == false &&
-                                  count == 0 &&
-                                  blockcount == 0) {
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      width: 15,
-                                      height: 15,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                          color: kCalendarColorAB,
-                                          borderRadius:
-                                              BorderRadius.circular(7)),
-                                      child: null,
-                                    ),
-                                  ],
-                                );
-                              } else if (isDayOffdate(date) == false &&
-                                  count == 0 &&
-                                  blockcount > 0) {
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      width: 15,
-                                      height: 15,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                          color: kCalendarColorAB,
-                                          borderRadius:
-                                              BorderRadius.circular(7)),
-                                      child: null,
-                                    ),
-                                    Container(
-                                      width: 15,
-                                      height: 15,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                          color: kCalendarColorB,
-                                          borderRadius:
-                                              BorderRadius.circular(7)),
-                                      child: null,
-                                    ),
-                                  ],
-                                );
-                              }
-
-                              return null;
-                            },
-                            defaultBuilder: (context, date, events) {
-                              // Check if the date is a day off
-                              if (isDayOff(date)) {
+                              },
+                              todayBuilder: (context, date, _) {
                                 return Container(
                                   margin: const EdgeInsets.only(
                                       top: 5, left: 5, right: 5),
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: Colors.redAccent[100],
+                                    color: Colors.transparent,
                                     shape: BoxShape.rectangle,
                                     borderRadius: BorderRadius.circular(5),
                                     border: Border.all(
@@ -823,139 +723,136 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                   child: Text(
                                     '${date.day}',
                                     style: const TextStyle(
-                                      color: Colors.white,
+                                      color: Colors.black,
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 );
-                              } else if (isDayOffdate(date)) {
-                                return Container(
-                                  margin: const EdgeInsets.only(
-                                      top: 5, left: 5, right: 5),
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: Colors.redAccent[100],
-                                    shape: BoxShape.rectangle,
-                                    borderRadius: BorderRadius.circular(5),
-                                    border: Border.all(
-                                      color: const Color(0xFF616161),
-                                      width: 0.5,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    '${date.day}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                return null;
+                              },
+                            ),
+                            onFormatChanged: (format) {
+                              if (_calendarFormat != format) {
+                                // Call `setState()` when updating calendar format
+                                setState(() {
+                                  _calendarFormat = format;
+                                });
                               }
                             },
-                            todayBuilder: (context, date, _) {
-                              return Container(
-                                margin: const EdgeInsets.only(
-                                    top: 5, left: 5, right: 5),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: const Color(0xFF616161),
-                                    width: 0.5,
-                                  ),
-                                ),
-                                child: Text(
-                                  '${date.day}',
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              );
+                            onPageChanged: (focusedDay) {
+                              // No need to call `setState()` here
+                              _focusedDay = focusedDay;
                             },
                           ),
-                          onFormatChanged: (format) {
-                            if (_calendarFormat != format) {
-                              // Call `setState()` when updating calendar format
-                              setState(() {
-                                _calendarFormat = format;
-                              });
-                            }
-                          },
-                          onPageChanged: (focusedDay) {
-                            // No need to call `setState()` here
-                            _focusedDay = focusedDay;
-                          },
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(
-            child: VerticalDivider(),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.start, children: <
-                    Widget>[
-              const SizedBox(
-                height: 20,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    DateFormat('MMMM, dd').format(_selectedDay),
-                    style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: kColorGrey),
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Text(
-                    daystatus == false
-                        ? "(${(filteredSchedules.where((schedule) => schedule.type == 'class').length)} Classes today)"
-                        : 'Day Off',
-                    style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.normal,
-                        color: kColorGrey),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              SizedBox(
-                  width: 720,
-                  height: 550,
-                  child: daystatus == false
-                      ? SizedBox(
-                          width: 720,
-                          height: 540,
-                          child: Row(children: [
-                            SizedBox(
-                              width: 60,
-                              child: ScrollConfiguration(
-                                behavior: ScrollConfiguration.of(context)
-                                    .copyWith(scrollbars: false),
+            const SizedBox(
+              child: VerticalDivider(),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child:
+                  Column(mainAxisAlignment: MainAxisAlignment.start, children: <
+                      Widget>[
+                const SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      DateFormat('MMMM, dd').format(_selectedDay),
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: kColorGrey),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      daystatus == false
+                          ? "(${(filteredSchedules.where((schedule) => schedule.type == 'class').length)} Classes today)"
+                          : 'Day Off',
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.normal,
+                          color: kColorGrey),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                SizedBox(
+                    width: 720,
+                    height: 550,
+                    child: daystatus == false
+                        ? SizedBox(
+                            width: 720,
+                            height: 540,
+                            child: Row(children: [
+                              SizedBox(
+                                width: 60,
+                                child: ScrollConfiguration(
+                                  behavior: ScrollConfiguration.of(context)
+                                      .copyWith(scrollbars: false),
+                                  child: ListView.builder(
+                                    itemExtent: 12,
+                                    controller: _controller2,
+                                    itemCount: 24 * 60 ~/ 5,
+                                    itemBuilder: (context, index) {
+                                      final time = TimeOfDay(
+                                          hour: index * 5 ~/ 60,
+                                          minute: (index * 5) % 60);
+                                      final isSelectable =
+                                          isTimeWithinRange(time);
+                                      final timeText = time.format(context);
+
+                                      TextStyle textStyle = TextStyle(
+                                          fontWeight: time.minute == 0
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
+                                          fontSize: time.minute == 0 ? 12 : 8,
+                                          color:
+                                              kColorGrey // Adjust the font size as needed
+                                          );
+
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 5,
+                                            right: 0,
+                                            bottom: 0,
+                                            top: 0),
+                                        child: SizedBox(
+                                          width: 55,
+                                          height:12,
+                                          child: Text(
+                                            time.minute == 0
+                                                ? timeText
+                                                : time.minute % 15 == 0
+                                                    ? timeText
+                                                    : '',
+                                            textAlign: time.minute == 0
+                                                ? TextAlign.start
+                                                : TextAlign.center,
+                                            style: textStyle,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                              Expanded(
                                 child: ListView.builder(
-                                  itemExtent: 12,
-                                  controller: _controller2,
+                                  controller: _controller1,
                                   itemCount: 24 * 60 ~/ 5,
                                   itemBuilder: (context, index) {
                                     final time = TimeOfDay(
@@ -966,103 +863,20 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                     final timeText = time.format(context);
 
                                     TextStyle textStyle = TextStyle(
-                                        fontWeight: time.minute == 0
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        fontSize: time.minute == 0 ? 12 : 8,
-                                        color:
-                                            kColorGrey // Adjust the font size as needed
-                                        );
-
-                                    return Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 5, right: 0, bottom: 0, top: 0),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 55,
-                                            child: Tooltip(
-                                              message: index.toString(),
-                                              child: Text(
-                                                time.minute == 0
-                                                    ? timeText
-                                                    : time.minute % 15 == 0
-                                                        ? timeText
-                                                        : '',
-                                                textAlign: time.minute == 0
-                                                    ? TextAlign.start
-                                                    : TextAlign.center,
-                                                style: textStyle,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                      fontWeight: time.minute == 0
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                      fontSize: time.minute == 0
+                                          ? 12
+                                          : 8, // Adjust the font size as needed
                                     );
-                                  },
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: ListView.builder(
-                                controller: _controller1,
-                                itemCount: 24 * 60 ~/ 5,
-                                itemBuilder: (context, index) {
-                                  final time = TimeOfDay(
-                                      hour: index * 5 ~/ 60,
-                                      minute: (index * 5) % 60);
-                                  final isSelectable = isTimeWithinRange(time);
-                                  final timeText = time.format(context);
-
-                                  TextStyle textStyle = TextStyle(
-                                    fontWeight: time.minute == 0
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    fontSize: time.minute == 0
-                                        ? 12
-                                        : 8, // Adjust the font size as needed
-                                  );
-                                  // Check if the time is in the bookings list
-                                  final isTimeInBookings =
-                                      filteredSchedules.any((booking) {
-                                    String from24Hour =
-                                        convertTo24HourFormat(booking.timefrom);
-                                    String to24Hour =
-                                        convertTo24HourFormat(booking.timeto);
-                                    final timeFrom = TimeOfDay(
-                                      hour: int.parse(from24Hour.split(':')[0]),
-                                      minute: (int.parse(from24Hour
-                                                  .split(':')[1]
-                                                  .split(' ')[0]) +
-                                              4) ~/
-                                          5 *
-                                          5,
-                                    );
-                                    final timeTo = TimeOfDay(
-                                      hour: int.parse(to24Hour.split(':')[0]),
-                                      minute: (int.parse(to24Hour
-                                                  .split(':')[1]
-                                                  .split(' ')[0]) +
-                                              4) ~/
-                                          5 *
-                                          5,
-                                    );
-
-                                    // Manually compare the hours and minutes
-                                    return (time.hour > timeFrom.hour ||
-                                            (time.hour == timeFrom.hour &&
-                                                time.minute >=
-                                                    timeFrom.minute)) &&
-                                        (time.hour < timeTo.hour ||
-                                            (time.hour == timeTo.hour &&
-                                                time.minute <= timeTo.minute));
-                                  });
-                                  if (isTimeInBookings) {
-                                    // Display only the timeFrom from the booking
-                                    final isTimefrom =
+                                    // Check if the time is in the bookings list
+                                    final isTimeInBookings =
                                         filteredSchedules.any((booking) {
                                       String from24Hour = convertTo24HourFormat(
                                           booking.timefrom);
+                                      String to24Hour =
+                                          convertTo24HourFormat(booking.timeto);
                                       final timeFrom = TimeOfDay(
                                         hour:
                                             int.parse(from24Hour.split(':')[0]),
@@ -1073,30 +887,30 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                             5 *
                                             5,
                                       );
+                                      final timeTo = TimeOfDay(
+                                        hour: int.parse(to24Hour.split(':')[0]),
+                                        minute: (int.parse(to24Hour
+                                                    .split(':')[1]
+                                                    .split(' ')[0]) +
+                                                4) ~/
+                                            5 *
+                                            5,
+                                      );
+
                                       // Manually compare the hours and minutes
-                                      return (time.hour == timeFrom.hour &&
-                                          time.minute == timeFrom.minute);
+                                      return (time.hour > timeFrom.hour ||
+                                              (time.hour == timeFrom.hour &&
+                                                  time.minute >=
+                                                      timeFrom.minute)) &&
+                                          (time.hour < timeTo.hour ||
+                                              (time.hour == timeTo.hour &&
+                                                  time.minute <=
+                                                      timeTo.minute));
                                     });
-                                    if (isTimefrom) {
-                                      int bookingIndex = 0;
-                                      TutorInformation? temp1;
-                                      StudentInfoClass? temp2;
-                                      SubjectClass? temp3;
-                                      ScheduleData currentbooking =
-                                          ScheduleData(
-                                              studentID: '',
-                                              tutorID: '',
-                                              classID: '',
-                                              scheduleID: '',
-                                              tutorinfo: temp1,
-                                              studentinfo: temp2,
-                                              subjectinfo: temp3,
-                                              session: '',
-                                              scheduledate: DateTime.now(),
-                                              timefrom: '',
-                                              timeto: '',
-                                              type: '');
-                                      for (var booking in filteredSchedules) {
+                                    if (isTimeInBookings) {
+                                      // Display only the timeFrom from the booking
+                                      final isTimefrom =
+                                          filteredSchedules.any((booking) {
                                         String from24Hour =
                                             convertTo24HourFormat(
                                                 booking.timefrom);
@@ -1110,16 +924,29 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                               5 *
                                               5,
                                         );
-                                        bookingIndex =
-                                            filteredSchedules.indexOf(booking);
-
-                                        if (timeFrom.hour == time.hour &&
-                                            timeFrom.minute == time.minute) {
-                                          currentbooking = booking;
-                                          break;
-                                        }
-                                      }
-                                      if (currentbooking.subjectinfo != null) {
+                                        // Manually compare the hours and minutes
+                                        return (time.hour == timeFrom.hour &&
+                                            time.minute == timeFrom.minute);
+                                      });
+                                      if (isTimefrom) {
+                                        int bookingIndex = 0;
+                                        TutorInformation? temp1;
+                                        StudentInfoClass? temp2;
+                                        SubjectClass? temp3;
+                                        ScheduleData currentbooking =
+                                            ScheduleData(
+                                                studentID: '',
+                                                tutorID: '',
+                                                classID: '',
+                                                scheduleID: '',
+                                                tutorinfo: temp1,
+                                                studentinfo: temp2,
+                                                subjectinfo: temp3,
+                                                session: '',
+                                                scheduledate: DateTime.now(),
+                                                timefrom: '',
+                                                timeto: '',
+                                                type: '');
                                         for (var booking in filteredSchedules) {
                                           String from24Hour =
                                               convertTo24HourFormat(
@@ -1134,62 +961,85 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                                 5 *
                                                 5,
                                           );
+                                          bookingIndex = filteredSchedules
+                                              .indexOf(booking);
+
                                           if (timeFrom.hour == time.hour &&
                                               timeFrom.minute == time.minute) {
-                                            selectedbookingdata = booking;
+                                            currentbooking = booking;
                                             break;
                                           }
                                         }
+                                        if (currentbooking.subjectinfo !=
+                                            null) {
+                                          for (var booking
+                                              in filteredSchedules) {
+                                            String from24Hour =
+                                                convertTo24HourFormat(
+                                                    booking.timefrom);
+                                            final timeFrom = TimeOfDay(
+                                              hour: int.parse(
+                                                  from24Hour.split(':')[0]),
+                                              minute: (int.parse(from24Hour
+                                                          .split(':')[1]
+                                                          .split(' ')[0]) +
+                                                      4) ~/
+                                                  5 *
+                                                  5,
+                                            );
+                                            if (timeFrom.hour == time.hour &&
+                                                timeFrom.minute ==
+                                                    time.minute) {
+                                              selectedbookingdata = booking;
+                                              break;
+                                            }
+                                          }
 
-                                        return Row(
-                                          children: [
-                                            InkWell(
-                                              onTap: isSelectable
-                                                  ? () {
-                                                      setState(() {
-                                                        for (var booking
-                                                            in filteredSchedules) {
-                                                          String from24Hour =
-                                                              convertTo24HourFormat(
-                                                                  booking
-                                                                      .timefrom);
-                                                          final timeFrom =
-                                                              TimeOfDay(
-                                                            hour: int.parse(
-                                                                from24Hour.split(
-                                                                    ':')[0]),
-                                                            minute: (int.parse(from24Hour
-                                                                        .split(':')[
-                                                                            1]
-                                                                        .split(
-                                                                            ' ')[0]) +
-                                                                    4) ~/
-                                                                5 *
-                                                                5,
-                                                          );
-                                                          if (timeFrom.hour ==
-                                                                  time.hour &&
-                                                              timeFrom.minute ==
-                                                                  time.minute) {
-                                                            selectedbooking =
-                                                                booking;
-                                                            break;
+                                          return Row(
+                                            children: [
+                                              InkWell(
+                                                onTap: isSelectable
+                                                    ? () {
+                                                        setState(() {
+                                                          for (var booking
+                                                              in filteredSchedules) {
+                                                            String from24Hour =
+                                                                convertTo24HourFormat(
+                                                                    booking
+                                                                        .timefrom);
+                                                            final timeFrom =
+                                                                TimeOfDay(
+                                                              hour: int.parse(
+                                                                  from24Hour.split(
+                                                                      ':')[0]),
+                                                              minute: (int.parse(from24Hour
+                                                                          .split(':')[
+                                                                              1]
+                                                                          .split(
+                                                                              ' ')[0]) +
+                                                                      4) ~/
+                                                                  5 *
+                                                                  5,
+                                                            );
+                                                            if (timeFrom.hour ==
+                                                                    time.hour &&
+                                                                timeFrom.minute ==
+                                                                    time.minute) {
+                                                              selectedbooking =
+                                                                  booking;
+                                                              break;
+                                                            }
                                                           }
-                                                        }
-                                                      });
-                                                    }
-                                                  : null,
-                                              onHover: (isHovered) {
-                                                setState(() {
-                                                  this.isHovered[bookingIndex] =
-                                                      isHovered;
-                                                });
-                                              },
-                                              child: Tooltip(
-                                                message: currentbooking.type ==
-                                                        'blocked'
-                                                    ? 'Blocked'
-                                                    : 'Booked',
+                                                        });
+                                                      }
+                                                    : null,
+                                                onHover: (isHovered) {
+                                                  setState(() {
+                                                    this.isHovered[
+                                                            bookingIndex] =
+                                                        isHovered;
+                                                  });
+                                                },
                                                 child: ClipRRect(
                                                   borderRadius:
                                                       BorderRadius.circular(
@@ -1229,49 +1079,14 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                                           CrossAxisAlignment
                                                               .start,
                                                       children: [
-                                                        //  Text(
-                                                        //    '${selectedbookingdata!.timefrom} to ${selectedbookingdata!.timeto}',
-                                                        //    style: const TextStyle(
-                                                        //        fontSize:
-                                                        //            16,
-                                                        //        fontWeight:
-                                                        //            FontWeight.w600),
-                                                        //  ),
-                                                        //  Visibility(
-                                                        //    visible: currentbooking
-                                                        //            .type !=
-                                                        //        'blocked',
-                                                        //    child:
-                                                        //        Text(
-                                                        //      currentbooking.studentinfo !=
-                                                        //              null
-                                                        //          ? '${currentbooking.studentinfo!.studentFirstname} ${currentbooking.studentinfo!.studentLastname}'
-                                                        //          : '',
-                                                        //      style: const TextStyle(
-                                                        //          fontSize:
-                                                        //              18,
-                                                        //          fontWeight:
-                                                        //              FontWeight.bold),
-                                                        //    ),
-                                                        //  ),
-                                                        //  Visibility(
-                                                        //    visible: currentbooking
-                                                        //            .type !=
-                                                        //        'blocked',
-                                                        //    child:
-                                                        //        Text(
-                                                        //      currentbooking.subjectinfo !=
-                                                        //              null
-                                                        //          ? '${currentbooking.subjectinfo!.subjectName} Class ${currentbooking.session}'
-                                                        //          : '',
-                                                        //      style: const TextStyle(
-                                                        //          fontSize:
-                                                        //              16,
-                                                        //          fontWeight:
-                                                        //              FontWeight.w400),
-                                                        //    ),
-                                                        //  ),
-                                                        Text(
+                                                       Text(
+                                                            '${selectedbookingdata!.timefrom} to ${selectedbookingdata!.timeto}',
+                                                            style: const TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600),
+                                                          ),  Text(
                                                           currentbooking.type ==
                                                                   'blocked'
                                                               ? 'Blocked'
@@ -1293,206 +1108,223 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        );
-                                      } else {
-                                        int bookingIndex = 0;
-                                        for (var booking in filteredSchedules) {
-                                          String from24Hour =
-                                              convertTo24HourFormat(
-                                                  booking.timefrom);
-                                          final timeFrom = TimeOfDay(
-                                            hour: int.parse(
-                                                from24Hour.split(':')[0]),
-                                            minute: (int.parse(from24Hour
-                                                        .split(':')[1]
-                                                        .split(' ')[0]) +
-                                                    4) ~/
-                                                5 *
-                                                5,
+                                            ],
                                           );
-                                          bookingIndex = filteredSchedules
-                                              .indexOf(booking);
-                                          if (timeFrom.hour == time.hour &&
-                                              timeFrom.minute == time.minute) {
-                                            selectedbookingdata = booking;
-                                            break;
+                                        } else {
+                                          int bookingIndex = 0;
+                                          for (var booking
+                                              in filteredSchedules) {
+                                            String from24Hour =
+                                                convertTo24HourFormat(
+                                                    booking.timefrom);
+                                            final timeFrom = TimeOfDay(
+                                              hour: int.parse(
+                                                  from24Hour.split(':')[0]),
+                                              minute: (int.parse(from24Hour
+                                                          .split(':')[1]
+                                                          .split(' ')[0]) +
+                                                      4) ~/
+                                                  5 *
+                                                  5,
+                                            );
+                                            bookingIndex = filteredSchedules
+                                                .indexOf(booking);
+                                            if (timeFrom.hour == time.hour &&
+                                                timeFrom.minute ==
+                                                    time.minute) {
+                                              selectedbookingdata = booking;
+                                              break;
+                                            }
                                           }
-                                        }
-                                        int intervals = 0;
-                                        final isTimefrom =
-                                            filteredSchedules.any((booking) {
-                                          String from24Hour =
-                                              convertTo24HourFormat(
-                                                  booking.timefrom);
-                                          String to24Hour =
-                                              convertTo24HourFormat(
-                                                  booking.timeto);
-                                          final timeFrom = TimeOfDay(
-                                            hour: int.parse(
-                                                from24Hour.split(':')[0]),
-                                            minute: (int.parse(from24Hour
-                                                        .split(':')[1]
-                                                        .split(' ')[0]) +
-                                                    4) ~/
-                                                5 *
-                                                5,
-                                          );
-                                          final timeTo = TimeOfDay(
-                                            hour: int.parse(
-                                                to24Hour.split(':')[0]),
-                                            minute: (int.parse(to24Hour
-                                                        .split(':')[1]
-                                                        .split(' ')[0]) +
-                                                    4) ~/
-                                                5 *
-                                                5,
-                                          );
-                                          int totalMinutes = (timeTo.hour -
-                                                      timeFrom.hour) *
-                                                  60 +
-                                              (timeTo.minute - timeFrom.minute);
+                                          int intervals = 0;
+                                          final isTimefrom =
+                                              filteredSchedules.any((booking) {
+                                            String from24Hour =
+                                                convertTo24HourFormat(
+                                                    booking.timefrom);
+                                            String to24Hour =
+                                                convertTo24HourFormat(
+                                                    booking.timeto);
+                                            final timeFrom = TimeOfDay(
+                                              hour: int.parse(
+                                                  from24Hour.split(':')[0]),
+                                              minute: (int.parse(from24Hour
+                                                          .split(':')[1]
+                                                          .split(' ')[0]) +
+                                                      4) ~/
+                                                  5 *
+                                                  5,
+                                            );
+                                            final timeTo = TimeOfDay(
+                                              hour: int.parse(
+                                                  to24Hour.split(':')[0]),
+                                              minute: (int.parse(to24Hour
+                                                          .split(':')[1]
+                                                          .split(' ')[0]) +
+                                                      4) ~/
+                                                  5 *
+                                                  5,
+                                            );
 
-                                          // Calculate how many 5-minute intervals are there
-                                          intervals =
-                                              (totalMinutes / 5).floor();
-                                          return (time.hour == timeFrom.hour &&
-                                              time.minute == timeFrom.minute);
-                                        });
-                                        return Row(
-                                          children: [
-                                            InkWell(
-                                              onTap: isSelectable
-                                                  ? () {
-                                                      setState(() {
-                                                        for (var booking
-                                                            in filteredSchedules) {
-                                                          String from24Hour =
-                                                              convertTo24HourFormat(
-                                                                  booking
-                                                                      .timefrom);
-                                                          final timeFrom =
-                                                              TimeOfDay(
-                                                            hour: int.parse(
-                                                                from24Hour.split(
-                                                                    ':')[0]),
-                                                            minute: (int.parse(from24Hour
-                                                                        .split(':')[
-                                                                            1]
-                                                                        .split(
-                                                                            ' ')[0]) +
-                                                                    4) ~/
-                                                                5 *
-                                                                5,
-                                                          );
-                                                          if (timeFrom.hour ==
-                                                                  time.hour &&
-                                                              timeFrom.minute ==
-                                                                  time.minute) {
-                                                            selectedbooking =
-                                                                booking;
-                                                            break;
+                                            // Convert TimeOfDay to DateTime (use today's date for simplicity)
+                                            DateTime now = DateTime.now();
+                                            DateTime startDateTime = DateTime(
+                                                now.year,
+                                                now.month,
+                                                now.day,
+                                                timeFrom.hour,
+                                                timeFrom.minute);
+                                            DateTime endDateTime = DateTime(
+                                                now.year,
+                                                now.month,
+                                                now.day,
+                                                timeTo.hour,
+                                                timeTo.minute);
+
+                                            // Subtract the DateTime objects
+                                            Duration difference = endDateTime
+                                                .difference(startDateTime);
+                                            int totalMinutes = difference.inMinutes;
+                                            // Calculate how many 5-minute intervals are there
+                                            intervals =
+                                                (totalMinutes / 5).round();
+                                            return (time.hour ==
+                                                    timeFrom.hour &&
+                                                time.minute == timeFrom.minute);
+                                          });
+                                          return Row(
+                                            children: [
+                                              InkWell(
+                                                onTap: isSelectable
+                                                    ? () {
+                                                        setState(() {
+                                                          for (var booking
+                                                              in filteredSchedules) {
+                                                            String from24Hour =
+                                                                convertTo24HourFormat(
+                                                                    booking
+                                                                        .timefrom);
+                                                            final timeFrom =
+                                                                TimeOfDay(
+                                                              hour: int.parse(
+                                                                  from24Hour.split(
+                                                                      ':')[0]),
+                                                              minute: (int.parse(from24Hour
+                                                                          .split(':')[
+                                                                              1]
+                                                                          .split(
+                                                                              ' ')[0]) +
+                                                                      4) ~/
+                                                                  5 *
+                                                                  5,
+                                                            );
+                                                            if (timeFrom.hour ==
+                                                                    time.hour &&
+                                                                timeFrom.minute ==
+                                                                    time.minute) {
+                                                              selectedbooking =
+                                                                  booking;
+                                                              break;
+                                                            }
                                                           }
-                                                        }
-                                                      });
-                                                    }
-                                                  : null,
-                                              onHover: (isHovered) {
-                                                setState(() {
-                                                  this.isHovered[bookingIndex] =
-                                                      isHovered;
-                                                });
-                                              },
-                                              child: Tooltip(
-                                                message: currentbooking.type ==
-                                                        'blocked'
-                                                    ? 'Blocked'
-                                                    : 'Booked',
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          5.0), // Circular border radius
-                                                  child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            10),
-                                                    width: 620,
-                                                    height:
-                                                        currentbooking.type ==
-                                                                'blocked'
-                                                            ? intervals * 13
-                                                            : 132,
-                                                    decoration: BoxDecoration(
-                                                      color:
+                                                        });
+                                                      }
+                                                    : null,
+                                                onHover: (isHovered) {
+                                                  setState(() {
+                                                    this.isHovered[
+                                                            bookingIndex] =
+                                                        isHovered;
+                                                  });
+                                                },
+                                                child: Tooltip(
+                                                  message:
+                                                      currentbooking.type ==
+                                                              'blocked'
+                                                          ? 'Blocked'
+                                                          : 'Booked',
+                                                  child: ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5.0), // Circular border radius
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      width: 620,
+                                                      height:
                                                           currentbooking.type ==
                                                                   'blocked'
-                                                              ? Colors.redAccent
-                                                              : kColorSecondary,
-                                                      border: Border.all(
-                                                        color: isHovered[
-                                                                bookingIndex]
-                                                            ? kColorPrimary
-                                                            : Colors.yellow,
-                                                        width: isHovered[
-                                                                bookingIndex]
-                                                            ? 3
-                                                            : 1,
+                                                              ? intervals * 12
+                                                              : 132,
+                                                      decoration: BoxDecoration(
+                                                        color: currentbooking
+                                                                    .type ==
+                                                                'blocked'
+                                                            ? Colors.redAccent
+                                                            : kColorSecondary,
+                                                        border: Border.all(
+                                                          color: isHovered[
+                                                                  bookingIndex]
+                                                              ? kColorPrimary
+                                                              : Colors.yellow,
+                                                          width: isHovered[
+                                                                  bookingIndex]
+                                                              ? 3
+                                                              : 1,
+                                                        ),
+                                                      ),
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            '${selectedbookingdata!.timefrom} to ${selectedbookingdata!.timeto}',
+                                                            style: const TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600),
+                                                          ),
+                                                          Text(
+                                                            currentbooking
+                                                                        .type ==
+                                                                    'blocked'
+                                                                ? 'Blocked'
+                                                                : 'Booked',
+                                                            style: TextStyle(
+                                                                color: currentbooking
+                                                                            .type ==
+                                                                        'blocked'
+                                                                    ? Colors
+                                                                        .black
+                                                                    : Colors
+                                                                        .white,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          '${selectedbookingdata!.timefrom} to ${selectedbookingdata!.timeto}',
-                                                          style: const TextStyle(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600),
-                                                        ),
-                                                        Text(
-                                                          currentbooking.type ==
-                                                                  'blocked'
-                                                              ? 'Blocked'
-                                                              : 'Booked',
-                                                          style: TextStyle(
-                                                              color: currentbooking
-                                                                          .type ==
-                                                                      'blocked'
-                                                                  ? Colors.black
-                                                                  : Colors
-                                                                      .white,
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                      ],
-                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        );
+                                            ],
+                                          );
+                                        }
                                       }
+                                      return const SizedBox.shrink();
                                     }
-                                    return const SizedBox.shrink();
-                                  }
-                                  return Row(
-                                    children: [
-                                      InkWell(
-                                        onTap: isSelectable ? () {} : null,
-                                        child: Tooltip(
-                                          message: isSelectable
-                                              ? 'Available'
-                                              : 'Not Available',
+                                    return Row(
+                                      children: [
+                                        InkWell(
+                                          onTap: isSelectable ? () {} : null,
                                           child: Container(
                                             width: 620,
                                             height:
@@ -1510,117 +1342,39 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                                 : null,
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  );
-                                },
+                                      ],
+                                    );
+                                  },
+                                ),
                               ),
+                            ]),
+                          )
+                        : Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: const [
+                                Icon(
+                                  Icons.block,
+                                  color: Colors.red,
+                                  size: 150,
+                                ),
+                                Text(
+                                  "Day Off",
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.red),
+                                ),
+                              ],
                             ),
-                          ]),
-                        )
-                      : Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: const [
-                              Icon(
-                                Icons.block,
-                                color: Colors.red,
-                                size: 150,
-                              ),
-                              Text(
-                                "Day Off",
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.red),
-                              ),
-                            ],
-                          ),
-                        )),
-            ]),
-          ),
-
-          // Column(
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   children: [
-          //      const SizedBox(
-          //       height: 5,
-          //     ),
-          //     Align(
-          //       alignment: Alignment.topLeft,
-          //       child: Text(
-          //         dateselected.isEmpty
-          //             ? DateFormat('MMMM dd,')
-          //                 .format(DateTime.now())
-          //                 .toString()
-          //             : dateselected,
-          //         textAlign: TextAlign.left,
-          //         style: const TextStyle(fontWeight: FontWeight.bold),
-          //       ),
-          //     ),
-          //     const SizedBox(
-          //       height: 5,
-          //     ),
-          //     SizedBox(
-          //       height: 375,
-          //       width: 200,
-          //       child: ListView.builder(
-          //           itemCount: endHour - startHour + 1,
-          //           itemBuilder: (context, index) {
-          //             final hour = startHour + index;
-          //             final timeString =
-          //                 '${hour.toString().padLeft(2, '0')}:00';
-          //             return Padding(
-          //               padding: const EdgeInsets.all(10.0),
-          //               child: Container(
-          //                 padding: const EdgeInsets.all(5.0),
-          //                 height: 50,
-          //                 decoration: BoxDecoration(
-          //                   color: Colors.white.withOpacity(.9),
-          //                   borderRadius: BorderRadius.circular(5),
-          //                   border: Border.all(
-          //                     color: Colors.black45,
-          //                     width: .5,
-          //                   ),
-          //                 ),
-          //                 child: Column(
-          //                   crossAxisAlignment: CrossAxisAlignment.center,
-          //                   mainAxisAlignment: MainAxisAlignment.center,
-          //                   children: [
-          //                     Row(
-          //                       children: [
-          //                         Text(
-          //                           timeString,
-          //                           style:
-          //                               const TextStyle(color: Colors.blue),
-          //                         ),
-          //                         const Spacer(),
-          //                         const Text(
-          //                           'Available',
-          //                           style: TextStyle(color: Colors.blue),
-          //                         ),
-          //                       ],
-          //                     ),
-          //                   ],
-          //                 ),
-          //               ),
-          //             );
-          //           }),
-          //     ),
-          //   ],
-          // ),
-        ],
-      ),
-      // actions: [
-      //   TextButton(
-      //     onPressed: () {
-      //       Navigator.of(context).pop(_selectedDate);
-      //     },
-      //     child: const Text('OK'),
-      //   ),
-      // ],
-    );
+                          )),
+              ]),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }

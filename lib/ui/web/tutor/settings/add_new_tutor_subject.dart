@@ -2,19 +2,14 @@
 
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../data_class/subject_class.dart';
 import '../../../../data_class/subject_teach_pricing.dart';
 import '../../../../data_class/tutor_info_class.dart';
-import '../../../../provider/user_id_provider.dart';
-import '../../../../services/getlanguages.dart';
 import '../../../../services/update_tutorinformations_services.dart';
+import '../../../../shared_components/header_text.dart';
 import '../../../../utils/themes.dart';
-import '../../../auth/database.dart';
-import '../../admin/admin_sharedcomponents/header_text.dart';
 
 class AddNewSubject extends StatefulWidget {
   final List<SubjectTeach> tutorssubject;
@@ -44,12 +39,20 @@ class _AddNewSubjectState extends State<AddNewSubject> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: kColorPrimary,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment(-0.1, 0),
+              end: Alignment.centerRight,
+              colors: secondaryHeadercolors, // Define this list of colors
+            ),
+          ),
+        ),
         title: const HeaderText('Add New Subject to Teach'),
       ),
       body: ClipRect(
         child: Container(
-            height: 600,
+            height: 400,
             alignment: Alignment.topCenter,
             child: SingleChildScrollView(
               child: Column(
@@ -60,7 +63,7 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                   Visibility(
                     visible: tSubjects.isNotEmpty,
                     child: SizedBox(
-                      width: 600,
+                      width: 500,
                       child: ListView.builder(
                         shrinkWrap: true,
                         primary: false,
@@ -633,59 +636,62 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 600,
-                    height: 45,
-                    child: Container(
-                      width: 600,
+                  Visibility(
+                    visible: tSubjects.isEmpty,
+                    child: SizedBox(
+                      width: 500,
                       height: 45,
-                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      decoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(5)),
-                          color: Colors.white,
-                          border: Border.all(
-                              color: Colors.grey.shade300, width: 1)),
-                      child: DropdownButtonFormField(
-                        decoration: const InputDecoration(
-                          enabledBorder: InputBorder.none,
+                      child: Container(
+                        width: 600,
+                        height: 45,
+                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                        decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(5)),
+                            color: Colors.white,
+                            border: Border.all(
+                                color: Colors.grey.shade300, width: 1)),
+                        child: DropdownButtonFormField(
+                          decoration: const InputDecoration(
+                            enabledBorder: InputBorder.none,
+                          ),
+                          value: dropdownvaluesubject,
+                          hint: const Text("Select your subject"),
+                          isExpanded: true,
+                          icon: const Icon(Icons.arrow_drop_down),
+                          items: uSubjects.map((String items) {
+                            return DropdownMenuItem(
+                              value: items,
+                              child: Text(items),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownvaluesubject = null;
+                              SubjectTeach data = SubjectTeach(
+                                  subjectname: newValue!,
+                                  price2: '',
+                                  price3: '',
+                                  price5: '',
+                                  subjectid: '');
+                              bool containsNewValue = containsSubject(
+                                  widget.tutorssubject, newValue);
+                              if (containsNewValue) {
+                                // ignore: use_build_context_synchronously
+                                CoolAlert.show(
+                                  context: context,
+                                  width: 200,
+                                  type: CoolAlertType.warning,
+                                  title: 'Oopss..',
+                                  text:
+                                      'Subject already added, select another one.',
+                                );
+                              } else {
+                                tSubjects.add(data);
+                              }
+                            });
+                          },
                         ),
-                        value: dropdownvaluesubject,
-                        hint: const Text("Select your subject"),
-                        isExpanded: true,
-                        icon: const Icon(Icons.arrow_drop_down),
-                        items: uSubjects.map((String items) {
-                          return DropdownMenuItem(
-                            value: items,
-                            child: Text(items),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            dropdownvaluesubject = null;
-                            SubjectTeach data = SubjectTeach(
-                                subjectname: newValue!,
-                                price2: '',
-                                price3: '',
-                                price5: '',
-                                subjectid: '');
-                            bool containsNewValue =
-                                containsSubject(widget.tutorssubject, newValue);
-                            if (containsNewValue) {
-                              // ignore: use_build_context_synchronously
-                              CoolAlert.show(
-                                context: context,
-                                width: 200,
-                                type: CoolAlertType.warning,
-                                title: 'Oopss..',
-                                text:
-                                    'Subject already added, select another one.',
-                              );
-                            } else {
-                              tSubjects.add(data);
-                            }
-                          });
-                        },
                       ),
                     ),
                   ),
@@ -716,17 +722,7 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                       await addSubjectTeach(widget.tutorinfo.userId, tSubjects);
                   if (result == 'success') {
                     setState(() {
-                      CoolAlert.show(
-                        context: context,
-                        width: 200,
-                        type: CoolAlertType.success,
-                        text: 'Subject/s Added!',
-                        autoCloseDuration: const Duration(seconds: 1),
-                      ).then(
-                        (value) {
-                          Navigator.of(context).pop();
-                        },
-                      );
+                      Navigator.of(context).pop();
                     });
                   } else {
                     // ignore: use_build_context_synchronously
@@ -756,7 +752,9 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(20))),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
                 child: const Text(
                   'Cancel',
                   style: TextStyle(color: kColorPrimary),

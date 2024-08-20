@@ -159,32 +159,24 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
   void selectImage(String classID, classNo) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: false,
-      // Remove the 'type' parameter to allow any type of file
-      // type: FileType.custom,
-      // allowedExtensions: ['jpg', 'jpeg', 'png'],
     );
     if (result != null) {
       Uint8List selectedImage = result.files.first.bytes!;
       String filename = result.files.first.name;
 
-      // Function to handle progress updates
       void updateProgress(int progress) {
-        // Update UI with progress indicator
-        print("Upload progress: $progress%");
-        // Access LinearProgressIndicator and update its progress
-        // setState(() {
-        //   progressupload = progress;
-        // });
+        setState(() {
+          progressupload = progress;
+        });
       }
 
-      // Here you can call your upload function
       bool? downloadURL = await uploadMaterialProfile(
           classID, selectedImage, filename, classNo, updateProgress);
-      if (downloadURL == true) {
-        handleUpload('Upload successfully!', true);
-      } else {
-        handleUpload('Error Uploading!', false);
-      }
+    }
+    if (downloadURL != null) {
+      setState(() {
+        progressupload = 0;
+      });
     }
   }
 
@@ -741,7 +733,6 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                           textAlign:
                                                                               TextAlign.justify,
                                                                         ),
-                                                                 
                                                                   const Spacer(),
                                                                   newclassdata.status ==
                                                                           'Cancelled'
@@ -795,7 +786,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                                     rescheduleclass(context, filteredScheduleList[index]);
                                                                                   },
                                                                                 )
-                                                                          : 
+                                                                          :
                                                                           // filteredScheduleList[index].tutorStatus == 'Completed'
                                                                           //     ? RatingBar(
                                                                           //         ignoreGestures: true,
@@ -818,7 +809,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                           //           // _ratingValue = value;
                                                                           //         })
                                                                           //     :
-                                                                               Container(),
+                                                                          Container(),
                                                                 ],
                                                               ),
                                                             ),
@@ -1075,89 +1066,19 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                               const SizedBox(
                                                                                 width: 5,
                                                                               ),
-                                                                              // Visibility(
-                                                                              //   visible: progressupload == 0 || progressupload == 100
-                                                                              //       ? false
-                                                                              //       : true,
-                                                                              //   child:
-                                                                              //       SizedBox(
-                                                                              //     width: 50,
-                                                                              //     height: 5,
-                                                                              //     child: LinearProgressIndicator(
-                                                                              //       key: progressKey,
-                                                                              //       value: double.parse(progressupload.toString()),
-                                                                              //     ),
-                                                                              //   ),
-                                                                              // )
+                                                                              Visibility(
+                                                                                  visible: progressupload > 0 && progressupload < 100,
+                                                                                  child: SizedBox(
+                                                                                    width: 20,
+                                                                                    height: 20,
+                                                                                    child: LinearProgressIndicator(
+                                                                                      value: progressupload / 100,
+                                                                                      color: kColorPrimary,
+                                                                                    ),
+                                                                                  )),
                                                                             ],
                                                                           ),
                                                                         ),
-                                                                        // Padding(
-                                                                        //   padding:
-                                                                        //       const EdgeInsets
-                                                                        //               .fromLTRB(
-                                                                        //           50,
-                                                                        //           10,
-                                                                        //           50,
-                                                                        //           10),
-                                                                        //   child: TextFormField(
-                                                                        //     decoration:
-                                                                        //         const InputDecoration(
-                                                                        //       labelText:
-                                                                        //           'Add notes here',
-                                                                        //       border:
-                                                                        //           OutlineInputBorder(
-                                                                        //         borderSide:
-                                                                        //             BorderSide(),
-                                                                        //         gapPadding: 0,
-                                                                        //       ),
-                                                                        //     ),
-                                                                        //   ),
-                                                                        // ),
-                                                                        // Align(
-                                                                        //   alignment: Alignment
-                                                                        //       .topRight,
-                                                                        //   child: Padding(
-                                                                        //     padding:
-                                                                        //         const EdgeInsets
-                                                                        //                 .fromLTRB(
-                                                                        //             50,
-                                                                        //             0,
-                                                                        //             50,
-                                                                        //             10),
-                                                                        //     child: SizedBox(
-                                                                        //       width: 100,
-                                                                        //       height: 40,
-                                                                        //       child:
-                                                                        //           ElevatedButton(
-                                                                        //         style: ElevatedButton
-                                                                        //             .styleFrom(
-                                                                        //           minimumSize:
-                                                                        //               Size.zero,
-                                                                        //           padding:
-                                                                        //               EdgeInsets
-                                                                        //                   .zero,
-                                                                        //           backgroundColor:
-                                                                        //               kColorPrimary,
-                                                                        //           shape: const RoundedRectangleBorder(
-                                                                        //               borderRadius:
-                                                                        //                   BorderRadius.all(
-                                                                        //                       Radius.circular(15))),
-                                                                        //         ),
-                                                                        //         onPressed:
-                                                                        //             () {},
-                                                                        //         // icon: const Icon(Icons.attach_file_outlined, color: kColorPrimary,),
-                                                                        //         child:
-                                                                        //             const Text(
-                                                                        //           'Save',
-                                                                        //           style: TextStyle(
-                                                                        //               color: Colors
-                                                                        //                   .white),
-                                                                        //         ),
-                                                                        //       ),
-                                                                        //     ),
-                                                                        //   ),
-                                                                        // ),
                                                                         Consumer<MaterialNotifier>(builder: (context,
                                                                             materialNotifier,
                                                                             _) {
@@ -1222,14 +1143,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                                               future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
                                                                                               builder: (context, snapshot) {
                                                                                                 if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                                  return Container(
-                                                                                                      height: 60,
-                                                                                                      width: 60,
-                                                                                                      child: const Center(
-                                                                                                          child: CircularProgressIndicator(
-                                                                                                        strokeWidth: 2,
-                                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                                                                  return Container(height: 60, width: 60, alignment: Alignment.center, child: const Text('Loading..'));
                                                                                                 } else if (snapshot.hasError) {
                                                                                                   return Text('Error: ${snapshot.error}');
                                                                                                 }
@@ -1309,11 +1223,11 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                                                                   child: GestureDetector(
                                                                                                                     onTap: () async {
                                                                                                                       bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
-                                                                                                                      if (result) {
-                                                                                                                        handleUpload('Deleted Successfully!', true);
-                                                                                                                      } else {
-                                                                                                                        handleUpload('Deleted Successfully!', false);
-                                                                                                                      }
+                                                                                                                      // if (result) {
+                                                                                                                      //   handleUpload('Deleted Successfully!', true);
+                                                                                                                      // } else {
+                                                                                                                      //   handleUpload('Deleted Successfully!', false);
+                                                                                                                      // }
                                                                                                                     },
                                                                                                                     child: Container(
                                                                                                                       padding: const EdgeInsets.all(2),
@@ -1333,21 +1247,36 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                                                             ),
                                                                                                           ),
                                                                                                           Center(
-                                                                                                            child: Tooltip(
-                                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                              child: SizedBox(
-                                                                                                                height: 60,
-                                                                                                                width: 60,
-                                                                                                                child: TextButton(
-                                                                                                                  onPressed: () {
-                                                                                                                    fetchFileData(snapshot.data.toString());
-                                                                                                                  },
-                                                                                                                  child: Text(
-                                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                            child: Row(
+                                                                                                              children: [
+                                                                                                                Tooltip(
+                                                                                                                  message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                                  child: SizedBox(
+                                                                                                                    height: 60,
+                                                                                                                    width: 60,
+                                                                                                                    child: TextButton(
+                                                                                                                      onPressed: () {},
+                                                                                                                      child: Text(
+                                                                                                                        getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                                        style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                                      ),
+                                                                                                                    ),
                                                                                                                   ),
                                                                                                                 ),
-                                                                                                              ),
+                                                                                                                InkWell(
+                                                                                                                  onTap: () {
+                                                                                                                    fetchFileData(snapshot.data.toString());
+                                                                                                                  },
+                                                                                                                  child: const Tooltip(
+                                                                                                                    message: 'Download',
+                                                                                                                    child: Icon(
+                                                                                                                      Icons.file_download_outlined,
+                                                                                                                      color: kColorPrimary,
+                                                                                                                      size: 15,
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ],
                                                                                                             ),
                                                                                                           )
                                                                                                         ],
@@ -1361,14 +1290,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                                               future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
                                                                                               builder: (context, snapshot) {
                                                                                                 if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                                  return Container(
-                                                                                                      height: 60,
-                                                                                                      width: 60,
-                                                                                                      child: const Center(
-                                                                                                          child: CircularProgressIndicator(
-                                                                                                        strokeWidth: 2,
-                                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                                                                  return Container(height: 60, width: 60, alignment: Alignment.center, child: const Text('Loading..'));
                                                                                                 } else if (snapshot.hasError) {
                                                                                                   return Text('Error: ${snapshot.error}');
                                                                                                 }
@@ -1447,11 +1369,11 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                                                                 child: GestureDetector(
                                                                                                                   onTap: () async {
                                                                                                                     bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
-                                                                                                                    if (result) {
-                                                                                                                      handleUpload('Deleted Successfully!', true);
-                                                                                                                    } else {
-                                                                                                                      handleUpload('Deleted Successfully!', false);
-                                                                                                                    }
+                                                                                                                    // if (result) {
+                                                                                                                    //   handleUpload('Deleted Successfully!', true);
+                                                                                                                    // } else {
+                                                                                                                    //   handleUpload('Deleted Successfully!', false);
+                                                                                                                    // }
                                                                                                                   },
                                                                                                                   child: Container(
                                                                                                                     padding: const EdgeInsets.all(2),
@@ -1470,21 +1392,38 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                                                             ]),
                                                                                                           ),
                                                                                                           Center(
-                                                                                                            child: Tooltip(
-                                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                              child: SizedBox(
-                                                                                                                height: 60,
-                                                                                                                width: 60,
-                                                                                                                child: TextButton(
-                                                                                                                  onPressed: () {
-                                                                                                                    fetchFileData(snapshot.data.toString());
-                                                                                                                  },
-                                                                                                                  child: Text(
-                                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                            child: Row(
+                                                                                                              children: [
+                                                                                                                Tooltip(
+                                                                                                                  message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                                  child: SizedBox(
+                                                                                                                    height: 60,
+                                                                                                                    width: 60,
+                                                                                                                    child: TextButton(
+                                                                                                                      onPressed: () {
+                                                                                                                        fetchFileData(snapshot.data.toString());
+                                                                                                                      },
+                                                                                                                      child: Text(
+                                                                                                                        getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                                        style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                                      ),
+                                                                                                                    ),
                                                                                                                   ),
                                                                                                                 ),
-                                                                                                              ),
+                                                                                                                InkWell(
+                                                                                                                  onTap: () {
+                                                                                                                    fetchFileData(snapshot.data.toString());
+                                                                                                                  },
+                                                                                                                  child: const Tooltip(
+                                                                                                                    message: 'Download',
+                                                                                                                    child: Icon(
+                                                                                                                      Icons.file_download_outlined,
+                                                                                                                      color: kColorPrimary,
+                                                                                                                      size: 15,
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ],
                                                                                                             ),
                                                                                                           )
                                                                                                         ],
@@ -1498,14 +1437,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                                               future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
                                                                                               builder: (context, snapshot) {
                                                                                                 if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                                  return Container(
-                                                                                                      height: 60,
-                                                                                                      width: 60,
-                                                                                                      child: const Center(
-                                                                                                          child: CircularProgressIndicator(
-                                                                                                        strokeWidth: 2,
-                                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                                                                  return Container(height: 60, width: 60, alignment: Alignment.center, child: const Text('Loading..'));
                                                                                                 } else if (snapshot.hasError) {
                                                                                                   return Text('Error: ${snapshot.error}');
                                                                                                 }
@@ -1585,11 +1517,11 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                                                                   child: GestureDetector(
                                                                                                                     onTap: () async {
                                                                                                                       bool result = await deleteMaterial(materialsdata[index]['classno'], materialsdata[index]['reference']);
-                                                                                                                      if (result) {
-                                                                                                                        handleUpload('Deleted Successfully!', true);
-                                                                                                                      } else {
-                                                                                                                        handleUpload('Deleted Successfully!', false);
-                                                                                                                      }
+                                                                                                                      // if (result) {
+                                                                                                                      //   handleUpload('Deleted Successfully!', true);
+                                                                                                                      // } else {
+                                                                                                                      //   handleUpload('Deleted Successfully!', false);
+                                                                                                                      // }
                                                                                                                     },
                                                                                                                     child: Container(
                                                                                                                       padding: const EdgeInsets.all(2),
@@ -1609,23 +1541,40 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                                                             ),
                                                                                                           ),
                                                                                                           Center(
-                                                                                                            child: Tooltip(
-                                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                              child: SizedBox(
-                                                                                                                height: 60,
-                                                                                                                width: 60,
-                                                                                                                child: TextButton(
-                                                                                                                  onPressed: () {
-                                                                                                                    setState(() {
-                                                                                                                      fetchFileData(snapshot.data.toString());
-                                                                                                                    });
-                                                                                                                  },
-                                                                                                                  child: Text(
-                                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                            child: Row(
+                                                                                                              children: [
+                                                                                                                Tooltip(
+                                                                                                                  message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                                  child: SizedBox(
+                                                                                                                    height: 60,
+                                                                                                                    width: 60,
+                                                                                                                    child: TextButton(
+                                                                                                                      onPressed: () {
+                                                                                                                        // setState(() {
+                                                                                                                        //   fetchFileData(snapshot.data.toString());
+                                                                                                                        // });
+                                                                                                                      },
+                                                                                                                      child: Text(
+                                                                                                                        getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                                        style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                                      ),
+                                                                                                                    ),
                                                                                                                   ),
                                                                                                                 ),
-                                                                                                              ),
+                                                                                                                InkWell(
+                                                                                                                  onTap: () {
+                                                                                                                    fetchFileData(snapshot.data.toString());
+                                                                                                                  },
+                                                                                                                  child: const Tooltip(
+                                                                                                                    message: 'Download',
+                                                                                                                    child: Icon(
+                                                                                                                      Icons.file_download_outlined,
+                                                                                                                      color: kColorPrimary,
+                                                                                                                      size: 15,
+                                                                                                                    ),
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ],
                                                                                                             ),
                                                                                                           )
                                                                                                         ],
@@ -1658,7 +1607,6 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                                 ],
                                                                               ));
                                                                         }),
-
                                                                         Padding(
                                                                           padding:
                                                                               const EdgeInsets.all(16.0),

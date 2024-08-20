@@ -1,12 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:work4ututor/ui/web/communication.dart/videocall.dart';
 
 import '../splash_page.dart';
 import '../ui/mobile/mob_main.dart';
-import '../ui/web/admin/adminlogin.dart';
-import '../ui/web/communication.dart/videotest.dart';
 import '../ui/web/login/login.dart';
 import '../ui/web/search_tutor/find_tutors.dart';
 import '../ui/web/signup/student_signup.dart';
@@ -52,9 +49,6 @@ class RouteGenerator {
 
       case Routes.studentSignup:
         return CupertinoPageRoute(builder: (_) => const StudentSignup());
-
-      case Routes.adminLogin:
-        return CupertinoPageRoute(builder: (_) => const AdminLoginPage());
 
       case Routes.tutorList:
         return CupertinoPageRoute(

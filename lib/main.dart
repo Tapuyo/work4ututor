@@ -3,13 +3,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:work4ututor/data_class/studentsEnrolledclass.dart';
 import 'package:work4ututor/provider/datarangenotifier.dart';
 import 'package:work4ututor/provider/displaycount.dart';
 import 'package:work4ututor/provider/displaystarred.dart';
@@ -20,24 +18,24 @@ import 'package:work4ututor/provider/search_provider.dart';
 import 'package:work4ututor/provider/selectnotifier.dart';
 import 'package:work4ututor/provider/update_tutor_provider.dart';
 import 'package:work4ututor/provider/user_id_provider.dart';
-import 'package:work4ututor/routes/routes.dart';
 import 'package:work4ututor/services/addgetstarmessages.dart';
 import 'package:work4ututor/services/addpreftutor.dart';
 import 'package:work4ututor/services/getPaymentHistory.dart';
+import 'package:work4ututor/services/getcalendardata.dart';
 import 'package:work4ututor/services/getcarddetails.dart';
 import 'package:work4ututor/services/getcart.dart';
 import 'package:work4ututor/services/getchatcall.dart';
+import 'package:work4ututor/services/getclassinfo.dart';
 import 'package:work4ututor/services/getcountries.dart';
 import 'package:work4ututor/services/getlanguages.dart';
 import 'package:work4ututor/services/getmyrating.dart';
 import 'package:work4ututor/services/getstudentinfo.dart';
+import 'package:work4ututor/services/getsubject.dart';
 import 'package:work4ututor/services/gettutorpayments.dart';
 import 'package:work4ututor/services/getunreadmessages.dart';
 import 'package:work4ututor/services/getvouchers.dart';
 import 'package:work4ututor/services/services.dart';
 import 'package:work4ututor/services/subjectServices.dart';
-import 'package:work4ututor/splash_page.dart';
-import 'package:work4ututor/ui/web/admin/executive_dashboard.dart';
 import 'package:work4ututor/ui/web/login/resetpassword.dart';
 import 'package:work4ututor/ui/web/search_tutor/find_tutors.dart';
 import 'package:work4ututor/ui/web/signup/tutor_information_signup.dart';
@@ -64,10 +62,13 @@ import 'ui/web/signup/tutor_signup.dart';
 import 'ui/web/student/main_dashboard/student_dashboard.dart';
 import 'ui/web/tutor/tutor_dashboard/tutor_dashboard.dart';
 import 'ui/web/web_main.dart';
+import 'package:timezone/browser.dart' as tz;
 
-// Future<void> setup() async {
-//   await tz.initializeTimeZone('packages/timezone/data/latest_all.tzf');
-// }
+Future<void> setup() async {
+  // await tz.initializeTimeZone();
+
+  await tz.initializeTimeZone('packages/timezone/data/latest_all.tzf');
+}
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await setupFlutterNotifications();
@@ -89,8 +90,22 @@ Future<void> setupFlutterNotifications() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  setup();
+
+  GoRouter.optionURLReflectsImperativeAPIs = true;
+  usePathUrlStrategy();
   if (kIsWeb) {
     if (runas == 'dev') {
+      await Firebase.initializeApp(
+        options: FirebaseOptions(
+          apiKey: firebaseConfig['apiKey'].toString(),
+          appId: firebaseConfig['appId'].toString(),
+          messagingSenderId: firebaseConfig['messagingSenderId'].toString(),
+          projectId: firebaseConfig['projectId'].toString(),
+          storageBucket: firebaseConfig['storageBucket'].toString(),
+        ),
+      );
+    } else if (runas == 'devextra') {
       await Firebase.initializeApp(
         options: FirebaseOptions(
           apiKey: firebaseConfig['apiKey'].toString(),
@@ -117,8 +132,6 @@ void main() async {
 
   await Hive.initFlutter();
   await Hive.openBox('userID');
-
-  Get.lazyPut(() => DashboardController());
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -190,6 +203,10 @@ void main() async {
       ChangeNotifierProvider(create: (_) => PaymentHistoryNotifier()),
       ChangeNotifierProvider(create: (_) => MessageNotifier()),
       ChangeNotifierProvider(create: (_) => SelectedClassInfoProvider()),
+      ChangeNotifierProvider(create: (_) => ClassInfoNotifier()),
+      ChangeNotifierProvider(create: (_) => SubjectInfoNotifier()),
+      ChangeNotifierProvider(create: (_) => TutorScheduleProvider()),
+      ChangeNotifierProvider(create: (_) => GetAllMaterialNotifier()),
     ],
     child: const MyApp(),
   ));
@@ -197,7 +214,9 @@ void main() async {
 
 /// The route configuration.
 final GoRouter _router = GoRouter(
-  routes: <RouteBase>[
+  initialLocation: '/',
+  debugLogDiagnostics: true,
+  routes: [
     GoRoute(
       path: '/',
       builder: (BuildContext context, GoRouterState state) {
@@ -208,7 +227,7 @@ final GoRouter _router = GoRouter(
         //   classId: '',
         // );
       },
-      routes: <RouteBase>[
+      routes: [
         GoRoute(
           path: 'account/student', // Define route with parameters
           builder: (context, state) {
@@ -305,15 +324,6 @@ final GoRouter _router = GoRouter(
             return const WebMainPage();
           },
         ),
-        GoRoute(
-          path: 'settings/admin', // Define route with parameters
-          builder: (context, state) {
-            // Retrieve parameters
-            return const AdminPage(
-              uID: '',
-            );
-          },
-        ),
       ],
     ),
     GoRoute(
@@ -336,17 +346,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp.router(
+    return MaterialApp.router(
       title: 'Work4ututor',
       routerDelegate: _router.routerDelegate,
       routeInformationParser: _router.routeInformationParser,
       routeInformationProvider: _router.routeInformationProvider,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: "Nunito",
+        fontFamily: "Roboto",
         canvasColor: Colors.white,
         primarySwatch: Colors.indigo,
       ),
+      // routerConfig: _router,
     );
   }
 }

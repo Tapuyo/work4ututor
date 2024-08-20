@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:work4ututor/services/timefromtimestamp.dart';
+import 'package:work4ututor/services/timestampconverter.dart';
 
 import '../data_class/classesdataclass.dart';
 import '../data_class/studentinfoclass.dart';
@@ -10,8 +13,10 @@ import '../data_class/tutor_info_class.dart';
 class EnrolledClass {
   final String uid;
   final String role;
+  final String targetTimezone;
 
-  EnrolledClass({required this.uid, required this.role});
+  EnrolledClass(
+      {required this.uid, required this.role, required this.targetTimezone});
 
   StreamTransformer<QuerySnapshot<Map<String, dynamic>>, List<ClassesData>>
       _transformer() {
@@ -43,7 +48,6 @@ class EnrolledClass {
   Future<ClassesData> _createClassesDataFromDocument(
       DocumentSnapshot<Object?> snapshot) async {
     var data = snapshot.data() as Map<String, dynamic>;
-    var subcollectionNames = ['materials', 'schedule', 'score'];
 
     List<ClassesMaterials> finalmaterials = [];
     List<Schedule> finalschedule = [];
@@ -168,13 +172,20 @@ class EnrolledClass {
         var data = documentSnapshot.data();
 
         String session = data['session'] ?? '';
-        DateTime schedule = data['schedule'].toDate() ?? DateTime.now();
+        // DateTime schedule = data['schedule'].toDate() ?? DateTime.now();
+        DateTime schedule = formatTimewDatewZone(
+            DateFormat('MMMM d, yyyy h:mm a')
+                .format(DateTime.parse(data['schedule']).toLocal()),
+            targetTimezone);
+        String timefrom = updateTime(targetTimezone, data['timefrom']);
+        String timeto = updateTime(targetTimezone, data['timeto']);
+
         Schedule tempschedinfo = Schedule(
           scheduleID: data['scheduleID'] ?? '',
           session: session,
           schedule: schedule,
-          timefrom: data['timefrom'] ?? '',
-          timeto: data['timeto'] ?? '',
+          timefrom: timefrom,
+          timeto: timeto,
           classstatus: data['classstatus'] ?? '',
           meetinglink: data['meetinglink'] ?? '',
           rating: data['rating'] ?? '',
@@ -227,8 +238,10 @@ class EnrolledClass {
 class EnrolledClassFuture {
   final String uid;
   final String role;
+  final String targetTimezone;
 
-  EnrolledClassFuture({required this.uid, required this.role});
+  EnrolledClassFuture(
+      {required this.uid, required this.role, required this.targetTimezone});
 
   Future<List<ClassesData>> _getStudentsInfo(
       QuerySnapshot<Object?> snapshot) async {
@@ -416,13 +429,19 @@ class EnrolledClassFuture {
         var data = documentSnapshot.data();
 
         String session = data['session'] ?? '';
-        DateTime schedule = data['schedule'].toDate() ?? DateTime.now();
+        // DateTime schedule = data['schedule'].toDate() ?? DateTime.now();
+        DateTime schedule = formatTimewDatewZone(
+            DateFormat('MMMM d, yyyy h:mm a')
+                .format(DateTime.parse(data['schedule']).toLocal()),
+            targetTimezone);
+        String timefrom = updateTime(targetTimezone, data['timefrom']);
+        String timeto = updateTime(targetTimezone, data['timeto']);
         Schedule tempschedinfo = Schedule(
           scheduleID: data['scheduleID'] ?? '',
           session: session,
           schedule: schedule,
-          timefrom: data['timefrom'] ?? '',
-          timeto: data['timeto'] ?? '',
+          timefrom: timefrom,
+          timeto: timeto,
           classstatus: data['classstatus'] ?? '',
           meetinglink: data['meetinglink'] ?? '',
           rating: data['rating'] ?? '',

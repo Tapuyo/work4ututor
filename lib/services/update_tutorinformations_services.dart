@@ -15,7 +15,6 @@ Future<String?> updatePersonalTutorInformation(
   String userid,
   String contact,
   String age,
-  String dateofbirth,
   String timezone,
   String profileurl,
 ) async {
@@ -23,20 +22,20 @@ Future<String?> updatePersonalTutorInformation(
     try {
       // Update the main student document
       await FirebaseFirestore.instance.collection('tutor').doc(uid).set({
-        "age": age,
+        // "age": age,
         "birthPlace": birthCountry,
         "birthCity": birthCity,
-        "birthdate": dateofbirth,
+        // "birthdate": dateofbirth,
         "country": country,
         "city": city,
         "contact": contact,
         "language": language,
         "timezone": timezone,
-        "firstName": name,
-        "lastName": lastname,
-        "middleName": middlename,
-        "userID": userid,
-        "withdrawal": "",
+        // "firstName": name,
+        // "lastName": lastname,
+        // "middleName": middlename,
+        // "userID": userid,
+        // "withdrawal": "",
       }, SetOptions(merge: true));
       return 'success';
     } catch (error) {
@@ -46,21 +45,21 @@ Future<String?> updatePersonalTutorInformation(
     try {
       // Update the main student document
       await FirebaseFirestore.instance.collection('tutor').doc(uid).set({
-        "age": age,
+        // "age": age,
         "birthPlace": birthCountry,
         "birthCity": birthCity,
-        "birthdate": dateofbirth,
+        // "birthdate": dateofbirth,
         "country": country,
         "city": city,
         "contact": contact,
         "language": language,
         "timezone": timezone,
-        "firstName": name,
-        "lastName": lastname,
-        "middleName": middlename,
-        "userID": userid,
+        // "firstName": name,
+        // "lastName": lastname,
+        // "middleName": middlename,
+        // "userID": userid,
         "imageID": profileurl,
-        "withdrawal": "",
+        // "withdrawal": "",
       }, SetOptions(merge: true));
       return 'success';
     } catch (error) {

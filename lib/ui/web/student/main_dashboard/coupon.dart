@@ -1,7 +1,9 @@
+// ignore_for_file: unused_element
+
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:work4ututor/ui/web/admin/helpers/app_helpers.dart';
+import 'package:work4ututor/ui/web/student/main_dashboard/app_helpers.dart';
 
 import '../../../../data_class/voucherclass.dart';
 import '../../../../utils/themes.dart';
@@ -134,8 +136,7 @@ class CardTask extends StatelessWidget {
     return ElevatedButton.icon(
       onPressed: () {},
       style: ElevatedButton.styleFrom(
-        primary: onPrimary,
-        onPrimary: primary,
+        foregroundColor: primary, backgroundColor: onPrimary,
       ),
       icon: const Icon(EvaIcons.checkmarkCircle2Outline),
       label: const Text("Use Now"),
@@ -270,8 +271,7 @@ class CardTaskSmall extends StatelessWidget {
     return ElevatedButton.icon(
       onPressed: () {},
       style: ElevatedButton.styleFrom(
-        primary: onPrimary,
-        onPrimary: primary,
+        foregroundColor: primary, backgroundColor: onPrimary,
       ),
       icon: const Icon(EvaIcons.checkmarkCircle2Outline),
       label: const Text("Use Now"),

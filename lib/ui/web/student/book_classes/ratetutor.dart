@@ -3,13 +3,9 @@
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:provider/provider.dart';
-import 'package:work4ututor/ui/web/admin/admin_sharedcomponents/header_text.dart';
 import '../../../../data_class/classesdataclass.dart';
-import '../../../../data_class/subject_class.dart';
 import '../../../../services/addrating.dart';
-import '../../../../services/bookingfunctions/addnewbooking.dart';
-import '../../../../services/bookingfunctions/paymenttransactions.dart';
+import '../../../../shared_components/header_text.dart';
 import '../../../../utils/themes.dart';
 
 class RateTutor extends StatefulWidget {

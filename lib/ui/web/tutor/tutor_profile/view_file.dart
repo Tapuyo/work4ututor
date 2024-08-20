@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../shared_components/header_text.dart';
 import '../../../../utils/themes.dart';
-import '../../admin/admin_sharedcomponents/header_text.dart';
 
 class ViewFile extends StatefulWidget {
   final String? imageURL;

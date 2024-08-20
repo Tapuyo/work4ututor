@@ -19,7 +19,8 @@ import '../../../../utils/themes.dart';
 
 class MyClasses extends StatefulWidget {
   final String uID;
-  const MyClasses({super.key, required this.uID});
+  final String timezone;
+  const MyClasses({super.key, required this.uID, required this.timezone});
 
   @override
   State<MyClasses> createState() => _MyClassesState();
@@ -1287,6 +1288,7 @@ class _MyClassesState extends State<MyClasses> {
                         child: StudentViewClassInfo(
                           enrolledClass: selectedclass.selectedclass,
                           uID: widget.uID,
+                          timezone: widget.timezone,
                         ),
                       ),
               )

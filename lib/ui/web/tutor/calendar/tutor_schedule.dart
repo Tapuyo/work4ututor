@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unused_local_variable, prefer_final_fields, avoid_print
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -14,45 +14,53 @@ import 'package:work4ututor/ui/web/tutor/calendar/setup_calendar.dart';
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../provider/init_provider.dart';
+import '../../../../services/getcalendardata.dart';
 import '../../../../services/getmaterials.dart';
+import '../../../../services/timefromtimestamp.dart';
+import '../../../../services/timestampconverter.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
 import '../../terms/termpage.dart';
 import '../tutor_profile/view_file.dart';
 import 'package:universal_html/html.dart' as html;
 
+// class TableBasicsExample1 extends StatefulWidget {
+//   final String uID;
+//   final TutorInformation tutor;
+//   const TableBasicsExample1({Key? key, required this.uID, required this.tutor})
+//       : super(key: key);
+
+//   @override
+//   State<TableBasicsExample1> createState() => _TableBasicsExample1State();
+// }
+
+// class _TableBasicsExample1State extends State<TableBasicsExample1> {
+//   String selectedDate = DateFormat('MMMM dd,').format(DateTime.now());
+
+//   int count = 0;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     Size size = MediaQuery.of(context).size;
+//     return TableBasicsExample(
+//       uID: widget.uID,
+//       tutor: widget.tutor,
+//     );
+//   }
+// }
+
 class TableBasicsExample1 extends StatefulWidget {
   final String uID;
-  const TableBasicsExample1({Key? key, required this.uID}) : super(key: key);
+  final TutorInformation tutor;
+
+  const TableBasicsExample1(
+      {super.key, required this.uID, required this.tutor});
 
   @override
   State<TableBasicsExample1> createState() => _TableBasicsExample1State();
 }
 
 class _TableBasicsExample1State extends State<TableBasicsExample1> {
-  String selectedDate = DateFormat('MMMM dd,').format(DateTime.now());
-
-  int count = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return TableBasicsExample(
-      uID: widget.uID,
-    );
-  }
-}
-
-class TableBasicsExample extends StatefulWidget {
-  final String uID;
-
-  const TableBasicsExample({super.key, required this.uID});
-
-  @override
-  State<TableBasicsExample> createState() => _TableBasicsExampleState();
-}
-
-class _TableBasicsExampleState extends State<TableBasicsExample> {
   List<String> dayOffs = [];
   List<DateTime> dayOffsdate = []; // Specify the day-offs as dates
 
@@ -84,18 +92,35 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
 
   @override
   void initState() {
-    getDataFromTutorScheduleCollection(
-      widget.uID,
-    );
-    getDataFromTutorScheduleCollectionavilableTime(
-      widget.uID,
-    );
-    getDataFromTutorScheduleCollectionBlockDateTime(
-      widget.uID,
-    );
-    getDataFromTutorScheduleCollectionAvailableDateTime(
-      widget.uID,
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cartNotifier =
+          Provider.of<TutorScheduleProvider>(context, listen: false);
+      cartNotifier.getDataFromTutorScheduleCollectionAvailableTime(widget.uID);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final timedatenotifier =
+          Provider.of<TutorScheduleProvider>(context, listen: false);
+      timedatenotifier.getDataFromTutorScheduleCollectionAvailableDateTime(
+          widget.uID, widget.tutor.timezone);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final availtimedatenotifier =
+          Provider.of<TutorScheduleProvider>(context, listen: false);
+      availtimedatenotifier.fetchSchedule(
+          widget.uID, 'tutor', widget.tutor.timezone);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final blocktimedatenotifier =
+          Provider.of<TutorScheduleProvider>(context, listen: false);
+      blocktimedatenotifier.getDataFromTutorScheduleCollectionBlockDateTime(
+          widget.uID, widget.tutor.timezone);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final dayofftimedatenotifier =
+          Provider.of<TutorScheduleProvider>(context, listen: false);
+      dayofftimedatenotifier.getDataFromTutorScheduleCollection(
+          widget.uID, widget.tutor.timezone);
+    });
     _controller1.addListener(() {
       _controller2.jumpTo(_controller1.offset);
     });
@@ -116,195 +141,12 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
       ..click();
   }
 
-  Future<void> getTimeAvailableForSpecificUID(String uid) async {
-    try {
-      QuerySnapshot tutorScheduleQuerySnapshot = await FirebaseFirestore
-          .instance
-          .collection('tutorSchedule')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      tutorScheduleQuerySnapshot.docs.forEach((tutorScheduleDoc) async {
-        QuerySnapshot timeAvailableQuerySnapshot =
-            await tutorScheduleDoc.reference.collection('timeavailable').get();
-
-        timeAvailableQuerySnapshot.docs.forEach((timeAvailableDoc) {
-          Map<String, dynamic> data =
-              timeAvailableDoc.data() as Map<String, dynamic>;
-          setState(() {
-            String timefrom = data['timeAvailableFrom'];
-            String timeend = data['timeAvailableTo'];
-          });
-        });
-      });
-    } catch (e) {
-      print('Error fetching data from Firestore: $e');
-    }
-  }
-
-  Future<void> getDataFromTutorScheduleCollection(String uid) async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('tutorSchedule')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      // Loop through the documents in the collection
-      querySnapshot.docs.forEach((doc) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-        // Access the data fields you need
-        String uid = data['uid'] ?? [];
-        List<dynamic> dateoffselected = data['dateoffselected'] != null
-            ? List<dynamic>.from(data['dateoffselected'])
-            : [];
-
-        // Convert the timestamp strings to DateTime objects
-        setState(() {
-          dayOffs = List<String>.from(data['dayoffs'] ?? []);
-
-          if (dateoffselected != null) {
-            dayOffsdate = dateoffselected
-                .map((dateString) => DateTime.tryParse(dateString))
-                .where((date) => date != null)
-                .cast<DateTime>()
-                .toList();
-          }
-        });
-      });
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
-
   String timeFrom = '12:00 AM';
   String timeTo = '11:59 PM';
-  Future<void> getDataFromTutorScheduleCollectionavilableTime(
-      String uid) async {
-    try {
-      // Get the tutorSchedule document for the specified UID
-      QuerySnapshot tutorScheduleQuerySnapshot = await FirebaseFirestore
-          .instance
-          .collection('tutorSchedule')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      // Loop through the documents in the tutorSchedule collection
-      tutorScheduleQuerySnapshot.docs.forEach((doc) async {
-        // Get the reference to the "timeavailable" subcollection
-        CollectionReference timeAvailableCollection =
-            doc.reference.collection('timeavailable');
-
-        // Query documents within the "timeavailable" subcollection
-        QuerySnapshot timeAvailableQuerySnapshot =
-            await timeAvailableCollection.get();
-
-        // Loop through the documents in the "timeavailable" subcollection
-        timeAvailableQuerySnapshot.docs.forEach((timeDoc) {
-          Map<String, dynamic> timeData =
-              timeDoc.data() as Map<String, dynamic>;
-
-          // Create a TimeAvailability instance from the map
-          TimeAvailability timeAvailability =
-              TimeAvailability.fromMap(timeData);
-
-          setState(() {
-            timeFrom = timeAvailability.timeAvailableFrom;
-            timeTo = timeAvailability.timeAvailableTo;
-          });
-        });
-      });
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
 
   List<BlockDate> blocktime = [];
-  Future<void> getDataFromTutorScheduleCollectionBlockDateTime(
-      String uid) async {
-    List<BlockDate> dateTimeAvailabilities = [];
-
-    try {
-      // Get the tutorSchedule document for the specified UID
-      QuerySnapshot tutorScheduleQuerySnapshot = await FirebaseFirestore
-          .instance
-          .collection('tutorSchedule')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      // Loop through the documents in the tutorSchedule collection
-      for (QueryDocumentSnapshot doc in tutorScheduleQuerySnapshot.docs) {
-        // Get the reference to the "timeavailable" subcollection
-        CollectionReference timeAvailableCollection =
-            doc.reference.collection('blockdatetime');
-
-        // Query documents within the "timeavailable" subcollection
-        QuerySnapshot timeAvailableQuerySnapshot =
-            await timeAvailableCollection.get();
-
-        // Loop through the documents in the "timeavailable" subcollection
-        for (QueryDocumentSnapshot timeDoc in timeAvailableQuerySnapshot.docs) {
-          Map<String, dynamic> timeData =
-              timeDoc.data() as Map<String, dynamic>;
-
-          // Create a TimeAvailability instance from the map
-          BlockDate timeAvailability = BlockDate.fromMap(timeData);
-
-          dateTimeAvailabilities.add(timeAvailability);
-        }
-      }
-
-      setState(() {
-        blocktime = dateTimeAvailabilities;
-      });
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
 
   List<DateTimeAvailability> dateavailabledateselected = [];
-  Future<void> getDataFromTutorScheduleCollectionAvailableDateTime(
-      String uid) async {
-    List<DateTimeAvailability> dateTimeAvailabilities = [];
-
-    try {
-      // Get the tutorSchedule document for the specified UID
-      QuerySnapshot tutorScheduleQuerySnapshot = await FirebaseFirestore
-          .instance
-          .collection('tutorSchedule')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      // Loop through the documents in the tutorSchedule collection
-      for (QueryDocumentSnapshot doc in tutorScheduleQuerySnapshot.docs) {
-        // Get the reference to the "timeavailable" subcollection
-        CollectionReference timeAvailableCollection =
-            doc.reference.collection('timedateavailable');
-
-        // Query documents within the "timeavailable" subcollection
-        QuerySnapshot timeAvailableQuerySnapshot =
-            await timeAvailableCollection.get();
-
-        // Loop through the documents in the "timeavailable" subcollection
-        for (QueryDocumentSnapshot timeDoc in timeAvailableQuerySnapshot.docs) {
-          Map<String, dynamic> timeData =
-              timeDoc.data() as Map<String, dynamic>;
-
-          // Create a TimeAvailability instance from the map
-          DateTimeAvailability timeAvailability =
-              DateTimeAvailability.fromMap(timeData);
-
-          dateTimeAvailabilities.add(timeAvailability);
-        }
-      }
-
-      setState(() {
-        dateavailabledateselected = dateTimeAvailabilities;
-      });
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
 
   List<ScheduleData> filteredSchedules = [];
   ScheduleData? selectedbooking;
@@ -380,26 +222,14 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
       }
     }
 
-    // TimeOfDay from = TimeOfDay(
-    //   hour: int.parse(from24Hour.split(':')[0]),
-    //   minute: int.parse(from24Hour.split(':')[1]),
-    // );
-
-    // TimeOfDay to = TimeOfDay(
-    //   hour: int.parse(to24Hour.split(':')[0]),
-    //   minute: int.parse(to24Hour.split(':')[1]),
-    // );
-
-    // int currentTimeInMinutes = time.hour * 60 + time.minute;
-    // int fromTimeInMinutes = from.hour * 60 + from.minute;
-    // int toTimeInMinutes = to.hour * 60 + to.minute;
-
     return isWithinRange;
   }
 
   ScrollController updatescrollController1 = ScrollController();
   ScrollController _controller1 = ScrollController();
   ScrollController _controller2 = ScrollController();
+  ScrollController controller3 = ScrollController();
+
   Set<int> selectedIndices = Set<int>();
   double containerX = 100.0; // Initial X position of the container
   double containerY = 100.0;
@@ -427,53 +257,46 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
   }
 
   List<bool> isHovered = [];
+  List<Schedule> finalschedule = [];
+  List<ScheduleData> getCombinedSchedule(List<ClassesData> enrolledClasses) {
+    List<ScheduleData> schedule = [];
+
+    for (var classesData in enrolledClasses) {
+      List<Schedule> scheduleDataList = classesData.schedule;
+      for (var scheduleItem in scheduleDataList) {
+        String studentID = classesData.studentID;
+        String tutorID = classesData.tutorID;
+        String classID = classesData.classid;
+        String scheduleID = scheduleItem.scheduleID;
+        String session = scheduleItem.session;
+        DateTime scheduleDateTime = scheduleItem.schedule;
+        String timefrom = scheduleItem.timefrom;
+        String timeto = scheduleItem.timeto;
+        ScheduleData tempsched = ScheduleData(
+            studentID: studentID,
+            tutorID: tutorID,
+            classID: classID,
+            scheduleID: scheduleID,
+            tutorinfo: classesData.tutorinfo.first,
+            studentinfo: classesData.studentinfo.first,
+            subjectinfo: classesData.subjectinfo.first,
+            session: session,
+            scheduledate: scheduleDateTime,
+            timefrom: timefrom,
+            timeto: timeto,
+            type: 'class');
+        schedule.add(tempsched);
+      }
+    }
+    return schedule;
+  }
 
   @override
   Widget build(BuildContext context) {
-    int itemCount = 24 * 60 ~/ 5; // Number of items in the list
-    List<TimeOfDay> timeList = List.generate(
-      itemCount,
-      (index) => TimeOfDay(hour: index * 5 ~/ 60, minute: (index * 5) % 60),
-    );
     Size size = MediaQuery.of(context).size;
-    final int listIndex = context.select((InitProvider s) => s.listIndex);
     List<TutorInformation> tutorinfodata =
         Provider.of<List<TutorInformation>>(context);
     List<ClassesData> enrolledClasses = Provider.of<List<ClassesData>>(context);
-
-    List<ScheduleData> getCombinedSchedule(List<ClassesData> enrolledClasses) {
-      List<ScheduleData> schedule = [];
-
-      for (var classesData in enrolledClasses) {
-        List<Schedule> scheduleDataList = classesData.schedule;
-        for (var scheduleItem in scheduleDataList) {
-          String studentID = classesData.studentID;
-          String tutorID = classesData.tutorID;
-          String classID = classesData.classid;
-          String scheduleID = scheduleItem.scheduleID;
-          String session = scheduleItem.session;
-          DateTime scheduleDateTime = scheduleItem.schedule;
-          String timefrom = scheduleItem.timefrom;
-          String timeto = scheduleItem.timeto;
-          ScheduleData tempsched = ScheduleData(
-              studentID: studentID,
-              tutorID: tutorID,
-              classID: classID,
-              scheduleID: scheduleID,
-              tutorinfo: classesData.tutorinfo.first,
-              studentinfo: classesData.studentinfo.first,
-              subjectinfo: classesData.subjectinfo.first,
-              session: session,
-              scheduledate: scheduleDateTime,
-              timefrom: timefrom,
-              timeto: timeto,
-              type: 'class');
-          schedule.add(tempsched);
-        }
-      }
-      // print('Schedule length ${(schedule.length)}');
-      return schedule;
-    }
 
     List<ScheduleData> scheduleList = getCombinedSchedule(enrolledClasses);
     for (var blocking in blocktime) {
@@ -495,7 +318,6 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
           type: 'blocked');
       scheduleList.add(tempsched);
     }
-
     filteredSchedules = scheduleList.where((schedule) {
       DateTime scheduleDate = schedule.scheduledate;
 
@@ -503,10 +325,11 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
       return DateFormat('yyyy-MM-dd').format(scheduleDate) ==
           DateFormat('yyyy-MM-dd').format(_selectedDay);
     }).toList();
-    for (var schedule in filteredSchedules) {
-      isHovered.add(false);
-    }
+    // for (var schedule in filteredSchedules) {
+    //   isHovered.add(false);
+    // }
     List<Widget> timeCards = generateTimeCards();
+
     return Container(
       padding: const EdgeInsets.only(left: 10, right: 10),
       alignment: Alignment.centerLeft,
@@ -570,302 +393,395 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                           height: 500,
                           child: Card(
                             elevation: 1,
-                            child: TableCalendar(
-                              shouldFillViewport: false,
-                              firstDay: DateTime(1950, 8),
-                              lastDay: DateTime(5000),
-                              focusedDay: _focusedDay,
-                              calendarFormat: _calendarFormat,
-                              daysOfWeekHeight: 60,
-                              rowHeight: 60,
-                              headerStyle: HeaderStyle(
-                                titleTextStyle: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.w400),
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    begin: Alignment(
-                                        -0.1, 0), // 0% from the top center
-                                    end: Alignment
-                                        .centerRight, // 86% to the bottom center
-                                    // transform: GradientRotation(1.57), // 90 degrees rotation
-                                    colors:
-                                        secondaryHeadercolors, // Add your desired colors here
+                            child: Consumer<TutorScheduleProvider>(
+                                builder: (context, scheduletime, _) {
+                              if (scheduletime.availableDateSelected != null) {
+                                timeFrom = updateTime(
+                                    widget.tutor.timezone,
+                                    scheduletime.availableDateSelected!
+                                        .timeAvailableFrom);
+                                timeTo = updateTime(
+                                    widget.tutor.timezone,
+                                    scheduletime.availableDateSelected!
+                                        .timeAvailableTo);
+                              } else {
+                                timeFrom = '12:00 AM';
+                                timeTo = '11:59 PM';
+                              }
+                              if (scheduletime.dateavailabledateselected !=
+                                  null) {
+                                dateavailabledateselected =
+                                    scheduletime.dateavailabledateselected!;
+                              } else {
+                                dateavailabledateselected = [];
+                              }
+                              if (scheduletime.blockdateselected != null) {
+                                blocktime = scheduletime.blockdateselected!;
+                              } else {
+                                blocktime = [];
+                              }
+                              if (scheduletime.dayOffs != null ||
+                                  scheduletime.dayOffsdate != null) {
+                                dayOffs = scheduletime.dayOffs!;
+                                dayOffsdate = scheduletime.dayOffsdate!;
+                              } else {
+                                dayOffs = [];
+                                dayOffsdate = [];
+                              }
+                              if (scheduletime.finalschedule != []) {
+                                finalschedule = scheduletime.finalschedule;
+                              } else {
+                                finalschedule = [];
+                              }
+
+                              return TableCalendar(
+                                shouldFillViewport: false,
+                                firstDay: DateTime(1950, 8),
+                                lastDay: DateTime(5000),
+                                focusedDay: _focusedDay,
+                                calendarFormat: _calendarFormat,
+                                daysOfWeekHeight: 60,
+                                rowHeight: 60,
+                                headerStyle: HeaderStyle(
+                                  titleTextStyle: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.w400),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      begin: Alignment(
+                                          -0.1, 0), // 0% from the top center
+                                      end: Alignment
+                                          .centerRight, // 86% to the bottom center
+                                      // transform: GradientRotation(1.57), // 90 degrees rotation
+                                      colors:
+                                          secondaryHeadercolors, // Add your desired colors here
+                                    ),
+                                    borderRadius: BorderRadius.circular(5.0),
                                   ),
-                                  borderRadius: BorderRadius.circular(5.0),
+                                  formatButtonVisible: false,
+                                  leftChevronIcon: const Icon(
+                                    Icons.arrow_left_outlined,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                  rightChevronIcon: const Icon(
+                                    Icons.arrow_right_outlined,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
                                 ),
-                                formatButtonVisible: false,
-                                leftChevronIcon: const Icon(
-                                  Icons.arrow_left_outlined,
-                                  color: Colors.white,
-                                  size: 28,
+                                // Calendar Dates styling
+                                daysOfWeekStyle: const DaysOfWeekStyle(
+                                  // Weekend days color (Sat,Sun)
+                                  weekendStyle: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
+                                  weekdayStyle: TextStyle(
+                                      color: kColorGrey,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
                                 ),
-                                rightChevronIcon: const Icon(
-                                  Icons.arrow_right_outlined,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                              ),
-                              // Calendar Dates styling
-                              daysOfWeekStyle: const DaysOfWeekStyle(
-                                // Weekend days color (Sat,Sun)
-                                weekendStyle: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                                weekdayStyle: TextStyle(
-                                    color: kColorGrey,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                              ),
-                              calendarStyle: CalendarStyle(
-                                // Weekend dates color (Sat & Sun Column)
-                                weekendTextStyle: const TextStyle(
+                                calendarStyle: CalendarStyle(
+                                  // Weekend dates color (Sat & Sun Column)
+                                  weekendTextStyle: const TextStyle(
+                                      color: kColorGrey,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.normal),
+                                  outsideDaysVisible: true,
+                                  cellMargin:
+                                      const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                                  rowDecoration: const BoxDecoration(
+                                    color: Colors.white,
+                                  ),
+                                  defaultDecoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    shape: BoxShape.rectangle,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                        color: const Color(0xFF616161),
+                                        width: .5),
+                                  ),
+                                  weekendDecoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    shape: BoxShape.rectangle,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                        color: const Color(0xFF616161),
+                                        width: .5),
+                                  ),
+                                  defaultTextStyle: const TextStyle(
                                     color: kColorGrey,
                                     fontSize: 16,
-                                    fontWeight: FontWeight.normal),
-                                outsideDaysVisible: true,
-                                cellMargin:
-                                    const EdgeInsets.fromLTRB(5, 5, 5, 0),
-                                rowDecoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
-                                defaultDecoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                  // highlighted color for today
+                                  todayDecoration: BoxDecoration(
+                                    color: kSecondarybuttonblue,
+                                    shape: BoxShape.rectangle,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
                                       color: const Color(0xFF616161),
-                                      width: .5),
-                                ),
-                                weekendDecoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
+                                    ),
+                                  ),
+                                  // highlighted color for selected day
+                                  selectedDecoration: BoxDecoration(
+                                    color: kSecondarybuttonblue,
+                                    shape: BoxShape.rectangle,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
                                       color: const Color(0xFF616161),
-                                      width: .5),
-                                ),
-                                defaultTextStyle: const TextStyle(
-                                  color: kColorGrey,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                                // highlighted color for today
-                                todayDecoration: BoxDecoration(
-                                  color: kSecondarybuttonblue,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: const Color(0xFF616161),
+                                    ),
                                   ),
                                 ),
-                                // highlighted color for selected day
-                                selectedDecoration: BoxDecoration(
-                                  color: kSecondarybuttonblue,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: const Color(0xFF616161),
-                                  ),
-                                ),
-                              ),
-                              selectedDayPredicate: (day) {
-                                // Use `selectedDayPredicate` to determine which day is currently selected.
-                                // If this returns true, then `day` will be marked as selected.
+                                selectedDayPredicate: (day) {
+                                  // Use `selectedDayPredicate` to determine which day is currently selected.
+                                  // If this returns true, then `day` will be marked as selected.
 
-                                // Using `isSameDay` is recommended to disregard
-                                // the time-part of compared DateTime objects.
-                                return isSameDay(_selectedDay, day);
-                              },
-                              onDaySelected: (selectedDay, focusedDay) {
-                                if (!isSameDay(_selectedDay, selectedDay)) {
-                                  // Call `setState()` when updating the selected day
+                                  // Using `isSameDay` is recommended to disregard
+                                  // the time-part of compared DateTime objects.
+                                  return isSameDay(_selectedDay, day);
+                                },
+                                onDaySelected: (selectedDay, focusedDay) {
+                                  if (!isSameDay(_selectedDay, selectedDay)) {
+                                    // Call `setState()` when updating the selected day
+                                    setState(() {
+                                      _selectedDay = selectedDay;
+                                      _focusedDay = focusedDay;
+                                      if (isDayOff(focusedDay)) {
+                                        daystatus = true;
+                                      } else if (isDayOffdate(focusedDay)) {
+                                        daystatus = true;
+                                      } else {
+                                        daystatus = false;
+                                      }
+                                    });
+                                  }
                                   setState(() {
-                                    _selectedDay = selectedDay;
-                                    _focusedDay = focusedDay;
-                                    if (isDayOff(focusedDay)) {
-                                      daystatus = true;
-                                    } else if (isDayOffdate(focusedDay)) {
-                                      daystatus = true;
+                                    selectedbooking = null;
+                                  });
+                                },
+
+                                calendarBuilders: CalendarBuilders(
+                                  markerBuilder: (context, date, _) {
+                                    int count = 0;
+                                    for (var highlightedDate in finalschedule) {
+                                      if (isSameDay(
+                                          date, highlightedDate.schedule)) {
+                                        count++;
+                                      }
+                                    }
+                                    int blockcount = 0;
+                                    for (var blockdata in blocktime) {
+                                      if (isSameDay(
+                                          date, blockdata.blockDate)) {
+                                        blockcount++;
+                                      }
+                                    }
+                                    if (count > 0 && blockcount > 0) {
+                                      return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Container(
+                                            width: 12,
+                                            height: 12,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: kCalendarColorFB,
+                                                borderRadius:
+                                                    BorderRadius.circular(6)),
+                                            child: Center(
+                                              child: Text(
+                                                '$count',
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 8),
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            width: 12,
+                                            height: 12,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: kCalendarColorAB,
+                                                borderRadius:
+                                                    BorderRadius.circular(6)),
+                                            child: null,
+                                          ),
+                                          Container(
+                                            width: 12,
+                                            height: 12,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: calendarRed,
+                                                borderRadius:
+                                                    BorderRadius.circular(6)),
+                                            child: null,
+                                          ),
+                                        ],
+                                      );
+                                    } else if (count > 0 && blockcount == 0) {
+                                      return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Container(
+                                            width: 12,
+                                            height: 12,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: kCalendarColorFB,
+                                                borderRadius:
+                                                    BorderRadius.circular(6)),
+                                            child: Center(
+                                              child: Text(
+                                                '$count',
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 8),
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            width: 12,
+                                            height: 12,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: kCalendarColorAB,
+                                                borderRadius:
+                                                    BorderRadius.circular(6)),
+                                            child: null,
+                                          ),
+                                        ],
+                                      );
+                                    } else if (isDayOff(date)) {
+                                      return null;
+                                    } else if (isDayOffdate(date)) {
+                                      return null;
+                                    } else if (isDayOffdate(date) == false &&
+                                        count == 0 &&
+                                        blockcount == 0) {
+                                      return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Container(
+                                            width: 12,
+                                            height: 12,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: kCalendarColorAB,
+                                                borderRadius:
+                                                    BorderRadius.circular(6)),
+                                            child: null,
+                                          ),
+                                        ],
+                                      );
+                                    } else if (isDayOffdate(date) == false &&
+                                        count == 0 &&
+                                        blockcount > 0) {
+                                      return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Container(
+                                            width: 12,
+                                            height: 12,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: kCalendarColorAB,
+                                                borderRadius:
+                                                    BorderRadius.circular(6)),
+                                            child: null,
+                                          ),
+                                          Container(
+                                            width: 12,
+                                            height: 12,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: calendarRed,
+                                                borderRadius:
+                                                    BorderRadius.circular(6)),
+                                            child: null,
+                                          ),
+                                        ],
+                                      );
+                                    }
+
+                                    return null;
+                                  },
+                                  defaultBuilder: (context, date, events) {
+                                    // Check if the date is a day off
+                                    if (isDayOff(date)) {
+                                      return Container(
+                                        margin: const EdgeInsets.only(
+                                            top: 5, left: 5, right: 5),
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: calendarRed,
+                                          shape: BoxShape.rectangle,
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border: Border.all(
+                                            color: const Color(0xFF616161),
+                                            width: 0.5,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${date.day}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      );
+                                    } else if (isDayOffdate(date)) {
+                                      return Container(
+                                        margin: const EdgeInsets.only(
+                                            top: 5, left: 5, right: 5),
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: calendarRed,
+                                          shape: BoxShape.rectangle,
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border: Border.all(
+                                            color: const Color(0xFF616161),
+                                            width: 0.5,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${date.day}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      );
                                     } else {
-                                      daystatus = false;
+                                      return null;
                                     }
-                                  });
-                                }
-                                setState(() {
-                                  selectedbooking = null;
-                                });
-                              },
-
-                              calendarBuilders: CalendarBuilders(
-                                markerBuilder: (context, date, _) {
-                                  int count = 0;
-                                  for (var highlightedDate in scheduleList) {
-                                    if (isSameDay(date,
-                                            highlightedDate.scheduledate) &&
-                                        highlightedDate.type == 'class') {
-                                      count++;
-                                    }
-                                  }
-                                  int blockcount = 0;
-                                  for (var blockdata in blocktime) {
-                                    if (isSameDay(date, blockdata.blockDate)) {
-                                      blockcount++;
-                                    }
-                                  }
-                                  if (count > 0 && blockcount > 0) {
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          width: 12,
-                                          height: 12,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: kCalendarColorFB,
-                                              borderRadius:
-                                                  BorderRadius.circular(6)),
-                                          child: Center(
-                                            child: Text(
-                                              '$count',
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 8),
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 12,
-                                          height: 12,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: kCalendarColorAB,
-                                              borderRadius:
-                                                  BorderRadius.circular(6)),
-                                          child: null,
-                                        ),
-                                        Container(
-                                          width: 12,
-                                          height: 12,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: calendarRed,
-                                              borderRadius:
-                                                  BorderRadius.circular(6)),
-                                          child: null,
-                                        ),
-                                      ],
-                                    );
-                                  } else if (count > 0 && blockcount == 0) {
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          width: 12,
-                                          height: 12,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: kCalendarColorFB,
-                                              borderRadius:
-                                                  BorderRadius.circular(6)),
-                                          child: Center(
-                                            child: Text(
-                                              '$count',
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 8),
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 12,
-                                          height: 12,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: kCalendarColorAB,
-                                              borderRadius:
-                                                  BorderRadius.circular(6)),
-                                          child: null,
-                                        ),
-                                      ],
-                                    );
-                                  } else if (isDayOff(date)) {
-                                    return null;
-                                  } else if (isDayOffdate(date)) {
-                                    return null;
-                                  } else if (isDayOffdate(date) == false &&
-                                      count == 0 &&
-                                      blockcount == 0) {
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          width: 12,
-                                          height: 12,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: kCalendarColorAB,
-                                              borderRadius:
-                                                  BorderRadius.circular(6)),
-                                          child: null,
-                                        ),
-                                      ],
-                                    );
-                                  } else if (isDayOffdate(date) == false &&
-                                      count == 0 &&
-                                      blockcount > 0) {
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          width: 12,
-                                          height: 12,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: kCalendarColorAB,
-                                              borderRadius:
-                                                  BorderRadius.circular(6)),
-                                          child: null,
-                                        ),
-                                        Container(
-                                          width: 12,
-                                          height: 12,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: calendarRed,
-                                              borderRadius:
-                                                  BorderRadius.circular(6)),
-                                          child: null,
-                                        ),
-                                      ],
-                                    );
-                                  }
-
-                                  return null;
-                                },
-                                defaultBuilder: (context, date, events) {
-                                  // Check if the date is a day off
-                                  if (isDayOff(date)) {
+                                  },
+                                  todayBuilder: (context, date, _) {
                                     return Container(
                                       margin: const EdgeInsets.only(
                                           top: 5, left: 5, right: 5),
                                       alignment: Alignment.center,
                                       decoration: BoxDecoration(
-                                        color: calendarRed,
+                                        color: Colors.transparent,
                                         shape: BoxShape.rectangle,
                                         borderRadius: BorderRadius.circular(5),
                                         border: Border.all(
@@ -876,77 +792,28 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                       child: Text(
                                         '${date.day}',
                                         style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
+                                          color: kColorGrey,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.normal,
                                         ),
                                       ),
                                     );
-                                  } else if (isDayOffdate(date)) {
-                                    return Container(
-                                      margin: const EdgeInsets.only(
-                                          top: 5, left: 5, right: 5),
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        color: calendarRed,
-                                        shape: BoxShape.rectangle,
-                                        borderRadius: BorderRadius.circular(5),
-                                        border: Border.all(
-                                          color: const Color(0xFF616161),
-                                          width: 0.5,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        '${date.day}',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    return null;
+                                  },
+                                ),
+                                onFormatChanged: (format) {
+                                  if (_calendarFormat != format) {
+                                    // Call `setState()` when updating calendar format
+                                    setState(() {
+                                      _calendarFormat = format;
+                                    });
                                   }
                                 },
-                                todayBuilder: (context, date, _) {
-                                  return Container(
-                                    margin: const EdgeInsets.only(
-                                        top: 5, left: 5, right: 5),
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      shape: BoxShape.rectangle,
-                                      borderRadius: BorderRadius.circular(5),
-                                      border: Border.all(
-                                        color: const Color(0xFF616161),
-                                        width: 0.5,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      '${date.day}',
-                                      style: const TextStyle(
-                                        color: kColorGrey,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                    ),
-                                  );
+                                onPageChanged: (focusedDay) {
+                                  // No need to call `setState()` here
+                                  _focusedDay = focusedDay;
                                 },
-                              ),
-                              onFormatChanged: (format) {
-                                if (_calendarFormat != format) {
-                                  // Call `setState()` when updating calendar format
-                                  setState(() {
-                                    _calendarFormat = format;
-                                  });
-                                }
-                              },
-                              onPageChanged: (focusedDay) {
-                                // No need to call `setState()` here
-                                _focusedDay = focusedDay;
-                              },
-                            ),
+                              );
+                            }),
                           ),
                         ),
                         const SizedBox(
@@ -973,302 +840,395 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                           child: MouseRegion(
                             onHover: (event) {},
                             cursor: SystemMouseCursors.click,
-                            child: TableCalendar(
-                              shouldFillViewport: false,
-                              firstDay: DateTime(1950, 8),
-                              lastDay: DateTime(5000),
-                              focusedDay: _focusedDay,
-                              calendarFormat: _calendarFormat,
-                              daysOfWeekHeight: 60,
-                              rowHeight: 60,
-                              headerStyle: HeaderStyle(
-                                titleTextStyle: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.w400),
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    begin: Alignment(
-                                        -0.1, 0), // 0% from the top center
-                                    end: Alignment
-                                        .centerRight, // 86% to the bottom center
-                                    // transform: GradientRotation(1.57), // 90 degrees rotation
-                                    colors:
-                                        secondaryHeadercolors, // Add your desired colors here
+                            child: Consumer<TutorScheduleProvider>(
+                                builder: (context, scheduletime, _) {
+                              if (scheduletime.availableDateSelected != null) {
+                                timeFrom = updateTime(
+                                    widget.tutor.timezone,
+                                    scheduletime.availableDateSelected!
+                                        .timeAvailableFrom);
+                                timeTo = updateTime(
+                                    widget.tutor.timezone,
+                                    scheduletime.availableDateSelected!
+                                        .timeAvailableTo);
+                              } else {
+                                timeFrom = '12:00 AM';
+                                timeTo = '11:59 PM';
+                              }
+                              if (scheduletime.dateavailabledateselected !=
+                                  null) {
+                                dateavailabledateselected =
+                                    scheduletime.dateavailabledateselected!;
+                              } else {
+                                dateavailabledateselected = [];
+                              }
+                              if (scheduletime.blockdateselected != null) {
+                                blocktime = scheduletime.blockdateselected!;
+                              } else {
+                                blocktime = [];
+                              }
+                              if (scheduletime.dayOffs != null ||
+                                  scheduletime.dayOffsdate != null) {
+                                dayOffs = scheduletime.dayOffs!;
+                                dayOffsdate = scheduletime.dayOffsdate!;
+                              } else {
+                                dayOffs = [];
+                                dayOffsdate = [];
+                              }
+                              if (scheduletime.finalschedule != []) {
+                                finalschedule = scheduletime.finalschedule;
+                              } else {
+                                finalschedule = [];
+                              }
+
+                              return TableCalendar(
+                                shouldFillViewport: false,
+                                firstDay: DateTime(1950, 8),
+                                lastDay: DateTime(5000),
+                                focusedDay: _focusedDay,
+                                calendarFormat: _calendarFormat,
+                                daysOfWeekHeight: 60,
+                                rowHeight: 60,
+                                headerStyle: HeaderStyle(
+                                  titleTextStyle: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.w400),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      begin: Alignment(
+                                          -0.1, 0), // 0% from the top center
+                                      end: Alignment
+                                          .centerRight, // 86% to the bottom center
+                                      // transform: GradientRotation(1.57), // 90 degrees rotation
+                                      colors:
+                                          secondaryHeadercolors, // Add your desired colors here
+                                    ),
+                                    borderRadius: BorderRadius.circular(5.0),
                                   ),
-                                  borderRadius: BorderRadius.circular(5.0),
+                                  formatButtonVisible: false,
+                                  leftChevronIcon: const Icon(
+                                    Icons.arrow_left_outlined,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
+                                  rightChevronIcon: const Icon(
+                                    Icons.arrow_right_outlined,
+                                    color: Colors.white,
+                                    size: 28,
+                                  ),
                                 ),
-                                formatButtonVisible: false,
-                                leftChevronIcon: const Icon(
-                                  Icons.arrow_left_outlined,
-                                  color: Colors.white,
-                                  size: 28,
+                                // Calendar Dates styling
+                                daysOfWeekStyle: const DaysOfWeekStyle(
+                                  // Weekend days color (Sat,Sun)
+                                  weekendStyle: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
+                                  weekdayStyle: TextStyle(
+                                      color: kColorGrey,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20),
                                 ),
-                                rightChevronIcon: const Icon(
-                                  Icons.arrow_right_outlined,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                              ),
-                              // Calendar Dates styling
-                              daysOfWeekStyle: const DaysOfWeekStyle(
-                                // Weekend days color (Sat,Sun)
-                                weekendStyle: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                                weekdayStyle: TextStyle(
-                                    color: kColorGrey,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                              ),
-                              calendarStyle: CalendarStyle(
-                                // Weekend dates color (Sat & Sun Column)
-                                weekendTextStyle: const TextStyle(
+                                calendarStyle: CalendarStyle(
+                                  // Weekend dates color (Sat & Sun Column)
+                                  weekendTextStyle: const TextStyle(
+                                      color: kColorGrey,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.normal),
+                                  outsideDaysVisible: true,
+                                  cellMargin:
+                                      const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                                  rowDecoration: const BoxDecoration(
+                                    color: Colors.white,
+                                  ),
+                                  defaultDecoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    shape: BoxShape.rectangle,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                        color: const Color(0xFF616161),
+                                        width: .5),
+                                  ),
+                                  weekendDecoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    shape: BoxShape.rectangle,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                        color: const Color(0xFF616161),
+                                        width: .5),
+                                  ),
+                                  defaultTextStyle: const TextStyle(
                                     color: kColorGrey,
                                     fontSize: 16,
-                                    fontWeight: FontWeight.normal),
-                                outsideDaysVisible: true,
-                                cellMargin:
-                                    const EdgeInsets.fromLTRB(5, 5, 5, 0),
-                                rowDecoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
-                                defaultDecoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                  // highlighted color for today
+                                  todayDecoration: BoxDecoration(
+                                    color: kSecondarybuttonblue,
+                                    shape: BoxShape.rectangle,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
                                       color: const Color(0xFF616161),
-                                      width: .5),
-                                ),
-                                weekendDecoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
+                                    ),
+                                  ),
+                                  // highlighted color for selected day
+                                  selectedDecoration: BoxDecoration(
+                                    color: kSecondarybuttonblue,
+                                    shape: BoxShape.rectangle,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
                                       color: const Color(0xFF616161),
-                                      width: .5),
-                                ),
-                                defaultTextStyle: const TextStyle(
-                                  color: kColorGrey,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                                // highlighted color for today
-                                todayDecoration: BoxDecoration(
-                                  color: kSecondarybuttonblue,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: const Color(0xFF616161),
+                                    ),
                                   ),
                                 ),
-                                // highlighted color for selected day
-                                selectedDecoration: BoxDecoration(
-                                  color: kSecondarybuttonblue,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    color: const Color(0xFF616161),
-                                  ),
-                                ),
-                              ),
-                              selectedDayPredicate: (day) {
-                                // Use `selectedDayPredicate` to determine which day is currently selected.
-                                // If this returns true, then `day` will be marked as selected.
+                                selectedDayPredicate: (day) {
+                                  // Use `selectedDayPredicate` to determine which day is currently selected.
+                                  // If this returns true, then `day` will be marked as selected.
 
-                                // Using `isSameDay` is recommended to disregard
-                                // the time-part of compared DateTime objects.
-                                return isSameDay(_selectedDay, day);
-                              },
-                              onDaySelected: (selectedDay, focusedDay) {
-                                if (!isSameDay(_selectedDay, selectedDay)) {
-                                  // Call `setState()` when updating the selected day
+                                  // Using `isSameDay` is recommended to disregard
+                                  // the time-part of compared DateTime objects.
+                                  return isSameDay(_selectedDay, day);
+                                },
+                                onDaySelected: (selectedDay, focusedDay) {
+                                  if (!isSameDay(_selectedDay, selectedDay)) {
+                                    // Call `setState()` when updating the selected day
+                                    setState(() {
+                                      _selectedDay = selectedDay;
+                                      _focusedDay = focusedDay;
+                                      if (isDayOff(focusedDay)) {
+                                        daystatus = true;
+                                      } else if (isDayOffdate(focusedDay)) {
+                                        daystatus = true;
+                                      } else {
+                                        daystatus = false;
+                                      }
+                                    });
+                                  }
                                   setState(() {
-                                    _selectedDay = selectedDay;
-                                    _focusedDay = focusedDay;
-                                    if (isDayOff(focusedDay)) {
-                                      daystatus = true;
-                                    } else if (isDayOffdate(focusedDay)) {
-                                      daystatus = true;
+                                    selectedbooking = null;
+                                  });
+                                },
+
+                                calendarBuilders: CalendarBuilders(
+                                  markerBuilder: (context, date, _) {
+                                    int count = 0;
+                                    for (var highlightedDate in finalschedule) {
+                                      if (isSameDay(
+                                          date, highlightedDate.schedule)) {
+                                        count++;
+                                      }
+                                    }
+                                    int blockcount = 0;
+                                    for (var blockdata in blocktime) {
+                                      if (isSameDay(
+                                          date, blockdata.blockDate)) {
+                                        blockcount++;
+                                      }
+                                    }
+                                    if (count > 0 && blockcount > 0) {
+                                      return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Container(
+                                            width: 15,
+                                            height: 15,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: kCalendarColorFB,
+                                                borderRadius:
+                                                    BorderRadius.circular(7)),
+                                            child: Center(
+                                              child: Text(
+                                                '$count',
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 8),
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            width: 15,
+                                            height: 15,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: kCalendarColorAB,
+                                                borderRadius:
+                                                    BorderRadius.circular(7)),
+                                            child: null,
+                                          ),
+                                          Container(
+                                            width: 15,
+                                            height: 15,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: calendarRed,
+                                                borderRadius:
+                                                    BorderRadius.circular(7)),
+                                            child: null,
+                                          ),
+                                        ],
+                                      );
+                                    } else if (count > 0 && blockcount == 0) {
+                                      return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Container(
+                                            width: 15,
+                                            height: 15,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: kCalendarColorFB,
+                                                borderRadius:
+                                                    BorderRadius.circular(7)),
+                                            child: Center(
+                                              child: Text(
+                                                '$count',
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 8),
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            width: 15,
+                                            height: 15,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: kCalendarColorAB,
+                                                borderRadius:
+                                                    BorderRadius.circular(7)),
+                                            child: null,
+                                          ),
+                                        ],
+                                      );
+                                    } else if (isDayOff(date)) {
+                                      return null;
+                                    } else if (isDayOffdate(date)) {
+                                      return null;
+                                    } else if (isDayOffdate(date) == false &&
+                                        count == 0 &&
+                                        blockcount == 0) {
+                                      return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Container(
+                                            width: 15,
+                                            height: 15,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: kCalendarColorAB,
+                                                borderRadius:
+                                                    BorderRadius.circular(7)),
+                                            child: null,
+                                          ),
+                                        ],
+                                      );
+                                    } else if (isDayOffdate(date) == false &&
+                                        count == 0 &&
+                                        blockcount > 0) {
+                                      return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Container(
+                                            width: 15,
+                                            height: 15,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: kCalendarColorAB,
+                                                borderRadius:
+                                                    BorderRadius.circular(7)),
+                                            child: null,
+                                          ),
+                                          Container(
+                                            width: 15,
+                                            height: 15,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                                color: calendarRed,
+                                                borderRadius:
+                                                    BorderRadius.circular(7)),
+                                            child: null,
+                                          ),
+                                        ],
+                                      );
+                                    }
+
+                                    return null;
+                                  },
+                                  defaultBuilder: (context, date, events) {
+                                    // Check if the date is a day off
+                                    if (isDayOff(date)) {
+                                      return Container(
+                                        margin: const EdgeInsets.only(
+                                            top: 5, left: 5, right: 5),
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: calendarRed,
+                                          shape: BoxShape.rectangle,
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border: Border.all(
+                                            color: const Color(0xFF616161),
+                                            width: 0.5,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${date.day}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      );
+                                    } else if (isDayOffdate(date)) {
+                                      return Container(
+                                        margin: const EdgeInsets.only(
+                                            top: 5, left: 5, right: 5),
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: calendarRed,
+                                          shape: BoxShape.rectangle,
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          border: Border.all(
+                                            color: const Color(0xFF616161),
+                                            width: 0.5,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${date.day}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      );
                                     } else {
-                                      daystatus = false;
+                                      return null;
                                     }
-                                  });
-                                }
-                                setState(() {
-                                  selectedbooking = null;
-                                });
-                              },
-
-                              calendarBuilders: CalendarBuilders(
-                                markerBuilder: (context, date, _) {
-                                  int count = 0;
-                                  for (var highlightedDate in scheduleList) {
-                                    if (isSameDay(date,
-                                            highlightedDate.scheduledate) &&
-                                        highlightedDate.type == 'class') {
-                                      count++;
-                                    }
-                                  }
-                                  int blockcount = 0;
-                                  for (var blockdata in blocktime) {
-                                    if (isSameDay(date, blockdata.blockDate)) {
-                                      blockcount++;
-                                    }
-                                  }
-                                  if (count > 0 && blockcount > 0) {
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          width: 15,
-                                          height: 15,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: kCalendarColorFB,
-                                              borderRadius:
-                                                  BorderRadius.circular(7)),
-                                          child: Center(
-                                            child: Text(
-                                              '$count',
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 8),
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 15,
-                                          height: 15,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: kCalendarColorAB,
-                                              borderRadius:
-                                                  BorderRadius.circular(7)),
-                                          child: null,
-                                        ),
-                                        Container(
-                                          width: 15,
-                                          height: 15,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: calendarRed,
-                                              borderRadius:
-                                                  BorderRadius.circular(7)),
-                                          child: null,
-                                        ),
-                                      ],
-                                    );
-                                  } else if (count > 0 && blockcount == 0) {
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          width: 15,
-                                          height: 15,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: kCalendarColorFB,
-                                              borderRadius:
-                                                  BorderRadius.circular(7)),
-                                          child: Center(
-                                            child: Text(
-                                              '$count',
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 8),
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 15,
-                                          height: 15,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: kCalendarColorAB,
-                                              borderRadius:
-                                                  BorderRadius.circular(7)),
-                                          child: null,
-                                        ),
-                                      ],
-                                    );
-                                  } else if (isDayOff(date)) {
-                                    return null;
-                                  } else if (isDayOffdate(date)) {
-                                    return null;
-                                  } else if (isDayOffdate(date) == false &&
-                                      count == 0 &&
-                                      blockcount == 0) {
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          width: 15,
-                                          height: 15,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: kCalendarColorAB,
-                                              borderRadius:
-                                                  BorderRadius.circular(7)),
-                                          child: null,
-                                        ),
-                                      ],
-                                    );
-                                  } else if (isDayOffdate(date) == false &&
-                                      count == 0 &&
-                                      blockcount > 0) {
-                                    return Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          width: 15,
-                                          height: 15,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: kCalendarColorAB,
-                                              borderRadius:
-                                                  BorderRadius.circular(7)),
-                                          child: null,
-                                        ),
-                                        Container(
-                                          width: 15,
-                                          height: 15,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                              color: calendarRed,
-                                              borderRadius:
-                                                  BorderRadius.circular(7)),
-                                          child: null,
-                                        ),
-                                      ],
-                                    );
-                                  }
-
-                                  return null;
-                                },
-                                defaultBuilder: (context, date, events) {
-                                  // Check if the date is a day off
-                                  if (isDayOff(date)) {
+                                  },
+                                  todayBuilder: (context, date, _) {
                                     return Container(
                                       margin: const EdgeInsets.only(
                                           top: 5, left: 5, right: 5),
                                       alignment: Alignment.center,
                                       decoration: BoxDecoration(
-                                        color: calendarRed,
+                                        color: Colors.transparent,
                                         shape: BoxShape.rectangle,
                                         borderRadius: BorderRadius.circular(5),
                                         border: Border.all(
@@ -1279,77 +1239,28 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                       child: Text(
                                         '${date.day}',
                                         style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
+                                          color: kColorGrey,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.normal,
                                         ),
                                       ),
                                     );
-                                  } else if (isDayOffdate(date)) {
-                                    return Container(
-                                      margin: const EdgeInsets.only(
-                                          top: 5, left: 5, right: 5),
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        color: calendarRed,
-                                        shape: BoxShape.rectangle,
-                                        borderRadius: BorderRadius.circular(5),
-                                        border: Border.all(
-                                          color: const Color(0xFF616161),
-                                          width: 0.5,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        '${date.day}',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    return null;
+                                  },
+                                ),
+                                onFormatChanged: (format) {
+                                  if (_calendarFormat != format) {
+                                    // Call `setState()` when updating calendar format
+                                    setState(() {
+                                      _calendarFormat = format;
+                                    });
                                   }
                                 },
-                                todayBuilder: (context, date, _) {
-                                  return Container(
-                                    margin: const EdgeInsets.only(
-                                        top: 5, left: 5, right: 5),
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      shape: BoxShape.rectangle,
-                                      borderRadius: BorderRadius.circular(5),
-                                      border: Border.all(
-                                        color: const Color(0xFF616161),
-                                        width: 0.5,
-                                      ),
-                                    ),
-                                    child: Text(
-                                      '${date.day}',
-                                      style: const TextStyle(
-                                        color: kColorGrey,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                    ),
-                                  );
+                                onPageChanged: (focusedDay) {
+                                  // No need to call `setState()` here
+                                  _focusedDay = focusedDay;
                                 },
-                              ),
-                              onFormatChanged: (format) {
-                                if (_calendarFormat != format) {
-                                  // Call `setState()` when updating calendar format
-                                  setState(() {
-                                    _calendarFormat = format;
-                                  });
-                                }
-                              },
-                              onPageChanged: (focusedDay) {
-                                // No need to call `setState()` here
-                                _focusedDay = focusedDay;
-                              },
-                            ),
+                              );
+                            }),
                           ),
                         ),
                         const Spacer(),
@@ -1508,33 +1419,26 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                   right: 0,
                                                                   bottom: 0,
                                                                   top: 0),
-                                                          child: Row(
-                                                            children: [
-                                                              SizedBox(
-                                                                width: 55,
-                                                                child: Tooltip(
-                                                                  message: index
-                                                                      .toString(),
-                                                                  child: Text(
-                                                                    time.minute ==
-                                                                            0
-                                                                        ? timeText
-                                                                        : time.minute % 15 ==
-                                                                                0
-                                                                            ? timeText
-                                                                            : '',
-                                                                    textAlign: time.minute ==
-                                                                            0
-                                                                        ? TextAlign
-                                                                            .start
-                                                                        : TextAlign
-                                                                            .center,
-                                                                    style:
-                                                                        textStyle,
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
+                                                          child: SizedBox(
+                                                            width: 55,
+                                                            height: 12,
+                                                            child: Text(
+                                                              time.minute == 0
+                                                                  ? timeText
+                                                                  : time.minute %
+                                                                              15 ==
+                                                                          0
+                                                                      ? timeText
+                                                                      : '',
+                                                              textAlign:
+                                                                  time.minute ==
+                                                                          0
+                                                                      ? TextAlign
+                                                                          .start
+                                                                      : TextAlign
+                                                                          .center,
+                                                              style: textStyle,
+                                                            ),
                                                           ),
                                                         );
                                                       },
@@ -1760,35 +1664,45 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                             return Row(
                                                               children: [
                                                                 InkWell(
-                                                                  onTap:
-                                                                      isSelectable
-                                                                          ? () {
-                                                                              setState(() {
-                                                                                for (var booking in filteredSchedules) {
-                                                                                  String from24Hour = convertTo24HourFormat(booking.timefrom);
-                                                                                  final timeFrom = TimeOfDay(
-                                                                                    hour: int.parse(from24Hour.split(':')[0]),
-                                                                                    minute: (int.parse(from24Hour.split(':')[1].split(' ')[0]) + 4) ~/ 5 * 5,
-                                                                                  );
-                                                                                  if (timeFrom.hour == time.hour && timeFrom.minute == time.minute) {
-                                                                                    selectedbooking = booking;
-                                                                                    final materialNotifier = Provider.of<MaterialNotifier>(context, listen: false);
-                                                                                    materialNotifier.getMaterials(selectedbooking!.classID);
-                                                                                    break;
-                                                                                  }
-                                                                                }
-                                                                              });
-                                                                            }
-                                                                          : null,
-                                                                  onHover:
-                                                                      (isHovered) {
+                                                                  onTap: () {
                                                                     setState(
                                                                         () {
-                                                                      this.isHovered[
-                                                                              bookingIndex] =
-                                                                          isHovered;
+                                                                      for (var booking
+                                                                          in filteredSchedules) {
+                                                                        String
+                                                                            from24Hour =
+                                                                            convertTo24HourFormat(booking.timefrom);
+                                                                        final timeFrom =
+                                                                            TimeOfDay(
+                                                                          hour:
+                                                                              int.parse(from24Hour.split(':')[0]),
+                                                                          minute: (int.parse(from24Hour.split(':')[1].split(' ')[0]) + 4) ~/
+                                                                              5 *
+                                                                              5,
+                                                                        );
+                                                                        if (timeFrom.hour == time.hour &&
+                                                                            timeFrom.minute ==
+                                                                                time.minute) {
+                                                                          selectedbooking =
+                                                                              booking;
+                                                                          final materialNotifier = Provider.of<MaterialNotifier>(
+                                                                              context,
+                                                                              listen: false);
+                                                                          materialNotifier
+                                                                              .getMaterials(selectedbooking!.classID);
+                                                                          break;
+                                                                        }
+                                                                      }
                                                                     });
                                                                   },
+                                                                  // onHover:
+                                                                  //     (isHovered) {
+                                                                  //   setState(
+                                                                  //       () {
+                                                                  //     this.isHovered[bookingIndex] =
+                                                                  //         isHovered;
+                                                                  //   });
+                                                                  // },
                                                                   child:
                                                                       Tooltip(
                                                                     message: currentbooking.type ==
@@ -1823,15 +1737,11 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                           color: currentbooking.type == 'blocked'
                                                                               ? calendarRed
                                                                               : kSecondarybuttonblue,
-                                                                          border:
-                                                                              Border.all(
-                                                                            color: isHovered[bookingIndex]
-                                                                                ? kColorPrimary
-                                                                                : Colors.yellow,
-                                                                            width: isHovered[bookingIndex]
-                                                                                ? 3
-                                                                                : 1,
-                                                                          ),
+                                                                          // border:
+                                                                          //     Border.all(
+                                                                          //   color: isHovered[bookingIndex] ? kColorPrimary : Colors.yellow,
+                                                                          //   width: isHovered[bookingIndex] ? 3 : 1,
+                                                                          // ),
                                                                         ),
                                                                         child:
                                                                             Column(
@@ -1912,16 +1822,6 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                       time.minute) {
                                                                 selectedbookingdata =
                                                                     booking;
-                                                                // final materialNotifier =
-                                                                //     Provider.of<
-                                                                //             MaterialNotifier>(
-                                                                //         context,
-                                                                //         listen:
-                                                                //             false);
-                                                                // materialNotifier
-                                                                //     .getMaterials(
-                                                                //         selectedbooking!
-                                                                //             .classID);
                                                                 break;
                                                               }
                                                             }
@@ -1964,20 +1864,44 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                     5 *
                                                                     5,
                                                               );
-                                                              int totalMinutes = (timeTo
-                                                                              .hour -
-                                                                          timeFrom
-                                                                              .hour) *
-                                                                      60 +
-                                                                  (timeTo.minute -
+                                                              DateTime now =
+                                                                  DateTime
+                                                                      .now();
+                                                              DateTime
+                                                                  startDateTime =
+                                                                  DateTime(
+                                                                      now.year,
+                                                                      now.month,
+                                                                      now.day,
+                                                                      timeFrom
+                                                                          .hour,
                                                                       timeFrom
                                                                           .minute);
+                                                              DateTime
+                                                                  endDateTime =
+                                                                  DateTime(
+                                                                      now.year,
+                                                                      now.month,
+                                                                      now.day,
+                                                                      timeTo
+                                                                          .hour,
+                                                                      timeTo
+                                                                          .minute);
 
+                                                              // Subtract the DateTime objects
+                                                              Duration
+                                                                  difference =
+                                                                  endDateTime
+                                                                      .difference(
+                                                                          startDateTime);
+                                                              int totalMinutes =
+                                                                  difference
+                                                                      .inMinutes;
                                                               // Calculate how many 5-minute intervals are there
                                                               intervals =
                                                                   (totalMinutes /
                                                                           5)
-                                                                      .floor();
+                                                                      .round();
                                                               return (time.hour ==
                                                                       timeFrom
                                                                           .hour &&
@@ -1988,35 +1912,45 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                             return Row(
                                                               children: [
                                                                 InkWell(
-                                                                  onTap:
-                                                                      isSelectable
-                                                                          ? () {
-                                                                              setState(() {
-                                                                                for (var booking in filteredSchedules) {
-                                                                                  String from24Hour = convertTo24HourFormat(booking.timefrom);
-                                                                                  final timeFrom = TimeOfDay(
-                                                                                    hour: int.parse(from24Hour.split(':')[0]),
-                                                                                    minute: (int.parse(from24Hour.split(':')[1].split(' ')[0]) + 4) ~/ 5 * 5,
-                                                                                  );
-                                                                                  if (timeFrom.hour == time.hour && timeFrom.minute == time.minute) {
-                                                                                    selectedbooking = booking;
-                                                                                    final materialNotifier = Provider.of<MaterialNotifier>(context, listen: false);
-                                                                                    materialNotifier.getMaterials(selectedbooking!.classID);
-                                                                                    break;
-                                                                                  }
-                                                                                }
-                                                                              });
-                                                                            }
-                                                                          : null,
-                                                                  onHover:
-                                                                      (isHovered) {
+                                                                  onTap: () {
                                                                     setState(
                                                                         () {
-                                                                      this.isHovered[
-                                                                              bookingIndex] =
-                                                                          isHovered;
+                                                                      for (var booking
+                                                                          in filteredSchedules) {
+                                                                        String
+                                                                            from24Hour =
+                                                                            convertTo24HourFormat(booking.timefrom);
+                                                                        final timeFrom =
+                                                                            TimeOfDay(
+                                                                          hour:
+                                                                              int.parse(from24Hour.split(':')[0]),
+                                                                          minute: (int.parse(from24Hour.split(':')[1].split(' ')[0]) + 4) ~/
+                                                                              5 *
+                                                                              5,
+                                                                        );
+                                                                        if (timeFrom.hour == time.hour &&
+                                                                            timeFrom.minute ==
+                                                                                time.minute) {
+                                                                          selectedbooking =
+                                                                              booking;
+                                                                          final materialNotifier = Provider.of<MaterialNotifier>(
+                                                                              context,
+                                                                              listen: false);
+                                                                          materialNotifier
+                                                                              .getMaterials(selectedbooking!.classID);
+                                                                          break;
+                                                                        }
+                                                                      }
                                                                     });
                                                                   },
+                                                                  // onHover:
+                                                                  //     (isHovered) {
+                                                                  //   setState(
+                                                                  //       () {
+                                                                  //     this.isHovered[bookingIndex] =
+                                                                  //         isHovered;
+                                                                  //   });
+                                                                  // },
                                                                   child:
                                                                       Tooltip(
                                                                     message: currentbooking.type ==
@@ -2042,22 +1976,18 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                         height: currentbooking.type ==
                                                                                 'blocked'
                                                                             ? intervals *
-                                                                                13
+                                                                                12
                                                                             : 132,
                                                                         decoration:
                                                                             BoxDecoration(
                                                                           color: currentbooking.type == 'blocked'
                                                                               ? calendarRed
                                                                               : kColorSecondary,
-                                                                          border:
-                                                                              Border.all(
-                                                                            color: isHovered[bookingIndex]
-                                                                                ? kColorPrimary
-                                                                                : Colors.yellow,
-                                                                            width: isHovered[bookingIndex]
-                                                                                ? 3
-                                                                                : 1,
-                                                                          ),
+                                                                          // border:
+                                                                          //     Border.all(
+                                                                          //   color: isHovered[bookingIndex] ? kColorPrimary : Colors.yellow,
+                                                                          //   width: isHovered[bookingIndex] ? 3 : 1,
+                                                                          // ),
                                                                         ),
                                                                         child:
                                                                             Column(
@@ -2093,63 +2023,41 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                       }
                                                       return Row(
                                                         children: [
-                                                          // SizedBox(
-                                                          //   width: 55,
-                                                          //   child: Tooltip(
-                                                          //     message: index.toString(),
-                                                          //     child: Text(
-                                                          //       time.minute == 0
-                                                          //           ? timeText
-                                                          //           : timeText,
-                                                          //       textAlign: time
-                                                          //                   .minute ==
-                                                          //               0
-                                                          //           ? TextAlign.start
-                                                          //           : TextAlign.center,
-                                                          //       style: textStyle,
-                                                          //     ),
-                                                          //   ),
-                                                          // ),
                                                           InkWell(
                                                             onTap: isSelectable
                                                                 ? () {}
                                                                 : null,
-                                                            child: Tooltip(
-                                                              message: isSelectable
-                                                                  ? 'Available'
-                                                                  : 'Not Available',
-                                                              child: Container(
-                                                                width: ResponsiveBuilder
-                                                                        .isDesktop(
-                                                                            context)
-                                                                    ? size.width -
-                                                                        780
-                                                                    : ResponsiveBuilder.isTablet(
-                                                                            context)
-                                                                        ? size.width -
-                                                                            510
-                                                                        : size.width -
-                                                                            110,
-                                                                height:
-                                                                    indexSelect ==
-                                                                            index
-                                                                        ? 200
-                                                                        : 12,
-                                                                color: isSelectable
-                                                                    ? indexSelect == index
-                                                                        ? Colors.blue
-                                                                        : Colors.green[50]
-                                                                    : Colors.grey[100],
-                                                                child: time.minute ==
-                                                                        0
-                                                                    ? const Center(
-                                                                        child:
-                                                                            Divider(
-                                                                        thickness:
-                                                                            .1,
-                                                                      ))
-                                                                    : null,
-                                                              ),
+                                                            child: Container(
+                                                              width: ResponsiveBuilder
+                                                                      .isDesktop(
+                                                                          context)
+                                                                  ? size.width -
+                                                                      780
+                                                                  : ResponsiveBuilder.isTablet(
+                                                                          context)
+                                                                      ? size.width -
+                                                                          510
+                                                                      : size.width -
+                                                                          110,
+                                                              height:
+                                                                  indexSelect ==
+                                                                          index
+                                                                      ? 200
+                                                                      : 12,
+                                                              color: isSelectable
+                                                                  ? indexSelect == index
+                                                                      ? Colors.blue
+                                                                      : Colors.green[50]
+                                                                  : Colors.grey[100],
+                                                              child: time.minute ==
+                                                                      0
+                                                                  ? const Center(
+                                                                      child:
+                                                                          Divider(
+                                                                      thickness:
+                                                                          .1,
+                                                                    ))
+                                                                  : null,
                                                             ),
                                                           ),
                                                         ],
@@ -2389,66 +2297,100 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                     ),
                                                   ),
                                                   const SizedBox(height: 10),
-                                                  Consumer<List<Schedule>>(
+                                                  // Consumer<List<Schedule>>(
+                                                  //     builder: (context,
+                                                  //         scheduleListdata,
+                                                  //         _) {
+                                                  //   if (scheduleListdata
+                                                  //       .isEmpty) {
+                                                  //     return Center(
+                                                  //       child: Text(
+                                                  //         '(Link will be attached when student set class schedule!)',
+                                                  //         style: TextStyle(
+                                                  //             overflow:
+                                                  //                 TextOverflow
+                                                  //                     .ellipsis,
+                                                  //             fontSize: 15,
+                                                  //             color: Colors
+                                                  //                 .blue
+                                                  //                 .shade200,
+                                                  //             fontStyle:
+                                                  //                 FontStyle
+                                                  //                     .italic),
+                                                  //       ),
+                                                  //     );
+                                                  //   }
+                                                  //   dynamic data =
+                                                  //       scheduleListdata;
+                                                  //   // ClassesData?
+                                                  //   //     newclassdata =
+                                                  //   //     widget.enrolledClass;
+                                                  //   List<Schedule>
+                                                  //       filtereddata = data
+                                                  //           .where((element) =>
+                                                  //               element
+                                                  //                   .scheduleID ==
+                                                  //               selectedbooking!
+                                                  //                   .classID)
+                                                  //           .toList();
+                                                  //   filtereddata.sort(
+                                                  //       (a, b) => a.schedule
+                                                  //           .compareTo(
+                                                  //               b.schedule));
+                                                  //   Schedule
+                                                  //       selectedSchedule =
+                                                  //       filtereddata
+                                                  //           .firstWhere(
+                                                  //     (schedule) =>
+                                                  //         schedule.schedule ==
+                                                  //             selectedbooking!
+                                                  //                 .scheduledate &&
+                                                  //         schedule.timefrom ==
+                                                  //             selectedbooking!
+                                                  //                 .timefrom,
+                                                  //     orElse: () =>
+                                                  //         throw Exception(
+                                                  //             'No matching schedule found.'),
+                                                  //   );
+                                                  //   int index =
+                                                  //       filtereddata.indexOf(
+                                                  //           selectedSchedule);
+                                                  //   return
+                                                  Consumer<MaterialNotifier>(
                                                       builder: (context,
-                                                          scheduleListdata, _) {
-                                                    if (scheduleListdata
-                                                        .isEmpty) {
-                                                      return Center(
-                                                        child: Text(
-                                                          '(Link will be attached when student set class schedule!)',
-                                                          style: TextStyle(
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                              fontSize: 15,
-                                                              color: Colors.blue
-                                                                  .shade200,
-                                                              fontStyle:
-                                                                  FontStyle
-                                                                      .italic),
+                                                          materialNotifier, _) {
+                                                    if (materialNotifier
+                                                        .materials.isEmpty) {
+                                                      return const SizedBox(
+                                                        width: 600,
+                                                        child: Center(
+                                                          child: Text(
+                                                            '(No materials added!)',
+                                                            style: TextStyle(
+                                                                fontSize: 15,
+                                                                color:
+                                                                    kColorGrey,
+                                                                fontStyle:
+                                                                    FontStyle
+                                                                        .italic),
+                                                          ),
                                                         ),
-                                                      );
+                                                      ); // Show loading indicator
                                                     }
-                                                    dynamic data =
-                                                        scheduleListdata;
-                                                    // ClassesData?
-                                                    //     newclassdata =
-                                                    //     widget.enrolledClass;
-                                                    List<Schedule>
-                                                        filtereddata = data
+                                                    List<Map<String, dynamic>>
+                                                        materialsdata =
+                                                        materialNotifier
+                                                            .materials
                                                             .where((element) =>
-                                                                element
-                                                                    .scheduleID ==
-                                                                selectedbooking!
-                                                                    .classID)
+                                                                element[
+                                                                    'classno'] ==
+                                                                (int.parse(selectedbooking!
+                                                                            .session) -
+                                                                        1)
+                                                                    .toString())
                                                             .toList();
-                                                    filtereddata.sort((a, b) =>
-                                                        a.schedule.compareTo(
-                                                            b.schedule));
-                                                    Schedule selectedSchedule =
-                                                        filtereddata.firstWhere(
-                                                      (schedule) =>
-                                                          schedule.schedule ==
-                                                              selectedbooking!
-                                                                  .scheduledate &&
-                                                          schedule.timefrom ==
-                                                              selectedbooking!
-                                                                  .timefrom,
-                                                      orElse: () => throw Exception(
-                                                          'No matching schedule found.'),
-                                                    );
-                                                    int index =
-                                                        filtereddata.indexOf(
-                                                            selectedSchedule);
-                                                    return Consumer<
-                                                            MaterialNotifier>(
-                                                        builder: (context,
-                                                            materialNotifier,
-                                                            _) {
-                                                      if (materialNotifier
-                                                          .materials.isEmpty) {
-                                                        return SizedBox(
+                                                    if (materialsdata.isEmpty) {
+                                                      return Container(
                                                           width: 600,
                                                           child: Center(
                                                             child: Text(
@@ -2462,475 +2404,446 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                       FontStyle
                                                                           .italic),
                                                             ),
-                                                          ),
-                                                        ); // Show loading indicator
-                                                      }
-                                                      List<Map<String, dynamic>>
-                                                          materialsdata =
-                                                          materialNotifier
-                                                              .materials
-                                                              .where((element) =>
-                                                                  element[
-                                                                      'classno'] ==
-                                                                  index
-                                                                      .toString())
-                                                              .toList();
-                                                      if (materialsdata
-                                                          .isEmpty) {
-                                                        return Container(
-                                                            width: 600,
-                                                            child: Center(
-                                                              child: Text(
-                                                                '(No materials added!)',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        15,
-                                                                    color: Colors
-                                                                        .blue
-                                                                        .shade200,
-                                                                    fontStyle:
-                                                                        FontStyle
-                                                                            .italic),
-                                                              ),
-                                                            )); // Show loading indicator
-                                                      }
-                                                      return Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .only(
-                                                                bottom: 10.0),
-                                                        child: Column(
-                                                          children: [
-                                                            Container(
-                                                                width: 600,
-                                                                height: 120,
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .fromLTRB(
-                                                                        10,
-                                                                        0,
-                                                                        10,
-                                                                        0),
-                                                                child: Row(
-                                                                  children: [
-                                                                    IconButton(
-                                                                      iconSize:
-                                                                          12,
-                                                                      padding:
-                                                                          EdgeInsets
-                                                                              .zero,
-                                                                      splashRadius:
-                                                                          1,
-                                                                      icon:
-                                                                          const Icon(
-                                                                        Icons
-                                                                            .arrow_back_ios, // Left arrow icon
-                                                                        color: Colors
-                                                                            .blue,
-                                                                      ),
-                                                                      onPressed:
-                                                                          () {
-                                                                        // Scroll to the left
-                                                                        updatescrollController1
-                                                                            .animateTo(
-                                                                          updatescrollController1.offset -
-                                                                              100.0, // Adjust the value as needed
-                                                                          duration:
-                                                                              const Duration(milliseconds: 500), // Adjust the duration as needed
-                                                                          curve:
-                                                                              Curves.ease,
-                                                                        );
+                                                          )); // Show loading indicator
+                                                    }
+                                                    return Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              bottom: 10.0),
+                                                      child: Column(
+                                                        children: [
+                                                          Container(
+                                                              width: 600,
+                                                              height: 120,
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .fromLTRB(
+                                                                      10,
+                                                                      0,
+                                                                      10,
+                                                                      0),
+                                                              child: Row(
+                                                                children: [
+                                                                  IconButton(
+                                                                    iconSize:
+                                                                        12,
+                                                                    padding:
+                                                                        EdgeInsets
+                                                                            .zero,
+                                                                    splashRadius:
+                                                                        1,
+                                                                    icon:
+                                                                        const Icon(
+                                                                      Icons
+                                                                          .arrow_back_ios, // Left arrow icon
+                                                                      color: Colors
+                                                                          .blue,
+                                                                    ),
+                                                                    onPressed:
+                                                                        () {
+                                                                      // Scroll to the left
+                                                                      updatescrollController1
+                                                                          .animateTo(
+                                                                        updatescrollController1.offset -
+                                                                            100.0, // Adjust the value as needed
+                                                                        duration:
+                                                                            const Duration(milliseconds: 500), // Adjust the duration as needed
+                                                                        curve: Curves
+                                                                            .ease,
+                                                                      );
+                                                                    },
+                                                                  ),
+                                                                  Expanded(
+                                                                    child: ListView
+                                                                        .builder(
+                                                                      shrinkWrap:
+                                                                          true,
+                                                                      controller:
+                                                                          updatescrollController1, // Assign the ScrollController to the ListView
+                                                                      scrollDirection:
+                                                                          Axis.horizontal,
+                                                                      itemCount:
+                                                                          materialsdata
+                                                                              .length,
+                                                                      itemBuilder:
+                                                                          (context,
+                                                                              index) {
+                                                                        if (materialsdata[index]['extension'] ==
+                                                                            'Image') {
+                                                                          return FutureBuilder(
+                                                                              future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                              builder: (context, snapshot) {
+                                                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                  // return Container(
+                                                                                  //     height: 60,
+                                                                                  //     width: 60,
+                                                                                  //     child: const Center(
+                                                                                  //         child: CircularProgressIndicator(
+                                                                                  //       strokeWidth: 2,
+                                                                                  //       color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                  //     ))); // Display a loading indicator while waiting for the file to download
+                                                                                } else if (snapshot.hasError) {
+                                                                                  return Text('Error: ${snapshot.error}');
+                                                                                }
+
+                                                                                return Padding(
+                                                                                  padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                  child: Row(
+                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                    children: [
+                                                                                      Column(
+                                                                                        children: [
+                                                                                          InkWell(
+                                                                                            onTap: () {
+                                                                                              showDialog(
+                                                                                                  barrierDismissible: false,
+                                                                                                  context: context,
+                                                                                                  builder: (BuildContext context) {
+                                                                                                    var height = MediaQuery.of(context).size.height;
+                                                                                                    return AlertDialog(
+                                                                                                      shape: RoundedRectangleBorder(
+                                                                                                        borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                      ),
+                                                                                                      contentPadding: EdgeInsets.zero,
+                                                                                                      content: ClipRRect(
+                                                                                                        borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                        child: Container(
+                                                                                                          color: Colors.white, // Set the background color of the circular content
+
+                                                                                                          child: Stack(
+                                                                                                            children: <Widget>[
+                                                                                                              SizedBox(
+                                                                                                                height: height,
+                                                                                                                width: 900,
+                                                                                                                child: ViewFile(imageURL: snapshot.data.toString()),
+                                                                                                              ),
+                                                                                                              Positioned(
+                                                                                                                top: 10.0,
+                                                                                                                right: 10.0,
+                                                                                                                child: GestureDetector(
+                                                                                                                  onTap: () {
+                                                                                                                    Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                  },
+                                                                                                                  child: const Icon(
+                                                                                                                    Icons.close,
+                                                                                                                    color: Colors.red,
+                                                                                                                    size: 20,
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ],
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    );
+                                                                                                  });
+                                                                                            },
+                                                                                            child: Container(
+                                                                                              height: 60,
+                                                                                              width: 60,
+                                                                                              decoration: BoxDecoration(
+                                                                                                borderRadius: BorderRadius.circular(10),
+                                                                                                color: Colors.grey.shade200,
+                                                                                              ),
+                                                                                              child: ClipRRect(
+                                                                                                borderRadius: BorderRadius.circular(10.0),
+                                                                                                child: Image.network(
+                                                                                                  snapshot.data.toString(),
+                                                                                                  fit: BoxFit.cover,
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                          Center(
+                                                                                            child: Tooltip(
+                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                              child: SizedBox(
+                                                                                                height: 60,
+                                                                                                width: 60,
+                                                                                                child: TextButton(
+                                                                                                  onPressed: () {
+                                                                                                    setState(() {
+                                                                                                      fetchFileData(snapshot.data.toString());
+                                                                                                    });
+                                                                                                  },
+                                                                                                  child: Text(
+                                                                                                    materialsdata[index]['reference'],
+                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          )
+                                                                                        ],
+                                                                                      ),
+                                                                                    ],
+                                                                                  ),
+                                                                                );
+                                                                              });
+                                                                        } else if (materialsdata[index]['extension'] ==
+                                                                            'pdf') {
+                                                                          return FutureBuilder(
+                                                                              future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                              builder: (context, snapshot) {
+                                                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                  return Container(
+                                                                                      height: 60,
+                                                                                      width: 60,
+                                                                                      child: const Center(
+                                                                                          child: CircularProgressIndicator(
+                                                                                        strokeWidth: 2,
+                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                                                } else if (snapshot.hasError) {
+                                                                                  return Text('Error: ${snapshot.error}');
+                                                                                }
+                                                                                return Padding(
+                                                                                  padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                  child: Row(
+                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                    children: [
+                                                                                      Column(
+                                                                                        children: [
+                                                                                          InkWell(
+                                                                                            onTap: () {
+                                                                                              showDialog(
+                                                                                                  barrierDismissible: false,
+                                                                                                  context: context,
+                                                                                                  builder: (BuildContext context) {
+                                                                                                    var height = MediaQuery.of(context).size.height;
+                                                                                                    return AlertDialog(
+                                                                                                      shape: RoundedRectangleBorder(
+                                                                                                        borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                      ),
+                                                                                                      contentPadding: EdgeInsets.zero,
+                                                                                                      content: ClipRRect(
+                                                                                                        borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                        child: Container(
+                                                                                                          color: Colors.white, // Set the background color of the circular content
+
+                                                                                                          child: Stack(
+                                                                                                            children: <Widget>[
+                                                                                                              SizedBox(
+                                                                                                                height: height,
+                                                                                                                width: 900,
+                                                                                                                child: TermPage(pdfurl: snapshot.data.toString()),
+                                                                                                              ),
+                                                                                                              Positioned(
+                                                                                                                top: 10.0,
+                                                                                                                right: 10.0,
+                                                                                                                child: GestureDetector(
+                                                                                                                  onTap: () {
+                                                                                                                    Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                  },
+                                                                                                                  child: const Icon(
+                                                                                                                    Icons.close,
+                                                                                                                    color: Colors.red,
+                                                                                                                    size: 20,
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ],
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    );
+                                                                                                  });
+                                                                                            },
+                                                                                            child: Container(
+                                                                                              height: 60,
+                                                                                              width: 60,
+                                                                                              decoration: BoxDecoration(
+                                                                                                borderRadius: BorderRadius.circular(10),
+                                                                                                color: Colors.grey.shade200, // You can adjust the fit as needed.
+                                                                                              ),
+                                                                                              child: ClipRRect(
+                                                                                                borderRadius: BorderRadius.circular(10.0),
+                                                                                                child: const Icon(
+                                                                                                  Icons.picture_as_pdf,
+                                                                                                  size: 48,
+                                                                                                  color: Colors.red,
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                          Center(
+                                                                                            child: Tooltip(
+                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                              child: SizedBox(
+                                                                                                height: 60,
+                                                                                                width: 60,
+                                                                                                child: TextButton(
+                                                                                                  onPressed: () {
+                                                                                                    setState(() {
+                                                                                                      fetchFileData(snapshot.data.toString());
+                                                                                                    });
+                                                                                                  },
+                                                                                                  child: Text(
+                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          )
+                                                                                        ],
+                                                                                      ),
+                                                                                    ],
+                                                                                  ),
+                                                                                );
+                                                                              });
+                                                                        } else {
+                                                                          return FutureBuilder(
+                                                                              future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
+                                                                              builder: (context, snapshot) {
+                                                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                                                  return Container(
+                                                                                      height: 60,
+                                                                                      width: 60,
+                                                                                      child: const Center(
+                                                                                          child: CircularProgressIndicator(
+                                                                                        strokeWidth: 2,
+                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
+                                                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                                                } else if (snapshot.hasError) {
+                                                                                  return Text('Error: ${snapshot.error}');
+                                                                                }
+                                                                                return Padding(
+                                                                                  padding: const EdgeInsets.only(left: 10.0, right: 10),
+                                                                                  child: Row(
+                                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                                    children: [
+                                                                                      Column(
+                                                                                        children: [
+                                                                                          InkWell(
+                                                                                            onTap: () {
+                                                                                              showDialog(
+                                                                                                  barrierDismissible: false,
+                                                                                                  context: context,
+                                                                                                  builder: (BuildContext context) {
+                                                                                                    var height = MediaQuery.of(context).size.height;
+                                                                                                    return AlertDialog(
+                                                                                                      shape: RoundedRectangleBorder(
+                                                                                                        borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
+                                                                                                      ),
+                                                                                                      contentPadding: EdgeInsets.zero,
+                                                                                                      content: ClipRRect(
+                                                                                                        borderRadius: BorderRadius.circular(15.0), // Same radius as above
+                                                                                                        child: Container(
+                                                                                                          color: Colors.white, // Set the background color of the circular content
+
+                                                                                                          child: Stack(
+                                                                                                            children: <Widget>[
+                                                                                                              SizedBox(
+                                                                                                                height: height,
+                                                                                                                width: 900,
+                                                                                                                child: ViewFile(imageURL: snapshot.data.toString()),
+                                                                                                              ),
+                                                                                                              Positioned(
+                                                                                                                top: 10.0,
+                                                                                                                right: 10.0,
+                                                                                                                child: GestureDetector(
+                                                                                                                  onTap: () {
+                                                                                                                    Navigator.of(context).pop(false); // Close the dialog
+                                                                                                                  },
+                                                                                                                  child: const Icon(
+                                                                                                                    Icons.close,
+                                                                                                                    color: Colors.red,
+                                                                                                                    size: 20,
+                                                                                                                  ),
+                                                                                                                ),
+                                                                                                              ),
+                                                                                                            ],
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                    );
+                                                                                                  });
+                                                                                            },
+                                                                                            child: Container(
+                                                                                              height: 60,
+                                                                                              width: 60,
+                                                                                              decoration: BoxDecoration(
+                                                                                                borderRadius: BorderRadius.circular(10),
+                                                                                                color: Colors.grey.shade200, // You can adjust the fit as needed.
+                                                                                              ),
+                                                                                              child: ClipRRect(
+                                                                                                borderRadius: BorderRadius.circular(10.0),
+                                                                                                child: const Icon(
+                                                                                                  FontAwesomeIcons.fileWord,
+                                                                                                  size: 48,
+                                                                                                  color: Colors.blue,
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                          Center(
+                                                                                            child: Tooltip(
+                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                              child: SizedBox(
+                                                                                                height: 60,
+                                                                                                width: 60,
+                                                                                                child: TextButton(
+                                                                                                  onPressed: () {
+                                                                                                    setState(() {
+                                                                                                      fetchFileData(snapshot.data.toString());
+                                                                                                    });
+                                                                                                  },
+                                                                                                  child: Text(
+                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                    style: const TextStyle(fontSize: 12.0, color: kColorGrey, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          )
+                                                                                        ],
+                                                                                      ),
+                                                                                    ],
+                                                                                  ),
+                                                                                );
+                                                                              });
+                                                                        }
+                                                                        // return Text(materialsdata[index]['reference']);
                                                                       },
                                                                     ),
-                                                                    Expanded(
-                                                                      child: ListView
-                                                                          .builder(
-                                                                        shrinkWrap:
-                                                                            true,
-                                                                        controller:
-                                                                            updatescrollController1, // Assign the ScrollController to the ListView
-                                                                        scrollDirection:
-                                                                            Axis.horizontal,
-                                                                        itemCount:
-                                                                            materialsdata.length,
-                                                                        itemBuilder:
-                                                                            (context,
-                                                                                index) {
-                                                                          if (materialsdata[index]['extension'] ==
-                                                                              'Image') {
-                                                                            return FutureBuilder(
-                                                                                future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
-                                                                                builder: (context, snapshot) {
-                                                                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                    return Container(
-                                                                                        height: 60,
-                                                                                        width: 60,
-                                                                                        child: const Center(
-                                                                                            child: CircularProgressIndicator(
-                                                                                          strokeWidth: 2,
-                                                                                          color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                        ))); // Display a loading indicator while waiting for the file to download
-                                                                                  } else if (snapshot.hasError) {
-                                                                                    return Text('Error: ${snapshot.error}');
-                                                                                  }
-
-                                                                                  return Padding(
-                                                                                    padding: const EdgeInsets.only(left: 10.0, right: 10),
-                                                                                    child: Row(
-                                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                      children: [
-                                                                                        Column(
-                                                                                          children: [
-                                                                                            InkWell(
-                                                                                              onTap: () {
-                                                                                                showDialog(
-                                                                                                    barrierDismissible: false,
-                                                                                                    context: context,
-                                                                                                    builder: (BuildContext context) {
-                                                                                                      var height = MediaQuery.of(context).size.height;
-                                                                                                      return AlertDialog(
-                                                                                                        shape: RoundedRectangleBorder(
-                                                                                                          borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
-                                                                                                        ),
-                                                                                                        contentPadding: EdgeInsets.zero,
-                                                                                                        content: ClipRRect(
-                                                                                                          borderRadius: BorderRadius.circular(15.0), // Same radius as above
-                                                                                                          child: Container(
-                                                                                                            color: Colors.white, // Set the background color of the circular content
-
-                                                                                                            child: Stack(
-                                                                                                              children: <Widget>[
-                                                                                                                SizedBox(
-                                                                                                                  height: height,
-                                                                                                                  width: 900,
-                                                                                                                  child: ViewFile(imageURL: snapshot.data.toString()),
-                                                                                                                ),
-                                                                                                                Positioned(
-                                                                                                                  top: 10.0,
-                                                                                                                  right: 10.0,
-                                                                                                                  child: GestureDetector(
-                                                                                                                    onTap: () {
-                                                                                                                      Navigator.of(context).pop(false); // Close the dialog
-                                                                                                                    },
-                                                                                                                    child: const Icon(
-                                                                                                                      Icons.close,
-                                                                                                                      color: Colors.red,
-                                                                                                                      size: 20,
-                                                                                                                    ),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              ],
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                      );
-                                                                                                    });
-                                                                                              },
-                                                                                              child: Container(
-                                                                                                height: 60,
-                                                                                                width: 60,
-                                                                                                decoration: BoxDecoration(
-                                                                                                  borderRadius: BorderRadius.circular(10),
-                                                                                                  color: Colors.grey.shade200,
-                                                                                                ),
-                                                                                                child: ClipRRect(
-                                                                                                  borderRadius: BorderRadius.circular(10.0),
-                                                                                                  child: Image.network(
-                                                                                                    snapshot.data.toString(),
-                                                                                                    fit: BoxFit.cover,
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ),
-                                                                                            ),
-                                                                                            Center(
-                                                                                              child: Tooltip(
-                                                                                                message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                child: SizedBox(
-                                                                                                  height: 60,
-                                                                                                  width: 60,
-                                                                                                  child: TextButton(
-                                                                                                    onPressed: () {
-                                                                                                      setState(() {
-                                                                                                        fetchFileData(snapshot.data.toString());
-                                                                                                      });
-                                                                                                    },
-                                                                                                    child: Text(
-                                                                                                      getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                      style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
-                                                                                                    ),
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ),
-                                                                                            )
-                                                                                          ],
-                                                                                        ),
-                                                                                      ],
-                                                                                    ),
-                                                                                  );
-                                                                                });
-                                                                          } else if (materialsdata[index]['extension'] ==
-                                                                              'pdf') {
-                                                                            return FutureBuilder(
-                                                                                future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
-                                                                                builder: (context, snapshot) {
-                                                                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                    return Container(
-                                                                                        height: 60,
-                                                                                        width: 60,
-                                                                                        child: const Center(
-                                                                                            child: CircularProgressIndicator(
-                                                                                          strokeWidth: 2,
-                                                                                          color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                        ))); // Display a loading indicator while waiting for the file to download
-                                                                                  } else if (snapshot.hasError) {
-                                                                                    return Text('Error: ${snapshot.error}');
-                                                                                  }
-                                                                                  return Padding(
-                                                                                    padding: const EdgeInsets.only(left: 10.0, right: 10),
-                                                                                    child: Row(
-                                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                      children: [
-                                                                                        Column(
-                                                                                          children: [
-                                                                                            InkWell(
-                                                                                              onTap: () {
-                                                                                                showDialog(
-                                                                                                    barrierDismissible: false,
-                                                                                                    context: context,
-                                                                                                    builder: (BuildContext context) {
-                                                                                                      var height = MediaQuery.of(context).size.height;
-                                                                                                      return AlertDialog(
-                                                                                                        shape: RoundedRectangleBorder(
-                                                                                                          borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
-                                                                                                        ),
-                                                                                                        contentPadding: EdgeInsets.zero,
-                                                                                                        content: ClipRRect(
-                                                                                                          borderRadius: BorderRadius.circular(15.0), // Same radius as above
-                                                                                                          child: Container(
-                                                                                                            color: Colors.white, // Set the background color of the circular content
-
-                                                                                                            child: Stack(
-                                                                                                              children: <Widget>[
-                                                                                                                SizedBox(
-                                                                                                                  height: height,
-                                                                                                                  width: 900,
-                                                                                                                  child: TermPage(pdfurl: snapshot.data.toString()),
-                                                                                                                ),
-                                                                                                                Positioned(
-                                                                                                                  top: 10.0,
-                                                                                                                  right: 10.0,
-                                                                                                                  child: GestureDetector(
-                                                                                                                    onTap: () {
-                                                                                                                      Navigator.of(context).pop(false); // Close the dialog
-                                                                                                                    },
-                                                                                                                    child: const Icon(
-                                                                                                                      Icons.close,
-                                                                                                                      color: Colors.red,
-                                                                                                                      size: 20,
-                                                                                                                    ),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              ],
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                      );
-                                                                                                    });
-                                                                                              },
-                                                                                              child: Container(
-                                                                                                height: 60,
-                                                                                                width: 60,
-                                                                                                decoration: BoxDecoration(
-                                                                                                  borderRadius: BorderRadius.circular(10),
-                                                                                                  color: Colors.grey.shade200, // You can adjust the fit as needed.
-                                                                                                ),
-                                                                                                child: ClipRRect(
-                                                                                                  borderRadius: BorderRadius.circular(10.0),
-                                                                                                  child: const Icon(
-                                                                                                    Icons.picture_as_pdf,
-                                                                                                    size: 48,
-                                                                                                    color: Colors.red,
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ),
-                                                                                            ),
-                                                                                            Center(
-                                                                                              child: Tooltip(
-                                                                                                message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                child: SizedBox(
-                                                                                                  height: 60,
-                                                                                                  width: 60,
-                                                                                                  child: TextButton(
-                                                                                                    onPressed: () {
-                                                                                                      setState(() {
-                                                                                                        fetchFileData(snapshot.data.toString());
-                                                                                                      });
-                                                                                                    },
-                                                                                                    child: Text(
-                                                                                                      getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                      style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
-                                                                                                    ),
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ),
-                                                                                            )
-                                                                                          ],
-                                                                                        ),
-                                                                                      ],
-                                                                                    ),
-                                                                                  );
-                                                                                });
-                                                                          } else {
-                                                                            return FutureBuilder(
-                                                                                future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
-                                                                                builder: (context, snapshot) {
-                                                                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                    return Container(
-                                                                                        height: 60,
-                                                                                        width: 60,
-                                                                                        child: const Center(
-                                                                                            child: CircularProgressIndicator(
-                                                                                          strokeWidth: 2,
-                                                                                          color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                        ))); // Display a loading indicator while waiting for the file to download
-                                                                                  } else if (snapshot.hasError) {
-                                                                                    return Text('Error: ${snapshot.error}');
-                                                                                  }
-                                                                                  return Padding(
-                                                                                    padding: const EdgeInsets.only(left: 10.0, right: 10),
-                                                                                    child: Row(
-                                                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                                      children: [
-                                                                                        Column(
-                                                                                          children: [
-                                                                                            InkWell(
-                                                                                              onTap: () {
-                                                                                                showDialog(
-                                                                                                    barrierDismissible: false,
-                                                                                                    context: context,
-                                                                                                    builder: (BuildContext context) {
-                                                                                                      var height = MediaQuery.of(context).size.height;
-                                                                                                      return AlertDialog(
-                                                                                                        shape: RoundedRectangleBorder(
-                                                                                                          borderRadius: BorderRadius.circular(15.0), // Adjust the radius as needed
-                                                                                                        ),
-                                                                                                        contentPadding: EdgeInsets.zero,
-                                                                                                        content: ClipRRect(
-                                                                                                          borderRadius: BorderRadius.circular(15.0), // Same radius as above
-                                                                                                          child: Container(
-                                                                                                            color: Colors.white, // Set the background color of the circular content
-
-                                                                                                            child: Stack(
-                                                                                                              children: <Widget>[
-                                                                                                                SizedBox(
-                                                                                                                  height: height,
-                                                                                                                  width: 900,
-                                                                                                                  child: ViewFile(imageURL: snapshot.data.toString()),
-                                                                                                                ),
-                                                                                                                Positioned(
-                                                                                                                  top: 10.0,
-                                                                                                                  right: 10.0,
-                                                                                                                  child: GestureDetector(
-                                                                                                                    onTap: () {
-                                                                                                                      Navigator.of(context).pop(false); // Close the dialog
-                                                                                                                    },
-                                                                                                                    child: const Icon(
-                                                                                                                      Icons.close,
-                                                                                                                      color: Colors.red,
-                                                                                                                      size: 20,
-                                                                                                                    ),
-                                                                                                                  ),
-                                                                                                                ),
-                                                                                                              ],
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                      );
-                                                                                                    });
-                                                                                              },
-                                                                                              child: Container(
-                                                                                                height: 60,
-                                                                                                width: 60,
-                                                                                                decoration: BoxDecoration(
-                                                                                                  borderRadius: BorderRadius.circular(10),
-                                                                                                  color: Colors.grey.shade200, // You can adjust the fit as needed.
-                                                                                                ),
-                                                                                                child: ClipRRect(
-                                                                                                  borderRadius: BorderRadius.circular(10.0),
-                                                                                                  child: const Icon(
-                                                                                                    FontAwesomeIcons.fileWord,
-                                                                                                    size: 48,
-                                                                                                    color: Colors.blue,
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ),
-                                                                                            ),
-                                                                                            Center(
-                                                                                              child: Tooltip(
-                                                                                                message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                child: SizedBox(
-                                                                                                  height: 60,
-                                                                                                  width: 60,
-                                                                                                  child: TextButton(
-                                                                                                    onPressed: () {
-                                                                                                      setState(() {
-                                                                                                        fetchFileData(snapshot.data.toString());
-                                                                                                      });
-                                                                                                    },
-                                                                                                    child: Text(
-                                                                                                      getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                      style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
-                                                                                                    ),
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ),
-                                                                                            )
-                                                                                          ],
-                                                                                        ),
-                                                                                      ],
-                                                                                    ),
-                                                                                  );
-                                                                                });
-                                                                          }
-                                                                        },
-                                                                      ),
+                                                                  ),
+                                                                  IconButton(
+                                                                    iconSize:
+                                                                        12,
+                                                                    padding:
+                                                                        EdgeInsets
+                                                                            .zero,
+                                                                    splashRadius:
+                                                                        1,
+                                                                    icon:
+                                                                        const Icon(
+                                                                      Icons
+                                                                          .arrow_forward_ios, // Right arrow icon
+                                                                      color: Colors
+                                                                          .blue,
                                                                     ),
-                                                                    IconButton(
-                                                                      iconSize:
-                                                                          12,
-                                                                      padding:
-                                                                          EdgeInsets
-                                                                              .zero,
-                                                                      splashRadius:
-                                                                          1,
-                                                                      icon:
-                                                                          const Icon(
-                                                                        Icons
-                                                                            .arrow_forward_ios, // Right arrow icon
-                                                                        color: Colors
-                                                                            .blue,
-                                                                      ),
-                                                                      onPressed:
-                                                                          () {
-                                                                        // Scroll to the right
-                                                                        updatescrollController1
-                                                                            .animateTo(
-                                                                          updatescrollController1.offset +
-                                                                              100.0, // Adjust the value as needed
-                                                                          duration:
-                                                                              const Duration(milliseconds: 500), // Adjust the duration as needed
-                                                                          curve:
-                                                                              Curves.ease,
-                                                                        );
-                                                                      },
-                                                                    ),
-                                                                  ],
-                                                                )),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    });
+                                                                    onPressed:
+                                                                        () {
+                                                                      // Scroll to the right
+                                                                      updatescrollController1
+                                                                          .animateTo(
+                                                                        updatescrollController1.offset +
+                                                                            100.0, // Adjust the value as needed
+                                                                        duration:
+                                                                            const Duration(milliseconds: 500), // Adjust the duration as needed
+                                                                        curve: Curves
+                                                                            .ease,
+                                                                      );
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              )),
+                                                        ],
+                                                      ),
+                                                    );
                                                   }),
+                                                  // }),
                                                   const Spacer(),
                                                   Text(
                                                     'Class Link',
@@ -3234,34 +3147,25 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                 right: 0,
                                                                 bottom: 0,
                                                                 top: 0),
-                                                        child: Row(
-                                                          children: [
-                                                            SizedBox(
-                                                              width: 55,
-                                                              child: Tooltip(
-                                                                message: index
-                                                                    .toString(),
-                                                                child: Text(
-                                                                  time.minute ==
-                                                                          0
-                                                                      ? timeText
-                                                                      : time.minute % 15 ==
-                                                                              0
-                                                                          ? timeText
-                                                                          : '',
-                                                                  textAlign: time
-                                                                              .minute ==
-                                                                          0
-                                                                      ? TextAlign
-                                                                          .start
-                                                                      : TextAlign
-                                                                          .center,
-                                                                  style:
-                                                                      textStyle,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
+                                                        child: SizedBox(
+                                                          width: 55,
+                                                          height: 12,
+                                                          child: Text(
+                                                            time.minute == 0
+                                                                ? timeText
+                                                                : time.minute %
+                                                                            15 ==
+                                                                        0
+                                                                    ? timeText
+                                                                    : '',
+                                                            textAlign:
+                                                                time.minute == 0
+                                                                    ? TextAlign
+                                                                        .start
+                                                                    : TextAlign
+                                                                        .center,
+                                                            style: textStyle,
+                                                          ),
                                                         ),
                                                       );
                                                     },
@@ -3475,34 +3379,50 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                           return Row(
                                                             children: [
                                                               InkWell(
-                                                                onTap:
-                                                                    isSelectable
-                                                                        ? () {
-                                                                            setState(() {
-                                                                              for (var booking in filteredSchedules) {
-                                                                                String from24Hour = convertTo24HourFormat(booking.timefrom);
-                                                                                final timeFrom = TimeOfDay(
-                                                                                  hour: int.parse(from24Hour.split(':')[0]),
-                                                                                  minute: (int.parse(from24Hour.split(':')[1].split(' ')[0]) + 4) ~/ 5 * 5,
-                                                                                );
-                                                                                if (timeFrom.hour == time.hour && timeFrom.minute == time.minute) {
-                                                                                  selectedbooking = booking;
-                                                                                  final materialNotifier = Provider.of<MaterialNotifier>(context, listen: false);
-                                                                                  materialNotifier.getMaterials(selectedbooking!.classID);
-                                                                                  break;
-                                                                                }
-                                                                              }
-                                                                            });
-                                                                          }
-                                                                        : null,
-                                                                onHover:
-                                                                    (isHovered) {
+                                                                onTap: () {
                                                                   setState(() {
-                                                                    this.isHovered[
-                                                                            bookingIndex] =
-                                                                        isHovered;
+                                                                    for (var booking
+                                                                        in filteredSchedules) {
+                                                                      String
+                                                                          from24Hour =
+                                                                          convertTo24HourFormat(
+                                                                              booking.timefrom);
+                                                                      final timeFrom =
+                                                                          TimeOfDay(
+                                                                        hour: int.parse(
+                                                                            from24Hour.split(':')[0]),
+                                                                        minute: (int.parse(from24Hour.split(':')[1].split(' ')[0]) +
+                                                                                4) ~/
+                                                                            5 *
+                                                                            5,
+                                                                      );
+                                                                      if (timeFrom.hour ==
+                                                                              time
+                                                                                  .hour &&
+                                                                          timeFrom.minute ==
+                                                                              time.minute) {
+                                                                        selectedbooking =
+                                                                            booking;
+                                                                        final materialNotifier = Provider.of<MaterialNotifier>(
+                                                                            context,
+                                                                            listen:
+                                                                                false);
+                                                                        materialNotifier
+                                                                            .getMaterials(selectedbooking!.classID);
+                                                                        break;
+                                                                      }
+                                                                    }
                                                                   });
                                                                 },
+                                                                // onHover:
+                                                                //     (isHovered) {
+                                                                //   setState(
+                                                                //       () {
+                                                                //     this.isHovered[
+                                                                //             bookingIndex] =
+                                                                //         isHovered;
+                                                                //   });
+                                                                // },
                                                                 child: Tooltip(
                                                                   message: currentbooking
                                                                               .type ==
@@ -3539,15 +3459,15 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                                 'blocked'
                                                                             ? calendarRed
                                                                             : kSecondarybuttonblue,
-                                                                        border:
-                                                                            Border.all(
-                                                                          color: isHovered[bookingIndex]
-                                                                              ? kColorPrimary
-                                                                              : Colors.yellow,
-                                                                          width: isHovered[bookingIndex]
-                                                                              ? 3
-                                                                              : 1,
-                                                                        ),
+                                                                        // border:
+                                                                        //     Border.all(
+                                                                        //   color: isHovered[bookingIndex]
+                                                                        //       ? kColorPrimary
+                                                                        //       : Colors.yellow,
+                                                                        //   width: isHovered[bookingIndex]
+                                                                        //       ? 3
+                                                                        //       : 1,
+                                                                        // ),
                                                                       ),
                                                                       child:
                                                                           Column(
@@ -3632,16 +3552,6 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                     time.minute) {
                                                               selectedbookingdata =
                                                                   booking;
-                                                              // final materialNotifier =
-                                                              //     Provider.of<
-                                                              //             MaterialNotifier>(
-                                                              //         context,
-                                                              //         listen:
-                                                              //             false);
-                                                              // materialNotifier
-                                                              //     .getMaterials(
-                                                              //         selectedbooking!
-                                                              //             .classID);
                                                               break;
                                                             }
                                                           }
@@ -3686,20 +3596,42 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                   5 *
                                                                   5,
                                                             );
-                                                            int totalMinutes = (timeTo
-                                                                            .hour -
-                                                                        timeFrom
-                                                                            .hour) *
-                                                                    60 +
-                                                                (timeTo.minute -
+                                                            DateTime now =
+                                                                DateTime.now();
+                                                            DateTime
+                                                                startDateTime =
+                                                                DateTime(
+                                                                    now.year,
+                                                                    now.month,
+                                                                    now.day,
+                                                                    timeFrom
+                                                                        .hour,
                                                                     timeFrom
                                                                         .minute);
+                                                            DateTime
+                                                                endDateTime =
+                                                                DateTime(
+                                                                    now.year,
+                                                                    now.month,
+                                                                    now.day,
+                                                                    timeTo.hour,
+                                                                    timeTo
+                                                                        .minute);
 
+                                                            // Subtract the DateTime objects
+                                                            Duration
+                                                                difference =
+                                                                endDateTime
+                                                                    .difference(
+                                                                        startDateTime);
+                                                            int totalMinutes =
+                                                                difference
+                                                                    .inMinutes;
                                                             // Calculate how many 5-minute intervals are there
                                                             intervals =
                                                                 (totalMinutes /
                                                                         5)
-                                                                    .floor();
+                                                                    .round();
                                                             return (time.hour ==
                                                                     timeFrom
                                                                         .hour &&
@@ -3710,34 +3642,50 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                           return Row(
                                                             children: [
                                                               InkWell(
-                                                                onTap:
-                                                                    isSelectable
-                                                                        ? () {
-                                                                            setState(() {
-                                                                              for (var booking in filteredSchedules) {
-                                                                                String from24Hour = convertTo24HourFormat(booking.timefrom);
-                                                                                final timeFrom = TimeOfDay(
-                                                                                  hour: int.parse(from24Hour.split(':')[0]),
-                                                                                  minute: (int.parse(from24Hour.split(':')[1].split(' ')[0]) + 4) ~/ 5 * 5,
-                                                                                );
-                                                                                if (timeFrom.hour == time.hour && timeFrom.minute == time.minute) {
-                                                                                  selectedbooking = booking;
-                                                                                  final materialNotifier = Provider.of<MaterialNotifier>(context, listen: false);
-                                                                                  materialNotifier.getMaterials(selectedbooking!.classID);
-                                                                                  break;
-                                                                                }
-                                                                              }
-                                                                            });
-                                                                          }
-                                                                        : null,
-                                                                onHover:
-                                                                    (isHovered) {
+                                                                onTap: () {
                                                                   setState(() {
-                                                                    this.isHovered[
-                                                                            bookingIndex] =
-                                                                        isHovered;
+                                                                    for (var booking
+                                                                        in filteredSchedules) {
+                                                                      String
+                                                                          from24Hour =
+                                                                          convertTo24HourFormat(
+                                                                              booking.timefrom);
+                                                                      final timeFrom =
+                                                                          TimeOfDay(
+                                                                        hour: int.parse(
+                                                                            from24Hour.split(':')[0]),
+                                                                        minute: (int.parse(from24Hour.split(':')[1].split(' ')[0]) +
+                                                                                4) ~/
+                                                                            5 *
+                                                                            5,
+                                                                      );
+                                                                      if (timeFrom.hour ==
+                                                                              time
+                                                                                  .hour &&
+                                                                          timeFrom.minute ==
+                                                                              time.minute) {
+                                                                        selectedbooking =
+                                                                            booking;
+                                                                        final materialNotifier = Provider.of<MaterialNotifier>(
+                                                                            context,
+                                                                            listen:
+                                                                                false);
+                                                                        materialNotifier
+                                                                            .getMaterials(selectedbooking!.classID);
+                                                                        break;
+                                                                      }
+                                                                    }
                                                                   });
                                                                 },
+                                                                // onHover:
+                                                                //     (isHovered) {
+                                                                //   setState(
+                                                                //       () {
+                                                                //     this.isHovered[
+                                                                //             bookingIndex] =
+                                                                //         isHovered;
+                                                                //   });
+                                                                // },
                                                                 child: Tooltip(
                                                                   message: currentbooking
                                                                               .type ==
@@ -3764,7 +3712,7 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                       height: currentbooking.type ==
                                                                               'blocked'
                                                                           ? intervals *
-                                                                              13
+                                                                              12
                                                                           : 132,
                                                                       decoration:
                                                                           BoxDecoration(
@@ -3772,15 +3720,15 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                                 'blocked'
                                                                             ? calendarRed
                                                                             : kColorSecondary,
-                                                                        border:
-                                                                            Border.all(
-                                                                          color: isHovered[bookingIndex]
-                                                                              ? kColorPrimary
-                                                                              : Colors.yellow,
-                                                                          width: isHovered[bookingIndex]
-                                                                              ? 3
-                                                                              : 1,
-                                                                        ),
+                                                                        // border:
+                                                                        //     Border.all(
+                                                                        //   color: isHovered[bookingIndex]
+                                                                        //       ? kColorPrimary
+                                                                        //       : Colors.yellow,
+                                                                        //   width: isHovered[bookingIndex]
+                                                                        //       ? 3
+                                                                        //       : 1,
+                                                                        // ),
                                                                       ),
                                                                       child:
                                                                           Column(
@@ -3818,63 +3766,42 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                     }
                                                     return Row(
                                                       children: [
-                                                        // SizedBox(
-                                                        //   width: 55,
-                                                        //   child: Tooltip(
-                                                        //     message: index.toString(),
-                                                        //     child: Text(
-                                                        //       time.minute == 0
-                                                        //           ? timeText
-                                                        //           : timeText,
-                                                        //       textAlign: time
-                                                        //                   .minute ==
-                                                        //               0
-                                                        //           ? TextAlign.start
-                                                        //           : TextAlign.center,
-                                                        //       style: textStyle,
-                                                        //     ),
-                                                        //   ),
-                                                        // ),
                                                         InkWell(
                                                           onTap: isSelectable
                                                               ? () {}
                                                               : null,
-                                                          child: Tooltip(
-                                                            message: isSelectable
-                                                                ? 'Available'
-                                                                : 'Not Available',
-                                                            child: Container(
-                                                              width: ResponsiveBuilder
-                                                                      .isDesktop(
-                                                                          context)
-                                                                  ? size.width -
-                                                                      780
-                                                                  : ResponsiveBuilder.isTablet(
-                                                                          context)
-                                                                      ? size.width -
-                                                                          510
-                                                                      : size.width -
-                                                                          210,
-                                                              height:
-                                                                  indexSelect ==
-                                                                          index
-                                                                      ? 200
-                                                                      : 12,
-                                                              color: isSelectable
-                                                                  ? indexSelect == index
-                                                                      ? Colors.blue
-                                                                      : Colors.green[50]
-                                                                  : Colors.grey[100],
-                                                              child: time.minute ==
-                                                                      0
-                                                                  ? const Center(
-                                                                      child:
-                                                                          Divider(
-                                                                      thickness:
-                                                                          .1,
-                                                                    ))
-                                                                  : null,
-                                                            ),
+                                                          child: Container(
+                                                            width: ResponsiveBuilder
+                                                                    .isDesktop(
+                                                                        context)
+                                                                ? size.width -
+                                                                    780
+                                                                : ResponsiveBuilder
+                                                                        .isTablet(
+                                                                            context)
+                                                                    ? size.width -
+                                                                        510
+                                                                    : size.width -
+                                                                        210,
+                                                            height: 12,
+                                                            color: isSelectable
+                                                                ? indexSelect ==
+                                                                        index
+                                                                    ? Colors
+                                                                        .blue
+                                                                    : Colors.green[
+                                                                        50]
+                                                                : Colors
+                                                                    .grey[100],
+                                                            child: time.minute ==
+                                                                    0
+                                                                ? const Center(
+                                                                    child:
+                                                                        Divider(
+                                                                    thickness:
+                                                                        .1,
+                                                                  ))
+                                                                : null,
                                                           ),
                                                         ),
                                                       ],
@@ -3966,16 +3893,11 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                     height: 150.0,
                                                     fit: BoxFit.fill,
                                                   ),
-                                                  Text(
+                                                  const Text(
                                                     "Select a schedule",
                                                     textAlign: TextAlign.left,
                                                     style: TextStyle(
-                                                        fontSize:
-                                                            ResponsiveBuilder
-                                                                    .isDesktop(
-                                                                        context)
-                                                                ? 18
-                                                                : 16,
+                                                        fontSize: 18,
                                                         fontWeight:
                                                             FontWeight.w600,
                                                         color: Colors.red),
@@ -4019,11 +3941,8 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                 Text(
                                                   '${selectedbooking!.studentinfo!.studentFirstname} ${selectedbooking!.studentinfo!.studentLastname}',
                                                   textAlign: TextAlign.left,
-                                                  style: TextStyle(
-                                                    fontSize: ResponsiveBuilder
-                                                            .isDesktop(context)
-                                                        ? 18
-                                                        : 16,
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
                                                     fontWeight: FontWeight.w800,
                                                     color: kColorGrey,
                                                   ),
@@ -4032,12 +3951,9 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                   selectedbooking!
                                                       .studentinfo!.studentID,
                                                   textAlign: TextAlign.left,
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
                                                     color: kColorGrey,
-                                                    fontSize: ResponsiveBuilder
-                                                            .isDesktop(context)
-                                                        ? 16
-                                                        : 14,
                                                     fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
@@ -4045,24 +3961,18 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                   selectedbooking!
                                                       .subjectinfo!.subjectName,
                                                   textAlign: TextAlign.left,
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
                                                     color: kColorGrey,
-                                                    fontSize: ResponsiveBuilder
-                                                            .isDesktop(context)
-                                                        ? 16
-                                                        : 14,
                                                     fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
                                                 Text(
                                                   'Class ${selectedbooking!.session}',
                                                   textAlign: TextAlign.left,
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
                                                     color: kColorGrey,
-                                                    fontSize: ResponsiveBuilder
-                                                            .isDesktop(context)
-                                                        ? 18
-                                                        : 16,
                                                     fontWeight: FontWeight.w700,
                                                   ),
                                                 ),
@@ -4087,7 +3997,7 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                       .isEmpty) {
                                                     return Center(
                                                       child: Text(
-                                                        '(Link will be attached when student set class schedule!)',
+                                                        '(No materials added!)',
                                                         style: TextStyle(
                                                             overflow:
                                                                 TextOverflow
@@ -4137,16 +4047,15 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                           materialNotifier, _) {
                                                     if (materialNotifier
                                                         .materials.isEmpty) {
-                                                      return SizedBox(
+                                                      return const SizedBox(
                                                         width: 600,
                                                         child: Center(
                                                           child: Text(
                                                             '(No materials added!)',
                                                             style: TextStyle(
                                                                 fontSize: 15,
-                                                                color: Colors
-                                                                    .blue
-                                                                    .shade200,
+                                                                color:
+                                                                    kColorGrey,
                                                                 fontStyle:
                                                                     FontStyle
                                                                         .italic),
@@ -4249,14 +4158,7 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                               future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
                                                                               builder: (context, snapshot) {
                                                                                 if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                  return Container(
-                                                                                      height: 60,
-                                                                                      width: 60,
-                                                                                      child: const Center(
-                                                                                          child: CircularProgressIndicator(
-                                                                                        strokeWidth: 2,
-                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                                                  return Container(height: 60, width: 60, alignment: Alignment.center, child: const Text('Loading..'));
                                                                                 } else if (snapshot.hasError) {
                                                                                   return Text('Error: ${snapshot.error}');
                                                                                 }
@@ -4330,23 +4232,40 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                                             ),
                                                                                           ),
                                                                                           Center(
-                                                                                            child: Tooltip(
-                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                              child: SizedBox(
-                                                                                                height: 60,
-                                                                                                width: 60,
-                                                                                                child: TextButton(
-                                                                                                  onPressed: () {
-                                                                                                    setState(() {
-                                                                                                      fetchFileData(snapshot.data.toString());
-                                                                                                    });
-                                                                                                  },
-                                                                                                  child: Text(
-                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                            child: Row(
+                                                                                              children: [
+                                                                                                Tooltip(
+                                                                                                  message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                  child: SizedBox(
+                                                                                                    height: 60,
+                                                                                                    width: 60,
+                                                                                                    child: TextButton(
+                                                                                                      onPressed: () {
+                                                                                                        // setState(() {
+                                                                                                        //   fetchFileData(snapshot.data.toString());
+                                                                                                        // });
+                                                                                                      },
+                                                                                                      child: Text(
+                                                                                                        getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                        style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                      ),
+                                                                                                    ),
                                                                                                   ),
                                                                                                 ),
-                                                                                              ),
+                                                                                                InkWell(
+                                                                                                  onTap: () {
+                                                                                                    fetchFileData(snapshot.data.toString());
+                                                                                                  },
+                                                                                                  child: const Tooltip(
+                                                                                                    message: 'Download',
+                                                                                                    child: Icon(
+                                                                                                      Icons.file_download_outlined,
+                                                                                                      color: kColorPrimary,
+                                                                                                      size: 15,
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ],
                                                                                             ),
                                                                                           )
                                                                                         ],
@@ -4361,14 +4280,7 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                               future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
                                                                               builder: (context, snapshot) {
                                                                                 if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                  return Container(
-                                                                                      height: 60,
-                                                                                      width: 60,
-                                                                                      child: const Center(
-                                                                                          child: CircularProgressIndicator(
-                                                                                        strokeWidth: 2,
-                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                                                  return Container(height: 60, width: 60, alignment: Alignment.center, child: const Text('Loading..'));
                                                                                 } else if (snapshot.hasError) {
                                                                                   return Text('Error: ${snapshot.error}');
                                                                                 }
@@ -4442,23 +4354,40 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                                             ),
                                                                                           ),
                                                                                           Center(
-                                                                                            child: Tooltip(
-                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                              child: SizedBox(
-                                                                                                height: 60,
-                                                                                                width: 60,
-                                                                                                child: TextButton(
-                                                                                                  onPressed: () {
-                                                                                                    setState(() {
-                                                                                                      fetchFileData(snapshot.data.toString());
-                                                                                                    });
-                                                                                                  },
-                                                                                                  child: Text(
-                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                            child: Row(
+                                                                                              children: [
+                                                                                                Tooltip(
+                                                                                                  message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                  child: SizedBox(
+                                                                                                    height: 60,
+                                                                                                    width: 60,
+                                                                                                    child: TextButton(
+                                                                                                      onPressed: () {
+                                                                                                        // setState(() {
+                                                                                                        //   fetchFileData(snapshot.data.toString());
+                                                                                                        // });
+                                                                                                      },
+                                                                                                      child: Text(
+                                                                                                        getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                        style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                      ),
+                                                                                                    ),
                                                                                                   ),
                                                                                                 ),
-                                                                                              ),
+                                                                                                InkWell(
+                                                                                                  onTap: () {
+                                                                                                    fetchFileData(snapshot.data.toString());
+                                                                                                  },
+                                                                                                  child: const Tooltip(
+                                                                                                    message: 'Download',
+                                                                                                    child: Icon(
+                                                                                                      Icons.file_download_outlined,
+                                                                                                      color: kColorPrimary,
+                                                                                                      size: 15,
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ],
                                                                                             ),
                                                                                           )
                                                                                         ],
@@ -4472,14 +4401,7 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                               future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
                                                                               builder: (context, snapshot) {
                                                                                 if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                  return Container(
-                                                                                      height: 60,
-                                                                                      width: 60,
-                                                                                      child: const Center(
-                                                                                          child: CircularProgressIndicator(
-                                                                                        strokeWidth: 2,
-                                                                                        color: Color.fromRGBO(1, 118, 132, 1),
-                                                                                      ))); // Display a loading indicator while waiting for the file to download
+                                                                                  return Container(height: 60, width: 60, alignment: Alignment.center, child: const Text('Loading..'));
                                                                                 } else if (snapshot.hasError) {
                                                                                   return Text('Error: ${snapshot.error}');
                                                                                 }
@@ -4553,23 +4475,40 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                                             ),
                                                                                           ),
                                                                                           Center(
-                                                                                            child: Tooltip(
-                                                                                              message: getFileNameFromUrl(snapshot.data.toString()),
-                                                                                              child: SizedBox(
-                                                                                                height: 60,
-                                                                                                width: 60,
-                                                                                                child: TextButton(
-                                                                                                  onPressed: () {
-                                                                                                    setState(() {
-                                                                                                      fetchFileData(snapshot.data.toString());
-                                                                                                    });
-                                                                                                  },
-                                                                                                  child: Text(
-                                                                                                    getFileNameFromUrl(snapshot.data.toString()),
-                                                                                                    style: const TextStyle(fontSize: 12.0, color: Colors.black54, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                            child: Row(
+                                                                                              children: [
+                                                                                                Tooltip(
+                                                                                                  message: getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                  child: SizedBox(
+                                                                                                    height: 60,
+                                                                                                    width: 60,
+                                                                                                    child: TextButton(
+                                                                                                      onPressed: () {
+                                                                                                        // setState(() {
+                                                                                                        //   fetchFileData(snapshot.data.toString());
+                                                                                                        // });
+                                                                                                      },
+                                                                                                      child: Text(
+                                                                                                        getFileNameFromUrl(snapshot.data.toString()),
+                                                                                                        style: const TextStyle(fontSize: 12.0, color: kColorGrey, decoration: TextDecoration.underline, overflow: TextOverflow.ellipsis),
+                                                                                                      ),
+                                                                                                    ),
                                                                                                   ),
                                                                                                 ),
-                                                                                              ),
+                                                                                                InkWell(
+                                                                                                  onTap: () {
+                                                                                                    fetchFileData(snapshot.data.toString());
+                                                                                                  },
+                                                                                                  child: const Tooltip(
+                                                                                                    message: 'Download',
+                                                                                                    child: Icon(
+                                                                                                      Icons.file_download_outlined,
+                                                                                                      color: kColorPrimary,
+                                                                                                      size: 15,
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                ),
+                                                                                              ],
                                                                                             ),
                                                                                           )
                                                                                         ],
@@ -4619,17 +4558,14 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                   });
                                                 }),
                                                 const Spacer(),
-                                                Text(
+                                                const Text(
                                                   'Class Link',
                                                   textAlign: TextAlign.left,
                                                   style: TextStyle(
-                                                    color: kColorGrey,
-                                                    fontSize: ResponsiveBuilder
-                                                            .isDesktop(context)
-                                                        ? 18
-                                                        : 16,
-                                                    fontWeight: FontWeight.w800,
-                                                  ),
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w800,
+                                                      color: kColorGrey),
                                                 ),
                                                 SizedBox(
                                                   width: 600,
@@ -4709,9 +4645,7 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                                   // Replace 'your_flutter_app_port' with the actual port your Flutter web app is running on
                                                                   // String url =
                                                                   //     'http://localhost:58586/tutorsList';
-                                                                  // html.window.open(
-                                                                  //     '/#/studentdiary/${widget.uid.toString()}/tutors',
-                                                                  //     '_blank');
+
                                                                   // Open the URL in a new tab
                                                                   // html.window.open('/videoCall', "");
                                                                   // html.window.open('/tutorslist', "");
@@ -4741,21 +4675,15 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                                         );
                                                       }
                                                       return Center(
-                                                        child: Flexible(
-                                                          child: Text(
-                                                            '(Link will be attached when student set class schedule!)',
-                                                            style: TextStyle(
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                fontSize: 15,
-                                                                color: Colors
-                                                                    .blue
-                                                                    .shade200,
-                                                                fontStyle:
-                                                                    FontStyle
-                                                                        .italic),
-                                                          ),
+                                                        child: Text(
+                                                          '(Link will be attached when student set class schedule!)',
+                                                          style: TextStyle(
+                                                              fontSize: 15,
+                                                              color: Colors.blue
+                                                                  .shade200,
+                                                              fontStyle:
+                                                                  FontStyle
+                                                                      .italic),
                                                         ),
                                                       );
                                                     }),
@@ -4989,14 +4917,6 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                       right: 20.0,
                                       child: GestureDetector(
                                         onTap: () {
-                                          getDataFromTutorScheduleCollection(
-                                              widget.uID);
-                                          getDataFromTutorScheduleCollectionBlockDateTime(
-                                              widget.uID);
-                                          getDataFromTutorScheduleCollectionavilableTime(
-                                              widget.uID);
-                                          getDataFromTutorScheduleCollectionAvailableDateTime(
-                                              widget.uID);
                                           Navigator.of(context)
                                               .pop(false); // Close the dialog
                                         },
@@ -5181,14 +5101,6 @@ class _TableBasicsExampleState extends State<TableBasicsExample> {
                                       right: 10.0,
                                       child: GestureDetector(
                                         onTap: () {
-                                          getDataFromTutorScheduleCollection(
-                                              widget.uID);
-                                          getDataFromTutorScheduleCollectionBlockDateTime(
-                                              widget.uID);
-                                          getDataFromTutorScheduleCollectionavilableTime(
-                                              widget.uID);
-                                          getDataFromTutorScheduleCollectionAvailableDateTime(
-                                              widget.uID);
                                           Navigator.of(context)
                                               .pop(false); // Close the dialog
                                         },

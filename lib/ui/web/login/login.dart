@@ -968,17 +968,17 @@ class _SigniNState extends State<SigniN> {
                             } else if (result.role == 'student' &&
                                 result.status == 'completed') {
                               setState(() {
-                                CoolAlert.show(
-                                  context: context,
-                                  width: 200,
-                                  type: CoolAlertType.success,
-                                  text: 'Log in Succesfully!',
-                                  autoCloseDuration: const Duration(seconds: 5),
-                                ).then((value) {
+                                // CoolAlert.show(
+                                //   context: context,
+                                //   width: 200,
+                                //   type: CoolAlertType.success,
+                                //   text: 'Log in Succesfully!',
+                                //   autoCloseDuration: const Duration(seconds: 5),
+                                // ).then((value) {
                                   GoRouter.of(context).go(
                                       '/studentdiary/${result.uid.toString()}');
                                 });
-                              });
+                              // });
                             } else if (result.role == 'student' &&
                                 result.status == 'unfinished') {
                               setState(() {
@@ -1162,8 +1162,6 @@ class _SigniNState extends State<SigniN> {
                                 val!.isEmpty ? 'Enter an email' : null,
                             onChanged: (val) {
                               userEmail = val;
-                              final alpha3Code = getAlpha3Code(val);
-                              print(alpha3Code);
                             },
                           ),
                         ),
@@ -1208,7 +1206,7 @@ class _SigniNState extends State<SigniN> {
                               textStyle: const TextStyle(color: Colors.black),
                             ),
                             onPressed: () {
-                              html.window.open('/#/account/reset', '');
+                              html.window.open('/account/reset', '');
 
                               // GoRouter.of(context).go('/account/reset');
                             },
@@ -1305,30 +1303,22 @@ class _SigniNState extends State<SigniN> {
                             } else if (result.role == 'tutor' &&
                                 result.status == 'completed') {
                               setState(() {
-                                CoolAlert.show(
-                                  context: context,
-                                  width: 200,
-                                  type: CoolAlertType.success,
-                                  text: 'Log in Succesfully!',
-                                  autoCloseDuration: const Duration(seconds: 5),
-                                ).then((value) {
-                                  GoRouter.of(context).go(
-                                      '/tutordesk/${result.uid.toString()}');
-                                });
+                                GoRouter.of(context)
+                                    .go('/tutordesk/${result.uid.toString()}');
                               });
                             } else if (result.role == 'student' &&
                                 result.status == 'completed') {
                               setState(() {
-                                CoolAlert.show(
-                                  context: context,
-                                  width: 200,
-                                  type: CoolAlertType.success,
-                                  text: 'Log in Succesfully!',
-                                  autoCloseDuration: const Duration(seconds: 5),
-                                ).then((value) {
+                                // CoolAlert.show(
+                                //   context: context,
+                                //   width: 200,
+                                //   type: CoolAlertType.success,
+                                //   text: 'Log in Succesfully!',
+                                //   autoCloseDuration: const Duration(seconds: 5),
+                                // ).then((value) {
                                   GoRouter.of(context).go(
                                       '/studentdiary/${result.uid.toString()}');
-                                });
+                                // });
                               });
                             } else if (result.role == 'student' &&
                                 result.status == 'unfinished') {

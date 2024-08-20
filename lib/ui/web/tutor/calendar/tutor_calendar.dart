@@ -1,93 +1,40 @@
-// ignore_for_file: must_be_immutable, unused_local_variable
-
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:work4ututor/services/getmaterials.dart';
+import 'package:work4ututor/ui/web/tutor/calendar/setup_calendar.dart';
 
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../provider/init_provider.dart';
+import '../../../../services/getcalendardata.dart';
 import '../../../../services/getenrolledclasses.dart';
-import '../../../../services/getmaterials.dart';
+import '../../../../services/timefromtimestamp.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
 import '../../terms/termpage.dart';
-import '../../tutor/calendar/setup_calendar.dart';
-import '../../tutor/tutor_profile/view_file.dart';
+import '../tutor_profile/view_file.dart';
 import 'package:universal_html/html.dart' as html;
 
-// class StudentCalendar extends StatefulWidget {
-//   final String uID;
-//   const StudentCalendar({Key? key, required this.uID}) : super(key: key);
-
-//   @override
-//   State<StudentCalendar> createState() => _StudentCalendarState();
-// }
-
-// class _StudentCalendarState extends State<StudentCalendar> {
-// //  TableCalendarController _calendarController;
-//   List<DateTime> highlightedDatesList = [
-//     DateTime(2023, 6, 10),
-//     DateTime(2023, 6, 15),
-//     DateTime(2023, 6, 20),
-//   ];
-
-//   CalendarFormat _calendarFormat = CalendarFormat.month;
-
-//   DateTime _focusedDay = DateTime.now();
-
-//   DateTime _selectedDay = DateTime.now();
-
-//   String selectedDate = DateFormat('MMMM dd,').format(DateTime.now());
-
-//   int count = 0;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     Size size = MediaQuery.of(context).size;
-//     return MultiProvider(
-//       providers: [
-//         // StreamProvider<List<Schedule>>.value(
-//         //   value: ScheduleEnrolledClass(
-//         //     uid: widget.uID,
-//         //     role: 'student',
-//         //   ).getenrolled,
-//         //   catchError: (context, error) {
-//         //     print('Error occurred: $error');
-//         //     return [];
-//         //   },
-//         //   initialData: const [],
-//         // ),
-//         // StreamProvider<List<ClassesData>>.value(
-//         //   value: EnrolledClass(uid: widget.uID, role: 'student').getenrolled,
-//         //   catchError: (context, error) {
-//         //     return [];
-//         //   },
-//         //   initialData: const [],
-//         // ),
-//       ],
-//       child: const StudentCalendarBody(),
-//     );
-//   }
-// }
-
-class StudentCalendar extends StatefulWidget {
+class TutorCalendar extends StatefulWidget {
   final String uID;
-    final String timezone;
+  // final TutorInformation tutor;
 
-  const StudentCalendar({Key? key, required this.uID, required this.timezone}) : super(key: key);
+  const TutorCalendar({super.key, required this.uID, });
 
   @override
-  State<StudentCalendar> createState() => _StudentCalendarState();
+  State<TutorCalendar> createState() => _TutorCalendarState();
 }
 
-class _StudentCalendarState extends State<StudentCalendar> {
-  List<DateTimeAvailability> dateavailabledateselected = [];
+class _TutorCalendarState extends State<TutorCalendar> {
+List<DateTimeAvailability> dateavailabledateselected = [];
 
   List<String> dayOffs = [];
   List<DateTime> dayOffsdate = []; // Specify the day-offs as dates
@@ -258,9 +205,9 @@ class _StudentCalendarState extends State<StudentCalendar> {
       return DateFormat('yyyy-MM-dd').format(scheduleDate) ==
           DateFormat('yyyy-MM-dd').format(_selectedDay);
     }).toList();
-    // for (var schedule in filteredSchedules) {
-    //   isHovered.add(false);
-    // }
+    for (var schedule in filteredSchedules) {
+      isHovered.add(false);
+    }
   }
 
   List<ScheduleData> filteredSchedules = [];
@@ -301,7 +248,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
 
   void getfutureclass() async {
     var futureclassdatatemp = await EnrolledClassFuture(
-            uid: widget.uID, role: 'student', targetTimezone: widget.timezone)
+            uid: widget.uID, role: 'tutor', targetTimezone: 'Asia/Manila')
         .getenrolled();
 
     if (mounted) {
@@ -391,10 +338,10 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                   .format(scheduleDate) ==
                               DateFormat('yyyy-MM-dd').format(_selectedDay);
                         }).toList();
- 
-                      //  for (var schedule in filteredSchedules) {
-                      //     isHovered.add(false);
-                      //   }
+
+                        for (var schedule in filteredSchedules) {
+                          isHovered.add(false);
+                        }
                         List<Schedule> scheduleList = scheduleListdata
                             .where((schedule) => enrolledlist.any((enrolled) =>
                                 enrolled.classid == schedule.scheduleID))
@@ -954,13 +901,13 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                   });
                                                                 }
                                                               : null,
-                                                          // onHover: (isHovered) {
-                                                          //   setState(() {
-                                                          //     this.isHovered[
-                                                          //             bookingIndex] =
-                                                          //         isHovered;
-                                                          //   });
-                                                          // },
+                                                          onHover: (isHovered) {
+                                                            setState(() {
+                                                              this.isHovered[
+                                                                      bookingIndex] =
+                                                                  isHovered;
+                                                            });
+                                                          },
                                                           child: Tooltip(
                                                             message: 'Booked',
                                                             child: ClipRRect(
@@ -997,21 +944,21 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                                 110,
                                                                 height: 132,
                                                                 decoration:
-                                                                    const BoxDecoration(
+                                                                    BoxDecoration(
                                                                   color:
                                                                       kSecondarybuttonblue,
-                                                                  // border: Border
-                                                                  //     .all(
-                                                                  //   color: isHovered[
-                                                                  //           bookingIndex]
-                                                                  //       ? kColorPrimary
-                                                                  //       : Colors
-                                                                  //           .yellow,
-                                                                  //   width: isHovered[
-                                                                  //           bookingIndex]
-                                                                  //       ? 3
-                                                                  //       : 1,
-                                                                  // ),
+                                                                  border: Border
+                                                                      .all(
+                                                                    color: isHovered[
+                                                                            bookingIndex]
+                                                                        ? kColorPrimary
+                                                                        : Colors
+                                                                            .yellow,
+                                                                    width: isHovered[
+                                                                            bookingIndex]
+                                                                        ? 3
+                                                                        : 1,
+                                                                  ),
                                                                 ),
                                                                 child: Column(
                                                                   mainAxisAlignment:
@@ -2128,21 +2075,31 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                   children: [
                                                     SizedBox(
                                                       width: 55,
-                                                      child: Text(
-                                                        time.minute == 0
+                                                      child: Tooltip(
+                                                        message: time.minute ==
+                                                                0
                                                             ? timeText
                                                             : time.minute %
                                                                         15 ==
                                                                     0
                                                                 ? timeText
                                                                 : '',
-                                                        textAlign:
-                                                            time.minute == 0
-                                                                ? TextAlign
-                                                                    .start
-                                                                : TextAlign
-                                                                    .center,
-                                                        style: textStyle,
+                                                        child: Text(
+                                                          time.minute == 0
+                                                              ? timeText
+                                                              : time.minute %
+                                                                          15 ==
+                                                                      0
+                                                                  ? timeText
+                                                                  : '',
+                                                          textAlign:
+                                                              time.minute == 0
+                                                                  ? TextAlign
+                                                                      .start
+                                                                  : TextAlign
+                                                                      .center,
+                                                          style: textStyle,
+                                                        ),
                                                       ),
                                                     ),
                                                   ],
@@ -2351,13 +2308,13 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                 });
                                                               }
                                                             : null,
-                                                        // onHover: (isHovered) {
-                                                        //   setState(() {
-                                                        //     this.isHovered[
-                                                        //             bookingIndex] =
-                                                        //         isHovered;
-                                                        //   });
-                                                        // },
+                                                        onHover: (isHovered) {
+                                                          setState(() {
+                                                            this.isHovered[
+                                                                    bookingIndex] =
+                                                                isHovered;
+                                                          });
+                                                        },
                                                         child: Tooltip(
                                                           message: 'Booked',
                                                           child: ClipRRect(
@@ -2382,21 +2339,21 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                           210,
                                                               height: 132,
                                                               decoration:
-                                                                  const BoxDecoration(
+                                                                  BoxDecoration(
                                                                 color:
                                                                     kSecondarybuttonblue,
-                                                                // border:
-                                                                //     Border.all(
-                                                                //   color: isHovered[
-                                                                //           bookingIndex]
-                                                                //       ? kColorPrimary
-                                                                //       : Colors
-                                                                //           .yellow,
-                                                                //   width: isHovered[
-                                                                //           bookingIndex]
-                                                                //       ? 3
-                                                                //       : 1,
-                                                                // ),
+                                                                border:
+                                                                    Border.all(
+                                                                  color: isHovered[
+                                                                          bookingIndex]
+                                                                      ? kColorPrimary
+                                                                      : Colors
+                                                                          .yellow,
+                                                                  width: isHovered[
+                                                                          bookingIndex]
+                                                                      ? 3
+                                                                      : 1,
+                                                                ),
                                                               ),
                                                               child: Column(
                                                                 mainAxisAlignment:
@@ -2487,32 +2444,37 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                   onTap: isSelectable
                                                       ? () {}
                                                       : null,
-                                                  child: Container(
-                                                    width: ResponsiveBuilder
-                                                            .isDesktop(
-                                                                context)
-                                                        ? size.width - 780
-                                                        : ResponsiveBuilder
-                                                                .isTablet(
-                                                                    context)
-                                                            ? size.width - 510
-                                                            : size.width -
-                                                                210,
-                                                    height:
-                                                        indexSelect == index
-                                                            ? 200
-                                                            : 12,
-                                                    color: isSelectable
-                                                        ? indexSelect == index
-                                                            ? Colors.blue
-                                                            : Colors.green[50]
-                                                        : Colors.grey[100],
-                                                    child: time.minute == 0
-                                                        ? const Center(
-                                                            child: Divider(
-                                                            thickness: .1,
-                                                          ))
-                                                        : null,
+                                                  child: Tooltip(
+                                                    message: isSelectable
+                                                        ? 'Available'
+                                                        : 'Not Available',
+                                                    child: Container(
+                                                      width: ResponsiveBuilder
+                                                              .isDesktop(
+                                                                  context)
+                                                          ? size.width - 780
+                                                          : ResponsiveBuilder
+                                                                  .isTablet(
+                                                                      context)
+                                                              ? size.width - 510
+                                                              : size.width -
+                                                                  210,
+                                                      height:
+                                                          indexSelect == index
+                                                              ? 200
+                                                              : 12,
+                                                      color: isSelectable
+                                                          ? indexSelect == index
+                                                              ? Colors.blue
+                                                              : Colors.green[50]
+                                                          : Colors.grey[100],
+                                                      child: time.minute == 0
+                                                          ? const Center(
+                                                              child: Divider(
+                                                              thickness: .1,
+                                                            ))
+                                                          : null,
+                                                    ),
                                                   ),
                                                 ),
                                               ],

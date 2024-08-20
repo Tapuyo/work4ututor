@@ -69,8 +69,6 @@ class _ClassesPricingState extends State<ClassesPricing> {
                         barrierDismissible: false,
                         context: context,
                         builder: (BuildContext context) {
-                          var height = MediaQuery.of(context).size.height;
-                          var width = MediaQuery.of(context).size.width;
                           return AlertDialog(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
@@ -87,8 +85,8 @@ class _ClassesPricingState extends State<ClassesPricing> {
                                 child: Stack(
                                   children: <Widget>[
                                     SizedBox(
-                                      height: height,
-                                      width: 800,
+                                      height: 500,
+                                      width: 600,
                                       child: AddNewSubject(
                                         tutorssubject: tutorinfodata,
                                         tutorinfo: tutorinfo.first,
@@ -104,7 +102,7 @@ class _ClassesPricingState extends State<ClassesPricing> {
                                         },
                                         child: const Icon(
                                           Icons.close,
-                                          color: Colors.red,
+                                          color: Colors.white,
                                           size: 20,
                                         ),
                                       ),
@@ -215,83 +213,7 @@ class _ClassesPricingState extends State<ClassesPricing> {
                                                 color: Colors.white),
                                           ),
                                           const Spacer(),
-                                          // textFieldEnabled[firstColumnIndex]
-                                          //     ? Row(
-                                          //         children: [
-                                          //           Tooltip(
-                                          //             message:
-                                          //                 'Cancel Update', // The hint text
-                                          //             child: IconButton(
-                                          //               icon: const Icon(Icons
-                                          //                   .cancel_outlined),
-                                          //               color: Colors
-                                          //                   .redAccent, // Replace with your desired icon
-                                          //               onPressed: () {
-                                          //                 toggleTextFieldEnabled(
-                                          //                     firstColumnIndex);
-                                          //               },
-                                          //             ),
-                                          //           ),
-                                          //           Tooltip(
-                                          //             message:
-                                          //                 'Save Update', // The hint text
-                                          //             child: IconButton(
-                                          //               icon: const Icon(
-                                          //                   Icons.save_outlined),
-                                          //               color: Colors
-                                          //                   .white, // Replace with your desired icon
-                                          //               onPressed: () async {
-                                          //                 String? result =
-                                          //                     await updateSubjectTeach(
-                                          //                         tutorinfo.first
-                                          //                             .userId,
-                                          //                         subject
-                                          //                             .subjectid,
-                                          //                         price2Controller
-                                          //                             .text,
-                                          //                         price3Controller
-                                          //                             .text,
-                                          //                         price5Controller
-                                          //                             .text);
-                                          //                 if (result ==
-                                          //                     'success') {
-                                          //                   setState(() {
-                                          //                     CoolAlert.show(
-                                          //                       context: context,
-                                          //                       width: 200,
-                                          //                       type:
-                                          //                           CoolAlertType
-                                          //                               .success,
-                                          //                       text:
-                                          //                           'Update Successful!',
-                                          //                       autoCloseDuration:
-                                          //                           const Duration(
-                                          //                               seconds:
-                                          //                                   1),
-                                          //                     ).then(
-                                          //                       (value) {
-                                          //                         toggleTextFieldEnabled(
-                                          //                             firstColumnIndex);
-                                          //                       },
-                                          //                     );
-                                          //                   });
-                                          //                 } else {
-                                          //                   CoolAlert.show(
-                                          //                     context: context,
-                                          //                     width: 200,
-                                          //                     type: CoolAlertType
-                                          //                         .error,
-                                          //                     text: result
-                                          //                         .toString(),
-                                          //                   );
-                                          //                 }
-                                          //               },
-                                          //             ),
-                                          //           ),
-                                          //         ],
-                                          //       )
-                                          //     :
-                                          Row(
+                                        Row(
                                             children: [
                                               Visibility(
                                                 visible: textFieldEnabled[
@@ -355,22 +277,7 @@ class _ClassesPricingState extends State<ClassesPricing> {
                                                           );
                                                           if (result ==
                                                               'success') {
-                                                            setState(() {
-                                                              CoolAlert.show(
-                                                                context:
-                                                                    context,
-                                                                width: 200,
-                                                                type:
-                                                                    CoolAlertType
-                                                                        .success,
-                                                                text:
-                                                                    'Successfuly Deleted!',
-                                                                autoCloseDuration:
-                                                                    const Duration(
-                                                                        seconds:
-                                                                            1),
-                                                              );
-                                                            });
+                                                          
                                                           } else {
                                                             CoolAlert.show(
                                                               context: context,
@@ -462,12 +369,7 @@ class _ClassesPricingState extends State<ClassesPricing> {
                                                     padding:
                                                         const EdgeInsets.all(
                                                             10),
-                                                    // decoration: BoxDecoration(
-                                                    //   color: const Color.fromRGBO(
-                                                    //       242, 242, 242, 1),
-                                                    //   borderRadius:
-                                                    //       BorderRadius.circular(5),
-                                                    // ),
+                                                 
                                                     child: const Text(
                                                       "2 classes",
                                                   style:  TextStyle(

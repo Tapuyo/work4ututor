@@ -1,16 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
-import 'package:work4ututor/splash_page.dart';
-import 'package:work4ututor/ui/web/communication.dart/screensharesample.dart';
-import 'package:work4ututor/ui/web/communication.dart/videocall.dart';
-import 'admin/adminlogin.dart';
-import 'login/login.dart';
-import 'search_tutor/find_tutors.dart';
-import 'signup/student_information_signup.dart';
-import 'signup/tutor_information_signup.dart';
-import 'tutor/tutor_dashboard/tutor_dashboard.dart';
-import 'student/main_dashboard/student_dashboard.dart';
 
 class WebMainPage extends StatefulWidget {
   const WebMainPage({Key? key}) : super(key: key);

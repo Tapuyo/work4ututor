@@ -1,15 +1,16 @@
 // ignore_for_file: prefer_final_fields, unused_field, unrelated_type_equality_checks, sized_box_for_whitespace, avoid_print, no_leading_underscores_for_local_identifiers, unnecessary_null_comparison, use_build_context_synchronously
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/tutor_info_class.dart';
+import '../../../../services/getcalendardata.dart';
+import '../../../../services/timefromtimestamp.dart';
 import '../../../../utils/themes.dart';
 import '../../../auth/database.dart';
-import '../../admin/admin_sharedcomponents/header_text.dart';
 
 class CalendarSetup extends StatefulWidget {
   final TutorInformation userinfo;
@@ -200,6 +201,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
   TimeAvailability availabledateselected =
       TimeAvailability(timeAvailableFrom: '', timeAvailableTo: '');
   List<DateTimeAvailability> dateavailabledateselected = [];
+  DateTimeAvailability? selectedDateTime;
   List<BlockDate> blockdateselected = [];
   ScrollController _scrollController = ScrollController();
   ScrollController daysoffcroll = ScrollController();
@@ -210,150 +212,13 @@ class _CalendarSetupState extends State<CalendarSetup> {
   ScrollController _scrollController2 = ScrollController();
   @override
   void initState() {
-    getDataFromTutorScheduleCollection(widget.userinfo.userId);
-    getDataFromTutorScheduleCollectionavilableTime(widget.userinfo.userId);
-    getDataFromTutorScheduleCollectionAvailableDateTime(widget.userinfo.userId);
-    getDataFromTutorScheduleCollectionBlockDateTime(widget.userinfo.userId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cartNotifier =
+          Provider.of<TutorScheduleProvider>(context, listen: false);
+      cartNotifier.getDataFromTutorScheduleCollectionAvailableTime(
+          widget.userinfo.userId);
+    });
     super.initState();
-  }
-
-  Future<void> getDataFromTutorScheduleCollection(String uid) async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('tutorSchedule')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      querySnapshot.docs.forEach((doc) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-        String uid = data['uid'] ?? [];
-        List<dynamic> dateoffselected = data['dateoffselected'] != null
-            ? List<dynamic>.from(data['dateoffselected'])
-            : [];
-
-        setState(() {
-          dayoffselected = List<String>.from(data['dayoffs'] ?? []);
-
-          if (dateoffselected != null) {
-            dateselected = dateoffselected
-                .map((dateString) => DateTime.tryParse(dateString))
-                .where((date) => date != null)
-                .cast<DateTime>()
-                .toList();
-          }
-        });
-      });
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
-
-  Future<void> getDataFromTutorScheduleCollectionavilableTime(
-      String uid) async {
-    try {
-      // Get the tutorSchedule document for the specified UID
-      QuerySnapshot tutorScheduleQuerySnapshot = await FirebaseFirestore
-          .instance
-          .collection('tutorSchedule')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      tutorScheduleQuerySnapshot.docs.forEach((doc) async {
-        CollectionReference timeAvailableCollection =
-            doc.reference.collection('timeavailable');
-
-        QuerySnapshot timeAvailableQuerySnapshot =
-            await timeAvailableCollection.get();
-
-        timeAvailableQuerySnapshot.docs.forEach((timeDoc) {
-          Map<String, dynamic> timeData =
-              timeDoc.data() as Map<String, dynamic>;
-
-          TimeAvailability timeAvailability =
-              TimeAvailability.fromMap(timeData);
-
-          setState(() {
-            availabledateselected = timeAvailability;
-          });
-        });
-      });
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
-
-  Future<void> getDataFromTutorScheduleCollectionAvailableDateTime(
-      String uid) async {
-    List<DateTimeAvailability> dateTimeAvailabilities = [];
-
-    try {
-      QuerySnapshot tutorScheduleQuerySnapshot = await FirebaseFirestore
-          .instance
-          .collection('tutorSchedule')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      for (QueryDocumentSnapshot doc in tutorScheduleQuerySnapshot.docs) {
-        CollectionReference timeAvailableCollection =
-            doc.reference.collection('timedateavailable');
-
-        QuerySnapshot timeAvailableQuerySnapshot =
-            await timeAvailableCollection.get();
-
-        for (QueryDocumentSnapshot timeDoc in timeAvailableQuerySnapshot.docs) {
-          Map<String, dynamic> timeData =
-              timeDoc.data() as Map<String, dynamic>;
-
-          DateTimeAvailability timeAvailability =
-              DateTimeAvailability.fromMap(timeData);
-
-          dateTimeAvailabilities.add(timeAvailability);
-        }
-      }
-
-      setState(() {
-        dateavailabledateselected = dateTimeAvailabilities;
-      });
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
-  }
-
-  Future<void> getDataFromTutorScheduleCollectionBlockDateTime(
-      String uid) async {
-    List<BlockDate> dateTimeAvailabilities = [];
-
-    try {
-      QuerySnapshot tutorScheduleQuerySnapshot = await FirebaseFirestore
-          .instance
-          .collection('tutorSchedule')
-          .where('uid', isEqualTo: uid)
-          .get();
-
-      for (QueryDocumentSnapshot doc in tutorScheduleQuerySnapshot.docs) {
-        CollectionReference timeAvailableCollection =
-            doc.reference.collection('blockdatetime');
-
-        QuerySnapshot timeAvailableQuerySnapshot =
-            await timeAvailableCollection.get();
-
-        for (QueryDocumentSnapshot timeDoc in timeAvailableQuerySnapshot.docs) {
-          Map<String, dynamic> timeData =
-              timeDoc.data() as Map<String, dynamic>;
-
-          BlockDate timeAvailability = BlockDate.fromMap(timeData);
-
-          dateTimeAvailabilities.add(timeAvailability);
-        }
-      }
-
-      setState(() {
-        blockdateselected = dateTimeAvailabilities;
-      });
-    } catch (e) {
-      print('Error fetching data: $e');
-    }
   }
 
   int calculateTimeDifferenceInMinutes(String time1, String time2) {
@@ -708,6 +573,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                   _typeAheadController3.text =
                                                       tempDayoffselected; // Update text field with selected items
                                                 }
+                                                _typeAheadController3.text = '';
                                               });
                                             },
                                           ),
@@ -764,97 +630,48 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                         width: 5,
                                       ),
                                       TextButton(
-                                        onPressed: () {
-                                          if (tempDayoffselected == '' &&
-                                              tempdateselected == null) {
-                                            CoolAlert.show(
-                                              context: context,
-                                              width: 200,
-                                              type: CoolAlertType.warning,
-                                              title: 'Nothing is selected!',
-                                              titleTextStyle: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            );
+                                        onPressed: () async {
+                                          // if (tempDayoffselected == '' &&
+                                          //     tempdateselected == null) {
+                                          //   CoolAlert.show(
+                                          //     context: context,
+                                          //     width: 200,
+                                          //     type: CoolAlertType.warning,
+                                          //     title: 'Nothing is selected!',
+                                          //     titleTextStyle: const TextStyle(
+                                          //         fontSize: 14,
+                                          //         fontWeight:
+                                          //             FontWeight.normal),
+                                          //   );
+                                          // } else {
+                                          setState(() {
+                                            if (tempDayoffselected != '') {
+                                              dayoffselected
+                                                  .add(tempDayoffselected);
+                                            }
+                                            if (tempdateselected != null) {
+                                              dateselected
+                                                  .add(tempdateselected!);
+                                            }
+                                            tempDayoffselected = '';
+                                            tempdateselected = null;
+                                          });
+
+                                          final result = await addDayOffDates(
+                                              widget.userinfo.userId,
+                                              dayoffselected,
+                                              dateselected);
+                                          if (result == 'success') {
                                           } else {
                                             CoolAlert.show(
                                               context: context,
-                                              barrierDismissible: false,
                                               width: 200,
-                                              type: CoolAlertType.confirm,
-                                              title: 'Continue adding dayoff?',
+                                              type: CoolAlertType.error,
+                                              title: result.toString(),
                                               titleTextStyle: const TextStyle(
                                                   fontSize: 14,
                                                   fontWeight:
                                                       FontWeight.normal),
-                                              confirmBtnText: 'Proceed',
-                                              confirmBtnColor:
-                                                  Colors.greenAccent,
-                                              cancelBtnText: 'Go back',
-                                              showCancelBtn: true,
-                                              cancelBtnTextStyle:
-                                                  const TextStyle(
-                                                      color: Colors.red),
-                                              onCancelBtnTap: () {
-                                                Navigator.of(context).pop;
-                                              },
-                                              onConfirmBtnTap: () async {
-                                                setState(() {
-                                                  if (tempDayoffselected !=
-                                                      '') {
-                                                    dayoffselected.add(
-                                                        tempDayoffselected);
-                                                  }
-                                                  if (tempdateselected !=
-                                                      null) {
-                                                    dateselected
-                                                        .add(tempdateselected!);
-                                                  }
-                                                  tempDayoffselected = '';
-                                                  tempdateselected = null;
-                                                });
-
-                                                final result =
-                                                    await addDayOffDates(
-                                                        widget.userinfo.userId,
-                                                        dayoffselected,
-                                                        dateselected);
-                                                if (result == 'success') {
-                                                  setState(() {
-                                                    CoolAlert.show(
-                                                      context: context,
-                                                      width: 200,
-                                                      type:
-                                                          CoolAlertType.success,
-                                                      title: 'Added!',
-                                                      titleTextStyle:
-                                                          const TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .normal),
-                                                      autoCloseDuration:
-                                                          const Duration(
-                                                              seconds: 1),
-                                                    );
-                                                  });
-                                                } else {
-                                                  // ignore: use_build_context_synchronously
-                                                  CoolAlert.show(
-                                                    context: context,
-                                                    width: 200,
-                                                    type: CoolAlertType.error,
-                                                    title: result.toString(),
-                                                    titleTextStyle:
-                                                        const TextStyle(
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal),
-                                                  );
-                                                }
-                                              },
                                             );
                                           }
                                         },
@@ -883,57 +700,200 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                   const SizedBox(
                                     height: 5,
                                   ),
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'Days Off:',
-                                            textAlign: TextAlign.left,
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: kColorWhite,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          dayoffselected.isNotEmpty
-                                              ? Container(
-                                                  width: 300,
-                                                  height: 100,
-                                                  padding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          10, 0, 10, 0),
-                                                  child: RawScrollbar(
-                                                    controller:
-                                                        daysoffcroll,
-                                                    thumbColor:
-                                                        Colors.redAccent,
-                                                    radius:
-                                                        const Radius.circular(
-                                                            8),
-                                                    crossAxisMargin: 2,
-                                                    child: Scrollbar(
-                                                          trackVisibility: true,
-                                                          thumbVisibility: true,
-                                                          controller:
-                                                              daysoffcroll,
-                                                      child: ListView.builder(
-                                                        shrinkWrap: true,
+                                  Consumer<TutorScheduleProvider>(
+                                      builder: (context, scheduletime, _) {
+                                    if (scheduletime.dayOffs != null ||
+                                        scheduletime.dayOffsdate != null) {
+                                      dayoffselected = scheduletime.dayOffs!;
+                                      dateselected = scheduletime.dayOffsdate!;
+                                    } else {
+                                      dayoffselected = [];
+                                      dateselected = [];
+                                    }
+                                    return Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Days Off:',
+                                              textAlign: TextAlign.left,
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: kColorWhite,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            dayoffselected.isNotEmpty
+                                                ? Container(
+                                                    width: 300,
+                                                    height: 100,
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(10, 0, 10, 0),
+                                                    child: RawScrollbar(
+                                                      controller: daysoffcroll,
+                                                      thumbColor:
+                                                          Colors.redAccent,
+                                                      radius:
+                                                          const Radius.circular(
+                                                              8),
+                                                      crossAxisMargin: 2,
+                                                      child: Scrollbar(
+                                                        trackVisibility: true,
+                                                        thumbVisibility: true,
                                                         controller:
-                                                            daysoffcroll, // Assign the ScrollController to the ListView
+                                                            daysoffcroll,
+                                                        child: ListView.builder(
+                                                          shrinkWrap: true,
+                                                          controller:
+                                                              daysoffcroll, // Assign the ScrollController to the ListView
+                                                          scrollDirection:
+                                                              Axis.vertical,
+                                                          itemCount:
+                                                              dayoffselected
+                                                                  .length,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            return Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .only(
+                                                                      left: 5.0,
+                                                                      right: 5),
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .fromLTRB(
+                                                                        5,
+                                                                        0,
+                                                                        5,
+                                                                        0),
+                                                                decoration:
+                                                                    const BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius.all(
+                                                                          Radius.circular(
+                                                                              15)),
+                                                                ),
+                                                                child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    Text(
+                                                                      dayoffselected[
+                                                                          index],
+                                                                      style: const TextStyle(
+                                                                          color:
+                                                                              kColorWhite),
+                                                                    ),
+                                                                    IconButton(
+                                                                      iconSize:
+                                                                          15,
+                                                                      icon:
+                                                                          const Icon(
+                                                                        Icons
+                                                                            .delete_outline,
+                                                                        color: Colors
+                                                                            .red,
+                                                                      ),
+                                                                      onPressed:
+                                                                          () async {
+                                                                        final result =
+                                                                            await deleteDayOff(
+                                                                          widget
+                                                                              .userinfo
+                                                                              .userId,
+                                                                          dayoffselected[
+                                                                              index],
+                                                                        );
+                                                                        if (result ==
+                                                                            'success') {
+                                                                        } else {
+                                                                          // ignore: use_build_context_synchronously
+                                                                          CoolAlert
+                                                                              .show(
+                                                                            context:
+                                                                                context,
+                                                                            width:
+                                                                                200,
+                                                                            type:
+                                                                                CoolAlertType.error,
+                                                                            title:
+                                                                                result.toString(),
+                                                                            titleTextStyle:
+                                                                                const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+                                                                          );
+                                                                        }
+                                                                      },
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ))
+                                                : Container(
+                                                    width: 300,
+                                                    height: 100,
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(10, 0, 10, 0),
+                                                    child: const Center(
+                                                      child: Text(
+                                                        '"Weekly dayoffs."',
+                                                        style: TextStyle(
+                                                            color: kColorWhite),
+                                                      ),
+                                                    ),
+                                                  ),
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Dates Off:',
+                                              textAlign: TextAlign.left,
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: kColorWhite,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            dateselected.isNotEmpty
+                                                ? Container(
+                                                    width: 300,
+                                                    height: 100,
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(10, 0, 10, 0),
+                                                    child: Scrollbar(
+                                                      trackVisibility: true,
+                                                      thumbVisibility: true,
+                                                      controller: dateoffscroll,
+                                                      child: ListView.builder(
+                                                        controller:
+                                                            dateoffscroll, // Assign the ScrollController to the ListView
                                                         scrollDirection:
                                                             Axis.vertical,
                                                         itemCount:
-                                                            dayoffselected
-                                                                .length,
+                                                            dateselected.length,
                                                         itemBuilder:
                                                             (context, index) {
                                                           return Padding(
@@ -963,12 +923,13 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                                         .spaceBetween,
                                                                 children: [
                                                                   Text(
-                                                                    dayoffselected[
-                                                                        index],
-                                                                    style: const TextStyle(
-                                                                        color:
-                                                                            kColorWhite),
-                                                                  ),
+                                                                      DateFormat(
+                                                                              'MMMM dd, yyyy')
+                                                                          .format(dateselected[
+                                                                              index]),
+                                                                      style: const TextStyle(
+                                                                          color:
+                                                                              kColorWhite)),
                                                                   IconButton(
                                                                     iconSize:
                                                                         15,
@@ -982,38 +943,16 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                                     onPressed:
                                                                         () async {
                                                                       final result =
-                                                                          await deleteDayOff(
+                                                                          await deleteDateOff(
                                                                         widget
                                                                             .userinfo
                                                                             .userId,
-                                                                        dayoffselected[
+                                                                        dateselected[
                                                                             index],
                                                                       );
                                                                       if (result ==
                                                                           'success') {
-                                                                        setState(
-                                                                            () {
-                                                                          getDataFromTutorScheduleCollection(widget
-                                                                              .userinfo
-                                                                              .userId);
-                                                                          CoolAlert
-                                                                              .show(
-                                                                            context:
-                                                                                context,
-                                                                            width:
-                                                                                200,
-                                                                            type:
-                                                                                CoolAlertType.success,
-                                                                            title:
-                                                                                'Deleted successfully!',
-                                                                            titleTextStyle:
-                                                                                const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
-                                                                            autoCloseDuration:
-                                                                                const Duration(seconds: 1),
-                                                                          );
-                                                                        });
                                                                       } else {
-                                                                        // ignore: use_build_context_synchronously
                                                                         CoolAlert
                                                                             .show(
                                                                           context:
@@ -1037,279 +976,87 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                           );
                                                         },
                                                       ),
-                                                    ),
-                                                  ))
-                                              : Container(
-                                                  width: 300,
-                                                  height: 100,
-                                                  padding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          10, 0, 10, 0),
-                                                  child: const Center(
-                                                    child: Text(
-                                                      '"Weekly dayoffs."',
-                                                      style: TextStyle(
-                                                          color: kColorWhite),
+                                                    ))
+                                                : Container(
+                                                    width: 300,
+                                                    height: 100,
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(10, 0, 10, 0),
+                                                    child: const Center(
+                                                      child: Text(
+                                                          '"Select Specific Dates."',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  kColorWhite)),
                                                     ),
                                                   ),
-                                                ),
-                                        ],
-                                      ),
-                                      const SizedBox(
-                                        width: 5,
-                                      ),
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'Dates Off:',
-                                            textAlign: TextAlign.left,
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: kColorWhite,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          dateselected.isNotEmpty
-                                              ? Container(
-                                                  width: 300,
-                                                  height: 100,
-                                                  padding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          10, 0, 10, 0),
-                                                  child: Scrollbar(
-                                                          trackVisibility: true,
-                                                          thumbVisibility: true,
-                                                          controller:
-                                                              dateoffscroll,
-                                                    child: ListView.builder(
-                                                      controller:
-                                                          dateoffscroll, // Assign the ScrollController to the ListView
-                                                      scrollDirection:
-                                                          Axis.vertical,
-                                                      itemCount:
-                                                          dateselected.length,
-                                                      itemBuilder:
-                                                          (context, index) {
-                                                        return Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .only(
-                                                                  left: 5.0,
-                                                                  right: 5),
-                                                          child: Container(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .fromLTRB(
-                                                                    5, 0, 5, 0),
-                                                            decoration:
-                                                                const BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .all(Radius
-                                                                          .circular(
-                                                                              15)),
-                                                            ),
-                                                            child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Text(
-                                                                    DateFormat(
-                                                                            'MMMM dd, yyyy')
-                                                                        .format(dateselected[
-                                                                            index]),
-                                                                    style: const TextStyle(
-                                                                        color:
-                                                                            kColorWhite)),
-                                                                IconButton(
-                                                                  iconSize: 15,
-                                                                  icon:
-                                                                      const Icon(
-                                                                    Icons
-                                                                        .delete_outline,
-                                                                    color: Colors
-                                                                        .red,
-                                                                  ),
-                                                                  onPressed:
-                                                                      () async {
-                                                                    final result =
-                                                                        await deleteDateOff(
-                                                                      widget
-                                                                          .userinfo
-                                                                          .userId,
-                                                                      dateselected[
-                                                                              index]
-                                                                          .toIso8601String(),
-                                                                    );
-                                                                    if (result ==
-                                                                        'success') {
-                                                                      setState(
-                                                                          () {
-                                                                        getDataFromTutorScheduleCollection(widget
-                                                                            .userinfo
-                                                                            .userId);
-                                                                        CoolAlert
-                                                                            .show(
-                                                                          context:
-                                                                              context,
-                                                                          width:
-                                                                              200,
-                                                                          type: CoolAlertType
-                                                                              .success,
-                                                                          title:
-                                                                              'Deleted successfully!',
-                                                                          titleTextStyle: const TextStyle(
-                                                                              fontSize:
-                                                                                  14,
-                                                                              fontWeight:
-                                                                                  FontWeight.normal),
-                                                                          autoCloseDuration:
-                                                                              const Duration(seconds: 1),
-                                                                        );
-                                                                      });
-                                                                    } else {
-                                                                      // ignore: use_build_context_synchronously
-                                                                      CoolAlert
-                                                                          .show(
-                                                                        context:
-                                                                            context,
-                                                                        width:
-                                                                            200,
-                                                                        type: CoolAlertType
-                                                                            .error,
-                                                                        title: result
-                                                                            .toString(),
-                                                                        titleTextStyle: const TextStyle(
-                                                                            fontSize:
-                                                                                14,
-                                                                            fontWeight:
-                                                                                FontWeight.normal),
-                                                                      );
-                                                                    }
-                                                                  },
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  ))
-                                              : Container(
-                                                  width: 300,
-                                                  height: 100,
-                                                  padding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          10, 0, 10, 0),
-                                                  child: const Center(
-                                                    child: Text(
-                                                        '"Select Specific Dates."',
-                                                        style: TextStyle(
-                                                            color:
-                                                                kColorWhite)),
-                                                  ),
-                                                ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  const Spacer(),
-                                  TextButton(
-                                    onPressed: () {
-                                      CoolAlert.show(
-                                        context: context,
-                                        barrierDismissible: false,
-                                        width: 200,
-                                        type: CoolAlertType.confirm,
-                                        title:
-                                            'Proceed clearing day/date off?',
-                                        titleTextStyle: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight:
-                                                FontWeight.normal),
-                                        confirmBtnText: 'Proceed',
-                                        confirmBtnColor:
-                                            Colors.greenAccent,
-                                        cancelBtnText: 'Go back',
-                                        showCancelBtn: true,
-                                        cancelBtnTextStyle:
-                                            const TextStyle(
-                                                color: Colors.red),
-                                        onCancelBtnTap: () {
-                                          Navigator.of(context).pop;
-                                        },
-                                        onConfirmBtnTap: () async {
-                                          final result =
-                                              await deleteDayOffDates(
-                                            widget.userinfo.userId,
-                                          );
-                                          if (result == 'success') {
-                                            setState(() {
-                                              getDataFromTutorScheduleCollection(
-                                                  widget.userinfo.userId);
-                                              CoolAlert.show(
-                                                context: context,
-                                                width: 200,
-                                                type:
-                                                    CoolAlertType.success,
-                                                title:
-                                                    'Cleared successfully!',
-                                                titleTextStyle:
-                                                    const TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight
-                                                                .normal),
-                                                autoCloseDuration:
-                                                    const Duration(
-                                                        seconds: 1),
-                                              );
-                                            });
-                                          } else {
-                                            // ignore: use_build_context_synchronously
-                                            CoolAlert.show(
-                                              context: context,
-                                              width: 200,
-                                              type: CoolAlertType.error,
-                                              title: result.toString(),
-                                              titleTextStyle:
-                                                  const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight
-                                                              .normal),
-                                            );
-                                          }
-                                        },
-                                      );
-                                    },
-                                    style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all(
-                                              Colors.transparent),
-                                      shape: MaterialStateProperty.all<
-                                          RoundedRectangleBorder>(
-                                        RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(15.0),
+                                          ],
                                         ),
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      'Clear',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.red),
-                                    ),
-                                  ),
+                                      ],
+                                    );
+                                  }),
+                                  // const Spacer(),
+                                  // TextButton(
+                                  //   onPressed: () {
+                                  //     CoolAlert.show(
+                                  //       context: context,
+                                  //       barrierDismissible: false,
+                                  //       width: 200,
+                                  //       type: CoolAlertType.confirm,
+                                  //       title: 'Proceed clearing day/date off?',
+                                  //       titleTextStyle: const TextStyle(
+                                  //           fontSize: 14,
+                                  //           fontWeight: FontWeight.normal),
+                                  //       confirmBtnText: 'Proceed',
+                                  //       confirmBtnColor: Colors.greenAccent,
+                                  //       cancelBtnText: 'Go back',
+                                  //       showCancelBtn: true,
+                                  //       cancelBtnTextStyle:
+                                  //           const TextStyle(color: Colors.red),
+                                  //       onCancelBtnTap: () {
+                                  //         Navigator.of(context).pop;
+                                  //       },
+                                  //       onConfirmBtnTap: () async {
+                                  //         final result =
+                                  //             await deleteDayOffDates(
+                                  //           widget.userinfo.userId,
+                                  //         );
+                                  //         if (result == 'success') {
+                                  //         } else {
+                                  //           CoolAlert.show(
+                                  //             context: context,
+                                  //             width: 200,
+                                  //             type: CoolAlertType.error,
+                                  //             title: result.toString(),
+                                  //             titleTextStyle: const TextStyle(
+                                  //                 fontSize: 14,
+                                  //                 fontWeight:
+                                  //                     FontWeight.normal),
+                                  //           );
+                                  //         }
+                                  //       },
+                                  //     );
+                                  //   },
+                                  //   style: ButtonStyle(
+                                  //     backgroundColor:
+                                  //         MaterialStateProperty.all(
+                                  //             Colors.transparent),
+                                  //     shape: MaterialStateProperty.all<
+                                  //         RoundedRectangleBorder>(
+                                  //       RoundedRectangleBorder(
+                                  //         borderRadius:
+                                  //             BorderRadius.circular(15.0),
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  //   child: const Text(
+                                  //     'Clear',
+                                  //     style: TextStyle(
+                                  //         fontSize: 16,
+                                  //         fontWeight: FontWeight.bold,
+                                  //         color: Colors.red),
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                             ),
@@ -1321,11 +1068,6 @@ class _CalendarSetupState extends State<CalendarSetup> {
                               padding: const EdgeInsets.fromLTRB(
                                   10.0, 5.0, 10.0, 5.0),
                               decoration: BoxDecoration(
-                                // gradient: const LinearGradient(
-                                //   begin: Alignment(-0.1, 0),
-                                //   end: Alignment.centerRight,
-                                //   colors: tabGreen,
-                                // ),
                                 border: Border.all(
                                   width: 3,
                                   color: kCalendarColorAB,
@@ -1570,7 +1312,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                         width: 15,
                                       ),
                                       InkWell(
-                                        onTap: () {
+                                        onTap: () async {
                                           if (_checkboxavailabledayTime) {
                                             if (selectedTime ==
                                                 selectedTimeto) {
@@ -1604,64 +1346,24 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                       timeAvailableTo:
                                                           selectedTimeto);
 
-                                              CoolAlert.show(
-                                                context: context,
-                                                barrierDismissible: false,
-                                                width: 200,
-                                                type: CoolAlertType.confirm,
-                                                title: 'You want to add time?',
-                                                titleTextStyle: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                        FontWeight.normal),
-                                                confirmBtnText: 'Proceed',
-                                                confirmBtnColor:
-                                                    Colors.greenAccent,
-                                                cancelBtnText: 'Go back',
-                                                showCancelBtn: true,
-                                                cancelBtnTextStyle:
-                                                    const TextStyle(
-                                                        color: Colors.red),
-                                                onCancelBtnTap: () {
-                                                  Navigator.of(context).pop;
-                                                },
-                                                onConfirmBtnTap: () async {
-                                                  final result =
-                                                      await addOrUpdateTimeAvailability(
-                                                          widget
-                                                              .userinfo.userId,
-                                                          timeselected);
-                                                  if (result == 'success') {
-                                                    CoolAlert.show(
-                                                      context: context,
-                                                      width: 200,
-                                                      type:
-                                                          CoolAlertType.success,
-                                                      title:
-                                                          'Added successfully!',
-                                                      titleTextStyle:
-                                                          const TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .normal),
-                                                    );
-                                                  } else {
-                                                    CoolAlert.show(
-                                                      context: context,
-                                                      width: 200,
-                                                      type: CoolAlertType.error,
-                                                      title: result.toString(),
-                                                      titleTextStyle:
-                                                          const TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .normal),
-                                                    );
-                                                  }
-                                                },
-                                              );
+                                              final result =
+                                                  await addOrUpdateTimeAvailability(
+                                                      widget.userinfo.userId,
+                                                      timeselected);
+                                              if (result == 'success') {
+                                              } else {
+                                                CoolAlert.show(
+                                                  context: context,
+                                                  width: 200,
+                                                  type: CoolAlertType.error,
+                                                  title: result.toString(),
+                                                  titleTextStyle:
+                                                      const TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight: FontWeight
+                                                              .normal),
+                                                );
+                                              }
 
                                               setState(() {
                                                 availabledateselected =
@@ -1678,7 +1380,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                         selectedTime,
                                                     timeAvailableTo:
                                                         selectedTimeto);
-                                            setState(() {
+                                            setState(() async {
                                               int time =
                                                   calculateTimeDifferenceInMinutes(
                                                       datetimeselected
@@ -1732,152 +1434,52 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                       dateavailabledateselected;
                                                   tempdateavailabledateselected
                                                       .add(datetimeselected);
-                                                  CoolAlert.show(
-                                                    context: context,
-                                                    barrierDismissible: false,
-                                                    width: 200,
-                                                    type: CoolAlertType.confirm,
-                                                    title:
-                                                        'You want to add time?',
-                                                    titleTextStyle:
-                                                        const TextStyle(
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal),
-                                                    confirmBtnText: 'Proceed',
-                                                    confirmBtnColor:
-                                                        Colors.greenAccent,
-                                                    cancelBtnText: 'Go back',
-                                                    showCancelBtn: true,
-                                                    cancelBtnTextStyle:
-                                                        const TextStyle(
-                                                            color: Colors.red),
-                                                    onCancelBtnTap: () {
-                                                      Navigator.of(context).pop;
-                                                    },
-                                                    onConfirmBtnTap: () async {
-                                                      final result1 =
-                                                          await addOrUpdateTimeAvailabilityWithDate(
-                                                              widget.userinfo
-                                                                  .userId,
-                                                              tempdateavailabledateselected);
-                                                      if (result1 ==
-                                                          'success') {
-                                                        setState(() {
-                                                          CoolAlert.show(
-                                                            context: context,
-                                                            width: 200,
-                                                            type: CoolAlertType
-                                                                .success,
-                                                            title:
-                                                                'Available Time/s Added!',
-                                                            titleTextStyle:
-                                                                const TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .normal),
-                                                          );
-                                                        });
-                                                      } else {
-                                                        CoolAlert.show(
-                                                          context: context,
-                                                          width: 200,
-                                                          type: CoolAlertType
-                                                              .error,
-                                                          title: result1
-                                                              .toString(),
-                                                          titleTextStyle:
-                                                              const TextStyle(
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal),
-                                                        );
-                                                      }
-                                                    },
-                                                  );
-
-                                                  dateavailabledateselected
-                                                      .add(datetimeselected);
+                                                  final result1 =
+                                                      await addOrUpdateTimeAvailabilityWithDate(
+                                                          widget
+                                                              .userinfo.userId,
+                                                          datetimeselected);
+                                                  if (result1 == 'success') {
+                                                  } else {
+                                                    CoolAlert.show(
+                                                      context: context,
+                                                      width: 200,
+                                                      type: CoolAlertType.error,
+                                                      title: result1.toString(),
+                                                      titleTextStyle:
+                                                          const TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal),
+                                                    );
+                                                  }
                                                 } else {
                                                   List<DateTimeAvailability>
                                                       tempdateavailabledateselected =
                                                       dateavailabledateselected;
                                                   tempdateavailabledateselected
                                                       .add(datetimeselected);
-                                                  CoolAlert.show(
-                                                    context: context,
-                                                    barrierDismissible: false,
-                                                    width: 200,
-                                                    type: CoolAlertType.confirm,
-                                                    title:
-                                                        'You want to add time?',
-                                                    titleTextStyle:
-                                                        const TextStyle(
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal),
-                                                    confirmBtnText: 'Proceed',
-                                                    confirmBtnColor:
-                                                        Colors.greenAccent,
-                                                    cancelBtnText: 'Go back',
-                                                    showCancelBtn: true,
-                                                    cancelBtnTextStyle:
-                                                        const TextStyle(
-                                                            color: Colors.red),
-                                                    onCancelBtnTap: () {
-                                                      Navigator.of(context).pop;
-                                                    },
-                                                    onConfirmBtnTap: () async {
-                                                      final result1 =
-                                                          await addOrUpdateTimeAvailabilityWithDate(
-                                                              widget.userinfo
-                                                                  .userId,
-                                                              tempdateavailabledateselected);
-                                                      if (result1 ==
-                                                          'success') {
-                                                        setState(() {
-                                                          CoolAlert.show(
-                                                            context: context,
-                                                            width: 200,
-                                                            type: CoolAlertType
-                                                                .success,
-                                                            title:
-                                                                'Available Time/s Added!',
-                                                            titleTextStyle:
-                                                                const TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .normal),
-                                                          );
-                                                        });
-                                                      } else {
-                                                        CoolAlert.show(
-                                                          context: context,
-                                                          width: 200,
-                                                          type: CoolAlertType
-                                                              .error,
-                                                          title: result1
-                                                              .toString(),
-                                                          titleTextStyle:
-                                                              const TextStyle(
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal),
-                                                        );
-                                                      }
-                                                    },
-                                                  );
-
-                                                  dateavailabledateselected
-                                                      .add(datetimeselected);
+                                                  final result1 =
+                                                      await addOrUpdateTimeAvailabilityWithDate(
+                                                          widget
+                                                              .userinfo.userId,
+                                                          datetimeselected);
+                                                  if (result1 == 'success') {
+                                                  } else {
+                                                    CoolAlert.show(
+                                                      context: context,
+                                                      width: 200,
+                                                      type: CoolAlertType.error,
+                                                      title: result1.toString(),
+                                                      titleTextStyle:
+                                                          const TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal),
+                                                    );
+                                                  }
                                                 }
                                               } else {
                                                 CoolAlert.show(
@@ -1916,522 +1518,347 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'Every Available Day:',
-                                            textAlign: TextAlign.left,
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: kColorGrey,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                          availabledateselected
-                                                      .timeAvailableTo !=
-                                                  ''
-                                              ? ClipRect(
-                                                  child: Container(
-                                                      width: 300,
-                                                      height: 60,
-                                                      padding: const EdgeInsets
-                                                              .fromLTRB(
-                                                          15, 10, 5, 0),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text(
-                                                            '${availabledateselected.timeAvailableFrom} to ${availabledateselected.timeAvailableTo}',
-                                                            style: const TextStyle(
-                                                                color:
-                                                                    kColorGrey),
-                                                          ),
-                                                          IconButton(
-                                                            iconSize: 15,
-                                                            icon: const Icon(
-                                                              Icons
-                                                                  .delete_outline,
-                                                              color: Colors.red,
+                                      Consumer<TutorScheduleProvider>(
+                                          builder: (context, scheduletime, _) {
+                                        if (scheduletime
+                                                .availableDateSelected !=
+                                            null) {
+                                          availabledateselected = scheduletime
+                                              .availableDateSelected!;
+                                        } else {
+                                          availabledateselected =
+                                              TimeAvailability(
+                                                  timeAvailableFrom: '',
+                                                  timeAvailableTo: '');
+                                        }
+                                        return Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Every Available Day:',
+                                              textAlign: TextAlign.left,
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: kColorGrey,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                            availabledateselected
+                                                        .timeAvailableTo !=
+                                                    ''
+                                                ? ClipRect(
+                                                    child: Container(
+                                                        width: 300,
+                                                        height: 60,
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                15, 10, 5, 0),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Text(
+                                                              '${updateTime(widget.userinfo.timezone, scheduletime.availableDateSelected!.timeAvailableFrom)} to ${updateTime(widget.userinfo.timezone, scheduletime.availableDateSelected!.timeAvailableTo)}',
+                                                              style: const TextStyle(
+                                                                  color:
+                                                                      kColorGrey),
                                                             ),
-                                                            onPressed:
-                                                                () async {
-                                                              final result =
-                                                                  await deleteTimeAvailability(
-                                                                widget.userinfo
-                                                                    .userId,
-                                                                availabledateselected,
-                                                              );
-                                                              if (result ==
-                                                                  'success') {
-                                                                setState(() {
-                                                                  getDataFromTutorScheduleCollectionavilableTime(widget
+                                                            IconButton(
+                                                              iconSize: 15,
+                                                              icon: const Icon(
+                                                                Icons
+                                                                    .delete_outline,
+                                                                color:
+                                                                    Colors.red,
+                                                              ),
+                                                              onPressed:
+                                                                  () async {
+                                                                final result =
+                                                                    await deleteTimeAvailability(
+                                                                  widget
                                                                       .userinfo
-                                                                      .userId);
+                                                                      .userId,
+                                                                  availabledateselected,
+                                                                );
+                                                                if (result ==
+                                                                    'success') {
+                                                                } else {
                                                                   CoolAlert
                                                                       .show(
                                                                     context:
                                                                         context,
                                                                     width: 200,
                                                                     type: CoolAlertType
-                                                                        .success,
-                                                                    title:
-                                                                        'Deleted successfully!',
+                                                                        .error,
+                                                                    title: result
+                                                                        .toString(),
                                                                     titleTextStyle: const TextStyle(
                                                                         fontSize:
                                                                             14,
                                                                         fontWeight:
                                                                             FontWeight.normal),
                                                                   );
-                                                                });
-                                                              } else {
-                                                                CoolAlert.show(
-                                                                  context:
-                                                                      context,
-                                                                  width: 200,
-                                                                  type:
-                                                                      CoolAlertType
-                                                                          .error,
-                                                                  title: result
-                                                                      .toString(),
-                                                                  titleTextStyle: const TextStyle(
-                                                                      fontSize:
-                                                                          14,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal),
-                                                                );
-                                                              }
-                                                            },
-                                                          ),
-                                                        ],
-                                                      )),
-                                                )
-                                              : Container(
-                                                  width: 200,
-                                                  height: 55,
-                                                  padding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          10, 0, 10, 0),
-                                                  child: const Center(
-                                                    child: Text(
-                                                      '"Time not set"',
-                                                      style: TextStyle(
-                                                          color: kColorGrey),
+                                                                }
+                                                              },
+                                                            ),
+                                                          ],
+                                                        )),
+                                                  )
+                                                : Container(
+                                                    width: 200,
+                                                    height: 55,
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(10, 0, 10, 0),
+                                                    child: const Center(
+                                                      child: Text(
+                                                        '"Time not set"',
+                                                        style: TextStyle(
+                                                            color: kColorGrey),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                        ],
-                                      ),
+                                          ],
+                                        );
+                                      }),
                                       const SizedBox(
                                         width: 2,
                                       ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'Specific Date:',
-                                            textAlign: TextAlign.left,
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: kColorGrey,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                          dateavailabledateselected.isNotEmpty
-                                              ? Container(
-                                                  width: 450,
-                                                  height: 100,
-                                                  padding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          10, 0, 10, 0),
-                                                  child: Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: Scrollbar(
-                                                          trackVisibility: true,
-                                                          thumbVisibility: true,
-                                                          controller:
-                                                              dateavailablescroll,
-                                                          child:
-                                                              ListView.builder(
+                                      Consumer<TutorScheduleProvider>(
+                                          builder: (context, scheduletime, _) {
+                                        if (scheduletime
+                                                .dateavailabledateselected !=
+                                            null) {
+                                          dateavailabledateselected =
+                                              scheduletime
+                                                  .dateavailabledateselected!;
+                                        } else {
+                                          dateavailabledateselected = [];
+                                        }
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Specific Date:',
+                                              textAlign: TextAlign.left,
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: kColorGrey,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                            dateavailabledateselected.isNotEmpty
+                                                ? Container(
+                                                    width: 450,
+                                                    height: 100,
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(10, 0, 10, 0),
+                                                    child: Row(
+                                                      children: [
+                                                        Expanded(
+                                                          child: Scrollbar(
+                                                            trackVisibility:
+                                                                true,
+                                                            thumbVisibility:
+                                                                true,
                                                             controller:
                                                                 dateavailablescroll,
-                                                            scrollDirection:
-                                                                Axis.vertical,
-                                                            itemCount:
-                                                                dateavailabledateselected
-                                                                    .length,
-                                                            itemBuilder:
-                                                                (context,
-                                                                    index) {
-                                                              return Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .only(
-                                                                        left:
-                                                                            5.0,
-                                                                        right:
-                                                                            5),
-                                                                child:
-                                                                    Container(
-                                                                  padding:
-                                                                      const EdgeInsets
-                                                                              .fromLTRB(
-                                                                          5,
-                                                                          0,
-                                                                          5,
-                                                                          0),
-                                                                  decoration:
-                                                                      const BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius.all(
-                                                                            Radius.circular(15)),
-                                                                  ),
-                                                                  child: Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      Text(
-                                                                        '${DateFormat('MMMM dd, yyyy').format(dateavailabledateselected[index].selectedDate)}(From: ${dateavailabledateselected[index].timeAvailableFrom} To: ${dateavailabledateselected[index].timeAvailableTo})',
-                                                                        style: const TextStyle(
-                                                                            color:
-                                                                                kColorGrey),
-                                                                      ),
-                                                                      IconButton(
-                                                                        iconSize:
-                                                                            15,
-                                                                        icon:
-                                                                            const Icon(
-                                                                          Icons
-                                                                              .delete_outline,
-                                                                          color:
-                                                                              Colors.red,
+                                                            child: ListView
+                                                                .builder(
+                                                              controller:
+                                                                  dateavailablescroll,
+                                                              scrollDirection:
+                                                                  Axis.vertical,
+                                                              itemCount:
+                                                                  dateavailabledateselected
+                                                                      .length,
+                                                              itemBuilder:
+                                                                  (context,
+                                                                      index) {
+                                                                return Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .only(
+                                                                      left: 5.0,
+                                                                      right: 5),
+                                                                  child:
+                                                                      Container(
+                                                                    padding:
+                                                                        const EdgeInsets.fromLTRB(
+                                                                            5,
+                                                                            0,
+                                                                            5,
+                                                                            0),
+                                                                    decoration:
+                                                                        const BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.all(
+                                                                              Radius.circular(15)),
+                                                                    ),
+                                                                    child: Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: [
+                                                                        Text(
+                                                                          '${DateFormat('MMMM dd, yyyy').format(dateavailabledateselected[index].selectedDate)}(From: ${dateavailabledateselected[index].timeAvailableFrom} To: ${dateavailabledateselected[index].timeAvailableTo})',
+                                                                          style:
+                                                                              const TextStyle(color: kColorGrey),
                                                                         ),
-                                                                        onPressed:
-                                                                            () async {
-                                                                          final result =
-                                                                              await deleteDateAvailability(
-                                                                            widget.userinfo.userId,
-                                                                            dateavailabledateselected[index],
-                                                                          );
-                                                                          if (result ==
-                                                                              'success') {
-                                                                            setState(() {
-                                                                              getDataFromTutorScheduleCollectionAvailableDateTime(widget.userinfo.userId);
+                                                                        IconButton(
+                                                                          iconSize:
+                                                                              15,
+                                                                          icon:
+                                                                              const Icon(
+                                                                            Icons.delete_outline,
+                                                                            color:
+                                                                                Colors.red,
+                                                                          ),
+                                                                          onPressed:
+                                                                              () async {
+                                                                            final result =
+                                                                                await deleteDateAvailability(
+                                                                              widget.userinfo.userId,
+                                                                              dateavailabledateselected[index],
+                                                                            );
+                                                                            print(result);
+                                                                            if (result ==
+                                                                                'success') {
+                                                                            } else {
                                                                               CoolAlert.show(
                                                                                 context: context,
                                                                                 width: 200,
-                                                                                type: CoolAlertType.success,
-                                                                                title: 'Deleted successfully!',
+                                                                                type: CoolAlertType.error,
+                                                                                title: result.toString(),
                                                                                 titleTextStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
                                                                               );
-                                                                            });
-                                                                          } else {
-                                                                            CoolAlert.show(
-                                                                              context: context,
-                                                                              width: 200,
-                                                                              type: CoolAlertType.error,
-                                                                              title: result.toString(),
-                                                                              titleTextStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
-                                                                            );
-                                                                          }
-                                                                          setState(
-                                                                              () {
-                                                                            dateavailabledateselected.removeAt(index);
-                                                                          });
-                                                                        },
-                                                                      ),
-                                                                    ],
+                                                                            }
+                                                                          
+                                                                          },
+                                                                        ),
+                                                                      ],
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              );
-                                                            },
+                                                                );
+                                                              },
+                                                            ),
                                                           ),
                                                         ),
+                                                      ],
+                                                    ))
+                                                : Container(
+                                                    width: 300,
+                                                    height: 55,
+                                                    padding: const EdgeInsets
+                                                        .fromLTRB(10, 0, 10, 0),
+                                                    child: const Center(
+                                                      child: Text(
+                                                        '"Select Specific Dates."',
+                                                        style: TextStyle(
+                                                            color: kColorGrey),
                                                       ),
-                                                    ],
-                                                  ))
-                                              : Container(
-                                                  width: 300,
-                                                  height: 55,
-                                                  padding:
-                                                      const EdgeInsets.fromLTRB(
-                                                          10, 0, 10, 0),
-                                                  child: const Center(
-                                                    child: Text(
-                                                      '"Select Specific Dates."',
-                                                      style: TextStyle(
-                                                          color: kColorGrey),
                                                     ),
                                                   ),
-                                                ),
-                                        ],
-                                      ),
+                                          ],
+                                        );
+                                      }),
                                     ],
                                   ),
                                   const Spacer(),
                                   // Padding(
-                                  //   padding: const EdgeInsets.all(5.0),
+                                  //   padding: const EdgeInsets.fromLTRB(
+                                  //       5.0, 0.0, 5.0, 0.0),
                                   //   child: Row(
                                   //     mainAxisAlignment:
-                                  //         MainAxisAlignment.center,
+                                  //         MainAxisAlignment.start,
                                   //     children: [
-                                  //       ElevatedButton(
+                                  //       TextButton(
                                   //         onPressed: () {
-                                  //           CoolAlert.show(
-                                  //             context: context,
-                                  //             barrierDismissible: false,
-                                  //             width: 200,
-                                  //             type: CoolAlertType.confirm,
-                                  //             text:
-                                  //                 'You want to add/update time?',
-                                  //             confirmBtnText: 'Proceed',
-                                  //             confirmBtnColor:
-                                  //                 Colors.greenAccent,
-                                  //             cancelBtnText: 'Go back',
-                                  //             showCancelBtn: true,
-                                  //             cancelBtnTextStyle:
-                                  //                 const TextStyle(
-                                  //                     color: Colors.red),
-                                  //             onCancelBtnTap: () {
-                                  //               Navigator.of(context).pop;
-                                  //             },
-                                  //             onConfirmBtnTap: () async {
-                                  //               if (availabledateselected
-                                  //                       .timeAvailableTo ==
-                                  //                   '') {
-                                  //                 CoolAlert.show(
-                                  //                   context: context,
-                                  //                   width: 200,
-                                  //                   type: CoolAlertType.error,
-                                  //                   text:
-                                  //                       'Please select time or click add for your selection!',
-                                  //                 );
-                                  //               } else {
+                                  //           if (widget.booking.isEmpty) {
+                                  //             CoolAlert.show(
+                                  //               context: context,
+                                  //               barrierDismissible: false,
+                                  //               width: 200,
+                                  //               type: CoolAlertType.confirm,
+                                  //               titleTextStyle: const TextStyle(
+                                  //                   fontSize: 14,
+                                  //                   fontWeight:
+                                  //                       FontWeight.normal),
+                                  //               title:
+                                  //                   'Procedd to clear schedule?',
+                                  //               confirmBtnText: 'Proceed',
+                                  //               confirmBtnColor:
+                                  //                   Colors.greenAccent,
+                                  //               cancelBtnText: 'Go back',
+                                  //               showCancelBtn: true,
+                                  //               cancelBtnTextStyle:
+                                  //                   const TextStyle(
+                                  //                       color: Colors.red),
+                                  //               onCancelBtnTap: () {
+                                  //                 Navigator.of(context).pop;
+                                  //               },
+                                  //               onConfirmBtnTap: () async {
                                   //                 final result =
-                                  //                     await addOrUpdateTimeAvailability(
-                                  //                         widget
-                                  //                             .userinfo.userId,
-                                  //                         availabledateselected);
-                                  //                 final result1 =
-                                  //                     await addOrUpdateTimeAvailabilityWithDate(
-                                  //                         widget
-                                  //                             .userinfo.userId,
-                                  //                         dateavailabledateselected);
-                                  //                 if (result1 == 'success') {
-                                  //                   setState(() {
-                                  //                     CoolAlert.show(
-                                  //                       context: context,
-                                  //                       width: 200,
-                                  //                       type: CoolAlertType
-                                  //                           .success,
-                                  //                       text:
-                                  //                           'Available Time/s Added!',
-                                  //                       autoCloseDuration:
-                                  //                           const Duration(
-                                  //                               seconds: 1),
-                                  //                     );
-                                  //                   });
+                                  //                     await deleteAllTimeData(
+                                  //                   widget.userinfo.userId,
+                                  //                 );
+                                  //                 if (result == 'success') {
                                   //                 } else {
-                                  //                   // ignore: use_build_context_synchronously
                                   //                   CoolAlert.show(
                                   //                     context: context,
                                   //                     width: 200,
                                   //                     type: CoolAlertType.error,
-                                  //                     text: result.toString(),
+                                  //                     title: result.toString(),
+                                  //                     titleTextStyle:
+                                  //                         const TextStyle(
+                                  //                             fontSize: 14,
+                                  //                             fontWeight:
+                                  //                                 FontWeight
+                                  //                                     .normal),
                                   //                   );
                                   //                 }
-                                  //               }
-                                  //             },
-                                  //           );
+                                  //               },
+                                  //             );
+                                  //           } else {
+                                  //             CoolAlert.show(
+                                  //               context: context,
+                                  //               width: 200,
+                                  //               type: CoolAlertType.error,
+                                  //               title:
+                                  //                   'You already have bookings! Clear individually!',
+                                  //               titleTextStyle: const TextStyle(
+                                  //                   fontSize: 14,
+                                  //                   fontWeight:
+                                  //                       FontWeight.normal),
+                                  //             );
+                                  //           }
                                   //         },
-                                  //         style: ElevatedButton.styleFrom(
-                                  //           foregroundColor: Colors.white,
+                                  //         style: ButtonStyle(
                                   //           backgroundColor:
-                                  //               kColorPrimary, // Text color
-                                  //           padding: const EdgeInsets.symmetric(
-                                  //               horizontal: 20, vertical: 15),
-                                  //           shape: RoundedRectangleBorder(
-                                  //             borderRadius:
-                                  //                 BorderRadius.circular(15),
-                                  //           ),
-                                  //         ),
-                                  //         child: const Text(
-                                  //           'Save Availability',
-                                  //           style: TextStyle(
-                                  //               fontSize: 16,
-                                  //               color: Colors.white),
-                                  //         ),
-                                  //       ),
-                                  //       const SizedBox(width: 20),
-                                  //       ElevatedButton(
-                                  //         onPressed: () {
-                                  //           CoolAlert.show(
-                                  //             context: context,
-                                  //             barrierDismissible: false,
-                                  //             width: 200,
-                                  //             type: CoolAlertType.confirm,
-                                  //             text:
-                                  //                 'You want to clear time availabilty?',
-                                  //             confirmBtnText: 'Proceed',
-                                  //             confirmBtnColor:
-                                  //                 Colors.greenAccent,
-                                  //             cancelBtnText: 'Go back',
-                                  //             showCancelBtn: true,
-                                  //             cancelBtnTextStyle:
-                                  //                 const TextStyle(
-                                  //                     color: Colors.red),
-                                  //             onCancelBtnTap: () {
-                                  //               Navigator.of(context).pop;
-                                  //             },
-                                  //             onConfirmBtnTap: () {
-                                  //               Navigator.of(context).pop;
-                                  //             },
-                                  //           );
-                                  //         },
-                                  //         style: ElevatedButton.styleFrom(
-                                  //           foregroundColor: kColorPrimary,
-                                  //           backgroundColor:
-                                  //               Colors.white, // Text color
-                                  //           padding: const EdgeInsets.symmetric(
-                                  //               horizontal: 20, vertical: 15),
-                                  //           shape: RoundedRectangleBorder(
-                                  //             borderRadius:
-                                  //                 BorderRadius.circular(15),
+                                  //               MaterialStateProperty.all(
+                                  //                   Colors.transparent),
+                                  //           shape: MaterialStateProperty.all<
+                                  //               RoundedRectangleBorder>(
+                                  //             RoundedRectangleBorder(
+                                  //               borderRadius:
+                                  //                   BorderRadius.circular(15.0),
+                                  //             ),
                                   //           ),
                                   //         ),
                                   //         child: const Text(
                                   //           'Clear',
                                   //           style: TextStyle(
                                   //               fontSize: 16,
+                                  //               fontWeight: FontWeight.bold,
                                   //               color: Colors.red),
                                   //         ),
                                   //       ),
                                   //     ],
                                   //   ),
                                   // ),
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                        5.0, 0.0, 5.0, 0.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        TextButton(
-                                          onPressed: () {
-                                            if (widget.booking.isEmpty) {
-                                              CoolAlert.show(
-                                                context: context,
-                                                barrierDismissible: false,
-                                                width: 200,
-                                                type: CoolAlertType.confirm,
-                                                titleTextStyle: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                        FontWeight.normal),
-                                                title:
-                                                    'Procedd to clear schedule?',
-                                                confirmBtnText: 'Proceed',
-                                                confirmBtnColor:
-                                                    Colors.greenAccent,
-                                                cancelBtnText: 'Go back',
-                                                showCancelBtn: true,
-                                                cancelBtnTextStyle:
-                                                    const TextStyle(
-                                                        color: Colors.red),
-                                                onCancelBtnTap: () {
-                                                  Navigator.of(context).pop;
-                                                },
-                                                onConfirmBtnTap: () async {
-                                                  final result =
-                                                      await deleteAllTimeData(
-                                                    widget.userinfo.userId,
-                                                  );
-                                                  if (result == 'success') {
-                                                    setState(() {
-                                                      getDataFromTutorScheduleCollectionavilableTime(
-                                                          widget
-                                                              .userinfo.userId);
-                                                      getDataFromTutorScheduleCollectionAvailableDateTime(
-                                                          widget
-                                                              .userinfo.userId);
-                                                      CoolAlert.show(
-                                                        context: context,
-                                                        width: 200,
-                                                        type: CoolAlertType
-                                                            .success,
-                                                        title:
-                                                            ' Cleared successfully!',
-                                                        titleTextStyle:
-                                                            const TextStyle(
-                                                                fontSize: 14,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .normal),
-                                                        autoCloseDuration:
-                                                            const Duration(
-                                                                seconds: 1),
-                                                      );
-                                                    });
-                                                  } else {
-                                                    CoolAlert.show(
-                                                      context: context,
-                                                      width: 200,
-                                                      type: CoolAlertType.error,
-                                                      title: result.toString(),
-                                                      titleTextStyle:
-                                                          const TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .normal),
-                                                    );
-                                                  }
-                                                },
-                                              );
-                                            } else {
-                                              CoolAlert.show(
-                                                context: context,
-                                                width: 200,
-                                                type: CoolAlertType.error,
-                                                title:
-                                                    'You already have bookings! Clear individually!',
-                                                titleTextStyle: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                        FontWeight.normal),
-                                              );
-                                            }
-                                          },
-                                          style: ButtonStyle(
-                                            backgroundColor:
-                                                MaterialStateProperty.all(
-                                                    Colors.transparent),
-                                            shape: MaterialStateProperty.all<
-                                                RoundedRectangleBorder>(
-                                              RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(15.0),
-                                              ),
-                                            ),
-                                          ),
-                                          child: const Text(
-                                            'Clear',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.red),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                
                                 ],
                               ),
                             ),
@@ -2443,11 +1870,6 @@ class _CalendarSetupState extends State<CalendarSetup> {
                               padding: const EdgeInsets.fromLTRB(
                                   10.0, 5.0, 10.0, 5.0),
                               decoration: BoxDecoration(
-                                // gradient: const LinearGradient(
-                                //   begin: Alignment(-0.1, 0),
-                                //   end: Alignment.centerRight,
-                                //   colors: tabred,
-                                // ),
                                 border: Border.all(
                                   width: 3,
                                   color: kCalendarColorB,
@@ -2607,7 +2029,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                     timeTo: selectedTimeto,
                                                     blockDate: blocktimedate!);
 
-                                            setState(() {
+                                            setState(() async {
                                               int time =
                                                   calculateTimeDifferenceInMinutes(
                                                       datetimeselected.timeFrom,
@@ -2651,68 +2073,12 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                                 timeAvailable
                                                                     .timeTo) ==
                                                             false)) {
-                                                  blockdateselected
-                                                      .add(datetimeselected);
-                                                  CoolAlert.show(
-                                                      context: context,
-                                                      barrierDismissible: false,
-                                                      width: 200,
-                                                      type:
-                                                          CoolAlertType.confirm,
-                                                      title:
-                                                          'You want to block date/time?',
-                                                      titleTextStyle:
-                                                          const TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .normal),
-                                                      confirmBtnText: 'Proceed',
-                                                      confirmBtnColor:
-                                                          Colors.greenAccent,
-                                                      cancelBtnText: 'Go back',
-                                                      showCancelBtn: true,
-                                                      cancelBtnTextStyle:
-                                                          const TextStyle(
-                                                              color:
-                                                                  Colors.red),
-                                                      onCancelBtnTap: () {
-                                                        Navigator.of(context)
-                                                            .pop;
-                                                      },
-                                                      onConfirmBtnTap:
-                                                          () async {
-                                                        final result1 =
-                                                            await blockTimeWithDate(
-                                                                widget.userinfo
-                                                                    .userId,
-                                                                datetimeselected);
-                                                        if (result1 ==
-                                                            'success') {
-                                                          setState(() {
-                                                            CoolAlert.show(
-                                                              context: context,
-                                                              width: 200,
-                                                              type:
-                                                                  CoolAlertType
-                                                                      .success,
-                                                              title:
-                                                                  'Date and time blocked!',
-                                                              titleTextStyle:
-                                                                  const TextStyle(
-                                                                      fontSize:
-                                                                          14,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal),
-                                                              autoCloseDuration:
-                                                                  const Duration(
-                                                                      seconds:
-                                                                          1),
-                                                            );
-                                                          });
-                                                        }
-                                                      });
+                                                  final result1 =
+                                                      await blockTimeWithDate(
+                                                          widget
+                                                              .userinfo.userId,
+                                                          datetimeselected);
+                                                  if (result1 == 'success') {}
                                                 } else if (dayoffselected
                                                         .contains(DateFormat('EEEE').format(datetimeselected.blockDate)) ||
                                                     dateselected.contains(datetimeselected.blockDate)) {
@@ -2730,68 +2096,12 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                         'Selected Date is a dayoff!',
                                                   );
                                                 } else {
-                                                  blockdateselected
-                                                      .add(datetimeselected);
-                                                  CoolAlert.show(
-                                                      context: context,
-                                                      barrierDismissible: false,
-                                                      width: 200,
-                                                      type:
-                                                          CoolAlertType.confirm,
-                                                      title:
-                                                          'You want to block date/time?',
-                                                      titleTextStyle:
-                                                          const TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .normal),
-                                                      confirmBtnText: 'Proceed',
-                                                      confirmBtnColor:
-                                                          Colors.greenAccent,
-                                                      cancelBtnText: 'Go back',
-                                                      showCancelBtn: true,
-                                                      cancelBtnTextStyle:
-                                                          const TextStyle(
-                                                              color:
-                                                                  Colors.red),
-                                                      onCancelBtnTap: () {
-                                                        Navigator.of(context)
-                                                            .pop;
-                                                      },
-                                                      onConfirmBtnTap:
-                                                          () async {
-                                                        final result1 =
-                                                            await blockTimeWithDate(
-                                                                widget.userinfo
-                                                                    .userId,
-                                                                datetimeselected);
-                                                        if (result1 ==
-                                                            'success') {
-                                                          setState(() {
-                                                            CoolAlert.show(
-                                                              context: context,
-                                                              width: 200,
-                                                              type:
-                                                                  CoolAlertType
-                                                                      .success,
-                                                              title:
-                                                                  'Date and time blocked!',
-                                                              titleTextStyle:
-                                                                  const TextStyle(
-                                                                      fontSize:
-                                                                          14,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .normal),
-                                                              autoCloseDuration:
-                                                                  const Duration(
-                                                                      seconds:
-                                                                          1),
-                                                            );
-                                                          });
-                                                        }
-                                                      });
+                                                  final result1 =
+                                                      await blockTimeWithDate(
+                                                          widget
+                                                              .userinfo.userId,
+                                                          datetimeselected);
+                                                  if (result1 == 'success') {}
                                                 }
                                               } else {
                                                 CoolAlert.show(
@@ -2837,264 +2147,230 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                   const SizedBox(
                                     height: 2,
                                   ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        'Specific Date:',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            color: kColorGrey,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      blockdateselected.isNotEmpty
-                                          ? Container(
-                                              width: 450,
-                                              height: 120,
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      10, 0, 5, 0),
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Scrollbar(
-                                                          trackVisibility: true,
-                                                          thumbVisibility: true,
-                                                          controller:
-                                                              blockdatetimescroll,
-                                                      child: ListView.builder(
+                                  Consumer<TutorScheduleProvider>(
+                                      builder: (context, scheduletime, _) {
+                                    if (scheduletime.blockdateselected !=
+                                        null) {
+                                      blockdateselected =
+                                          scheduletime.blockdateselected!;
+                                    } else {
+                                      blockdateselected = [];
+                                    }
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Specific Date:',
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: kColorGrey,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        blockdateselected.isNotEmpty
+                                            ? Container(
+                                                width: 450,
+                                                height: 120,
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        10, 0, 5, 0),
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Scrollbar(
+                                                        trackVisibility: true,
+                                                        thumbVisibility: true,
                                                         controller:
                                                             blockdatetimescroll,
-                                                        scrollDirection:
-                                                            Axis.vertical,
-                                                        itemCount:
-                                                            blockdateselected
-                                                                .length,
-                                                        itemBuilder:
-                                                            (context, index) {
-                                                          return Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .only(
-                                                                    left: 5.0,
-                                                                    right: 5),
-                                                            child: Container(
+                                                        child: ListView.builder(
+                                                          controller:
+                                                              blockdatetimescroll,
+                                                          scrollDirection:
+                                                              Axis.vertical,
+                                                          itemCount:
+                                                              blockdateselected
+                                                                  .length,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            return Padding(
                                                               padding:
                                                                   const EdgeInsets
-                                                                          .fromLTRB(
-                                                                      5, 0, 5, 0),
-                                                              decoration:
-                                                                  const BoxDecoration(
-                                                                borderRadius: BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            15)),
-                                                              ),
-                                                              child: Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .spaceBetween,
-                                                                children: [
-                                                                  Text(
-                                                                    '${DateFormat('MMMM dd, yyyy').format(blockdateselected[index].blockDate)}(From: ${blockdateselected[index].timeFrom} To: ${blockdateselected[index].timeTo})',
-                                                                    style:
-                                                                        const TextStyle(
-                                                                      color:
-                                                                          kColorGrey,
+                                                                          .only(
+                                                                      left: 5.0,
+                                                                      right: 5),
+                                                              child: Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .fromLTRB(
+                                                                        5,
+                                                                        0,
+                                                                        5,
+                                                                        0),
+                                                                decoration:
+                                                                    const BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius.all(
+                                                                          Radius.circular(
+                                                                              15)),
+                                                                ),
+                                                                child: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    Text(
+                                                                      '${DateFormat('MMMM dd, yyyy').format(blockdateselected[index].blockDate)}(From: ${blockdateselected[index].timeFrom} To: ${blockdateselected[index].timeTo})',
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        color:
+                                                                            kColorGrey,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                  IconButton(
-                                                                    iconSize: 15,
-                                                                    icon:
-                                                                        const Icon(
-                                                                      Icons
-                                                                          .delete_outline,
-                                                                      color: Colors
-                                                                          .red,
+                                                                    IconButton(
+                                                                      iconSize:
+                                                                          15,
+                                                                      icon:
+                                                                          const Icon(
+                                                                        Icons
+                                                                            .delete_outline,
+                                                                        color: Colors
+                                                                            .red,
+                                                                      ),
+                                                                      onPressed:
+                                                                          () async {
+                                                                        final result =
+                                                                            await deleteBlockDate(
+                                                                          widget
+                                                                              .userinfo
+                                                                              .userId,
+                                                                          blockdateselected[
+                                                                              index],
+                                                                        );
+                                                                        if (result ==
+                                                                            'success') {
+                                                                        } else {
+                                                                          CoolAlert
+                                                                              .show(
+                                                                            context:
+                                                                                context,
+                                                                            width:
+                                                                                200,
+                                                                            type:
+                                                                                CoolAlertType.error,
+                                                                            title:
+                                                                                result.toString(),
+                                                                            titleTextStyle:
+                                                                                const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
+                                                                          );
+                                                                        }
+                                                                      },
                                                                     ),
-                                                                    onPressed:
-                                                                        () async {
-                                                                      final result =
-                                                                          await deleteBlockDate(
-                                                                        widget
-                                                                            .userinfo
-                                                                            .userId,
-                                                                        blockdateselected[
-                                                                            index],
-                                                                      );
-                                                                      if (result ==
-                                                                          'success') {
-                                                                        CoolAlert
-                                                                            .show(
-                                                                          context:
-                                                                              context,
-                                                                          width:
-                                                                              200,
-                                                                          type: CoolAlertType
-                                                                              .success,
-                                                                          title:
-                                                                              'Deleted successfully!',
-                                                                          titleTextStyle: const TextStyle(
-                                                                              fontSize:
-                                                                                  14,
-                                                                              fontWeight:
-                                                                                  FontWeight.normal),
-                                                                          autoCloseDuration:
-                                                                              const Duration(seconds: 1),
-                                                                        );
-                                                                      } else {
-                                                                        // ignore: use_build_context_synchronously
-                                                                        CoolAlert
-                                                                            .show(
-                                                                          context:
-                                                                              context,
-                                                                          width:
-                                                                              200,
-                                                                          type: CoolAlertType
-                                                                              .error,
-                                                                          title: result
-                                                                              .toString(),
-                                                                          titleTextStyle: const TextStyle(
-                                                                              fontSize:
-                                                                                  14,
-                                                                              fontWeight:
-                                                                                  FontWeight.normal),
-                                                                        );
-                                                                      }
-                                                                      setState(
-                                                                          () {
-                                                                        blockdateselected
-                                                                            .removeAt(
-                                                                                index);
-                                                                      });
-                                                                    },
-                                                                  ),
-                                                                ],
+                                                                  ],
+                                                                ),
                                                               ),
-                                                            ),
-                                                          );
-                                                        },
+                                                            );
+                                                          },
+                                                        ),
                                                       ),
                                                     ),
+                                                  ],
+                                                ))
+                                            : Container(
+                                                width: 300,
+                                                height: 55,
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        10, 0, 10, 0),
+                                                child: const Center(
+                                                  child: Text(
+                                                    '"Select Specific Dates."',
+                                                    style: TextStyle(
+                                                        color: kColorGrey),
                                                   ),
-                                                ],
-                                              ))
-                                          : Container(
-                                              width: 300,
-                                              height: 55,
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      10, 0, 10, 0),
-                                              child: const Center(
-                                                child: Text(
-                                                  '"Select Specific Dates."',
-                                                  style: TextStyle(
-                                                      color: kColorGrey),
                                                 ),
                                               ),
-                                            ),
-                                    ],
-                                  ),
-                                  const Spacer(),
-                                  Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                        5.0, 0.0, 5.0, 0.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        TextButton(
-                                          onPressed: () {
-                                            CoolAlert.show(
-                                              context: context,
-                                              barrierDismissible: false,
-                                              width: 200,
-                                              type: CoolAlertType.confirm,
-                                              titleTextStyle: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                              title: 'Proceed clearing?',
-                                              confirmBtnText: 'Proceed',
-                                              confirmBtnColor:
-                                                  Colors.greenAccent,
-                                              cancelBtnText: 'Go back',
-                                              showCancelBtn: true,
-                                              cancelBtnTextStyle:
-                                                  const TextStyle(
-                                                      color: Colors.red),
-                                              onCancelBtnTap: () {
-                                                Navigator.of(context).pop;
-                                              },
-                                              onConfirmBtnTap: () async {
-                                                final result =
-                                                    await deleteAllBlockDates(
-                                                  widget.userinfo.userId,
-                                                );
-                                                if (result == 'success') {
-                                                  setState(() {
-                                                    getDataFromTutorScheduleCollectionBlockDateTime(
-                                                        widget.userinfo.userId);
-                                                    CoolAlert.show(
-                                                      context: context,
-                                                      width: 200,
-                                                      type:
-                                                          CoolAlertType.success,
-                                                      titleTextStyle:
-                                                          const TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .normal),
-                                                      title:
-                                                          'Block Time Deleted!',
-                                                      autoCloseDuration:
-                                                          const Duration(
-                                                              seconds: 1),
-                                                    );
-                                                  });
-                                                } else {
-                                                  CoolAlert.show(
-                                                    context: context,
-                                                    width: 200,
-                                                    type: CoolAlertType.error,
-                                                    titleTextStyle:
-                                                        const TextStyle(
-                                                            fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .normal),
-                                                    title: result.toString(),
-                                                  );
-                                                }
-                                              },
-                                            );
-                                          },
-                                          style: ButtonStyle(
-                                            backgroundColor:
-                                                MaterialStateProperty.all(
-                                                    Colors.transparent),
-                                            shape: MaterialStateProperty.all<
-                                                RoundedRectangleBorder>(
-                                              RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(15.0),
-                                              ),
-                                            ),
-                                          ),
-                                          child: const Text(
-                                            'Clear',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.red),
-                                          ),
-                                        ),
                                       ],
-                                    ),
-                                  ),
+                                    );
+                                  }),
+                                  const Spacer(),
+                                  // Padding(
+                                  //   padding: const EdgeInsets.fromLTRB(
+                                  //       5.0, 0.0, 5.0, 0.0),
+                                  //   child: Row(
+                                  //     mainAxisAlignment:
+                                  //         MainAxisAlignment.start,
+                                  //     children: [
+                                  //       TextButton(
+                                  //         onPressed: () {
+                                  //           CoolAlert.show(
+                                  //             context: context,
+                                  //             barrierDismissible: false,
+                                  //             width: 200,
+                                  //             type: CoolAlertType.confirm,
+                                  //             titleTextStyle: const TextStyle(
+                                  //                 fontSize: 14,
+                                  //                 fontWeight:
+                                  //                     FontWeight.normal),
+                                  //             title: 'Proceed clearing?',
+                                  //             confirmBtnText: 'Proceed',
+                                  //             confirmBtnColor:
+                                  //                 Colors.greenAccent,
+                                  //             cancelBtnText: 'Go back',
+                                  //             showCancelBtn: true,
+                                  //             cancelBtnTextStyle:
+                                  //                 const TextStyle(
+                                  //                     color: Colors.red),
+                                  //             onCancelBtnTap: () {
+                                  //               Navigator.of(context).pop;
+                                  //             },
+                                  //             onConfirmBtnTap: () async {
+                                  //               final result =
+                                  //                   await deleteAllBlockDates(
+                                  //                 widget.userinfo.userId,
+                                  //               );
+                                  //               if (result == 'success') {
+                                  //               } else {
+                                  //                 CoolAlert.show(
+                                  //                   context: context,
+                                  //                   width: 200,
+                                  //                   type: CoolAlertType.error,
+                                  //                   titleTextStyle:
+                                  //                       const TextStyle(
+                                  //                           fontSize: 14,
+                                  //                           fontWeight:
+                                  //                               FontWeight
+                                  //                                   .normal),
+                                  //                   title: result.toString(),
+                                  //                 );
+                                  //               }
+                                  //             },
+                                  //           );
+                                  //         },
+                                  //         style: ButtonStyle(
+                                  //           backgroundColor:
+                                  //               MaterialStateProperty.all(
+                                  //                   Colors.transparent),
+                                  //           shape: MaterialStateProperty.all<
+                                  //               RoundedRectangleBorder>(
+                                  //             RoundedRectangleBorder(
+                                  //               borderRadius:
+                                  //                   BorderRadius.circular(15.0),
+                                  //             ),
+                                  //           ),
+                                  //         ),
+                                  //         child: const Text(
+                                  //           'Clear',
+                                  //           style: TextStyle(
+                                  //               fontSize: 16,
+                                  //               fontWeight: FontWeight.bold,
+                                  //               color: Colors.red),
+                                  //         ),
+                                  //       ),
+                                  //     ],
+                                  //   ),
+                                  // ),
+                              
                                 ],
                               ),
                             ),

@@ -13,14 +13,27 @@ class CartNotifier with ChangeNotifier {
           .where('studentid', isEqualTo: studentid)
           .snapshots()
           .listen((QuerySnapshot querySnapshot) {
-        _cart = querySnapshot.docs
-            .map((doc) => doc.data() as Map<String, dynamic>)
-            .toList();
+        _cart = querySnapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          data['docid'] = doc.id; // Include the document ID in the map
+          return data;
+        }).toList();
         notifyListeners();
       });
     } catch (e) {
       _cart = [];
       notifyListeners();
     }
+  }
+}
+
+
+Future<String> deleteCartItem(String docId) async {
+  try {
+    await FirebaseFirestore.instance.collection('mycart').doc(docId).delete();
+    print("Document with ID: $docId deleted successfully.");
+    return 'success';
+  } catch (e) {
+    return 'failed';
   }
 }

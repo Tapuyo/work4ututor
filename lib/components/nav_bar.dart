@@ -1,15 +1,13 @@
-// ignore_for_file: avoid_print, no_leading_underscores_for_local_identifiers
+// ignore_for_file: avoid_print, no_leading_underscores_for_local_identifiers, unnecessary_null_comparison
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cool_alert/cool_alert.dart';
-import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
-import 'package:work4ututor/data_class/chatmessageclass.dart';
-import 'package:work4ututor/shared_components/alphacode3.dart';
 import 'package:work4ututor/ui/web/login/login.dart';
 import 'package:work4ututor/ui/web/signup/student_signup.dart';
 import 'package:work4ututor/ui/web/signup/tutor_signup.dart';
@@ -23,7 +21,6 @@ import '../ui/web/search_tutor/find_tutors.dart';
 import '../ui/web/terms/termpage.dart';
 import '../utils/themes.dart';
 
-import 'package:universal_html/html.dart' as html;
 
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({Key? key}) : super(key: key);
@@ -236,35 +233,14 @@ class CustomAppBarLog extends StatelessWidget {
     );
   }
 }
+class NavBarMenu extends HookWidget {
+    final String uID;
 
-Widget navbarmenu(BuildContext context, String uID) {
-  // List<ChatMessage> tempmessage = Provider.of<List<ChatMessage>>(context);
-  int totalMessage = 0;
-  // int countMessagesWithTutorRead(List<ChatMessage> messagelist) {
-  //   int count = 0;
-  //   for (ChatMessage message in messagelist) {
-  //     if (message.messageStatus != null &&
-  //         message.messageStatus['tutorRead'] == 1) {
-  //       count++;
-  //     }
-  //   }
-  //   return count;
-  // }
-
-  // if (tempmessage.isNotEmpty) {
-  //   totalMessage = countMessagesWithTutorRead(tempmessage);
-  //   if (totalMessage > 0) {
-  //     final provider = context.read<GotMessageProvider>();
-  //     provider.setGotMessage(true);
-  //   } else {
-  //     final provider = context.read<GotMessageProvider>();
-  //     provider.setGotMessage(false);
-  //   }
-  // } else {
-  //   totalMessage = 0;
-  //   // final provider = context.read<GotMessageProvider>();
-  //   // provider.setGotMessage(false);
-  // }
+ NavBarMenu(this.uID, {Key? key}) : super(key: key);
+  final AuthService _auth = AuthService();
+  @override
+Widget build(BuildContext context) {
+ 
   Provider.of<MessageNotifier>(context, listen: false).getHistory(uID, 'tutor');
   final int menuIndex = context.select((InitProvider p) => p.menuIndex);
   final AuthService _auth = AuthService();
@@ -1078,7 +1054,7 @@ Widget navbarmenu(BuildContext context, String uID) {
     ],
   );
 }
-
+}
 _buildNotif(int data) {
   return (data == null || data <= 0)
       ? Container()
@@ -1095,7 +1071,7 @@ _buildNotif(int data) {
           ),
           alignment: Alignment.center,
           child: Text(
-            (data >= 100) ? "99+" : "${data}",
+            (data >= 100) ? "99+" : "$data",
             style: const TextStyle(
               color: Colors.white,
               fontSize: 10,

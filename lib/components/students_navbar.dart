@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, avoid_web_libraries_in_flutter
+// ignore_for_file: avoid_print, avoid_web_libraries_in_flutter, unnecessary_null_comparison
 
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/gestures.dart';
@@ -15,7 +15,6 @@ import '../services/getunreadmessages.dart';
 import '../ui/auth/auth.dart';
 import '../ui/web/terms/termpage.dart';
 import '../utils/themes.dart';
-import 'dart:html' as html;
 
 class StudentsMenu extends HookWidget {
   final String uid;
@@ -858,7 +857,7 @@ class StudentsMenu extends HookWidget {
             ),
             alignment: Alignment.center,
             child: Text(
-              (data >= 100) ? "99+" : "${data}",
+              (data >= 100) ? "99+" : "$data",
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 10,

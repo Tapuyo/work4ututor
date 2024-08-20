@@ -25,13 +25,35 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="work4ututor">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="logo.png" />
+
+  <meta name="robots" content="noindex" />
+
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="logo.png" />
 
+  <!-- Open Graph & SEO tags -->
+  <meta property="og:title" content="work4ututor" />
+  <meta property="og:description"
+    content="Elevate your learning with our education website, your gateway to knowledge!" />
+  <meta property="og:image"
+    href="https://firebasestorage.googleapis.com/v0/b/work4ututordev.appspot.com/o/assets%2Fvideologo.png?alt=media&token=4fd93a67-d542-4291-b572-89acf2a4501d" />
+  <meta name="twitter:title" content="work4ututor" />
+  <meta name="twitter:description"
+    content="Elevate your learning with our education website, your gateway to knowledge!" />
+  <meta name="twitter:image"
+    content="https://firebasestorage.googleapis.com/v0/b/work4ututordev.appspot.com/o/assets%2Fvideologo.png?alt=media&token=4fd93a67-d542-4291-b572-89acf2a4501d" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+
   <title>work4ututor</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- Status Bar color in Safari browser (iOS) and PWA -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f1f4f8">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121926">
+
 
   <script>
     // The value below is injected by flutter build, do not touch.
@@ -68,11 +90,7 @@
     }
 
     if ('serviceWorker' in navigator) {
-      // Service workers are supported. Use them.
       window.addEventListener('load', function () {
-        // Wait for registration to finish before dropping the <script> tag.
-        // Otherwise, the browser will load the script multiple times,
-        // potentially different versions.
         var serviceWorkerUrl = 'flutter_service_worker.js?v=' + serviceWorkerVersion;
         navigator.serviceWorker.register(serviceWorkerUrl)
           .then((reg) => {
@@ -85,24 +103,17 @@
               });
             }
             if (!reg.active && (reg.installing || reg.waiting)) {
-              // No active web worker and we have installed or are installing
-              // one for the first time. Simply wait for it to activate.
               waitForActivation(reg.installing || reg.waiting);
             } else if (!reg.active.scriptURL.endsWith(serviceWorkerVersion)) {
-              // When the app updates the serviceWorkerVersion changes, so we
-              // need to ask the service worker to update.
               console.log('New service worker available.');
               reg.update();
               waitForActivation(reg.installing);
             } else {
-              // Existing service worker is still good.
               console.log('Loading app from service worker.');
               loadMainDartJs();
             }
           });
 
-        // If service worker doesn't succeed in a reasonable amount of time,
-        // fallback to plaint <script> tag.
         setTimeout(() => {
           if (!scriptLoaded) {
             console.warn(
@@ -113,7 +124,6 @@
         }, 4000);
       });
     } else {
-      // Service workers not supported. Just drop the <script> tag.
       loadMainDartJs();
     }
   </script>

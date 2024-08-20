@@ -112,11 +112,11 @@ class _BookLessonBodyState extends State<BookLessonBody> {
   @override
   void initState() {
     super.initState();
-    for (dynamic tutor in widget.tutorteach) {
-      if (tutor is Map<String, dynamic> && tutor.containsKey('subjectname')) {
-        subjects.add(tutor['subjectname']);
-      }
-    }
+    // for (dynamic tutor in widget.tutorteach) {
+    //   if (tutor is Map<String, dynamic> && tutor.containsKey('subjectname')) {
+    //     subjects.add(tutor['subjectname']);
+    //   }
+    // }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final notifier = Provider.of<VoucherProvider>(context, listen: false);
@@ -373,8 +373,7 @@ class _BookLessonBodyState extends State<BookLessonBody> {
                                                                     document
                                                                         .amount;
                                                         if (tempAmount >
-                                                            double.parse(widget
-                                                                .currentprice)) {
+                                                            totalOrder) {
                                                           CoolAlert.show(
                                                             context: context,
                                                             width: 200,

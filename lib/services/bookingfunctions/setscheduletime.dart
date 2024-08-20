@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
+import '../timestampconverter.dart';
+
 Future<String?> setClassSchedule(
   String uid,
   String session,
@@ -15,14 +17,25 @@ Future<String?> setClassSchedule(
         FirebaseFirestore.instance.collection('schedule');
 
     String formattedDate = DateFormat('MMddyyyy').format(dateschedule);
-    // Create a reference to the "blockdatetime" subcollection
     final CollectionReference scheduleCollectionRef = docRef;
     Map<String, dynamic> schdeduledata = {
       'scheduleID': uid,
-      'schedule': dateschedule,
+      'schedule': timefrom,
+      //   'schedule': formatTimewDate(
+      //     DateFormat('MMMM d, yyyy').format(dateschedule),
+      //     timefrom)
+      // .toString(),
       'session': session.toString(),
       'timefrom': timefrom,
       'timeto': timeto,
+      //      'timefrom':  formatTimewDate(
+      //         DateFormat('MMMM d, yyyy').format(dateschedule),
+      //         timefrom)
+      //     .toString(),
+      // 'timeto': formatTimewDate(
+      //         DateFormat('MMMM d, yyyy').format(dateschedule),
+      //         timeto)
+      //     .toString(),
       'classstatus': 'unfinish',
       'meetinglink': '$uid$formattedDate$timefrom'.replaceAll(' ', ''),
       'rating': '',

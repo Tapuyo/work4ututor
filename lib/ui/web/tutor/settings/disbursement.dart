@@ -276,6 +276,36 @@ class DisbursementTableDataSource extends DataTableSource {
   //   }
   //   notifyListeners();
   // }
+  Future<String?> getToken(String username, String password) async {
+    final url =
+        Uri.parse('http://localhost:21021/api/TokenAuth/Authenticate');
+
+    final headers = {
+      'Content-Type': 'application/json',
+    };
+
+    final body = jsonEncode({
+      'usernameOrEmailAddress': username,
+      'password': password,
+      'rememberClient': true
+    });
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseBody = jsonDecode(response.body);
+        return responseBody['result']['accessToken'];
+      } else {
+        print('Failed to authenticate. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+      return null;
+    }
+  }
 
   @override
   DataRow getRow(int index) {
@@ -409,32 +439,34 @@ class DisbursementTableDataSource extends DataTableSource {
                       )
                     : InkWell(
                         onTap: () async {
+                          String? data = await getToken('admin', '123qwe');
+                          print(data);
                           // Future<void> fetchData() async {
-                          const url =
-                              'http://180.191.42.44/accapi/api/services/app/CollectionService/GetCollection'; // Replace with your API endpoint
-                          final headers = {
-                            'Content-Type': 'application/json',
-                            'Authorization':
-                                'Bearer wNYmO41/48SHNstaLVXxHCCre29BZQl1NhC6NM3R3rzpXtPQxVzH6jEzA/QhXFN5tu6Fk7pO53uppm1mVXMZgxbyRVz26dnepi/FyB6axBY+6gq1GL+uRQgoiFUCjRN2p8w6LevViwKlHyWZZJZO1DGVSjAi1m2U+og9pkHw9/QR4Nl/DPnoP9JYDMpZ1zxx09u6s0GZ9/Q5Sjk+L0UfcSCbl38X8he5w9UIn/Hvxh7ysM1CiPLsoOwtbiieSRVmrmt0JjnipAn4/K283F8GrGwzwgehWsqefmUnM0ckMwP9ZAdwQxWDhxv0IqNw4tDhwUYs/1SYdYozdNzgByhgNOBPzQDObNLlWc4vV5VMOiYZmN7CVtsiggbIwTzBxCrV6Al+zX/ZmD7qz8tKJxf8WTXZKLKYVAdLkCeGRR0fTHhv5E54oZ3Idit9u2SPA/KtxvigVBgknOY1xAp8TijHac5A8r8Pb7n7Tg+iW4HX4bnIC95zjoVGzmnyrCdlcJfWswtDkPCESnPIXOmj1CrqE3+tGfJMoYzqhKmfTZwcsARFkPE7fTY7rb2DaOowVhjz50zqgSeLiBdBv1X494P1gOwGoTQc4m6FMnjSHzE+mSiR/TV34sAZJKyRZrt8dball2d1LZA/LEuBVhNUJdu4J5u+OnEZ2yJKgY3T4dq6esIJyoy+noSihiXyH3ESI0ZzOLNeQqvXLonJOem9ZlCVjpwjY5tm4NE7Wxowfrx/gX8QgFdYQkV0/Ngyib+z7LuT8dsXBSd7RV+s13LGGxINdgI96LAbBYaR3iYABEopIfoGDbqHK7xAx+DNxbZZ/Ch4OuHaGeYzSxGbjm+jl6Rz+ddF6FNgsjAIHj5A7qsW7QyTH/HV4usW8QaLwc59K2vZeRcngDi5wK7tD+tD9i206EK9zCJfPkF+HsVIN6BuaWAvAg+d11T9SOKTdkfTe6+nNTOiADHrJPkx5pyCYX5EHTQnZvly/2q7vmnVsp0VbPI5xG6oPC9Xh+P7n6QsSn6Kx+TqhPtvbumEIAZKwutCJXVggJerXs5Qf+tJTREyKS19gK2gHee7VAVvc2lxro8ftkuMFoZLLOpSjIbLqUIE/ezG6kF0+tHoiDMQFw/vV1kg9msChLEmixcM6mHvFlO5ND34hWGzbN/+GRD+a3TaSdeERclM4glKFv+v5qjcwMQ='
-                          };
+                          // const url =
+                          //     'http://180.191.42.44/accapi/api/services/app/CollectionService/GetCollection'; // Replace with your API endpoint
+                          // final headers = {
+                          //   'Content-Type': 'application/json',
+                          //   'Authorization':
+                          //       'Bearer wNYmO41/48SHNstaLVXxHCCre29BZQl1NhC6NM3R3rzpXtPQxVzH6jEzA/QhXFN5tu6Fk7pO53uppm1mVXMZgxbyRVz26dnepi/FyB6axBY+6gq1GL+uRQgoiFUCjRN2p8w6LevViwKlHyWZZJZO1DGVSjAi1m2U+og9pkHw9/QR4Nl/DPnoP9JYDMpZ1zxx09u6s0GZ9/Q5Sjk+L0UfcSCbl38X8he5w9UIn/Hvxh7ysM1CiPLsoOwtbiieSRVmrmt0JjnipAn4/K283F8GrGwzwgehWsqefmUnM0ckMwP9ZAdwQxWDhxv0IqNw4tDhwUYs/1SYdYozdNzgByhgNOBPzQDObNLlWc4vV5VMOiYZmN7CVtsiggbIwTzBxCrV6Al+zX/ZmD7qz8tKJxf8WTXZKLKYVAdLkCeGRR0fTHhv5E54oZ3Idit9u2SPA/KtxvigVBgknOY1xAp8TijHac5A8r8Pb7n7Tg+iW4HX4bnIC95zjoVGzmnyrCdlcJfWswtDkPCESnPIXOmj1CrqE3+tGfJMoYzqhKmfTZwcsARFkPE7fTY7rb2DaOowVhjz50zqgSeLiBdBv1X494P1gOwGoTQc4m6FMnjSHzE+mSiR/TV34sAZJKyRZrt8dball2d1LZA/LEuBVhNUJdu4J5u+OnEZ2yJKgY3T4dq6esIJyoy+noSihiXyH3ESI0ZzOLNeQqvXLonJOem9ZlCVjpwjY5tm4NE7Wxowfrx/gX8QgFdYQkV0/Ngyib+z7LuT8dsXBSd7RV+s13LGGxINdgI96LAbBYaR3iYABEopIfoGDbqHK7xAx+DNxbZZ/Ch4OuHaGeYzSxGbjm+jl6Rz+ddF6FNgsjAIHj5A7qsW7QyTH/HV4usW8QaLwc59K2vZeRcngDi5wK7tD+tD9i206EK9zCJfPkF+HsVIN6BuaWAvAg+d11T9SOKTdkfTe6+nNTOiADHrJPkx5pyCYX5EHTQnZvly/2q7vmnVsp0VbPI5xG6oPC9Xh+P7n6QsSn6Kx+TqhPtvbumEIAZKwutCJXVggJerXs5Qf+tJTREyKS19gK2gHee7VAVvc2lxro8ftkuMFoZLLOpSjIbLqUIE/ezG6kF0+tHoiDMQFw/vV1kg9msChLEmixcM6mHvFlO5ND34hWGzbN/+GRD+a3TaSdeERclM4glKFv+v5qjcwMQ='
+                          // };
 
-                          try {
-                            final response = await http.get(
-                              Uri.parse(url),
-                              headers: headers,
-                            );
+                          // try {
+                          //   final response = await http.get(
+                          //     Uri.parse(url),
+                          //     headers: headers,
+                          //   );
 
-                            if (response.statusCode == 200) {
-                              // If the server returns an OK response, parse the JSON
-                              final data = json.decode(response.body);
-                              print(data); // Handle your data here
-                            } else {
-                              // If the server did not return an OK response, throw an exception
-                              throw Exception('Failed to load data');
-                            }
-                          } catch (error) {
-                            print('Error fetching data: $error');
-                          }
+                          //   if (response.statusCode == 200) {
+                          //     // If the server returns an OK response, parse the JSON
+                          //     final data = json.decode(response.body);
+                          //     print(data); // Handle your data here
+                          //   } else {
+                          //     // If the server did not return an OK response, throw an exception
+                          //     throw Exception('Failed to load data');
+                          //   }
+                          // } catch (error) {
+                          //   print('Error fetching data: $error');
+                          // }
                           // }
                         },
                         child: Container(

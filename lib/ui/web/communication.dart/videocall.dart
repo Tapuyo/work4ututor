@@ -21,7 +21,10 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:work4ututor/ui/web/communication.dart/whiteboard.dart';
 
+import '../../../data_class/subject_class.dart';
 import '../../../services/getchatcall.dart';
+import '../../../services/getclassinfo.dart';
+import '../../../services/getsubject.dart';
 import '../../../utils/themes.dart';
 import 'package:http/http.dart' as http;
 
@@ -312,6 +315,11 @@ class _VideoCallState extends State<VideoCall> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final classInfoNotifier =
+          Provider.of<ClassInfoNotifier>(context, listen: false);
+      classInfoNotifier.getClassInfo(widget.classId);
+    });
     // initAgora();
     _initEngine();
     // _startTimer();
@@ -810,45 +818,64 @@ class _VideoCallState extends State<VideoCall> {
                                       // ),
                                       color: Colors.transparent,
                                       padding: const EdgeInsets.all(10),
-                                      child: Row(
-                                        children: [
-                                          Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: const [
-                                                Text(
-                                                  'Chemistry Class (First Session)',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      fontSize: 20,
-                                                      color: Colors.white),
-                                                ),
-                                                Text(
-                                                  '50 minutes per class session',
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.normal,
-                                                      fontSize: 16,
-                                                      color: Colors.white),
-                                                ),
-                                              ]),
-                                          const Spacer(),
-                                          // Padding(
-                                          //   padding: const EdgeInsets.only(
-                                          //       left: 10.0),
-                                          //   child: Text(
-                                          //     _formatTime(_seconds),
-                                          //     style: const TextStyle(
-                                          //         fontSize: 30.0,
-                                          //         fontWeight: FontWeight.bold,
-                                          //         color: kColorPrimaryDark),
-                                          //   ),
-                                          // ),
-                                        ],
-                                      )),
+                                      child: Consumer<ClassInfoNotifier>(
+                                          builder: (context, classinfo, _) {
+                                        if (classinfo.classinfo.isEmpty) {
+                                          return Container();
+                                        }
+                                        Provider.of<SubjectInfoNotifier>(
+                                                context,
+                                                listen: false)
+                                            .getClassInfo(classinfo
+                                                .classinfo['subjectID']);
+                                        return Consumer<SubjectInfoNotifier>(
+                                            builder: (context, subjectinfo, _) {
+                                          if (subjectinfo
+                                                  .subjectinfo.subjectName ==
+                                              '') {
+                                            return Container();
+                                          }
+                                          return Row(
+                                            children: [
+                                              Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      '${subjectinfo.subjectinfo.subjectName} Class',
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          fontSize: 20,
+                                                          color: Colors.white),
+                                                    ),
+                                                    const Text(
+                                                      '50 minutes per class session',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                          fontSize: 16,
+                                                          color: Colors.white),
+                                                    ),
+                                                  ]),
+                                              const Spacer(),
+                                              // Padding(
+                                              //   padding: const EdgeInsets.only(
+                                              //       left: 10.0),
+                                              //   child: Text(
+                                              //     _formatTime(_seconds),
+                                              //     style: const TextStyle(
+                                              //         fontSize: 30.0,
+                                              //         fontWeight: FontWeight.bold,
+                                              //         color: kColorPrimaryDark),
+                                              //   ),
+                                              // ),
+                                            ],
+                                          );
+                                        });
+                                      })),
                                 ),
                               ),
                             )

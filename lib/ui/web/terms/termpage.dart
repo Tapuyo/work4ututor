@@ -2,8 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'package:work4ututor/ui/web/admin/admin_sharedcomponents/header_text.dart';
 import 'package:work4ututor/utils/themes.dart';
+
+import '../../../shared_components/header_text.dart';
 
 /// Represents Homepage for Navigation
 class TermPage extends StatefulWidget {

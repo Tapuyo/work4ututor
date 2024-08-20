@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:work4ututor/shared_components/responsive_builder.dart';
 import 'dart:html' as html;
 
+import '../../../data_class/studentinfoclass.dart';
 import '../../../data_class/tutor_info_class.dart';
 import '../../../provider/displaycount.dart';
 import '../../../services/addpreftutor.dart';
@@ -31,6 +32,7 @@ class TutorList extends StatefulWidget {
   final bool isLoading;
   final String studentdata;
   final List<TutorInformation> tutorsinfo;
+  final String studenttzone;
   const TutorList({
     super.key,
     required this.keyword,
@@ -44,6 +46,7 @@ class TutorList extends StatefulWidget {
     required this.provided,
     required this.tutorsinfo,
     required this.temppreffered,
+    required this.studenttzone,
   });
 
   @override
@@ -375,11 +378,13 @@ class _TutorListState extends State<TutorList> {
                                                         child: Stack(
                                                           children: <Widget>[
                                                             TutorProfileFloat(
-                                                                tutorsinfo:
-                                                              tutorDataMap,
-                                                                studentdata: widget
-                                                              .studentdata,
-                                                              ),
+                                                              tutorsinfo:
+                                                                  tutorDataMap,
+                                                              studentdata: widget
+                                                                  .studentdata,
+                                                              studenttinfo: widget
+                                                                  .studenttzone,
+                                                            ),
                                                             Positioned(
                                                               top: 10.0,
                                                               right: 10.0,
@@ -781,11 +786,11 @@ class _TutorListState extends State<TutorList> {
                 ),
               )
             : ResponsiveBuilder.isTablet(context)
-                ?  Container(
-                width:size.width - 50,
-                height: _foundUsers.length > 3 ? 760 : 540,
-                 alignment: Alignment.center,
-                  child: Scrollbar(
+                ? Container(
+                    width: size.width - 50,
+                    height: _foundUsers.length > 3 ? 760 : 540,
+                    alignment: Alignment.center,
+                    child: Scrollbar(
                       thumbVisibility: true,
                       controller: studentsDataController,
                       child: SingleChildScrollView(
@@ -805,8 +810,9 @@ class _TutorListState extends State<TutorList> {
                                       width: 40,
                                       height: 40,
                                       child: const CircularProgressIndicator(
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                            kColorPrimary),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                kColorPrimary),
                                         strokeWidth: 5.0,
                                       ),
                                     ),
@@ -823,20 +829,22 @@ class _TutorListState extends State<TutorList> {
                                       mainAxisSpacing:
                                           10.0, // Adjust spacing as needed
                                     ),
-                                    itemCount: Provider.of<
+                                    itemCount:
+                                        Provider.of<DisplayedItemCountProvider>(
+                                                        context)
+                                                    .displayedItemCount <
+                                                _foundUsers.length
+                                            ? Provider.of<
                                                         DisplayedItemCountProvider>(
                                                     context)
-                                                .displayedItemCount <
-                                            _foundUsers.length
-                                        ? Provider.of<DisplayedItemCountProvider>(
-                                                context)
-                                            .displayedItemCount
-                                        : _foundUsers.length,
+                                                .displayedItemCount
+                                            : _foundUsers.length,
                                     itemBuilder: (context, index) {
                                       int smallestPrice = findSmallestPrice(
                                           tutorteachdata,
                                           _foundUsers[index].userId);
-                                      List<dynamic> subjectNames = snapshot.data!
+                                      List<dynamic> subjectNames = snapshot
+                                          .data!
                                           .where((data) =>
                                               data['collectionId'] ==
                                               _foundUsers[index].userId)
@@ -881,13 +889,15 @@ class _TutorListState extends State<TutorList> {
                                                           child: Container(
                                                             color: Colors
                                                                 .white, // Set the background color of the circular content
-                
+
                                                             child: Stack(
-                                                              children: <Widget>[
+                                                              children: <
+                                                                  Widget>[
                                                                 SizedBox(
-                                                                  height: height,
-                                                                  width:
-                                                                      width - 400,
+                                                                  height:
+                                                                      height,
+                                                                  width: width -
+                                                                      400,
                                                                   child:
                                                                       TutorProfileFloat(
                                                                     tutorsinfo:
@@ -895,6 +905,9 @@ class _TutorListState extends State<TutorList> {
                                                                     studentdata:
                                                                         widget
                                                                             .studentdata,
+                                                                    studenttinfo:
+                                                                        widget
+                                                                            .studenttzone,
                                                                   ),
                                                                 ),
                                                                 Positioned(
@@ -909,7 +922,8 @@ class _TutorListState extends State<TutorList> {
                                                                     },
                                                                     child:
                                                                         const Icon(
-                                                                      Icons.close,
+                                                                      Icons
+                                                                          .close,
                                                                       color: Colors
                                                                           .white,
                                                                       size: 20,
@@ -925,8 +939,9 @@ class _TutorListState extends State<TutorList> {
                                               });
                                             },
                                             child: Padding(
-                                              padding: const EdgeInsets.fromLTRB(
-                                                  20, 10, 20, 0),
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      20, 10, 20, 0),
                                               child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
@@ -936,7 +951,8 @@ class _TutorListState extends State<TutorList> {
                                                         MainAxisAlignment
                                                             .spaceBetween,
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       ClipRRect(
                                                         child: Container(
@@ -981,22 +997,18 @@ class _TutorListState extends State<TutorList> {
                                                                   itemSize: 20,
                                                                   ratingWidget:
                                                                       RatingWidget(
-                                                                          full: const Icon(
-                                                                              Icons
-                                                                                  .star,
+                                                                          full: const Icon(Icons.star,
                                                                               color: Colors
                                                                                   .orange),
                                                                           half:
                                                                               const Icon(
-                                                                            Icons
-                                                                                .star_half,
+                                                                            Icons.star_half,
                                                                             color:
                                                                                 Colors.orange,
                                                                           ),
                                                                           empty:
                                                                               const Icon(
-                                                                            Icons
-                                                                                .star_outline,
+                                                                            Icons.star_outline,
                                                                             color:
                                                                                 Colors.orange,
                                                                           )),
@@ -1034,19 +1046,17 @@ class _TutorListState extends State<TutorList> {
                                                                         // prefTutor = widget
                                                                         //     .temppreffered;
                                                                         if (prefTutor
-                                                                            .contains(
-                                                                                _foundUsers[index].userId)) {
+                                                                            .contains(_foundUsers[index].userId)) {
                                                                           prefTutor
                                                                               .remove(_foundUsers[index].userId);
                                                                         } else {
                                                                           prefTutor
                                                                               .add(_foundUsers[index].userId);
                                                                         }
-                
+
                                                                         updateprefferdInFirestore(
                                                                             prefTutor,
-                                                                            widget
-                                                                                .studentdata);
+                                                                            widget.studentdata);
                                                                       });
                                                                     },
                                                                     iconSize:
@@ -1091,12 +1101,14 @@ class _TutorListState extends State<TutorList> {
                                                         MainAxisAlignment
                                                             .spaceEvenly,
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       Padding(
-                                                        padding: const EdgeInsets
-                                                                .fromLTRB(
-                                                            0.0, 0, 0, 0),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .fromLTRB(
+                                                                0.0, 0, 0, 0),
                                                         child: Row(
                                                           mainAxisAlignment:
                                                               MainAxisAlignment
@@ -1114,16 +1126,15 @@ class _TutorListState extends State<TutorList> {
                                                                           .only(
                                                                       top: 3),
                                                               child: Text(
-                                                                _foundUsers[index]
-                                                                                .middleName ==
+                                                                _foundUsers[index].middleName ==
                                                                             'N/A' ||
-                                                                        _foundUsers[index]
-                                                                                .middleName ==
+                                                                        _foundUsers[index].middleName ==
                                                                             ''
                                                                     ? "${_foundUsers[index].firstName} ${_foundUsers[index].lastname}, (${calculateAge(_foundUsers[index].birthdate)})"
                                                                     : "${_foundUsers[index].firstName} ${_foundUsers[index].middleName} ${_foundUsers[index].lastname}, (${calculateAge(_foundUsers[index].birthdate)})",
                                                                 style: GoogleFonts.roboto(
-                                                                    fontSize: 20,
+                                                                    fontSize:
+                                                                        20,
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w400,
@@ -1140,8 +1151,8 @@ class _TutorListState extends State<TutorList> {
                                                       ),
                                                       Padding(
                                                         padding:
-                                                            const EdgeInsets.only(
-                                                                top: 3),
+                                                            const EdgeInsets
+                                                                .only(top: 3),
                                                         child: Row(
                                                           children: [
                                                             const Icon(
@@ -1175,7 +1186,8 @@ class _TutorListState extends State<TutorList> {
                                                       Row(
                                                         children: [
                                                           const Icon(
-                                                            FontAwesomeIcons.book,
+                                                            FontAwesomeIcons
+                                                                .book,
                                                             size: 15,
                                                             color: kColorGrey,
                                                           ),
@@ -1183,8 +1195,9 @@ class _TutorListState extends State<TutorList> {
                                                             width: 10,
                                                           ),
                                                           Tooltip(
-                                                            message: subjectNames
-                                                                .join(', '),
+                                                            message:
+                                                                subjectNames
+                                                                    .join(', '),
                                                             child: Padding(
                                                               padding:
                                                                   const EdgeInsets
@@ -1203,7 +1216,8 @@ class _TutorListState extends State<TutorList> {
                                                                 style: const TextStyle(
                                                                     color:
                                                                         kColorGrey,
-                                                                    fontSize: 15,
+                                                                    fontSize:
+                                                                        15,
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w600),
@@ -1228,7 +1242,8 @@ class _TutorListState extends State<TutorList> {
                                                           ),
                                                           Tooltip(
                                                             message:
-                                                                _foundUsers[index]
+                                                                _foundUsers[
+                                                                        index]
                                                                     .language
                                                                     .join(', '),
                                                             child: Padding(
@@ -1256,7 +1271,8 @@ class _TutorListState extends State<TutorList> {
                                                                 style: const TextStyle(
                                                                     color:
                                                                         kColorGrey,
-                                                                    fontSize: 14),
+                                                                    fontSize:
+                                                                        14),
                                                               ),
                                                             ),
                                                           ),
@@ -1268,7 +1284,8 @@ class _TutorListState extends State<TutorList> {
                                                     height: 10,
                                                   ),
                                                   Container(
-                                                    alignment: Alignment.topLeft,
+                                                    alignment:
+                                                        Alignment.topLeft,
                                                     height: 45,
                                                     child: Text(
                                                       _foundUsers[index]
@@ -1297,7 +1314,7 @@ class _TutorListState extends State<TutorList> {
                                                   //   crossAxisAlignment:
                                                   //       CrossAxisAlignment.end,
                                                   //   children: [
-                
+
                                                   //   ],
                                                   // ),
                                                 ],
@@ -1311,7 +1328,7 @@ class _TutorListState extends State<TutorList> {
                         ),
                       ),
                     ),
-                )
+                  )
                 : SizedBox(
                     width: size.width - 20,
                     height: _foundUsers.length > 3 ? size.height : 300,
@@ -1417,6 +1434,7 @@ class _TutorListState extends State<TutorList> {
                                                                     tutorDataMap,
                                                                 studentdata: widget
                                                                     .studentdata,
+                                                                    studenttinfo: widget.studenttzone,
                                                               ),
                                                             ),
                                                             Positioned(
@@ -1843,7 +1861,9 @@ class _TutorListState extends State<TutorList> {
                         }),
                   )
         : SizedBox(
-            width: ResponsiveBuilder.isDesktop(context) ? size.width - 400 :size.width - 60,
+            width: ResponsiveBuilder.isDesktop(context)
+                ? size.width - 400
+                : size.width - 60,
             height: size.height,
             child: Center(
               child: Column(

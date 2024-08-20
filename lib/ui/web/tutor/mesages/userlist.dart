@@ -160,8 +160,7 @@ class _UserListState extends State<UserList> {
         setState(() {
           messagelist = tempmessage.where((message) {
             bool matches = selectedStudent.contains(message.studentID);
-            if (matches) {
-            }
+            if (matches) {}
             return matches;
           }).toList();
         });
@@ -184,203 +183,211 @@ class _UserListState extends State<UserList> {
 
       return messagedateB.compareTo(messagedateA);
     });
-    return Consumer<StarMessagesNotifier>(
-        builder: (context, messagenotifierdata, _) {
-      starred = messagenotifierdata.starMessages;
-      return Scaffold(
-        appBar: AppBar(
-          elevation: 1,
-          backgroundColor: Colors.white,
-          leading: IconButton(
-            padding: const EdgeInsets.all(5),
-            hoverColor: kCalendarColorFB,
-            onPressed: () {
-              setState(() {
-                isSearchVisible = !isSearchVisible;
-              });
-            },
-            icon: const Icon(EvaIcons.searchOutline),
-            iconSize: 25,
-            color: kColorPrimary,
-          ),
-          title: PreferredSize(
-            preferredSize: const Size.fromHeight(48),
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: isSearchVisible
-                  ? Padding(
-                      key: const Key(
-                          'search-bar-key'), // Add a key to differentiate between widgets
 
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 0, vertical: 2),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Colors.grey.shade400, // Border color
-                            width: 1.0, // Border width
-                          ),
-                        ),
-                        width: 250,
-                        child: TextField(
-                          decoration: InputDecoration(
-                            fillColor: Colors.white,
-                            border: InputBorder.none,
-                            hintText: _items.first['role'] == 'tutor'
-                                ? 'Search student'
-                                : 'Search tutor',
-                          ),
-                          focusNode: _searchFocusNode, // Assign the focus node
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 1,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          padding: const EdgeInsets.all(5),
+          hoverColor: kCalendarColorFB,
+          onPressed: () {
+            setState(() {
+              isSearchVisible = !isSearchVisible;
+            });
+          },
+          icon: const Icon(EvaIcons.searchOutline),
+          iconSize: 25,
+          color: kColorPrimary,
+        ),
+        title: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: isSearchVisible
+                ? Padding(
+                    key: const Key(
+                        'search-bar-key'), // Add a key to differentiate between widgets
 
-                          onChanged: (value) {
-                            if (_items.first['role'] == 'tutor') {
-                              setState(() {
-                                getfilterStudentInformation(
-                                    value, studentinfodata);
-                              });
-                            } else {
-                              setState(() {
-                                getfilterTutorInformation(value, tutorsList);
-                              });
-                            }
-                          },
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 0, vertical: 2),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.grey.shade400, // Border color
+                          width: 1.0, // Border width
                         ),
                       ),
-                    )
-                  : Container(
-                      key: const Key(
-                          'search-bar-key'), // Add a key to differentiate between widgets
+                      width: 250,
+                      child: TextField(
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          border: InputBorder.none,
+                          hintText: _items.first['role'] == 'tutor'
+                              ? 'Search student'
+                              : 'Search tutor',
+                        ),
+                        focusNode: _searchFocusNode, // Assign the focus node
+
+                        onChanged: (value) {
+                          if (_items.first['role'] == 'tutor') {
+                            setState(() {
+                              getfilterStudentInformation(
+                                  value, studentinfodata);
+                            });
+                          } else {
+                            setState(() {
+                              getfilterTutorInformation(value, tutorsList);
+                            });
+                          }
+                        },
+                      ),
                     ),
-            ),
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(
-                openStarred ? Icons.star : Icons.star_border,
-                color: kColorPrimary,
-              ),
-              onPressed: () {
-                final provider = context.read<StarDisplayProvider>();
-                provider.setOpenstarred(!openStarred);
-              },
-            ),
-          ],
-        ),
-        body: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Flexible(
-              flex: size.width > 1350 ? 4 : 5,
-              child: SizedBox(
-                height: size.height - 130,
-                child: Card(
-                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  elevation: 2,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(5),
-                    ),
+                  )
+                : Container(
+                    key: const Key(
+                        'search-bar-key'), // Add a key to differentiate between widgets
                   ),
-                  child: MouseRegion(
-                    onHover: (event) {},
-                    cursor: SystemMouseCursors.click,
-                    child: messagelist.isEmpty
-                        ? LayoutBuilder(builder: (context, constrain) {
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              openStarred ? Icons.star : Icons.star_border,
+              color: kColorPrimary,
+            ),
+            onPressed: () {
+              final provider = context.read<StarDisplayProvider>();
+              provider.setOpenstarred(!openStarred);
+            },
+          ),
+        ],
+      ),
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Flexible(
+            flex: size.width > 1350 ? 4 : 5,
+            child: SizedBox(
+              height: size.height - 130,
+              child: Card(
+                margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                elevation: 2,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(5),
+                  ),
+                ),
+                child: MouseRegion(
+                  onHover: (event) {},
+                  cursor: SystemMouseCursors.click,
+                  child: messagelist.isEmpty
+                      ? LayoutBuilder(builder: (context, constrain) {
+                          return Container(
+                              constraints: BoxConstraints(
+                                minWidth: 0,
+                                maxWidth: constrain.maxWidth,
+                              ),
+                              child: const Text('No users found..'));
+                        })
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: messagelist.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            TutorInformation data = getTutorInformation(
+                                messagelist[index].tutorID, tutorsList);
+                            StudentInfoClass studentdata =
+                                studentinfodata.firstWhere((student) =>
+                                    student.userID ==
+                                    messagelist[index].studentID);
                             return Container(
-                                constraints: BoxConstraints(
-                                  minWidth: 0,
-                                  maxWidth: constrain.maxWidth,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: currentconvo != null &&
+                                          currentconvo!.chatID ==
+                                              messagelist[index].chatID
+                                      ? kColorPrimary
+                                      : Colors.grey.shade400, // Border color
+                                  width: currentconvo != null &&
+                                          currentconvo!.chatID ==
+                                              messagelist[index].chatID
+                                      ? 2.0
+                                      : 1.0, // Border width
                                 ),
-                                child: const Text('No users found..'));
-                          })
-                        : ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: messagelist.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              TutorInformation data = getTutorInformation(
-                                  messagelist[index].tutorID, tutorsList);
-                              StudentInfoClass studentdata =
-                                  studentinfodata.firstWhere((student) =>
-                                      student.userID ==
-                                      messagelist[index].studentID);
-                              return Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: currentconvo != null &&
-                                            currentconvo!.chatID ==
-                                                messagelist[index].chatID
-                                        ? kColorPrimary
-                                        : Colors.grey.shade400, // Border color
-                                    width: currentconvo != null &&
-                                            currentconvo!.chatID ==
-                                                messagelist[index].chatID
-                                        ? 2.0
-                                        : 1.0, // Border width
-                                  ),
-                                ),
-                                child: LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    bool showFullTile =
-                                        constraints.maxWidth >= 100;
-                                    return ListTile(
-                                      contentPadding: showFullTile
-                                          ? const EdgeInsets.symmetric(
-                                              horizontal: 16.0)
-                                          : const EdgeInsets.symmetric(
-                                              horizontal: 16.0),
-                                      leading: CircleAvatar(
-                                          backgroundColor: Colors.black12,
-                                          backgroundImage: (data.userId ==
-                                                  _items.first['userID']
-                                              ? NetworkImage(
-                                                  studentdata.profilelink,
-                                                  scale: Checkbox.width)
-                                              : NetworkImage(data.imageID,
-                                                  scale: Checkbox.width))),
-                                      title: showFullTile
-                                          ? Text(
-                                              data.userId ==
+                              ),
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  bool showFullTile =
+                                      constraints.maxWidth >= 100;
+                                  return ListTile(
+                                    contentPadding: showFullTile
+                                        ? const EdgeInsets.symmetric(
+                                            horizontal: 16.0)
+                                        : const EdgeInsets.symmetric(
+                                            horizontal: 16.0),
+                                    leading: CircleAvatar(
+                                        backgroundColor: Colors.black12,
+                                        backgroundImage: (data.userId ==
+                                                _items.first['userID']
+                                            ? NetworkImage(
+                                                studentdata.profilelink,
+                                                scale: Checkbox.width)
+                                            : NetworkImage(data.imageID,
+                                                scale: Checkbox.width))),
+                                    title: showFullTile
+                                        ? Text(
+                                            data.userId ==
+                                                    _items.first['userID']
+                                                ? '${studentdata.studentFirstname} ${studentdata.studentLastname}'
+                                                : '${data.firstName} ${data.lastname}',
+                                            style: TextStyle(
+                                              color: data.userId ==
                                                       _items.first['userID']
-                                                  ? '${studentdata.studentFirstname} ${studentdata.studentLastname}'
-                                                  : '${data.firstName} ${data.lastname}',
-                                              style: TextStyle(
-                                                color: data.userId ==
-                                                        _items.first['userID']
-                                                    ? messagelist[index]
-                                                                    .messageStatus[
-                                                                'tutorRead'] !=
-                                                            '0'
-                                                        ? Colors.black
-                                                        : kColorGrey
-                                                    : messagelist[index]
-                                                                    .messageStatus[
-                                                                'studentRead'] !=
-                                                            '0'
-                                                        ? Colors.black
-                                                        : kColorGrey,
-                                                fontWeight: FontWeight.bold,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            )
-                                          : null,
-                                      subtitle: showFullTile
-                                          ? Text(
-                                              data.userId ==
-                                                      _items.first['userID']
-                                                  ? studentdata.studentID
-                                                  : data.tutorID,
-                                              style: const TextStyle(
-                                                color: kColorGrey,
-                                                fontWeight: FontWeight.normal,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            )
-                                          : null,
-                                      trailing: IconButton(
+                                                  ? messagelist[index]
+                                                                  .messageStatus[
+                                                              'tutorRead'] !=
+                                                          '0'
+                                                      ? Colors.black
+                                                      : kColorGrey
+                                                  : messagelist[index]
+                                                                  .messageStatus[
+                                                              'studentRead'] !=
+                                                          '0'
+                                                      ? Colors.black
+                                                      : kColorGrey,
+                                              fontWeight: FontWeight.bold,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          )
+                                        : null,
+                                    subtitle: showFullTile
+                                        ? Text(
+                                            data.userId ==
+                                                    _items.first['userID']
+                                                ? studentdata.studentID
+                                                : data.tutorID,
+                                            style: const TextStyle(
+                                              color: kColorGrey,
+                                              fontWeight: FontWeight.normal,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          )
+                                        : null,
+                                    trailing: Consumer<StarMessagesNotifier>(
+                                        builder:
+                                            (context, messagenotifierdata, _) {
+                                      if (messagenotifierdata.starMessages !=
+                                          []) {
+                                        starred =
+                                            messagenotifierdata.starMessages;
+                                      } else {
+                                        starred = [];
+                                      }
+                                      return IconButton(
                                         iconSize: 20,
                                         icon: Icon(
                                           starred.contains(data.userId) ||
@@ -418,98 +425,94 @@ class _UserListState extends State<UserList> {
                                             _items.first['userID'],
                                           );
                                         },
-                                      ),
-                                      onTap: () {
-                                        final provider =
-                                            context.read<ChatDisplayProvider>();
-                                        provider.setOpenMessage(true);
-                                        setState(() {
-                                          currentconvo = messagelist[index];
-                                          bool usertype = data.userId ==
-                                              _items.first['userID'];
-                                          if (usertype == true) {
-                                            if (currentconvo!.messageStatus[
-                                                    'tutorRead'] ==
-                                                '1') {
-                                              updatemessagestatusInfo(
-                                                  usertype,
-                                                  messagelist[index].chatID,
-                                                  '0');
-                                            }
-                                          } else {
-                                            if (currentconvo!.messageStatus[
-                                                    'studentRead'] ==
-                                                '1') {
-                                              updatemessagestatusInfo(
-                                                  usertype,
-                                                  messagelist[index].chatID,
-                                                  '0');
-                                            }
+                                      );
+                                    }),
+                                    onTap: () {
+                                      final provider =
+                                          context.read<ChatDisplayProvider>();
+                                      provider.setOpenMessage(true);
+                                      setState(() {
+                                        currentconvo = messagelist[index];
+                                        bool usertype = data.userId ==
+                                            _items.first['userID'];
+                                        if (usertype == true) {
+                                          if (currentconvo!
+                                                  .messageStatus['tutorRead'] ==
+                                              '1') {
+                                            updatemessagestatusInfo(usertype,
+                                                messagelist[index].chatID, '0');
                                           }
-                                          chatID = messagelist[index].chatID;
-                                        });
-                                      },
-                                    );
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                  ),
+                                        } else {
+                                          if (currentconvo!.messageStatus[
+                                                  'studentRead'] ==
+                                              '1') {
+                                            updatemessagestatusInfo(usertype,
+                                                messagelist[index].chatID, '0');
+                                          }
+                                        }
+                                        chatID = messagelist[index].chatID;
+                                      });
+                                    },
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
                 ),
               ),
             ),
-            const SizedBox(
-              // height: MediaQuery.of(context).size.height,
-              // child: const VerticalDivider(),
-              width: 5,
-            ),
-            Flexible(
-                flex: 10,
-                child: SizedBox(
-                  child: openChat != true
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: const [
-                              Icon(
-                                Icons.wechat_rounded,
-                                color: kColorPrimary,
-                                size: 75,
+          ),
+          const SizedBox(
+            // height: MediaQuery.of(context).size.height,
+            // child: const VerticalDivider(),
+            width: 5,
+          ),
+          Flexible(
+              flex: 10,
+              child: SizedBox(
+                child: openChat != true
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: const [
+                            Icon(
+                              Icons.wechat_rounded,
+                              color: kColorPrimary,
+                              size: 75,
+                            ),
+                            Text(
+                              'Select a conversation to display messages',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: kColorGrey,
                               ),
-                              Text(
-                                'Select a conversation to display messages',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: kColorGrey,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              // const Text(
-                              //   'or',
-                              //   style:
-                              //       TextStyle(fontSize: 16, color: kColorGrey),
-                              // ),
-                              // InkWell(
-                              //     onTap: () {},
-                              //     child: const Text(
-                              //       'Start a new conversation',
-                              //       style: TextStyle(
-                              //           fontSize: 16, color: kColorPrimary),
-                              //     ))
-                            ],
-                          ),
-                        )
-                      : ViewMessage(
-                          uID: _items.first['userID'].toString(),
-                          chatID: chatID,
-                          convo: currentconvo),
-                )),
-          ],
-        ),
-      );
-    });
+                              textAlign: TextAlign.center,
+                            ),
+                            // const Text(
+                            //   'or',
+                            //   style:
+                            //       TextStyle(fontSize: 16, color: kColorGrey),
+                            // ),
+                            // InkWell(
+                            //     onTap: () {},
+                            //     child: const Text(
+                            //       'Start a new conversation',
+                            //       style: TextStyle(
+                            //           fontSize: 16, color: kColorPrimary),
+                            //     ))
+                          ],
+                        ),
+                      )
+                    : ViewMessage(
+                        uID: _items.first['userID'].toString(),
+                        chatID: chatID,
+                        convo: currentconvo),
+              )),
+        ],
+      ),
+    );
   }
 
   void _requestFocus() {
