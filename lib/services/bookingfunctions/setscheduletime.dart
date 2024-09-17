@@ -95,7 +95,9 @@ Future<String?> updateSchedule(String documentId, oldtimefrom, oldtimeto,
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('schedule')
         .where('scheduleID', isEqualTo: documentId)
-        .where('schedule', isEqualTo: oldDate)
+        .where('schedule', isEqualTo: oldtimefrom)
+        .where('timefrom', isEqualTo: oldtimefrom)
+        .where('timeto', isEqualTo: oldtimeto)
         .get();
 
     if (querySnapshot.docs.isNotEmpty) {
@@ -106,14 +108,14 @@ Future<String?> updateSchedule(String documentId, oldtimefrom, oldtimeto,
           .collection('schedule')
           .doc(docIdToUpdate)
           .update({
-        'schedule': newSchedule,
+        'schedule': timefrom,
         'timefrom': timefrom,
         'timeto': timeto,
       });
 
       return 'Success';
     } else {
-      return null;
+      return 'Error updating';
     }
   } catch (error) {
     return error.toString();

@@ -19,7 +19,10 @@ Future<String> sendInquiryToDatabase(
     Map<String, dynamic> data1 = {
       'lastmessage': message ?? '',
       'messageDate': DateTime.now(),
-      'messageStatus': 'unread',
+      'messageStatus': {
+          'studentRead': '0',
+          'tutorRead': '0',
+        },
       'studentFav': 'no',
       'studentID': studentID ?? '',
       'tutorFav': 'no',

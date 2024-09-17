@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cool_alert/cool_alert.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -28,7 +29,10 @@ class TutorProfileFloat extends StatefulWidget {
   final String studentdata;
   final String studenttinfo;
   const TutorProfileFloat(
-      {super.key, required this.tutorsinfo, required this.studentdata, required this.studenttinfo});
+      {super.key,
+      required this.tutorsinfo,
+      required this.studentdata,
+      required this.studenttinfo});
 
   @override
   State<TutorProfileFloat> createState() => _TutorProfileFloatState();
@@ -223,144 +227,237 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                     );
                                                   },
                                                 ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 10.0,
-                                                          right: 10),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      InkWell(
-                                                        onTap: () {
-                                                          showDialog(
-                                                              barrierDismissible:
-                                                                  false,
-                                                              context: context,
-                                                              builder:
-                                                                  (BuildContext
-                                                                      context) {
-                                                                var height =
-                                                                    MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .height;
-                                                                return AlertDialog(
-                                                                  shape:
-                                                                      RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            15.0), // Adjust the radius as needed
-                                                                  ),
-                                                                  contentPadding:
-                                                                      EdgeInsets
-                                                                          .zero,
-                                                                  content:
-                                                                      ClipRRect(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            15.0), // Same radius as above
-                                                                    child:
-                                                                        Container(
-                                                                      color: Colors
-                                                                          .white, // Set the background color of the circular content
+                                                Visibility(
+                                                  visible: widget.tutorsinfo[
+                                                      'presentation'],
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 10.0,
+                                                            right: 10),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        InkWell(
+                                                          onTap: () {
+                                                            // showDialog(
+                                                            //     barrierDismissible:
+                                                            //         false,
+                                                            //     context: context,
+                                                            //     builder:
+                                                            //         (BuildContext
+                                                            //             context) {
+                                                            //       var height =
+                                                            //           MediaQuery.of(
+                                                            //                   context)
+                                                            //               .size
+                                                            //               .height;
+                                                            //       return AlertDialog(
+                                                            //         shape:
+                                                            //             RoundedRectangleBorder(
+                                                            //           borderRadius:
+                                                            //               BorderRadius.circular(
+                                                            //                   15.0), // Adjust the radius as needed
+                                                            //         ),
+                                                            //         contentPadding:
+                                                            //             EdgeInsets
+                                                            //                 .zero,
+                                                            //         content:
+                                                            //             ClipRRect(
+                                                            //           borderRadius:
+                                                            //               BorderRadius.circular(
+                                                            //                   15.0), // Same radius as above
+                                                            //           child:
+                                                            //               Container(
+                                                            //             color: Colors
+                                                            //                 .white, // Set the background color of the circular content
 
-                                                                      child:
-                                                                          Stack(
-                                                                        children: <
-                                                                            Widget>[
-                                                                          SizedBox(
-                                                                            height:
-                                                                                height,
-                                                                            width:
-                                                                                900,
-                                                                            child:
-                                                                                VideoUploadWidget(
-                                                                              videolink: widget.tutorsinfo['presentation'].first,
-                                                                            ),
+                                                            //             child:
+                                                            //                 Stack(
+                                                            //               children: <
+                                                            //                   Widget>[
+                                                            //                 SizedBox(
+                                                            //                   height:
+                                                            //                       height,
+                                                            //                   width:
+                                                            //                       900,
+                                                            //                   child:
+                                                            //                       VideoUploadWidget(
+                                                            //                     videolink: widget.tutorsinfo['presentation'].first,
+                                                            //                   ),
+                                                            //                 ),
+                                                            //                 Positioned(
+                                                            //                   top:
+                                                            //                       10.0,
+                                                            //                   right:
+                                                            //                       10.0,
+                                                            //                   child:
+                                                            //                       GestureDetector(
+                                                            //                     onTap: () {
+                                                            //                       Navigator.of(context).pop(false); // Close the dialog
+                                                            //                     },
+                                                            //                     child: const Icon(
+                                                            //                       Icons.close,
+                                                            //                       color: Colors.white,
+                                                            //                       size: 20,
+                                                            //                     ),
+                                                            //                   ),
+                                                            //                 ),
+                                                            //               ],
+                                                            //             ),
+                                                            //           ),
+                                                            //         ),
+                                                            //       );
+                                                            //     });
+                                                            // // showDialog(
+                                                            // //   barrierDismissible:
+                                                            // //       false,
+                                                            // //   context: context,
+                                                            // //   builder:
+                                                            // //       (BuildContext
+                                                            // //           context) {
+                                                            // //     return VideoUploadWidget(
+                                                            // //       videolink: widget
+                                                            // //           .tutorsinfo[
+                                                            // //               'presentation']
+                                                            // //           .first,
+                                                            // //     );
+                                                            // //   },
+                                                            // // );
+                                                            showDialog(
+                                                                barrierDismissible:
+                                                                    false,
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  var height =
+                                                                      MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .height;
+                                                                  return FutureBuilder(
+                                                                      future: FirebaseStorage
+                                                                          .instance
+                                                                          .ref(widget
+                                                                              .tutorsinfo[
+                                                                                  'presentation']
+                                                                              .first)
+                                                                          .getDownloadURL(),
+                                                                      builder:
+                                                                          (context,
+                                                                              snapshot) {
+                                                                        if (snapshot.connectionState ==
+                                                                            ConnectionState
+                                                                                .waiting) {
+                                                                          return const SizedBox(
+                                                                              height: 25,
+                                                                              width: 25,
+                                                                              child: Center(
+                                                                                  child: CircularProgressIndicator(
+                                                                                strokeWidth: 2,
+                                                                                color: Color.fromRGBO(1, 118, 132, 1),
+                                                                              )));
+
+                                                                          /// Display a loading indicator while waiting for the file to download
+                                                                        } else if (snapshot
+                                                                            .hasError) {
+                                                                          return Text(
+                                                                              'Error: ${snapshot.error}');
+                                                                        }
+                                                                        return AlertDialog(
+                                                                          shape:
+                                                                              RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(15.0), // Adjust the radius as needed
                                                                           ),
-                                                                          Positioned(
-                                                                            top:
-                                                                                10.0,
-                                                                            right:
-                                                                                10.0,
+                                                                          contentPadding:
+                                                                              EdgeInsets.zero,
+                                                                          content:
+                                                                              ClipRRect(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(15.0), // Same radius as above
                                                                             child:
-                                                                                GestureDetector(
-                                                                              onTap: () {
-                                                                                Navigator.of(context).pop(false); // Close the dialog
-                                                                              },
-                                                                              child: const Icon(
-                                                                                Icons.close,
-                                                                                color: Colors.white,
-                                                                                size: 20,
+                                                                                Container(
+                                                                              color: Colors.white, // Set the background color of the circular content
+
+                                                                              child: Stack(
+                                                                                children: <Widget>[
+                                                                                  SizedBox(
+                                                                                    height: height,
+                                                                                    width: 900,
+                                                                                    child: VideoUploadWidget(
+                                                                                      videolink: snapshot.data.toString(),
+                                                                                    ),
+                                                                                  ),
+                                                                                  Positioned(
+                                                                                    top: 10.0,
+                                                                                    right: 10.0,
+                                                                                    child: GestureDetector(
+                                                                                      onTap: () {
+                                                                                        Navigator.of(context).pop(false); // Close the dialog
+                                                                                      },
+                                                                                      child: const Icon(
+                                                                                        Icons.close,
+                                                                                        color: Colors.white,
+                                                                                        size: 20,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
                                                                               ),
                                                                             ),
                                                                           ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
+                                                                        );
+                                                                      });
+                                                                });
+                                                          },
+                                                          child: Container(
+                                                            height: 60,
+                                                            width: 60,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                              color: Colors.grey
+                                                                  .shade200,
+                                                            ),
+                                                            child: Stack(
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              children: [
+                                                                ClipRRect(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10.0),
+                                                                  child: Image
+                                                                      .network(
+                                                                    widget.tutorsinfo[
+                                                                        'imageID'],
+                                                                    fit: BoxFit
+                                                                        .cover,
                                                                   ),
-                                                                );
-                                                              });
-                                                          // showDialog(
-                                                          //   barrierDismissible:
-                                                          //       false,
-                                                          //   context: context,
-                                                          //   builder:
-                                                          //       (BuildContext
-                                                          //           context) {
-                                                          //     return VideoUploadWidget(
-                                                          //       videolink: widget
-                                                          //           .tutorsinfo[
-                                                          //               'presentation']
-                                                          //           .first,
-                                                          //     );
-                                                          //   },
-                                                          // );
-                                                        },
-                                                        child: Container(
-                                                          height: 60,
-                                                          width: 60,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            color: Colors
-                                                                .grey.shade200,
-                                                          ),
-                                                          child: Stack(
-                                                            alignment: Alignment
-                                                                .center,
-                                                            children: [
-                                                              ClipRRect(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            10.0),
-                                                                child: Image
-                                                                    .network(
-                                                                  widget.tutorsinfo[
-                                                                      'imageID'],
-                                                                  fit: BoxFit
-                                                                      .cover,
                                                                 ),
-                                                              ),
-                                                              const Icon(
-                                                                Icons
-                                                                    .play_circle, // You can use a different play icon if needed
-                                                                size: 40,
-                                                                color: Colors
-                                                                    .white,
-                                                              ),
-                                                            ],
+                                                                const Icon(
+                                                                  Icons
+                                                                      .play_circle, // You can use a different play icon if needed
+                                                                  size: 40,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              ],
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                                 Expanded(
@@ -867,6 +964,9 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                                       index]) {
                                                                 selectedsuject =
                                                                     {};
+                                                                classcount = '';
+                                                                currentprice =
+                                                                    '0';
                                                               } else {
                                                                 selectedsuject =
                                                                     tutorteach[
@@ -1800,7 +1900,8 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                                                 width - 400,
                                                                             child:
                                                                                 ViewScheduleData(
-                                                                              data: widget.tutorsinfo, studentdata: widget.studenttinfo,
+                                                                              data: widget.tutorsinfo,
+                                                                              studentdata: widget.studenttinfo,
                                                                             ),
                                                                           ),
                                                                           Positioned(
@@ -1923,8 +2024,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                   width: 15,
                                                 ),
                                                 Text(
-                                                  widget
-                                                      .tutorsinfo['country'],
+                                                  widget.tutorsinfo['country'],
                                                   style: const TextStyle(
                                                       fontSize: 22,
                                                       color: Colors.white,

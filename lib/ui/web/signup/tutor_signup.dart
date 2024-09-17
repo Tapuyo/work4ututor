@@ -6,14 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:work4ututor/constant/constant.dart';
-import 'package:work4ututor/ui/web/signup/student_signup.dart';
 
 import '../../../components/nav_bar.dart';
 import '../../../shared_components/responsive_builder.dart';
 import '../../../utils/themes.dart';
 import '../../auth/auth.dart';
 import '../terms/termpage.dart';
-import 'tutor_information_signup.dart';
 
 class TutorSignup extends StatefulWidget {
   const TutorSignup({Key? key}) : super(key: key);
@@ -122,7 +120,6 @@ class _TutorSignupState extends State<TutorSignup> {
                         foregroundColor: Colors.white,
                         shape: const BeveledRectangleBorder(
                             borderRadius: BorderRadius.all(Radius.circular(5))),
-                        // ignore: prefer_const_constructors
                         textStyle: TextStyle(
                           color: Colors.black,
                           // fontFamily: 'Avenir',
@@ -153,7 +150,6 @@ class _TutorSignupState extends State<TutorSignup> {
                         foregroundColor: Colors.white,
                         shape: const BeveledRectangleBorder(
                             borderRadius: BorderRadius.all(Radius.circular(5))),
-                        // ignore: prefer_const_constructors
                         textStyle: TextStyle(
                           color: Colors.black,
                           // fontFamily: 'Avenir',
@@ -184,7 +180,6 @@ class _TutorSignupState extends State<TutorSignup> {
                         foregroundColor: Colors.white,
                         shape: const BeveledRectangleBorder(
                             borderRadius: BorderRadius.all(Radius.circular(5))),
-                        // ignore: prefer_const_constructors
                         textStyle: TextStyle(
                           color: Colors.black,
                           // fontFamily: 'Avenir',
@@ -601,40 +596,61 @@ class _SignUpState extends State<SignUp> {
                                           tEmail.text, tPassword.text, uType);
                                   if (result == null) {
                                     setState(() {
-                                      error = 'Please supply a valid email';
+                                      error = 'Please check your inputs!';
+                                      CoolAlert.show(
+                                        context: context,
+                                        type: CoolAlertType.error,
+                                        title: '',
+                                        width: 200,
+                                        text: error,
+                                        backgroundColor: kColorDarkBlue,
+                                      );
                                     });
                                   } else {
                                     setState(() {
                                       if (result.toString().contains(
                                           "The email address is already in use by another account")) {
                                         result =
-                                            "The email address is already in use by another account!\nPlease check your inputs.";
+                                            "The email address is already in use by another account!\nPlease login to proceed.";
 
                                         CoolAlert.show(
-                                            context: context,
-                                            width: 200,
-                                            type: CoolAlertType.error,
-                                            title: 'Oops...',
-                                            text: result,
-                                            backgroundColor: Colors.black);
-                                      } else {
-                                        result =
-                                            "Account succesfully registered! Click okay to continue.";
-                                        print(result.uid);
-                                        CoolAlert.show(
                                           context: context,
-                                          type: CoolAlertType.success,
+                                          type: CoolAlertType.error,
+                                          title: '',
                                           width: 200,
                                           text: result,
+                                          backgroundColor: kCalendarColorFB,
                                           confirmBtnText: 'Okay',
-                                          onConfirmBtnTap: () {
-                                            tEmail.clear();
-                                            tPassword.clear();
-                                            tConPassword.clear();
-                                            GoRouter.of(context).go(
-                                                '/tutorsignup/${result.uid.toString()}');
-                                          },
+                                          confirmBtnColor:
+                                              Color.fromRGBO(103, 195, 208, 1),
                                         );
+                                      } else {
+                                        _auth.adduserInfo({
+                                          "userID": result.uid,
+                                          "role": result.role,
+                                          "userStatus": result.status
+                                        });
+                                        String resultdata =
+                                            "Account succesfully registered! Click okay to continue.";
+                                        print(result.email);
+                                        setState(() {
+                                          CoolAlert.show(
+                                            context: context,
+                                            type: CoolAlertType.success,
+                                            width: 200,
+                                            text: resultdata,
+                                            confirmBtnText: 'Okay',
+                                            confirmBtnColor: Color.fromRGBO(
+                                                103, 195, 208, 1),
+                                            autoCloseDuration:
+                                                const Duration(seconds: 1),
+                                          ).then((value) =>
+                                              GoRouter.of(context).go(
+                                                '/tutorsignup/${result.uid.toString()}',
+                                                extra: result
+                                                    .email, // Email is passed as extra
+                                              ));
+                                        });
                                       }
                                     });
                                   }
@@ -923,38 +939,59 @@ class _SignUpState extends State<SignUp> {
                                         tEmail.text, tPassword.text, uType);
                                 if (result == null) {
                                   setState(() {
-                                    error = 'Please supply a valid email';
+                                    error = 'Please check your inputs!';
+                                    CoolAlert.show(
+                                      context: context,
+                                      type: CoolAlertType.error,
+                                      title: '',
+                                      width: 200,
+                                      text: error,
+                                      backgroundColor: kColorDarkBlue,
+                                    );
                                   });
                                 } else {
                                   setState(() {
                                     if (result.toString().contains(
                                         "The email address is already in use by another account")) {
                                       result =
-                                          "The email address is already in use by another account!\nPlease check your inputs.";
+                                          "The email address is already in use by another account!\nPlease login to proceed.";
 
                                       CoolAlert.show(
                                         context: context,
                                         type: CoolAlertType.error,
-                                        title: 'Oops...',
+                                        title: '',
                                         width: 200,
                                         text: result,
-                                        backgroundColor: Colors.black,
+                                        backgroundColor: kCalendarColorFB,
+                                        confirmBtnText: 'Okay',
+                                        confirmBtnColor:
+                                            Color.fromRGBO(103, 195, 208, 1),
                                       );
                                     } else {
-                                      result =
+                                      _auth.adduserInfo({
+                                        "userID": result.uid,
+                                        "role": result.role,
+                                        "userStatus": result.status
+                                      });
+                                      String resultdata =
                                           "Account succesfully registered! Click okay to continue.";
-                                      print(result.uid);
-                                      CoolAlert.show(
-                                        context: context,
-                                        type: CoolAlertType.success,
-                                        text: result,
-                                        width: 200,
-                                        confirmBtnText: 'Okay',
-                                        onConfirmBtnTap: () {
-                                          GoRouter.of(context).go(
-                                              '/tutorsignup/${result.uid.toString()}');
-                                        },
-                                      );
+                                      setState(() {
+                                        CoolAlert.show(
+                                          context: context,
+                                          type: CoolAlertType.success,
+                                          width: 200,
+                                          text: resultdata,
+                                          confirmBtnText: 'Okay',
+                                          confirmBtnColor:
+                                              Color.fromRGBO(103, 195, 208, 1),
+                                          autoCloseDuration:
+                                              const Duration(seconds: 1),
+                                        ).then(
+                                            (value) => GoRouter.of(context).go(
+                                                  '/tutorsignup/${result.uid.toString()}',
+                                                  extra: result.email,
+                                                ));
+                                      });
                                     }
                                   });
                                 }
@@ -1242,38 +1279,38 @@ class _SignUpState extends State<SignUp> {
                                   CoolAlert.show(
                                     context: context,
                                     type: CoolAlertType.error,
-                                    title: 'Oops...',
+                                    title: '',
                                     width: 200,
                                     text: error,
-                                    backgroundColor: Colors.black,
+                                    backgroundColor: kColorDarkBlue,
                                   );
                                 });
                               } else {
                                 setState(() {
-                                  print(result.uid);
-                                  print(result.role);
-                                  _auth.adduserInfo({
-                                    "userID": result.uid,
-                                    "role": result.role,
-                                    "userStatus": result.status
-                                  });
                                   if (result.toString().contains(
                                       "The email address is already in use by another account")) {
                                     result =
-                                        "The email address is already in use by another account!\nPlease check your inputs.";
+                                        "The email address is already in use by another account!\nPlease login to proceed.";
 
                                     CoolAlert.show(
                                       context: context,
                                       type: CoolAlertType.error,
-                                      title: 'Oops...',
+                                      title: '',
                                       width: 200,
                                       text: result,
-                                      backgroundColor: Colors.black,
+                                      backgroundColor: kCalendarColorFB,
+                                      confirmBtnText: 'Okay',
+                                      confirmBtnColor:
+                                          Color.fromRGBO(103, 195, 208, 1),
                                     );
                                   } else {
+                                    _auth.adduserInfo({
+                                      "userID": result.uid,
+                                      "role": result.role,
+                                      "userStatus": result.status
+                                    });
                                     String resultdata =
                                         "Account succesfully registered! Click okay to continue.";
-                                    print(result.uid);
                                     setState(() {
                                       CoolAlert.show(
                                         context: context,
@@ -1281,10 +1318,13 @@ class _SignUpState extends State<SignUp> {
                                         width: 200,
                                         text: resultdata,
                                         confirmBtnText: 'Okay',
+                                        confirmBtnColor:
+                                            Color.fromRGBO(103, 195, 208, 1),
                                         autoCloseDuration:
                                             const Duration(seconds: 1),
                                       ).then((value) => GoRouter.of(context).go(
-                                          '/tutorsignup/${result.uid.toString()}'));
+                                          '/tutorsignup/${result.uid.toString()}',
+                                          extra: result.email));
                                     });
                                   }
                                 });

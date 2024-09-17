@@ -53,57 +53,135 @@ class UserDataService {
 }
 
 Future<String?> addDayOffDates(
-    String uid, List<String> dayoffs, List<DateTime> dateoffselected) async {
+    String uid, DateTime dateoffselected, String timezone) async {
   try {
     final DocumentReference docRef =
         FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
     final DocumentSnapshot doc = await docRef.get();
 
+    // Prepare the new date off data
+    String timefrom = createTimeWithDateAndZone(
+      DateFormat('MMMM d, yyyy').format(dateoffselected),
+      timezone,
+      DateFormat('h:mm a').format(DateTime(2022, 1, 1, 00, 00)),
+    ).toString();
+    String timeto = createTimeWithDateAndZone(
+      DateFormat('MMMM d, yyyy').format(dateoffselected),
+      timezone,
+      DateFormat('h:mm a').format(DateTime(2022, 1, 1, 23, 59)),
+    ).toString();
+    Map<String, dynamic> newDateOffData = {
+      'selectedDate': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(timefrom).toLocal()),
+              'Asia/Manila')
+          .toString(),
+      'timeAvailableFrom': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(timefrom).toLocal()),
+              'Asia/Manila')
+          .toString(),
+      'timeAvailableTo': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(timeto).toLocal()),
+              'Asia/Manila')
+          .toString(),
+    };
+
     if (doc.exists) {
       final dynamic data = doc.data();
-      if (data != null &&
-          data['dayoffs'] is List<dynamic> &&
-          data['dateoffselected'] is List<dynamic>) {
-        final List<dynamic> currentDayoffs = data['dayoffs'];
-        final List<dynamic> currentDateOffSelected = data['dateoffselected'];
+      if (data != null || data != []) {
+        // final List<dynamic> currentDayoffs = data['dayoffs'];
+        final List<dynamic> currentDateOffSelected =
+            data['dateoffselected'] ?? [];
 
-        if (!listsAreEqual(dayoffs, currentDayoffs) ||
-            !datesAreEqual(dateoffselected, currentDateOffSelected)) {
+        // Check if the new date off data already exists in currentDateOffSelected
+        bool isDateOffExists = currentDateOffSelected.any((existingDateOff) {
+          if (existingDateOff is Map<String, dynamic>) {
+            return existingDateOff['selectedDate'] ==
+                    newDateOffData['selectedDate'] &&
+                existingDateOff['timeAvailableFrom'] ==
+                    newDateOffData['timeAvailableFrom'] &&
+                existingDateOff['timeAvailableTo'] ==
+                    newDateOffData['timeAvailableTo'];
+          }
+          return false;
+        });
+
+        if (!isDateOffExists) {
+          // Add new date off data
+          currentDateOffSelected.add(newDateOffData);
+
           await docRef.update({
-            'uid': uid,
-            'dayoffs': dayoffs,
-            'dateoffselected': dateoffselected
-                .map((date) => <String, dynamic>{
-                      'selectedDate': formatTimewDate(
-                              DateFormat('MMMM d, yyyy').format(date),
-                              "12:00 AM")
-                          .toString(),
-                      'timeAvailableFrom': formatTimewDate(
-                              DateFormat('MMMM d, yyyy').format(date),
-                              "12:00 AM")
-                          .toString(),
-                      'timeAvailableTo': formatTimewDate(
-                              DateFormat('MMMM d, yyyy').format(date),
-                              "11:59 PM")
-                          .toString(),
-                    })
-                .toList(),
+            'dateoffselected': currentDateOffSelected,
           });
 
           return 'success';
         } else {
           return 'Dayoffs and DateOffSelected are already up to date';
         }
+      } else {
+        await docRef.set({
+          'dateoffselected': [newDateOffData],
+        });
       }
     }
 
     // Create a new document if it doesn't exist or if 'dayoffs' or 'dateoffselected' is not a list
     await docRef.set({
-      'uid': uid,
-      'dayoffs': dayoffs,
-      'dateoffselected':
-          dateoffselected.map((date) => date.toIso8601String()).toList(),
+      'dateoffselected': [newDateOffData],
     });
+
+    return 'success';
+  } catch (e) {
+    print(e.toString());
+    return null;
+  }
+}
+
+Future<String?> addUpdateDayOffDates(
+    String uid, String dayoffs, String timezone) async {
+  try {
+    final DocumentReference docRef =
+        FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
+    final DocumentSnapshot doc = await docRef.get();
+
+    if (doc.exists) {
+      print('imherefff');
+
+      final dynamic data = doc.data();
+      if (data != null || data != []) {
+        final List<dynamic> currentDayoffs = data['dayoffs'] ?? [];
+        // final List<dynamic> currentDateOffSelected =
+        //     data['dateoffselected'] ?? [];
+
+        // Check if the new date off data already exists in currentDateOffSelected
+        bool isDateOffExists = currentDayoffs.contains(dayoffs);
+
+        if (!isDateOffExists) {
+          // Add new date off data
+          currentDayoffs.add(dayoffs);
+
+          await docRef.update({
+            'dayoffs': currentDayoffs,
+          });
+
+          return 'success';
+        } else {
+          return 'Dayoffs and DateOffSelected are already up to date';
+        }
+      } else {
+        await docRef.update({
+          'dayoffs': [dayoffs],
+        });
+      }
+    } else {
+      print('imhere');
+      // Create a new document if it doesn't exist or if 'dayoffs' or 'dateoffselected' is not a list
+      await docRef.set({
+        'dayoffs': [dayoffs],
+      });
+    }
 
     return 'success';
   } catch (e) {
@@ -207,20 +285,37 @@ Future<String?> deleteDayOff(String uid, String dayOffDate) async {
   }
 }
 
-Future<String?> deleteDateOff(String uid, DateTime dayOffDate) async {
+Future<String?> deleteDateOff(
+    String uid, DateTimeAvailability date, String timezone) async {
   try {
     final DocumentReference docRef =
         FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
     final DocumentSnapshot doc = await docRef.get();
+    // String timefrom = createTimeWithDateAndZone(
+    //   DateFormat('MMMM d, yyyy').format(date.selectedDate),
+    //   timezone,
+    //   date.timeAvailableFrom,
+    // ).toString();
+    // String timeto = createTimeWithDateAndZone(
+    //   DateFormat('MMMM d, yyyy').format(date.selectedDate),
+    //   timezone,
+    //   date.timeAvailableTo,
+    // ).toString();
     Map<String, dynamic> datatoupload = {
-      'selectedDate': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(dayOffDate), '12:00 AM')
+      'selectedDate': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(date.timeAvailableFrom).toLocal()),
+              'Asia/Manila')
           .toString(),
-      'timeAvailableFrom': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(dayOffDate), '12:00 AM')
+      'timeAvailableFrom': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(date.timeAvailableFrom).toLocal()),
+              'Asia/Manila')
           .toString(),
-      'timeAvailableTo': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(dayOffDate), '11:59 PM')
+      'timeAvailableTo': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(date.timeAvailableTo).toLocal()),
+              'Asia/Manila')
           .toString(),
     };
     print(datatoupload);
@@ -276,16 +371,31 @@ Future<String?> deleteDateOff(String uid, DateTime dayOffDate) async {
 // }
 
 Future<String?> addOrUpdateTimeAvailability(
-    String uid, TimeAvailability timeAvailability) async {
+    String uid, TimeAvailability timeAvailability, String timezone) async {
   try {
     final DocumentReference docRef =
         FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
-
+    String convertedtimefrom = createTimeWithDateAndZone(
+      'August 6, 2024',
+      timezone,
+      timeAvailability.timeAvailableFrom,
+    ).toString();
+    String convertedtimeto = createTimeWithDateAndZone(
+      'August 6, 2024',
+      timezone,
+      timeAvailability.timeAvailableTo,
+    ).toString();
     Map<String, dynamic> data = {
-      'timeAvailableFrom':
-          formatTime(timeAvailability.timeAvailableFrom).toString(),
-      'timeAvailableTo':
-          formatTime(timeAvailability.timeAvailableTo).toString(),
+      'timeAvailableFrom': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(convertedtimefrom).toLocal()),
+              'Asia/Manila')
+          .toString(),
+      'timeAvailableTo': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(convertedtimeto).toLocal()),
+              'Asia/Manila')
+          .toString(),
     };
 
     // Update the "timeavailable" field in the main document
@@ -384,7 +494,7 @@ Future<String?> deleteTimeAvailability(
 //   }
 // }
 Future<String?> addOrUpdateTimeAvailabilityWithDate(
-    String uid, DateTimeAvailability timeAvailability) async {
+    String uid, DateTimeAvailability timeAvailability, String timezone) async {
   try {
     final DocumentReference docRef =
         FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
@@ -398,19 +508,31 @@ Future<String?> addOrUpdateTimeAvailabilityWithDate(
     // Convert each item in the list to a Map<String, dynamic>
     List<Map<String, dynamic>> timeList =
         timedateavailable.cast<Map<String, dynamic>>();
-
+    String convertedtimefrom = createTimeWithDateAndZone(
+      DateFormat('MMMM d, yyyy').format(timeAvailability.selectedDate),
+      timezone,
+      timeAvailability.timeAvailableFrom,
+    ).toString();
+    String convertedtimeto = createTimeWithDateAndZone(
+      DateFormat('MMMM d, yyyy').format(timeAvailability.selectedDate),
+      timezone,
+      timeAvailability.timeAvailableTo,
+    ).toString();
     Map<String, dynamic> datatoupload = {
-      'selectedDate': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(timeAvailability.selectedDate),
-              timeAvailability.timeAvailableFrom)
+      'selectedDate': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(convertedtimefrom).toLocal()),
+              'Asia/Manila')
           .toString(),
-      'timeAvailableFrom': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(timeAvailability.selectedDate),
-              timeAvailability.timeAvailableFrom)
+      'timeAvailableFrom': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(convertedtimefrom).toLocal()),
+              'Asia/Manila')
           .toString(),
-      'timeAvailableTo': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(timeAvailability.selectedDate),
-              timeAvailability.timeAvailableTo)
+      'timeAvailableTo': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(convertedtimeto).toLocal()),
+              'Asia/Manila')
           .toString(),
     };
     // Find the index of the existing availability with the same selectedDate
@@ -427,7 +549,7 @@ Future<String?> addOrUpdateTimeAvailabilityWithDate(
 }
 
 Future<String?> deleteDateAvailability(
-    String uid, DateTimeAvailability timeAvailability) async {
+    String uid, DateTimeAvailability timeAvailability, String timezone) async {
   try {
     final DocumentReference docRef =
         FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
@@ -439,20 +561,47 @@ Future<String?> deleteDateAvailability(
     }
 
     // Format the values for comparison
+    String convertedtimefrom = createTimeWithDateAndZone(
+      DateFormat('MMMM d, yyyy').format(timeAvailability.selectedDate),
+      timezone,
+      timeAvailability.timeAvailableFrom,
+    ).toString();
+    String convertedtimeto = createTimeWithDateAndZone(
+      DateFormat('MMMM d, yyyy').format(timeAvailability.selectedDate),
+      timezone,
+      timeAvailability.timeAvailableTo,
+    ).toString();
     Map<String, dynamic> dateoff = {
-      'timeAvailableTo': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(timeAvailability.selectedDate),
-              timeAvailability.timeAvailableTo)
+      'selectedDate': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(convertedtimefrom).toLocal()),
+              'Asia/Manila')
           .toString(),
-      'selectedDate': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(timeAvailability.selectedDate),
-              timeAvailability.timeAvailableFrom)
+      'timeAvailableFrom': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(convertedtimefrom).toLocal()),
+              'Asia/Manila')
           .toString(),
-      'timeAvailableFrom': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(timeAvailability.selectedDate),
-              timeAvailability.timeAvailableFrom)
+      'timeAvailableTo': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(convertedtimeto).toLocal()),
+              'Asia/Manila')
           .toString(),
     };
+    // Map<String, dynamic> dateoff = {
+    //   'timeAvailableTo': formatTimewDate(
+    //           DateFormat('MMMM d, yyyy').format(timeAvailability.selectedDate),
+    //           timeAvailability.timeAvailableTo)
+    //       .toString(),
+    //   'selectedDate': formatTimewDate(
+    //           DateFormat('MMMM d, yyyy').format(timeAvailability.selectedDate),
+    //           timeAvailability.timeAvailableFrom)
+    //       .toString(),
+    //   'timeAvailableFrom': formatTimewDate(
+    //           DateFormat('MMMM d, yyyy').format(timeAvailability.selectedDate),
+    //           timeAvailability.timeAvailableFrom)
+    //       .toString(),
+    // };
 
     // Retrieve the existing list from Firestore
     List<dynamic> dateoffs =
@@ -532,7 +681,8 @@ Future<void> deleteSubcollection(
 //   }
 // }
 
-Future<String?> blockTimeWithDate(String uid, BlockDate blockDate) async {
+Future<String?> blockTimeWithDate(
+    String uid, BlockDate blockDate, String timezone) async {
   try {
     final DocumentReference docRef =
         FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
@@ -546,22 +696,48 @@ Future<String?> blockTimeWithDate(String uid, BlockDate blockDate) async {
     // Convert each item in the list to a Map<String, dynamic>
     List<Map<String, dynamic>> timeList =
         timedateavailable.cast<Map<String, dynamic>>();
-
+    String convertedtimefrom = createTimeWithDateAndZone(
+      DateFormat('MMMM d, yyyy').format(blockDate.blockDate),
+      timezone,
+      blockDate.timeFrom,
+    ).toString();
+    String convertedtimeto = createTimeWithDateAndZone(
+      DateFormat('MMMM d, yyyy').format(blockDate.blockDate),
+      timezone,
+      blockDate.timeTo,
+    ).toString();
     Map<String, dynamic> datatoupload = {
-      'selectedDate': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(blockDate.blockDate),
-              blockDate.timeFrom)
+      'selectedDate': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(convertedtimefrom).toLocal()),
+              'Asia/Manila')
           .toString(),
-      'timeAvailableFrom': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(blockDate.blockDate),
-              blockDate.timeFrom)
+      'timeAvailableFrom': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(convertedtimefrom).toLocal()),
+              'Asia/Manila')
           .toString(),
-      'timeAvailableTo': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(blockDate.blockDate),
-              blockDate.timeTo)
+      'timeAvailableTo': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(convertedtimeto).toLocal()),
+              'Asia/Manila')
           .toString(),
     };
-    // Find the index of the existing availability with the same selectedDate
+    // Map<String, dynamic> datatoupload = {
+    //   'selectedDate': formatTimewDate(
+    //           DateFormat('MMMM d, yyyy').format(blockDate.blockDate),
+    //           blockDate.timeFrom)
+    //       .toString(),
+    //   'timeAvailableFrom': formatTimewDate(
+    //           DateFormat('MMMM d, yyyy').format(blockDate.blockDate),
+    //           blockDate.timeFrom)
+    //       .toString(),
+    //   'timeAvailableTo': formatTimewDate(
+    //           DateFormat('MMMM d, yyyy').format(blockDate.blockDate),
+    //           blockDate.timeTo)
+    //       .toString(),
+    // };
+    // // Find the index of the existing availability with the same selectedDate
 
     timeList.add(datatoupload);
 
@@ -574,29 +750,42 @@ Future<String?> blockTimeWithDate(String uid, BlockDate blockDate) async {
   }
 }
 
-Future<String?> deleteBlockDate(String uid, BlockDate blockDate) async {
+Future<String?> deleteBlockDate(
+    String uid, BlockDate blockDate, timezone) async {
   try {
     final DocumentReference docRef =
         FirebaseFirestore.instance.collection('tutorSchedule').doc(uid);
 
     // Retrieve the document containing the blockdatetime field
     DocumentSnapshot docSnapshot = await docRef.get();
-
+    // String convertedtimefrom = createTimeWithDateAndZone(
+    //   DateFormat('MMMM d, yyyy').format(blockDate.blockDate),
+    //   timezone,
+    //   blockDate.timeFrom,
+    // ).toString();
+    // String convertedtimeto = createTimeWithDateAndZone(
+    //   DateFormat('MMMM d, yyyy').format(blockDate.blockDate),
+    //   timezone,
+    //   blockDate.timeTo,
+    // ).toString();
     dynamic tempBlockDate = {
-      'timeAvailableTo': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(blockDate.blockDate),
-              blockDate.timeTo)
+      'timeAvailableTo': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(blockDate.timeTo).toLocal()),
+              'Asia/Manila')
           .toString(),
-      'selectedDate': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(blockDate.blockDate),
-              blockDate.timeFrom)
+      'selectedDate': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(blockDate.timeFrom).toLocal()),
+              'Asia/Manila')
           .toString(),
-      'timeAvailableFrom': formatTimewDate(
-              DateFormat('MMMM d, yyyy').format(blockDate.blockDate),
-              blockDate.timeFrom)
+      'timeAvailableFrom': formatTimewDatewZone(
+              DateFormat('MMMM d, yyyy h:mm a')
+                  .format(DateTime.parse(blockDate.timeFrom).toLocal()),
+              'Asia/Manila')
           .toString(),
     };
-
+    print(tempBlockDate);
     if (docSnapshot.exists) {
       List<dynamic> blockDates = docSnapshot['blockdatetime'] ?? [];
 

@@ -136,7 +136,7 @@ class _VideoCallState extends State<VideoCall> {
 
   _initEngine() async {
     _engine = await RtcEngine.createWithContext(RtcEngineContext(appId));
-    _joinChannel();
+    // _joinChannel();
     _addListeners();
 
     await _engine.enableVideo();
@@ -200,7 +200,7 @@ class _VideoCallState extends State<VideoCall> {
     if (defaultTargetPlatform == TargetPlatform.android) {
       await [Permission.microphone, Permission.camera].request();
     }
-    await _engine.joinChannel(token, widget.chatID, null, 01);
+    await _engine.joinChannel(token, 'test', null, 02);
   }
 
   _leaveChannel() async {
@@ -1145,11 +1145,15 @@ class _VideoCallState extends State<VideoCall> {
                                                           const EdgeInsets.all(
                                                               5.0),
                                                       child: kIsWeb
-                                                          ? rtc_remote_view
-                                                              .SurfaceView(
-                                                              uid: e,
-                                                              channelId:
-                                                                  channelId,
+                                                          ? AspectRatio(
+                                                              aspectRatio:
+                                                                  16 / 9,
+                                                              child: rtc_remote_view
+                                                                  .SurfaceView(
+                                                                uid: e,
+                                                                channelId:
+                                                                    channelId,
+                                                              ),
                                                             )
                                                           : rtc_remote_view
                                                               .TextureView(

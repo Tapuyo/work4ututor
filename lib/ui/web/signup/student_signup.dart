@@ -118,7 +118,6 @@ class _StudentSignupState extends State<StudentSignup> {
                         foregroundColor: Colors.white,
                         shape: const BeveledRectangleBorder(
                             borderRadius: BorderRadius.all(Radius.circular(5))),
-                        // ignore: prefer_const_constructors
                         textStyle: TextStyle(
                           color: Colors.black,
                           // fontFamily: 'Avenir',
@@ -149,7 +148,6 @@ class _StudentSignupState extends State<StudentSignup> {
                         foregroundColor: Colors.white,
                         shape: const BeveledRectangleBorder(
                             borderRadius: BorderRadius.all(Radius.circular(5))),
-                        // ignore: prefer_const_constructors
                         textStyle: TextStyle(
                           color: Colors.black,
                           // fontFamily: 'Avenir',
@@ -180,7 +178,6 @@ class _StudentSignupState extends State<StudentSignup> {
                         foregroundColor: Colors.white,
                         shape: const BeveledRectangleBorder(
                             borderRadius: BorderRadius.all(Radius.circular(5))),
-                        // ignore: prefer_const_constructors
                         textStyle: TextStyle(
                           color: Colors.black,
                           // fontFamily: 'Avenir',
@@ -201,8 +198,6 @@ class _StudentSignupState extends State<StudentSignup> {
                 ],
               ),
             ),
-      // bottomNavigationBar:
-      //     (ResponsiveBuilder.isDesktop(context) || kIsWeb) ? null : null,
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
@@ -600,17 +595,22 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                     if (result.toString().contains(
                                         "The email address is already in use by another account")) {
                                       result =
-                                          "The email address is already in use by another account!\nPlease check your inputs.";
+                                          "The email address is already in use by another account!\nPlease login to proceed.";
 
                                       CoolAlert.show(
                                         context: context,
                                         type: CoolAlertType.error,
+                                        title: '',
                                         width: 200,
-                                        title: 'Oops...',
                                         text: result,
-                                        backgroundColor: Colors.black,
+                                      backgroundColor: kCalendarColorFB,
                                       );
                                     } else {
+                                      _auth.adduserInfo({
+                                        "userID": result.uid,
+                                        "role": result.role,
+                                        "userStatus": result.status
+                                      });
                                       String resultdata =
                                           "Account succesfully registered! Click okay to continue.";
                                       setState(() {
@@ -919,16 +919,22 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                 if (result.toString().contains(
                                     "The email address is already in use by another account")) {
                                   result =
-                                      "The email address is already in use by another account!\nPlease check your inputs.";
+                                      "The email address is already in use by another account!\nPlease login to proceed.";
 
                                   CoolAlert.show(
                                     context: context,
                                     type: CoolAlertType.error,
-                                    title: 'Oops...',
+                                    title: '',
+                                    width: 200,
                                     text: result,
-                                    backgroundColor: Colors.black,
+                                      backgroundColor: kCalendarColorFB,
                                   );
                                 } else {
+                                  _auth.adduserInfo({
+                                    "userID": result.uid,
+                                    "role": result.role,
+                                    "userStatus": result.status
+                                  });
                                   String resultdata =
                                       "Account succesfully registered! Click okay to continue.";
                                   setState(() {
@@ -1227,25 +1233,25 @@ class _StudentSignUpState extends State<StudentSignUp> {
                               });
                             } else {
                               setState(() {
-                                _auth.adduserInfo({
-                                  "userID": result.uid,
-                                  "role": result.role,
-                                  "userStatus": result.status
-                                });
                                 if (result.toString().contains(
                                     "The email address is already in use by another account")) {
                                   result =
-                                      "The email address is already in use by another account!\nPlease check your inputs.";
+                                      "The email address is already in use by another account!\nPlease login to proceed.";
 
                                   CoolAlert.show(
                                     context: context,
                                     type: CoolAlertType.error,
-                                    title: 'Oops...',
+                                    title: '',
                                     width: 200,
                                     text: result,
-                                    backgroundColor: Colors.black,
+                                      backgroundColor: kCalendarColorFB,
                                   );
                                 } else {
+                                  _auth.adduserInfo({
+                                    "userID": result.uid,
+                                    "role": result.role,
+                                    "userStatus": result.status
+                                  });
                                   String resultdata =
                                       "Account succesfully registered! Click okay to continue.";
                                   setState(() {

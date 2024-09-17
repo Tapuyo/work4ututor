@@ -87,6 +87,7 @@ dependencies:
   pdf: ^3.10.1
   printing: ^5.10.4
   timezone: ^0.9.4
+  local_session_timeout: ^3.2.0
   
 
   

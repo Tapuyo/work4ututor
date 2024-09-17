@@ -8,7 +8,7 @@ import '../../../../services/cancelaccount.dart';
 import '../../../../utils/themes.dart';
 
 @override
-rescheduleclass(BuildContext context, Schedule currentschedule) {
+rescheduleclass(BuildContext context, Schedule currentschedule, String timezone) {
   TextEditingController conreason = TextEditingController();
   TextEditingController conemail = TextEditingController();
   showDialog(
@@ -131,12 +131,13 @@ rescheduleclass(BuildContext context, Schedule currentschedule) {
                                   ),
                                 ),
                                 onPressed: () async {
+                                  print(currentschedule.toMap());
                                   await showDialog(
                                       barrierDismissible: false,
                                       context: context,
                                       builder: (BuildContext context) {
                                         return ReSchedNow(
-                                          currentschedule: currentschedule,
+                                          currentschedule: currentschedule, timezone: timezone,
                                         );
                                       });
                                   Navigator.pop(context);

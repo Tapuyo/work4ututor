@@ -1,18 +1,29 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, prefer_final_fields
+
+import 'dart:convert';
 
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../services/bookingfunctions/setscheduletime.dart';
 import '../../../../services/notificationfunctions/sendnotifications.dart';
+import '../../../../services/timestampconverter.dart';
 import '../../../../shared_components/header_text.dart';
 import '../../../../utils/themes.dart';
 
+import 'package:timezone/browser.dart' as tz;
+
+import 'package:http/http.dart' as http;
+
 class ReSchedNow extends StatefulWidget {
   final Schedule currentschedule;
-  const ReSchedNow({super.key, required this.currentschedule});
+  final String timezone;
+
+  const ReSchedNow(
+      {super.key, required this.currentschedule, required this.timezone});
 
   @override
   State<ReSchedNow> createState() => _ReSchedNowState();
@@ -35,6 +46,53 @@ class _ReSchedNowState extends State<ReSchedNow> {
     return TimeOfDay(hour: hour, minute: minute);
   }
 
+  TextEditingController _selectedTimeZone = TextEditingController();
+  FocusNode _selectedTimeZonefocusNode = FocusNode();
+
+  bool showselectedTimeZoneSuggestions = false;
+  List<String> timezonesList = [];
+
+  Future<void> getTimezones() async {
+    final response =
+        await http.get(Uri.parse('http://worldtimeapi.org/api/timezone'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> timezones = json.decode(response.body);
+      if (timezones.isNotEmpty) {
+        setState(() {
+          timezonesList = List<String>.from(timezones);
+        });
+      } else {
+        throw Exception('No timezones found');
+      }
+    } else {
+      throw Exception('Failed to load timezones: ${response.statusCode}');
+    }
+  }
+
+  TimeOfDay initialTime(String timezone) {
+    final location = tz.getLocation(timezone);
+
+    // Get the current time in the specified timezone
+    final nowInSpecificTimeZone = tz.TZDateTime.now(location);
+
+    // Create a TimeOfDay from the timezone-adjusted DateTime
+    return TimeOfDay(
+      hour: nowInSpecificTimeZone.hour,
+      minute: nowInSpecificTimeZone.minute,
+    );
+  }
+
+  DateTime initialDate(String timezone) {
+    final location = tz.getLocation(timezone);
+
+    // Get the current time in the specified timezone
+    final nowInSpecificTimeZone = tz.TZDateTime.now(location);
+
+    // Create a TimeOfDay from the timezone-adjusted DateTime
+    return nowInSpecificTimeZone;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +102,8 @@ class _ReSchedNowState extends State<ReSchedNow> {
         convertTimeStringToTimeOfDay(widget.currentschedule.timefrom);
     selectedTimeschedto =
         convertTimeStringToTimeOfDay(widget.currentschedule.timeto);
+    _selectedTimeZone.text = widget.timezone;
+    getTimezones();
   }
 
   void _selectDate() async {
@@ -98,7 +158,7 @@ class _ReSchedNowState extends State<ReSchedNow> {
           children: <Widget>[
             SizedBox(
               width: 250,
-              height: 200,
+              height: 250,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,6 +217,76 @@ class _ReSchedNowState extends State<ReSchedNow> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 10),
+                  Card(
+                    margin: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    elevation: 5,
+                    child: SizedBox(
+                      width: 300,
+                      height: 45,
+                      child: GestureDetector(
+                        onTap: () {
+                          // Close suggestions when tapped anywhere outside the input field.
+                          if (_selectedTimeZonefocusNode.hasFocus) {
+                            _selectedTimeZonefocusNode.unfocus();
+                            setState(() {
+                              showselectedTimeZoneSuggestions = false;
+                            });
+                          }
+                        },
+                        child: TypeAheadFormField<String>(
+                          textFieldConfiguration: TextFieldConfiguration(
+                            controller: _selectedTimeZone,
+                            focusNode: _selectedTimeZonefocusNode,
+                            onTap: () {
+                              setState(() {
+                                showselectedTimeZoneSuggestions = false;
+                              });
+                            },
+                            decoration: InputDecoration(
+                              hintText: 'Ex. America/Chicago',
+                              hintStyle: const TextStyle(color: Colors.grey),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                    10.0), // Rounded border
+                                borderSide:
+                                    BorderSide.none, // No outline border
+                              ),
+                              suffixIcon: const Icon(Icons.arrow_drop_down),
+                            ),
+                          ),
+                          suggestionsCallback: (String pattern) {
+                            return timezonesList.where((timezone) => timezone
+                                .toLowerCase()
+                                .contains(pattern.toLowerCase()));
+                          },
+                          itemBuilder: (context, String suggestion) {
+                            return ListTile(
+                              title: Text(suggestion),
+                            );
+                          },
+                          onSuggestionSelected: (String suggestion) {
+                            setState(() {
+                              _selectedTimeZone.text = suggestion;
+                              selectedTimesched =
+                                  initialTime(_selectedTimeZone.text);
+                              selectedTimeschedto =
+                                  initialTime(_selectedTimeZone.text);
+                              selectedDatesched =
+                                  initialDate(_selectedTimeZone.text);
+                            });
+                          },
+                          hideOnEmpty:
+                              true, // Hide suggestions when the input is empty.
+                          hideOnLoading:
+                              true, // Hide suggestions during loading.
+                        ),
+                      ),
+                    ),
+                  ),
                   const Spacer(),
                   SizedBox(
                     width: 200,
@@ -181,22 +311,76 @@ class _ReSchedNowState extends State<ReSchedNow> {
                               ),
                             ),
                             onPressed: () async {
+                              String convertedtimefrom =
+                                  createTimeWithDateAndZone(
+                                DateFormat('MMMM d, yyyy')
+                                    .format(selectedDatesched!),
+                                _selectedTimeZone.text,
+                                DateFormat('h:mm a').format(DateTime(
+                                    2022,
+                                    1,
+                                    1,
+                                    selectedTimesched!.hour,
+                                    selectedTimesched!.minute)),
+                              ).toString();
+                              String convertedtimeto =
+                                  createTimeWithDateAndZone(
+                                DateFormat('MMMM d, yyyy')
+                                    .format(selectedDatesched!),
+                                _selectedTimeZone.text,
+                                DateFormat('h:mm a').format(DateTime(
+                                    2022,
+                                    1,
+                                    1,
+                                    selectedTimeschedto!.hour,
+                                    selectedTimeschedto!.minute)),
+                              ).toString();
+
+                              String oldconvertedtimefrom =
+                                  createTimeWithDateAndZone(
+                                DateFormat('MMMM d, yyyy')
+                                    .format(widget.currentschedule.schedule),
+                                _selectedTimeZone.text,
+                                widget.currentschedule.timefrom,
+                              ).toString();
+                              String oldconvertedtimeto =
+                                  createTimeWithDateAndZone(
+                                DateFormat('MMMM d, yyyy')
+                                    .format(widget.currentschedule.schedule),
+                                _selectedTimeZone.text,
+                                widget.currentschedule.timeto,
+                              ).toString();
+                              String datefrom = formatTimewDatewZone(
+                                      DateFormat('MMMM d, yyyy h:mm a').format(
+                                          DateTime.parse(convertedtimefrom)
+                                              .toLocal()),
+                                      'Asia/Manila')
+                                  .toString();
+                              String dateto = formatTimewDatewZone(
+                                      DateFormat('MMMM d, yyyy h:mm a').format(
+                                          DateTime.parse(convertedtimeto)
+                                              .toLocal()),
+                                      'Asia/Manila')
+                                  .toString();
+                              String olddatefrom = formatTimewDatewZone(
+                                      DateFormat('MMMM d, yyyy h:mm a').format(
+                                          DateTime.parse(oldconvertedtimefrom)
+                                              .toLocal()),
+                                      'Asia/Manila')
+                                  .toString();
+                              String olddateto = formatTimewDatewZone(
+                                      DateFormat('MMMM d, yyyy h:mm a').format(
+                                          DateTime.parse(oldconvertedtimeto)
+                                              .toLocal()),
+                                      'Asia/Manila')
+                                  .toString();
+                              print('$olddatefrom $olddateto');
                               String? result = await updateSchedule(
                                   widget.currentschedule.scheduleID,
-                                  widget.currentschedule.timefrom,
-                                  widget.currentschedule.timeto,
-                                  DateFormat('h:mm a').format(DateTime(
-                                      2022,
-                                      1,
-                                      1,
-                                      selectedTimesched!.hour,
-                                      selectedTimesched!.minute)),
-                                  DateFormat('h:mm a').format(DateTime(
-                                      2022,
-                                      1,
-                                      1,
-                                      selectedTimeschedto!.hour,
-                                      selectedTimeschedto!.minute)),
+                                  olddatefrom,
+                                  olddateto,
+                                  datefrom,
+                                  dateto,
                                   widget.currentschedule.schedule,
                                   selectedDatesched!);
 
@@ -206,19 +390,19 @@ class _ReSchedNowState extends State<ReSchedNow> {
                                 ];
                                 addNewNotification('ReSchedule', '', idList);
                                 result = "Schedule succesfully updated!";
-                                CoolAlert.show(
-                                        context: context,
-                                        width: 200,
-                                        type: CoolAlertType.success,
-                                        title: 'Success...',
-                                        text: result,
-                                        autoCloseDuration:
-                                            const Duration(seconds: 3))
-                                    .then(
-                                  (value) {
+                                // CoolAlert.show(
+                                //         context: context,
+                                //         width: 200,
+                                //         type: CoolAlertType.success,
+                                //         title: 'Success...',
+                                //         text: result,
+                                //         autoCloseDuration:
+                                //             const Duration(seconds: 3))
+                                //     .then(
+                                //   (value) {
                                     Navigator.of(context).pop(true);
-                                  },
-                                );
+                                //   },
+                                // );
                               } else {
                                 CoolAlert.show(
                                   context: context,

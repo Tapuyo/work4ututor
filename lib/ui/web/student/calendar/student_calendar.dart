@@ -540,8 +540,8 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Container(
-                                      width: 12,
-                                      height: 12,
+                                      width: 16,
+                                      height: 16,
                                       alignment: Alignment.center,
                                       decoration: BoxDecoration(
                                           color: kCalendarColorFB,
@@ -551,7 +551,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                         child: Text(
                                           '$count',
                                           style: const TextStyle(
-                                              color: Colors.black, fontSize: 8),
+                                              color: Colors.black, fontSize: 10),
                                         ),
                                       ),
                                     ),

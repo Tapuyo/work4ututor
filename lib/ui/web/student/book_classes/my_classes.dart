@@ -1267,7 +1267,7 @@ class _MyClassesState extends State<MyClasses> {
                                                         color: kColorPrimary,
                                                       ),
                                                       Text(
-                                                        'No students found.',
+                                                        'No classes found.',
                                                         style: TextStyle(
                                                             color: kCalendarColorB,
                                                              fontStyle: FontStyle.italic,

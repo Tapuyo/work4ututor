@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hive/hive.dart';
@@ -47,17 +46,14 @@ class AuthService {
       User? user = result.user;
       return _userFromFirebaseUser(user!);
     } catch (e) {
-      print(e.toString());
       return null;
     }
   }
 
   Future signOutAnon() async {
     try {
-      print("Success");
       return await _auth.signOut();
     } catch (e) {
-      print(e.toString());
       return null;
     }
   }
@@ -70,7 +66,6 @@ class AuthService {
       User? user = result.user;
       return _userFromFirebaseUser(user);
     } catch (e) {
-      print(e.toString());
       return null;
     }
   }
@@ -87,7 +82,13 @@ class AuthService {
       await DatabaseService(uid: user.uid).updateTutorData(email);
       return _userFromFirebaseUser(user);
     } catch (e) {
-      return null;
+      if (e
+          .toString()
+          .contains("The email address is already in use by another account")) {
+        return e.toString();
+      } else {
+        return null;
+      }
     }
   }
 
@@ -105,7 +106,13 @@ class AuthService {
       await DatabaseService(uid: user.uid).updateStudentData(email);
       return _userFromFirebaseUser(user);
     } catch (e) {
-      return e;
+      if (e
+          .toString()
+          .contains("The email address is already in use by another account")) {
+        return e.toString();
+      } else {
+        return null;
+      }
     }
   }
 

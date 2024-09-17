@@ -15,6 +15,7 @@ import 'package:work4ututor/ui/web/tutor/tutor_profile/view_file.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../services/getstudentinfo.dart';
 import '../../../../utils/themes.dart';
+import '../../communication.dart/uploadrecording.dart';
 
 class UpdateTutorSevices extends StatefulWidget {
   final TutorInformation tutordata;
@@ -769,19 +770,79 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                     children: [
                                                       InkWell(
                                                         onTap: () {
-                                                          showDialog(
-                                                              barrierDismissible:
-                                                                  false,
-                                                              context: context,
-                                                              builder:
-                                                                  (BuildContext
-                                                                      context) {
-                                                                return ViewFile(
-                                                                    imageURL:
-                                                                        snapshot
-                                                                            .data
-                                                                            .toString());
-                                                              });
+                                                                 showDialog(
+                                                            barrierDismissible:
+                                                                false,
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              var height =
+                                                                  MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .height;
+                                                              return AlertDialog(
+                                                                shape:
+                                                                    RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              15.0), // Adjust the radius as needed
+                                                                ),
+                                                                contentPadding:
+                                                                    EdgeInsets
+                                                                        .zero,
+                                                                content:
+                                                                    ClipRRect(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              15.0), // Same radius as above
+                                                                  child:
+                                                                      Container(
+                                                                    color: Colors
+                                                                        .white, // Set the background color of the circular content
+
+                                                                    child:
+                                                                        Stack(
+                                                                      children: <
+                                                                          Widget>[
+                                                                        SizedBox(
+                                                                          height:
+                                                                              height,
+                                                                          width:
+                                                                              900,
+                                                                          child:
+                                                                              ViewFile(imageURL: snapshot.data
+                                                                .toString()),
+                                                                        ),
+                                                                        Positioned(
+                                                                          top:
+                                                                              10.0,
+                                                                          right:
+                                                                              10.0,
+                                                                          child:
+                                                                              GestureDetector(
+                                                                            onTap:
+                                                                                () {
+                                                                              Navigator.of(context).pop(false); // Close the dialog
+                                                                            },
+                                                                            child:
+                                                                                const Icon(
+                                                                              Icons.close,
+                                                                              color: Colors.white,
+                                                                              size: 20,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            });
+                                                      
                                                         },
                                                         child: Container(
                                                           height: 80,
@@ -981,17 +1042,68 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                       children: [
                                                         InkWell(
                                                           onTap: () {
-                                                            // showDialog(
-                                                            //     barrierDismissible:
-                                                            //         false,
-                                                            //     context: context,
-                                                            //     builder: (BuildContext
-                                                            //         context) {
-                                                            //       return ViewFile(
-                                                            //           imageURL:
-                                                            //               certificates[
-                                                            //                   index]);
-                                                            //     });
+                                                            showDialog(
+                                                                barrierDismissible:
+                                                                    false,
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  var height =
+                                                                      MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .height;
+                                                                  return AlertDialog(
+                                                                    shape:
+                                                                        RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              15.0), // Adjust the radius as needed
+                                                                    ),
+                                                                    contentPadding:
+                                                                        EdgeInsets
+                                                                            .zero,
+                                                                    content:
+                                                                        ClipRRect(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              15.0), // Same radius as above
+                                                                      child:
+                                                                          Container(
+                                                                        color: Colors
+                                                                            .white, // Set the background color of the circular content
+
+                                                                        child:
+                                                                            Stack(
+                                                                          children: <
+                                                                              Widget>[
+                                                                            SizedBox(
+                                                                              height: height,
+                                                                              width: 900,
+                                                                              child: ViewFile(imageURL: snapshot.data.toString()),
+                                                                            ),
+                                                                            Positioned(
+                                                                              top: 10.0,
+                                                                              right: 10.0,
+                                                                              child: GestureDetector(
+                                                                                onTap: () {
+                                                                                  Navigator.of(context).pop(false); // Close the dialog
+                                                                                },
+                                                                                child: const Icon(
+                                                                                  Icons.close,
+                                                                                  color: Colors.white,
+                                                                                  size: 20,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  );
+                                                                });
                                                           },
                                                           child: Container(
                                                             height: 80,
@@ -1258,10 +1370,59 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                                 builder:
                                                                     (BuildContext
                                                                         context) {
-                                                                  return ViewFile(
-                                                                      imageURL:
-                                                                          tutor.certificates[
-                                                                              index]);
+                                                                  var height =
+                                                                      MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .height;
+                                                                  return AlertDialog(
+                                                                    shape:
+                                                                        RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              15.0), // Adjust the radius as needed
+                                                                    ),
+                                                                    contentPadding:
+                                                                        EdgeInsets
+                                                                            .zero,
+                                                                    content:
+                                                                        ClipRRect(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              15.0), // Same radius as above
+                                                                      child:
+                                                                          Container(
+                                                                        color: Colors
+                                                                            .white, // Set the background color of the circular content
+
+                                                                        child:
+                                                                            Stack(
+                                                                          children: <
+                                                                              Widget>[
+                                                                            SizedBox(
+                                                                              height: height,
+                                                                              width: 900,
+                                                                              child: ViewFile(imageURL: snapshot.data.toString()),
+                                                                            ),
+                                                                            Positioned(
+                                                                              top: 10.0,
+                                                                              right: 10.0,
+                                                                              child: GestureDetector(
+                                                                                onTap: () {
+                                                                                  Navigator.of(context).pop(false); // Close the dialog
+                                                                                },
+                                                                                child: const Icon(
+                                                                                  Icons.close,
+                                                                                  color: Colors.white,
+                                                                                  size: 20,
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  );
                                                                 });
                                                           },
                                                           child: Container(
@@ -2204,10 +2365,107 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                       context: context,
                                                       builder: (BuildContext
                                                           context) {
-                                                        return ViewFile(
-                                                            imageURL: tutor
-                                                                    .presentation[
-                                                                index]);
+                                                        var height =
+                                                            MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .height;
+                                                        return FutureBuilder(
+                                                            future: FirebaseStorage
+                                                                .instance
+                                                                .ref(tutor
+                                                                        .presentation[
+                                                                    index])
+                                                                .getDownloadURL(),
+                                                            builder: (context,
+                                                                snapshot) {
+                                                              if (snapshot
+                                                                      .connectionState ==
+                                                                  ConnectionState
+                                                                      .waiting) {
+                                                                return const SizedBox(
+                                                                    height: 25,
+                                                                    width: 25,
+                                                                    child: Center(
+                                                                        child: CircularProgressIndicator(
+                                                                      strokeWidth:
+                                                                          2,
+                                                                      color: Color
+                                                                          .fromRGBO(
+                                                                              1,
+                                                                              118,
+                                                                              132,
+                                                                              1),
+                                                                    )));
+
+                                                                /// Display a loading indicator while waiting for the file to download
+                                                              } else if (snapshot
+                                                                  .hasError) {
+                                                                return Text(
+                                                                    'Error: ${snapshot.error}');
+                                                              }
+                                                              return AlertDialog(
+                                                                shape:
+                                                                    RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              15.0), // Adjust the radius as needed
+                                                                ),
+                                                                contentPadding:
+                                                                    EdgeInsets
+                                                                        .zero,
+                                                                content:
+                                                                    ClipRRect(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              15.0), // Same radius as above
+                                                                  child:
+                                                                      Container(
+                                                                    color: Colors
+                                                                        .white, // Set the background color of the circular content
+
+                                                                    child:
+                                                                        Stack(
+                                                                      children: <
+                                                                          Widget>[
+                                                                        SizedBox(
+                                                                          height:
+                                                                              height,
+                                                                          width:
+                                                                              900,
+                                                                          child:
+                                                                              VideoUploadWidget(
+                                                                            videolink:
+                                                                                snapshot.data.toString(),
+                                                                          ),
+                                                                        ),
+                                                                        Positioned(
+                                                                          top:
+                                                                              10.0,
+                                                                          right:
+                                                                              10.0,
+                                                                          child:
+                                                                              GestureDetector(
+                                                                            onTap:
+                                                                                () {
+                                                                              Navigator.of(context).pop(false); // Close the dialog
+                                                                            },
+                                                                            child:
+                                                                                const Icon(
+                                                                              Icons.close,
+                                                                              color: Colors.white,
+                                                                              size: 20,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            });
                                                       });
                                                 },
                                                 child: Container(
@@ -3070,10 +3328,69 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                             builder:
                                                                 (BuildContext
                                                                     context) {
-                                                              return ViewFile(
-                                                                  imageURL: snapshot
-                                                                      .data
-                                                                      .toString());
+                                                              var height =
+                                                                  MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .height;
+                                                              return AlertDialog(
+                                                                shape:
+                                                                    RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              15.0), // Adjust the radius as needed
+                                                                ),
+                                                                contentPadding:
+                                                                    EdgeInsets
+                                                                        .zero,
+                                                                content:
+                                                                    ClipRRect(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              15.0), // Same radius as above
+                                                                  child:
+                                                                      Container(
+                                                                    color: Colors
+                                                                        .white, // Set the background color of the circular content
+
+                                                                    child:
+                                                                        Stack(
+                                                                      children: <
+                                                                          Widget>[
+                                                                        SizedBox(
+                                                                          height:
+                                                                              height,
+                                                                          width:
+                                                                              900,
+                                                                          child:
+                                                                              ViewFile(imageURL: snapshot.data.toString()),
+                                                                        ),
+                                                                        Positioned(
+                                                                          top:
+                                                                              10.0,
+                                                                          right:
+                                                                              10.0,
+                                                                          child:
+                                                                              GestureDetector(
+                                                                            onTap:
+                                                                                () {
+                                                                              Navigator.of(context).pop(false); // Close the dialog
+                                                                            },
+                                                                            child:
+                                                                                const Icon(
+                                                                              Icons.close,
+                                                                              color: Colors.white,
+                                                                              size: 20,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              );
                                                             });
                                                       },
                                                       child: Container(
@@ -3250,11 +3567,65 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                               builder:
                                                                   (BuildContext
                                                                       context) {
-                                                                return ViewFile(
-                                                                    imageURL:
-                                                                        snapshot
-                                                                            .data
-                                                                            .toString());
+                                                                var height =
+                                                                    MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .height;
+                                                                return AlertDialog(
+                                                                  shape:
+                                                                      RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            15.0), // Adjust the radius as needed
+                                                                  ),
+                                                                  contentPadding:
+                                                                      EdgeInsets
+                                                                          .zero,
+                                                                  content:
+                                                                      ClipRRect(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            15.0), // Same radius as above
+                                                                    child:
+                                                                        Container(
+                                                                      color: Colors
+                                                                          .white, // Set the background color of the circular content
+
+                                                                      child:
+                                                                          Stack(
+                                                                        children: <
+                                                                            Widget>[
+                                                                          SizedBox(
+                                                                            height:
+                                                                                height,
+                                                                            width:
+                                                                                900,
+                                                                            child:
+                                                                                ViewFile(imageURL: snapshot.data.toString()),
+                                                                          ),
+                                                                          Positioned(
+                                                                            top:
+                                                                                10.0,
+                                                                            right:
+                                                                                10.0,
+                                                                            child:
+                                                                                GestureDetector(
+                                                                              onTap: () {
+                                                                                Navigator.of(context).pop(false); // Close the dialog
+                                                                              },
+                                                                              child: const Icon(
+                                                                                Icons.close,
+                                                                                color: Colors.white,
+                                                                                size: 20,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                );
                                                               });
                                                         },
                                                         child: Container(
@@ -3817,6 +4188,11 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                       context: context,
                                                       builder: (BuildContext
                                                           context) {
+                                                        var height =
+                                                            MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .height;
                                                         return FutureBuilder(
                                                             future: FirebaseStorage
                                                                 .instance
@@ -3852,11 +4228,67 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                                 return Text(
                                                                     'Error: ${snapshot.error}');
                                                               }
-                                                              return ViewFile(
-                                                                  imageURL: tutorinfodata
-                                                                          .first
-                                                                          .presentation[
-                                                                      index]);
+                                                              return AlertDialog(
+                                                                shape:
+                                                                    RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              15.0), // Adjust the radius as needed
+                                                                ),
+                                                                contentPadding:
+                                                                    EdgeInsets
+                                                                        .zero,
+                                                                content:
+                                                                    ClipRRect(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              15.0), // Same radius as above
+                                                                  child:
+                                                                      Container(
+                                                                    color: Colors
+                                                                        .white, // Set the background color of the circular content
+
+                                                                    child:
+                                                                        Stack(
+                                                                      children: <
+                                                                          Widget>[
+                                                                        SizedBox(
+                                                                          height:
+                                                                              height,
+                                                                          width:
+                                                                              900,
+                                                                          child:
+                                                                              VideoUploadWidget(
+                                                                            videolink:
+                                                                                snapshot.data.toString(),
+                                                                          ),
+                                                                        ),
+                                                                        Positioned(
+                                                                          top:
+                                                                              10.0,
+                                                                          right:
+                                                                              10.0,
+                                                                          child:
+                                                                              GestureDetector(
+                                                                            onTap:
+                                                                                () {
+                                                                              Navigator.of(context).pop(false); // Close the dialog
+                                                                            },
+                                                                            child:
+                                                                                const Icon(
+                                                                              Icons.close,
+                                                                              color: Colors.white,
+                                                                              size: 20,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              );
                                                             });
                                                       });
                                                 },

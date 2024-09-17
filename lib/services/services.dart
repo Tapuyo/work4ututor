@@ -134,6 +134,54 @@ class DatabaseService {
   Stream<List<TutorInformation>> get tutorlist {
     return tutorCollection.snapshots().map(_getTutorInformation);
   }
+// // Optimized TutorInformation retrieval function
+// List<TutorInformation> _getTutorInformation(QuerySnapshot snapshot) {
+//   return snapshot.docs
+//       .where((tutordata) => 
+//           tutordata['firstName']?.isNotEmpty == true && 
+//           tutordata['status'] == 'Active') // Only process active tutors with firstName
+//       .map((tutordata) {
+//         return TutorInformation(
+//           contact: tutordata['contact'] ?? '',
+//           birthPlace: tutordata['birthPlace'] ?? '',
+//           country: tutordata['country'] ?? '',
+//           certificates: List<String>.from(tutordata['certificates'] ?? []),
+//           resume: List<String>.from(tutordata['resume'] ?? []),
+//           promotionalMessage: tutordata['promotionalMessage'] ?? '',
+//           withdrawal: tutordata['withdrawal'] ?? '',
+//           status: tutordata['status'] ?? '',
+//           extensionName: tutordata['extensionName'] ?? '',
+//           dateSign: (tutordata['dateSign'] as Timestamp?)?.toDate() ?? DateTime.now(),
+//           firstName: tutordata['firstName'] ?? '',
+//           imageID: tutordata['imageID'] ?? '',
+//           language: List<String>.from(tutordata['language'] ?? []),
+//           lastname: tutordata['lastName'] ?? '',
+//           middleName: tutordata['middleName'] ?? '',
+//           presentation: List<String>.from(tutordata['presentation'] ?? []),
+//           tutorID: tutordata['tutorID'] ?? '',
+//           userId: tutordata['userID'] ?? '',
+//           age: tutordata['age'] ?? '',
+//           applicationID: tutordata['applicationID'] ?? '',
+//           birthCity: tutordata['birthCity'] ?? '',
+//           birthdate: (tutordata['birthdate'] as Timestamp?)?.toDate() ?? DateTime.now(),
+//           emailadd: tutordata['emailadd'] ?? '',
+//           city: tutordata['city'] ?? '',
+//           servicesprovided: List<String>.from(tutordata['servicesprovided'] ?? []),
+//           timezone: tutordata['timezone'] ?? '',
+//           validIds: List<String>.from(tutordata['validIDs'] ?? []),
+//           certificatestype: List<String>.from(tutordata['certificatestype'] ?? []),
+//           resumelinktype: List<String>.from(tutordata['resumetype'] ?? []),
+//           validIDstype: List<String>.from(tutordata['validIDstype'] ?? []),
+//           citizenship: List<String>.from(tutordata['citizenship'] ?? []),
+//           gender: tutordata['gender'] ?? '',
+//         );
+//       }).toList();
+// }
+
+// // Stream to get tutor list
+// Stream<List<TutorInformation>> get tutorlist {
+//   return tutorCollection.snapshots().map(_getTutorInformation);
+// }
 
   List<StudentsList> _getStudentsEnrolled(QuerySnapshot snapshot) {
     return snapshot.docs.map((enrolleedata) {

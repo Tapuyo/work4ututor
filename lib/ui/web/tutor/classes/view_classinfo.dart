@@ -28,7 +28,8 @@ import 'package:universal_html/html.dart' as html;
 
 class ViewClassInfo extends StatefulWidget {
   final ClassesData enrolledClass;
-  const ViewClassInfo({super.key, required this.enrolledClass});
+  final String timezone;
+  const ViewClassInfo({super.key, required this.enrolledClass, required this.timezone});
 
   @override
   State<ViewClassInfo> createState() => _ViewClassInfoState();
@@ -783,7 +784,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                                   onPressed: () {
                                                                                     String dateresult = dueCancelDate(scheduledata!.schedule);
 
-                                                                                    rescheduleclass(context, filteredScheduleList[index]);
+                                                                                    rescheduleclass(context, filteredScheduleList[index], widget.timezone);
                                                                                   },
                                                                                 )
                                                                           :

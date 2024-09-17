@@ -885,7 +885,7 @@ Widget build(BuildContext context) {
                       barrierDismissible: false,
                       width: 200,
                       type: CoolAlertType.confirm,
-                      text: 'You want to Log Out?',
+                      text: 'Are you sure you want to logout?',
                       confirmBtnText: 'Proceed',
                       confirmBtnColor: Colors.greenAccent,
                       cancelBtnText: 'Go back',

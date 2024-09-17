@@ -400,12 +400,13 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                                     ],
                                   ),
                                 ),
-                                const SizedBox(
-                                  width: 10,
+                                const Spacer(
                                 ),
                                 Container(
-                                    height: 320,
-                                    width: 320,
+                                    height: MediaQuery.of(context).size.width *
+                                        0.8, // Adjust height based on screen width
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.8,
                                     decoration: const BoxDecoration(
                                       image: DecorationImage(
                                           image: AssetImage(
@@ -1037,7 +1038,6 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                           
                             Card(
                               elevation: 5,
                               child: Container(

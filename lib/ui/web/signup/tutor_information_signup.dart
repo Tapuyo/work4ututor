@@ -44,6 +44,7 @@ class TutorInfo extends StatefulWidget {
 class _TutorInfoState extends State<TutorInfo> {
   @override
   Widget build(BuildContext context) {
+    print(widget.email);
     return Scaffold(
         appBar: null,
         body: Center(

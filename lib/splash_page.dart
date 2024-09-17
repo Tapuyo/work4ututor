@@ -36,7 +36,7 @@ class _SplashPageState extends State<SplashPage> {
     Timer(const Duration(seconds: 3), () {
       final index = _items.length;
       if (index == 0) {
-        GoRouter.of(context).go('/signin');
+        // GoRouter.of(context).go('/');
       } else {
         debugPrint(index.toString());
         if (_items[0]['role'].toString() == 'student' &&
@@ -45,8 +45,11 @@ class _SplashPageState extends State<SplashPage> {
               .go('/studentsignup/${_items[0]['userID'].toString()}');
         } else if (_items[0]['role'].toString() == 'student' &&
             _items[0]['userStatus'].toString() == 'completed') {
-          GoRouter.of(context)
-              .go('/studentdiary/${_items[0]['userID'].toString()}');
+          Uri.base.toString().contains('/tutors')
+              ? GoRouter.of(context)
+                  .go('/studentdiary/${_items[0]['userID'].toString()}/tutors')
+              : GoRouter.of(context)
+                  .go('/studentdiary/${_items[0]['userID'].toString()}');
         } else if (_items[0]['role'].toString() == 'tutor' &&
             _items[0]['userStatus'].toString() == 'completed') {
           GoRouter.of(context)
@@ -56,7 +59,7 @@ class _SplashPageState extends State<SplashPage> {
           GoRouter.of(context)
               .go('/tutorsignup/${_items[0]['userID'].toString()}');
         } else {
-          GoRouter.of(context).go('/signin');
+          GoRouter.of(context).go('/');
         }
       }
     });

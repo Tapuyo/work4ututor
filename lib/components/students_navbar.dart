@@ -732,7 +732,7 @@ class StudentsMenu extends HookWidget {
                         barrierDismissible: false,
                         width: 200,
                         type: CoolAlertType.confirm,
-                        text: 'You want to Log Out?',
+                        text: 'Are you sure you want to logout?',
                         confirmBtnText: 'Proceed',
                         confirmBtnColor: Colors.greenAccent,
                         cancelBtnText: 'Go back',

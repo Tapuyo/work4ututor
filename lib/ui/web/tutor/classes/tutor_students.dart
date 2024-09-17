@@ -14,7 +14,8 @@ import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
 
 class StudentsEnrolled extends StatefulWidget {
-  const StudentsEnrolled({super.key});
+  final String timezone;
+  const StudentsEnrolled({super.key, required this.timezone});
 
   @override
   State<StudentsEnrolled> createState() => _StudentsEnrolledState();
@@ -886,12 +887,9 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
                                                                             () {
                                                                           setState(
                                                                               () {
-                                                                             final provider1 =
-                                                                      context.read<
-                                                                          SelectedClassInfoProvider>();
-                                                                  provider1
-                                                                      .setSelectedClass(
-                                                                          enrolledClass);
+                                                                            final provider1 =
+                                                                                context.read<SelectedClassInfoProvider>();
+                                                                            provider1.setSelectedClass(enrolledClass);
                                                                           });
                                                                           final provider =
                                                                               context.read<ViewClassDisplayProvider>();
@@ -1089,12 +1087,8 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
                                                                             onPressed:
                                                                                 () {
                                                                               setState(() {
-                                                                                final provider1 =
-                                                                      context.read<
-                                                                          SelectedClassInfoProvider>();
-                                                                  provider1
-                                                                      .setSelectedClass(
-                                                                          enrolledClass);
+                                                                                final provider1 = context.read<SelectedClassInfoProvider>();
+                                                                                provider1.setSelectedClass(enrolledClass);
                                                                               });
                                                                               final provider = context.read<ViewClassDisplayProvider>();
                                                                               provider.setViewClassinfo(true);
@@ -1161,6 +1155,7 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
                       color: Colors.white,
                       child: ViewClassInfo(
                         enrolledClass: selectedclass.selectedclass,
+                        timezone: widget.timezone,
                       ),
                     ),
             ),

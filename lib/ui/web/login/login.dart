@@ -36,6 +36,9 @@ final formKey = GlobalKey<FormState>();
 String userPassword = '';
 String userEmail = '';
 
+TextEditingController password = TextEditingController();
+TextEditingController email = TextEditingController();
+
 String error = '';
 bool obscure = true;
 final scafoldKey = GlobalKey<ScaffoldState>();
@@ -436,6 +439,7 @@ class _SigniNState extends State<SigniN> {
                               width: 380,
                               height: 60,
                               child: TextFormField(
+                                controller: email,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(5.0),
@@ -447,9 +451,9 @@ class _SigniNState extends State<SigniN> {
                                 validator: (val) =>
                                     val!.isEmpty ? 'Enter an email' : null,
                                 onChanged: (val) {
-                                  userEmail = val;
-                                  final alpha3Code = getAlpha3Code(val);
-                                  print(alpha3Code);
+                                  setState(() {
+                                    userEmail = val;
+                                  });
                                 },
                               ),
                             ),
@@ -460,6 +464,7 @@ class _SigniNState extends State<SigniN> {
                               width: 380,
                               height: 60,
                               child: TextFormField(
+                                controller: password,
                                 obscureText: obscure,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
@@ -488,7 +493,9 @@ class _SigniNState extends State<SigniN> {
                                     ? 'Enter a 6+ valid password'
                                     : null,
                                 onChanged: (val) {
-                                  userPassword = val;
+                                  setState(() {
+                                    userPassword = val;
+                                  });
                                 },
                               ),
                             ),
@@ -500,7 +507,7 @@ class _SigniNState extends State<SigniN> {
                                       const TextStyle(color: Colors.black),
                                 ),
                                 onPressed: () {
-                                  html.window.open('/#/account/reset', '');
+                                  html.window.open('/account/reset', '');
                                   // GoRouter.of(context).go('/account/reset');
                                 },
                                 child: Text(
@@ -534,123 +541,124 @@ class _SigniNState extends State<SigniN> {
                               borderRadius: BorderRadius.circular(30.0),
                             ),
                           ),
-                          onPressed: () async {
-                            dynamic result =
-                                await _auth.signinwEmailandPassword(
-                                    userEmail, userPassword);
-                            // 'mjselma@gmail.com',
-                            // '123456');
-                            setState(() {
-                              isLoading ? _handleButtonPress : null;
-                              if (result == null) {
-                                setState(() {
-                                  error =
-                                      'Could not sign in w/ those credential';
-                                  print(error);
-                                  CoolAlert.show(
-                                    context: context,
-                                    width: 200,
-                                    title: 'Error!',
-                                    type: CoolAlertType.error,
-                                    text: error,
-                                  );
-                                });
-                              } else if (result.role == 'tutor' &&
-                                  result.status == 'pending') {
-                                setState(() {
-                                  CoolAlert.show(
-                                    context: context,
-                                    width: 200,
-                                    type: CoolAlertType.error,
-                                    backgroundColor: kCalendarColorFB,
-                                    title: '',
-                                    text:
-                                        "Account still pending, proceed interview and wait to be activated.",
-                                    autoCloseDuration:
-                                        const Duration(seconds: 5),
-                                  );
-                                });
-                              } else {
-                                setState(() {
-                                  _auth.adduserInfo({
-                                    "userID": result.uid,
-                                    "role": result.role,
-                                    "userStatus": result.status
-                                  });
-                                });
-                                if (result.role == 'tutor' &&
-                                    result.status == 'unfinished') {
+                          onPressed: userEmail == '' || userPassword == ''
+                              ? null
+                              : () async {
+                                  dynamic result =
+                                      await _auth.signinwEmailandPassword(
+                                          userEmail, userPassword);
+                                  // 'mjselma@gmail.com',
+                                  // '123456');
                                   setState(() {
-                                    CoolAlert.show(
-                                      context: context,
-                                      width: 200,
-                                      type: CoolAlertType.success,
-                                      text: "You will redirected to sign up!",
-                                      autoCloseDuration:
-                                          const Duration(seconds: 5),
-                                    ).then((value) {
-                                      GoRouter.of(context).go(
-                                          '/tutorsignup/${result.uid.toString()}');
-                                    });
+                                    isLoading ? _handleButtonPress : null;
+                                    if (result == null) {
+                                      setState(() {
+                                        error =
+                                            'Could not sign in w/ those credential';
+                                        print(error);
+                                        CoolAlert.show(
+                                          context: context,
+                                          width: 200,
+                                          title: '',
+                                          type: CoolAlertType.error,
+                                          text: error,
+                                        );
+                                      });
+                                    } else if (result.role == 'tutor' &&
+                                        result.status == 'pending') {
+                                      setState(() {
+                                        CoolAlert.show(
+                                          context: context,
+                                          width: 200,
+                                          type: CoolAlertType.error,
+                                          backgroundColor: kCalendarColorFB,
+                                          title: '',
+                                          text:
+                                              "Account still pending, proceed interview and wait to be activated",
+                                          autoCloseDuration:
+                                              const Duration(seconds: 5),
+                                        );
+                                      });
+                                    } else {
+                                      setState(() {
+                                        _auth.adduserInfo({
+                                          "userID": result.uid,
+                                          "role": result.role,
+                                          "userStatus": result.status
+                                        });
+                                        password.clear();
+                                        email.clear();
+                                      });
+                                      if (result.role == 'tutor' &&
+                                          result.status == 'unfinished') {
+                                        setState(() {
+                                          CoolAlert.show(
+                                            context: context,
+                                            width: 200,
+                                            type: CoolAlertType.success,
+                                            text:
+                                                "You will redirected to sign up!",
+                                            autoCloseDuration:
+                                                const Duration(seconds: 5),
+                                          ).then((value) {
+                                            GoRouter.of(context).go(
+                                                '/tutorsignup/${result.uid.toString()}');
+                                          });
+                                        });
+
+                                        // StudentDashboardPage(
+                                        //   uID: result.uid.toString(),
+                                        //   email: result.email.toString(),
+                                        // );
+                                      } else if (result.role == 'tutor' &&
+                                          result.status == 'completed') {
+                                        setState(() {
+                                          GoRouter.of(context).go(
+                                              '/tutordesk/${result.uid.toString()}');
+                                        });
+                                      } else if (result.role == 'student' &&
+                                          result.status == 'completed') {
+                                        setState(() {
+                                          // CoolAlert.show(
+                                          //   context: context,
+                                          //   width: 200,
+                                          //   type: CoolAlertType.success,
+                                          //   text: 'Log in Succesfully!',
+                                          //   autoCloseDuration: const Duration(seconds: 5),
+                                          // ).then((value) {
+                                          GoRouter.of(context).go(
+                                              '/studentdiary/${result.uid.toString()}');
+                                          // });
+                                        });
+                                      } else if (result.role == 'student' &&
+                                          result.status == 'unfinished') {
+                                        setState(() {
+                                          CoolAlert.show(
+                                            context: context,
+                                            width: 200,
+                                            type: CoolAlertType.success,
+                                            text:
+                                                'You will redirected to sign up!',
+                                            autoCloseDuration:
+                                                const Duration(seconds: 5),
+                                          ).then((value) {
+                                            GoRouter.of(context).go(
+                                                '/studentsignup/${result.uid.toString()}');
+                                          });
+                                        });
+                                      } else {
+                                        CoolAlert.show(
+                                          context: context,
+                                          width: 200,
+                                          type: CoolAlertType.error,
+                                          title: 'Oops...',
+                                          text: result.toString(),
+                                          backgroundColor: Colors.black,
+                                        );
+                                      }
+                                    }
                                   });
-                                } else if (result.role == 'tutor' &&
-                                    result.status == 'completed') {
-                                  setState(() {
-                                    CoolAlert.show(
-                                      context: context,
-                                      width: 200,
-                                      type: CoolAlertType.success,
-                                      text: 'Log in Succesfully!',
-                                      autoCloseDuration:
-                                          const Duration(seconds: 5),
-                                    ).then((value) {
-                                      GoRouter.of(context).go(
-                                          '/tutordesk/${result.uid.toString()}');
-                                    });
-                                  });
-                                } else if (result.role == 'student' &&
-                                    result.status == 'completed') {
-                                  setState(() {
-                                    CoolAlert.show(
-                                      context: context,
-                                      width: 200,
-                                      type: CoolAlertType.success,
-                                      text: 'Log in Succesfully!',
-                                      autoCloseDuration:
-                                          const Duration(seconds: 5),
-                                    ).then((value) {
-                                      GoRouter.of(context).go(
-                                          '/studentdiary/${result.uid.toString()}');
-                                    });
-                                  });
-                                } else if (result.role == 'student' &&
-                                    result.status == 'unfinished') {
-                                  setState(() {
-                                    CoolAlert.show(
-                                      context: context,
-                                      width: 200,
-                                      type: CoolAlertType.success,
-                                      text: 'You will redirected to sign up!',
-                                      autoCloseDuration:
-                                          const Duration(seconds: 5),
-                                    ).then((value) {
-                                      GoRouter.of(context).go(
-                                          '/studentsignup/${result.uid.toString()}');
-                                    });
-                                  });
-                                } else {
-                                  CoolAlert.show(
-                                    context: context,
-                                    width: 200,
-                                    type: CoolAlertType.error,
-                                    title: 'Oops...',
-                                    text: result.toString(),
-                                    backgroundColor: Colors.black,
-                                  );
-                                }
-                              }
-                            });
-                          },
+                                },
                           child: isLoading
                               ? CircularProgressIndicator() // Display progress indicator
                               : Text(
@@ -658,7 +666,7 @@ class _SigniNState extends State<SigniN> {
                                     color: Colors.white,
                                     fontSize: 18,
                                   ),
-                                  'Confirm Submission',
+                                  'Sign in',
                                 ),
                         ),
                       ),
@@ -799,6 +807,7 @@ class _SigniNState extends State<SigniN> {
                           width: 380,
                           height: 60,
                           child: TextFormField(
+                            controller: email,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(5.0),
@@ -810,9 +819,9 @@ class _SigniNState extends State<SigniN> {
                             validator: (val) =>
                                 val!.isEmpty ? 'Enter an email' : null,
                             onChanged: (val) {
-                              userEmail = val;
-                              final alpha3Code = getAlpha3Code(val);
-                              print(alpha3Code);
+                              setState(() {
+                                userEmail = val;
+                              });
                             },
                           ),
                         ),
@@ -823,6 +832,7 @@ class _SigniNState extends State<SigniN> {
                           width: 380,
                           height: 60,
                           child: TextFormField(
+                            controller: password,
                             obscureText: obscure,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
@@ -846,7 +856,9 @@ class _SigniNState extends State<SigniN> {
                                 ? 'Enter a 6+ valid password'
                                 : null,
                             onChanged: (val) {
-                              userPassword = val;
+                              setState(() {
+                                userPassword = val;
+                              });
                             },
                           ),
                         ),
@@ -857,7 +869,7 @@ class _SigniNState extends State<SigniN> {
                               textStyle: const TextStyle(color: Colors.black),
                             ),
                             onPressed: () {
-                              html.window.open('/#/account/reset', '');
+                              html.window.open('/account/reset', '');
 
                               // GoRouter.of(context).go('/account/reset');
                             },
@@ -891,121 +903,122 @@ class _SigniNState extends State<SigniN> {
                           borderRadius: BorderRadius.circular(30.0),
                         ),
                       ),
-                      onPressed: () async {
-                        dynamic result = await _auth.signinwEmailandPassword(
-                            userEmail, userPassword);
-                        // 'mjselma@gmail.com',
-                        // '123456');
-                        setState(() {
-                          isLoading ? _handleButtonPress : null;
-                          if (result == null) {
-                            setState(() {
-                              error = 'Could not sign in w/ those credential';
-                              print(error);
-                              CoolAlert.show(
-                                context: context,
-                                width: 200,
-                                title: 'Error!',
-                                type: CoolAlertType.error,
-                                text: error,
-                              );
-                            });
-                          } else if (result.role == 'tutor' &&
-                              result.status == 'pending') {
-                            setState(() {
-                              CoolAlert.show(
-                                context: context,
-                                width: 200,
-                                type: CoolAlertType.error,
-                                backgroundColor: kCalendarColorFB,
-                                title: '',
-                                text:
-                                    "Account still pending, proceed interview and wait to be activated",
-                                autoCloseDuration: const Duration(seconds: 5),
-                              );
-                            });
-                          } else {
-                            setState(() {
-                              _auth.adduserInfo({
-                                "userID": result.uid,
-                                "role": result.role,
-                                "userStatus": result.status
-                              });
-                            });
-                            if (result.role == 'tutor' &&
-                                result.status == 'unfinished') {
+                      onPressed: userEmail == '' || userPassword == ''
+                          ? null
+                          : () async {
+                              dynamic result =
+                                  await _auth.signinwEmailandPassword(
+                                      userEmail, userPassword);
+                              // 'mjselma@gmail.com',
+                              // '123456');
                               setState(() {
-                                CoolAlert.show(
-                                  context: context,
-                                  width: 200,
-                                  type: CoolAlertType.success,
-                                  text: "You will redirected to sign up!",
-                                  autoCloseDuration: const Duration(seconds: 5),
-                                ).then((value) {
-                                  GoRouter.of(context).go(
-                                      '/tutorsignup/${result.uid.toString()}');
-                                });
-                              });
+                                isLoading ? _handleButtonPress : null;
+                                if (result == null) {
+                                  setState(() {
+                                    error =
+                                        'Could not sign in w/ those credential';
+                                    print(error);
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: '',
+                                      type: CoolAlertType.error,
+                                      text: error,
+                                    );
+                                  });
+                                } else if (result.role == 'tutor' &&
+                                    result.status == 'pending') {
+                                  setState(() {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      type: CoolAlertType.error,
+                                      backgroundColor: kCalendarColorFB,
+                                      title: '',
+                                      text:
+                                          "Account still pending, proceed interview and wait to be activated",
+                                      autoCloseDuration:
+                                          const Duration(seconds: 5),
+                                    );
+                                  });
+                                } else {
+                                  setState(() {
+                                    _auth.adduserInfo({
+                                      "userID": result.uid,
+                                      "role": result.role,
+                                      "userStatus": result.status
+                                    });
+                                    password.clear();
+                                    email.clear();
+                                  });
+                                  if (result.role == 'tutor' &&
+                                      result.status == 'unfinished') {
+                                    setState(() {
+                                      CoolAlert.show(
+                                        context: context,
+                                        width: 200,
+                                        type: CoolAlertType.success,
+                                        text: "You will redirected to sign up!",
+                                        autoCloseDuration:
+                                            const Duration(seconds: 5),
+                                      ).then((value) {
+                                        GoRouter.of(context).go(
+                                            '/tutorsignup/${result.uid.toString()}');
+                                      });
+                                    });
 
-                              // StudentDashboardPage(
-                              //   uID: result.uid.toString(),
-                              //   email: result.email.toString(),
-                              // );
-                            } else if (result.role == 'tutor' &&
-                                result.status == 'completed') {
-                              setState(() {
-                                CoolAlert.show(
-                                  context: context,
-                                  width: 200,
-                                  type: CoolAlertType.success,
-                                  text: 'Log in Succesfully!',
-                                  autoCloseDuration: const Duration(seconds: 5),
-                                ).then((value) {
-                                  GoRouter.of(context).go(
-                                      '/tutordesk/${result.uid.toString()}');
-                                });
+                                    // StudentDashboardPage(
+                                    //   uID: result.uid.toString(),
+                                    //   email: result.email.toString(),
+                                    // );
+                                  } else if (result.role == 'tutor' &&
+                                      result.status == 'completed') {
+                                    setState(() {
+                                      GoRouter.of(context).go(
+                                          '/tutordesk/${result.uid.toString()}');
+                                    });
+                                  } else if (result.role == 'student' &&
+                                      result.status == 'completed') {
+                                    setState(() {
+                                      // CoolAlert.show(
+                                      //   context: context,
+                                      //   width: 200,
+                                      //   type: CoolAlertType.success,
+                                      //   text: 'Log in Succesfully!',
+                                      //   autoCloseDuration: const Duration(seconds: 5),
+                                      // ).then((value) {
+                                      GoRouter.of(context).go(
+                                          '/studentdiary/${result.uid.toString()}');
+                                      // });
+                                    });
+                                  } else if (result.role == 'student' &&
+                                      result.status == 'unfinished') {
+                                    setState(() {
+                                      CoolAlert.show(
+                                        context: context,
+                                        width: 200,
+                                        type: CoolAlertType.success,
+                                        text: 'You will redirected to sign up!',
+                                        autoCloseDuration:
+                                            const Duration(seconds: 5),
+                                      ).then((value) {
+                                        GoRouter.of(context).go(
+                                            '/studentsignup/${result.uid.toString()}');
+                                      });
+                                    });
+                                  } else {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      type: CoolAlertType.error,
+                                      title: 'Oops...',
+                                      text: result.toString(),
+                                      backgroundColor: Colors.black,
+                                    );
+                                  }
+                                }
                               });
-                            } else if (result.role == 'student' &&
-                                result.status == 'completed') {
-                              setState(() {
-                                // CoolAlert.show(
-                                //   context: context,
-                                //   width: 200,
-                                //   type: CoolAlertType.success,
-                                //   text: 'Log in Succesfully!',
-                                //   autoCloseDuration: const Duration(seconds: 5),
-                                // ).then((value) {
-                                  GoRouter.of(context).go(
-                                      '/studentdiary/${result.uid.toString()}');
-                                });
-                              // });
-                            } else if (result.role == 'student' &&
-                                result.status == 'unfinished') {
-                              setState(() {
-                                CoolAlert.show(
-                                  context: context,
-                                  width: 200,
-                                  type: CoolAlertType.success,
-                                  text: 'You will redirected to sign up!',
-                                  autoCloseDuration: const Duration(seconds: 5),
-                                ).then((value) {
-                                  GoRouter.of(context).go(
-                                      '/studentsignup/${result.uid.toString()}');
-                                });
-                              });
-                            } else {
-                              CoolAlert.show(
-                                context: context,
-                                width: 200,
-                                type: CoolAlertType.error,
-                                title: 'Oops...',
-                                text: result.toString(),
-                                backgroundColor: Colors.black,
-                              );
-                            }
-                          }
-                        });
-                      },
+                            },
                       child: isLoading
                           ? CircularProgressIndicator() // Display progress indicator
                           : Text(
@@ -1013,7 +1026,7 @@ class _SigniNState extends State<SigniN> {
                                 color: Colors.white,
                                 fontSize: 18,
                               ),
-                              'Confirm Submission',
+                              'Sign in',
                             ),
                     ),
                   ),
@@ -1150,6 +1163,7 @@ class _SigniNState extends State<SigniN> {
                           width: 380,
                           height: 60,
                           child: TextFormField(
+                            controller: email,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(5.0),
@@ -1161,7 +1175,9 @@ class _SigniNState extends State<SigniN> {
                             validator: (val) =>
                                 val!.isEmpty ? 'Enter an email' : null,
                             onChanged: (val) {
-                              userEmail = val;
+                              setState(() {
+                                userEmail = val;
+                              });
                             },
                           ),
                         ),
@@ -1172,6 +1188,7 @@ class _SigniNState extends State<SigniN> {
                           width: 380,
                           height: 60,
                           child: TextFormField(
+                            controller: password,
                             obscureText: obscure,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
@@ -1195,7 +1212,9 @@ class _SigniNState extends State<SigniN> {
                                 ? 'Enter a 6+ valid password'
                                 : null,
                             onChanged: (val) {
-                              userPassword = val;
+                              setState(() {
+                                userPassword = val;
+                              });
                             },
                           ),
                         ),
@@ -1240,113 +1259,124 @@ class _SigniNState extends State<SigniN> {
                           borderRadius: BorderRadius.circular(30.0),
                         ),
                       ),
-                      onPressed: () async {
-                        dynamic result = await _auth.signinwEmailandPassword(
-                            userEmail, userPassword);
-                        // 'mjselma@gmail.com',
-                        // '123456');
-                        setState(() {
-                          isLoading ? _handleButtonPress : null;
-                          if (result == null) {
-                            setState(() {
-                              error = 'Could not sign in w/ those credential';
-                              print(error);
-                              CoolAlert.show(
-                                context: context,
-                                width: 200,
-                                title: 'Error!',
-                                type: CoolAlertType.error,
-                                text: error,
-                              );
-                            });
-                          } else if (result.role == 'tutor' &&
-                              result.status == 'pending') {
-                            setState(() {
-                              CoolAlert.show(
-                                context: context,
-                                width: 200,
-                                type: CoolAlertType.error,
-                                backgroundColor: kCalendarColorFB,
-                                title: '',
-                                text:
-                                    "Account still pending, proceed interview and wait to be activated",
-                                autoCloseDuration: const Duration(seconds: 5),
-                              );
-                            });
-                          } else {
-                            setState(() {
-                              _auth.adduserInfo({
-                                "userID": result.uid,
-                                "role": result.role,
-                                "userStatus": result.status
-                              });
-                            });
-                            if (result.role == 'tutor' &&
-                                result.status == 'unfinished') {
+                      onPressed: userEmail == '' || userPassword == ''
+                          ? null
+                          : () async {
+                              dynamic result =
+                                  await _auth.signinwEmailandPassword(
+                                      userEmail, userPassword);
+                              // 'mjselma@gmail.com',
+                              // '123456');
                               setState(() {
-                                CoolAlert.show(
-                                  context: context,
-                                  width: 200,
-                                  type: CoolAlertType.success,
-                                  text: "You will redirected to sign up!",
-                                  autoCloseDuration: const Duration(seconds: 5),
-                                ).then((value) {
-                                  GoRouter.of(context).go(
-                                      '/tutorsignup/${result.uid.toString()}');
-                                });
-                              });
+                                isLoading ? _handleButtonPress : null;
+                                if (result == null) {
+                                  setState(() {
+                                    error =
+                                        'Could not sign in w/ those credential';
+                                    print(error);
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      title: '',
+                                      type: CoolAlertType.error,
+                                      text: error,
+                                    );
+                                  });
+                                } else if (result.role == 'tutor' &&
+                                    result.status == 'pending') {
+                                  setState(() {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      type: CoolAlertType.error,
+                                      backgroundColor: kCalendarColorFB,
+                                      title: '',
+                                      text:
+                                          "Account still pending, proceed interview and wait to be activated",
+                                      autoCloseDuration:
+                                          const Duration(seconds: 5),
+                                    );
+                                  });
+                                } else {
+                                  setState(() {
+                                    password.clear();
+                                    email.clear();
+                                    _auth.adduserInfo({
+                                      "userID": result.uid,
+                                      "role": result.role,
+                                      "userStatus": result.status
+                                    });
+                                  });
+                                  if (result.role == 'tutor' &&
+                                      result.status == 'unfinished') {
+                                    setState(() {
+                                      userEmail = '';
+                                      userPassword = '';
+                                      CoolAlert.show(
+                                        context: context,
+                                        width: 200,
+                                        type: CoolAlertType.success,
+                                        text: "You will redirected to sign up!",
+                                        autoCloseDuration:
+                                            const Duration(seconds: 5),
+                                      ).then((value) {
+                                        GoRouter.of(context).go(
+                                            '/tutorsignup/${result.uid.toString()}');
+                                      });
+                                    });
 
-                              // StudentDashboardPage(
-                              //   uID: result.uid.toString(),
-                              //   email: result.email.toString(),
-                              // );
-                            } else if (result.role == 'tutor' &&
-                                result.status == 'completed') {
-                              setState(() {
-                                GoRouter.of(context)
-                                    .go('/tutordesk/${result.uid.toString()}');
+                                    // StudentDashboardPage(
+                                    //   uID: result.uid.toString(),
+                                    //   email: result.email.toString(),
+                                    // );
+                                  } else if (result.role == 'tutor' &&
+                                      result.status == 'completed') {
+                                    setState(() {
+                                      GoRouter.of(context).go(
+                                          '/tutordesk/${result.uid.toString()}');
+                                    });
+                                  } else if (result.role == 'student' &&
+                                      result.status == 'completed') {
+                                    setState(() {
+                                      // CoolAlert.show(
+                                      //   context: context,
+                                      //   width: 200,
+                                      //   type: CoolAlertType.success,
+                                      //   text: 'Log in Succesfully!',
+                                      //   autoCloseDuration: const Duration(seconds: 5),
+                                      // ).then((value) {
+                                      GoRouter.of(context).go(
+                                          '/studentdiary/${result.uid.toString()}');
+                                      // });
+                                    });
+                                  } else if (result.role == 'student' &&
+                                      result.status == 'unfinished') {
+                                    setState(() {
+                                      CoolAlert.show(
+                                        context: context,
+                                        width: 200,
+                                        type: CoolAlertType.success,
+                                        text: 'You will redirected to sign up!',
+                                        autoCloseDuration:
+                                            const Duration(seconds: 5),
+                                      ).then((value) {
+                                        GoRouter.of(context).go(
+                                            '/studentsignup/${result.uid.toString()}');
+                                      });
+                                    });
+                                  } else {
+                                    CoolAlert.show(
+                                      context: context,
+                                      width: 200,
+                                      type: CoolAlertType.error,
+                                      title: 'Oops...',
+                                      text: result.toString(),
+                                      backgroundColor: Colors.black,
+                                    ).then((value) => setState(() {}));
+                                  }
+                                }
                               });
-                            } else if (result.role == 'student' &&
-                                result.status == 'completed') {
-                              setState(() {
-                                // CoolAlert.show(
-                                //   context: context,
-                                //   width: 200,
-                                //   type: CoolAlertType.success,
-                                //   text: 'Log in Succesfully!',
-                                //   autoCloseDuration: const Duration(seconds: 5),
-                                // ).then((value) {
-                                  GoRouter.of(context).go(
-                                      '/studentdiary/${result.uid.toString()}');
-                                // });
-                              });
-                            } else if (result.role == 'student' &&
-                                result.status == 'unfinished') {
-                              setState(() {
-                                CoolAlert.show(
-                                  context: context,
-                                  width: 200,
-                                  type: CoolAlertType.success,
-                                  text: 'You will redirected to sign up!',
-                                  autoCloseDuration: const Duration(seconds: 5),
-                                ).then((value) {
-                                  GoRouter.of(context).go(
-                                      '/studentsignup/${result.uid.toString()}');
-                                });
-                              });
-                            } else {
-                              CoolAlert.show(
-                                context: context,
-                                width: 200,
-                                type: CoolAlertType.error,
-                                title: 'Oops...',
-                                text: result.toString(),
-                                backgroundColor: Colors.black,
-                              );
-                            }
-                          }
-                        });
-                      },
+                            },
                       child: isLoading
                           ? CircularProgressIndicator() // Display progress indicator
                           : Text(

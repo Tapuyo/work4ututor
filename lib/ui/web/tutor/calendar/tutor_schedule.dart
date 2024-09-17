@@ -173,11 +173,164 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
     bool isWithinRange = false;
     if (selectedTimeRanges.isNotEmpty) {
       for (var selectedTimeRange in selectedTimeRanges) {
-        String from24Hour =
-            convertTo24HourFormat(selectedTimeRange.timeAvailableFrom);
-        String to24Hour =
-            convertTo24HourFormat(selectedTimeRange.timeAvailableTo);
+        String from24Hourcompare = convertTo24HourFormat(selectedTimeRange.timeAvailableFrom);
+        String to24Hourcompare = convertTo24HourFormat(selectedTimeRange.timeAvailableTo);
+        TimeOfDay from = TimeOfDay(
+          hour: int.parse(from24Hourcompare.split(':')[0]),
+          minute: int.parse(from24Hourcompare.split(':')[1]),
+        );
 
+        TimeOfDay to = TimeOfDay(
+          hour: int.parse(to24Hourcompare.split(':')[0]),
+          minute: int.parse(to24Hourcompare.split(':')[1]),
+        );
+
+        int currentTimeInMinutes = time.hour * 60 + time.minute;
+        int comparefromTimeInMinutes = from.hour * 60 + from.minute;
+        int comparetoTimeInMinutes = to.hour * 60 + to.minute;
+
+        if (comparefromTimeInMinutes > comparetoTimeInMinutes) {
+          String from24Hour1 = convertTo24HourFormat(selectedTimeRange.timeAvailableFrom);
+          String to24Hour1 = convertTo24HourFormat('11:59 PM');
+          String from24Hour2 = convertTo24HourFormat('12:01 AM');
+          String to24Hour2 = convertTo24HourFormat(selectedTimeRange.timeAvailableTo);
+          TimeOfDay from1 = TimeOfDay(
+            hour: int.parse(from24Hour1.split(':')[0]),
+            minute: int.parse(from24Hour1.split(':')[1]),
+          );
+
+          TimeOfDay to1 = TimeOfDay(
+            hour: int.parse(to24Hour1.split(':')[0]),
+            minute: int.parse(to24Hour1.split(':')[1]),
+          );
+          //convert to int
+          int fromTimeInMinutes1 = from1.hour * 60 + from.minute;
+          int toTimeInMinutes1 = to1.hour * 60 + to.minute + 5;
+          TimeOfDay from2 = TimeOfDay(
+            hour: int.parse(from24Hour2.split(':')[0]),
+            minute: int.parse(from24Hour2.split(':')[1]),
+          );
+
+          TimeOfDay to2 = TimeOfDay(
+            hour: int.parse(to24Hour2.split(':')[0]),
+            minute: int.parse(to24Hour2.split(':')[1]),
+          );
+          //convert to int
+          int fromTimeInMinutes2 = from2.hour * 60 + from.minute - 60;
+          int toTimeInMinutes2 = to2.hour * 60 + to.minute;
+          if (currentTimeInMinutes >= fromTimeInMinutes2 &&
+                  currentTimeInMinutes <= toTimeInMinutes2 ||
+              currentTimeInMinutes >= fromTimeInMinutes1 &&
+                  currentTimeInMinutes <= toTimeInMinutes1) {
+            isWithinRange =
+                true; // Exit the loop when the first valid range is found
+          }
+        } else {
+          String from24Hour =
+              convertTo24HourFormat(selectedTimeRange.timeAvailableFrom);
+          String to24Hour =
+              convertTo24HourFormat(selectedTimeRange.timeAvailableTo);
+
+          TimeOfDay from = TimeOfDay(
+            hour: int.parse(from24Hour.split(':')[0]),
+            minute: int.parse(from24Hour.split(':')[1]),
+          );
+
+          TimeOfDay to = TimeOfDay(
+            hour: int.parse(to24Hour.split(':')[0]),
+            minute: int.parse(to24Hour.split(':')[1]),
+          );
+
+          int currentTimeInMinutes = time.hour * 60 + time.minute;
+          int fromTimeInMinutes = from.hour * 60 + from.minute;
+          int toTimeInMinutes = to.hour * 60 + to.minute;
+
+          if (currentTimeInMinutes >= fromTimeInMinutes &&
+              currentTimeInMinutes <= toTimeInMinutes) {
+            isWithinRange = true;
+            break; // Exit the loop when the first valid range is found
+          }
+        }
+      }
+    } else {
+      // from24Hour = convertTo24HourFormat(timeFrom);
+      // to24Hour = convertTo24HourFormat(timeTo);
+      // TimeOfDay from = TimeOfDay(
+      //   hour: int.parse(from24Hour.split(':')[0]),
+      //   minute: int.parse(from24Hour.split(':')[1]),
+      // );
+
+      // TimeOfDay to = TimeOfDay(
+      //   hour: int.parse(to24Hour.split(':')[0]),
+      //   minute: int.parse(to24Hour.split(':')[1]),
+      // );
+
+      // int currentTimeInMinutes = time.hour * 60 + time.minute;
+      // int fromTimeInMinutes = from.hour * 60 + from.minute;
+      // int toTimeInMinutes = to.hour * 60 + to.minute;
+
+      // if (currentTimeInMinutes >= fromTimeInMinutes &&
+      //     currentTimeInMinutes <= toTimeInMinutes) {
+      //   isWithinRange =
+      //       true; // Exit the loop when the first valid range is found
+      // }
+
+      // -----new implementation with time conversion-------
+      String from24Hourcompare = convertTo24HourFormat(timeFrom);
+      String to24Hourcompare = convertTo24HourFormat(timeTo);
+      TimeOfDay from = TimeOfDay(
+        hour: int.parse(from24Hourcompare.split(':')[0]),
+        minute: int.parse(from24Hourcompare.split(':')[1]),
+      );
+
+      TimeOfDay to = TimeOfDay(
+        hour: int.parse(to24Hourcompare.split(':')[0]),
+        minute: int.parse(to24Hourcompare.split(':')[1]),
+      );
+
+      int currentTimeInMinutes = time.hour * 60 + time.minute;
+      int comparefromTimeInMinutes = from.hour * 60 + from.minute;
+      int comparetoTimeInMinutes = to.hour * 60 + to.minute;
+
+      if (comparefromTimeInMinutes > comparetoTimeInMinutes) {
+        String from24Hour1 = convertTo24HourFormat(timeFrom);
+        String to24Hour1 = convertTo24HourFormat('11:59 PM');
+        String from24Hour2 = convertTo24HourFormat('12:01 AM');
+        String to24Hour2 = convertTo24HourFormat(timeTo);
+        TimeOfDay from1 = TimeOfDay(
+          hour: int.parse(from24Hour1.split(':')[0]),
+          minute: int.parse(from24Hour1.split(':')[1]),
+        );
+
+        TimeOfDay to1 = TimeOfDay(
+          hour: int.parse(to24Hour1.split(':')[0]),
+          minute: int.parse(to24Hour1.split(':')[1]),
+        );
+        //convert to int
+        int fromTimeInMinutes1 = from1.hour * 60 + from.minute;
+        int toTimeInMinutes1 = to1.hour * 60 + to.minute + 5;
+        TimeOfDay from2 = TimeOfDay(
+          hour: int.parse(from24Hour2.split(':')[0]),
+          minute: int.parse(from24Hour2.split(':')[1]),
+        );
+
+        TimeOfDay to2 = TimeOfDay(
+          hour: int.parse(to24Hour2.split(':')[0]),
+          minute: int.parse(to24Hour2.split(':')[1]),
+        );
+        //convert to int
+        int fromTimeInMinutes2 = from2.hour * 60 + from.minute - 60;
+        int toTimeInMinutes2 = to2.hour * 60 + to.minute;
+        if (currentTimeInMinutes >= fromTimeInMinutes2 &&
+                currentTimeInMinutes <= toTimeInMinutes2 ||
+            currentTimeInMinutes >= fromTimeInMinutes1 &&
+                currentTimeInMinutes <= toTimeInMinutes1) {
+          isWithinRange =
+              true; // Exit the loop when the first valid range is found
+        }
+      } else {
+        from24Hour = convertTo24HourFormat(timeFrom);
+        to24Hour = convertTo24HourFormat(timeTo);
         TimeOfDay from = TimeOfDay(
           hour: int.parse(from24Hour.split(':')[0]),
           minute: int.parse(from24Hour.split(':')[1]),
@@ -194,31 +347,9 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
 
         if (currentTimeInMinutes >= fromTimeInMinutes &&
             currentTimeInMinutes <= toTimeInMinutes) {
-          isWithinRange = true;
-          break; // Exit the loop when the first valid range is found
+          isWithinRange =
+              true; // Exit the loop when the first valid range is found
         }
-      }
-    } else {
-      from24Hour = convertTo24HourFormat(timeFrom);
-      to24Hour = convertTo24HourFormat(timeTo);
-      TimeOfDay from = TimeOfDay(
-        hour: int.parse(from24Hour.split(':')[0]),
-        minute: int.parse(from24Hour.split(':')[1]),
-      );
-
-      TimeOfDay to = TimeOfDay(
-        hour: int.parse(to24Hour.split(':')[0]),
-        minute: int.parse(to24Hour.split(':')[1]),
-      );
-
-      int currentTimeInMinutes = time.hour * 60 + time.minute;
-      int fromTimeInMinutes = from.hour * 60 + from.minute;
-      int toTimeInMinutes = to.hour * 60 + to.minute;
-
-      if (currentTimeInMinutes >= fromTimeInMinutes &&
-          currentTimeInMinutes <= toTimeInMinutes) {
-        isWithinRange =
-            true; // Exit the loop when the first valid range is found
       }
     }
 
@@ -428,10 +559,16 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                 dayOffs = [];
                                 dayOffsdate = [];
                               }
-                              if (scheduletime.finalschedule != []) {
-                                finalschedule = scheduletime.finalschedule;
+                              if (scheduletime.finalschedule != null) {
+                                finalschedule = scheduletime.finalschedule!;
                               } else {
                                 finalschedule = [];
+                              }
+                              if (scheduletime.forlistdayoffsdate != null ||
+                                  scheduletime.forlistdayoffsdate != []) {
+                                print(scheduletime.forlistdayoffsdate);
+                              } else {
+                                print('way sulod');
                               }
 
                               return TableCalendar(
@@ -875,11 +1012,17 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                 dayOffs = [];
                                 dayOffsdate = [];
                               }
-                              if (scheduletime.finalschedule != []) {
-                                finalschedule = scheduletime.finalschedule;
+                              if (scheduletime.finalschedule != null) {
+                                finalschedule = scheduletime.finalschedule!;
                               } else {
                                 finalschedule = [];
                               }
+                               if (scheduletime.forlistdayoffsdate != null) {
+                                print('Total length ${scheduletime.forlistdayoffsdate!.length}');
+                              } else {
+                                print('Walay Sulod');
+                              }
+
 
                               return TableCalendar(
                                 shouldFillViewport: false,
@@ -4910,6 +5053,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                       child: CalendarSetup(
                                         userinfo: tutorinfodata.first,
                                         booking: scheduleList,
+                                        timezone: widget.tutor.timezone,
                                       ),
                                     ),
                                     Positioned(
@@ -5094,6 +5238,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                       child: CalendarSetup(
                                         userinfo: tutorinfodata.first,
                                         booking: scheduleList,
+                                        timezone: widget.tutor.timezone,
                                       ),
                                     ),
                                     Positioned(

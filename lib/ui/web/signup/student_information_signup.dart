@@ -1071,7 +1071,7 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                           fontWeight: FontWeight.w600),
                                     ),
                                     Text(
-                                      "(You can select more than one language.)",
+                                      "(You can select more than one citizenship.)",
                                       style: TextStyle(
                                           color: Colors.redAccent,
                                           fontWeight: FontWeight.w100,
@@ -1333,12 +1333,14 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                       const Icon(Icons.delete_outline_outlined),
                                   color: Colors.red,
                                   iconSize: 18,
-                                  onPressed: () {
-                                    setState(() {
-                                      citizenship.removeWhere(
-                                          (item) => item == currentctzship);
-                                    });
-                                  },
+                                  onPressed: currentctzship == ''
+                                      ? null
+                                      : () {
+                                          setState(() {
+                                            citizenship.removeWhere((item) =>
+                                                item == currentctzship);
+                                          });
+                                        },
                                 ),
                               ],
                             ),
@@ -1768,12 +1770,14 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                                       const Icon(Icons.delete_outline_outlined),
                                   color: Colors.red,
                                   iconSize: 18,
-                                  onPressed: () {
-                                    setState(() {
-                                      tlanguages.removeWhere(
-                                          (item) => item == currentLanguage);
-                                    });
-                                  },
+                                  onPressed: currentLanguage == ''
+                                      ? null
+                                      : () {
+                                          setState(() {
+                                            tlanguages.removeWhere((item) =>
+                                                item == currentLanguage);
+                                          });
+                                        },
                                 ),
                               ],
                             ),

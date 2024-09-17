@@ -291,49 +291,69 @@ class _ContactTeacherBodyState extends State<ContactTeacherBody> {
                             // ),
                             child: Align(
                               alignment: Alignment.topCenter,
-                              child: TypeAheadField(
-                                hideOnEmpty: false,
-                                textFieldConfiguration: TextFieldConfiguration(
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
+                              child: TextFormField(
+                                controller: numberofclassController,
+                                decoration: InputDecoration(
+                                  fillColor: Colors.grey,
+                                  hintText: 'Ex. 2',
+                                  hintStyle: const TextStyle(
+                                      color: Colors.grey, fontSize: 15),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 10,
                                   ),
-                                  autofocus: false,
-                                  controller: numberofclassController,
-                                  decoration: InputDecoration(
-                                    fillColor: Colors.grey,
-                                    hintText: 'Ex. 2',
-                                    hintStyle: const TextStyle(
-                                        color: Colors.grey, fontSize: 15),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 12, horizontal: 10),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(
-                                          10.0), // Rounded border
-                                      borderSide:
-                                          BorderSide.none, // No outline border
-                                    ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        10.0), // Rounded border
+                                    borderSide:
+                                        BorderSide.none, // No outline border
                                   ),
                                 ),
-                                suggestionsCallback: (pattern) {
-                                  return provided.where((item) => item
-                                      .toLowerCase()
-                                      .contains(pattern.toLowerCase()));
-                                },
-                                itemBuilder: (context, suggestion) {
-                                  return ListTile(
-                                    title: Text(
-                                      suggestion.toString(),
-                                    ),
-                                  );
-                                },
-                                onSuggestionSelected: (selectedItem) {
-                                  setState(() {
-                                    numberofclassController.text =
-                                        selectedItem.toString();
-                                  });
-                                },
+                                onChanged: (pattern) {},
                               ),
+                              // TypeAheadField(
+                              //   hideOnEmpty: false,
+                              //   textFieldConfiguration: TextFieldConfiguration(
+                              //     style: const TextStyle(
+                              //       color: Colors.black,
+                              //       fontSize: 15,
+                              //     ),
+                              //     autofocus: false,
+                              //     controller: numberofclassController,
+                              //     decoration: InputDecoration(
+                              //       fillColor: Colors.grey,
+                              //       hintText: 'Ex. 2',
+                              //       hintStyle: const TextStyle(
+                              //           color: Colors.grey, fontSize: 15),
+                              //       contentPadding: const EdgeInsets.symmetric(
+                              //           vertical: 12, horizontal: 10),
+                              //       border: OutlineInputBorder(
+                              //         borderRadius: BorderRadius.circular(
+                              //             10.0), // Rounded border
+                              //         borderSide:
+                              //             BorderSide.none, // No outline border
+                              //       ),
+                              //     ),
+                              //   ),
+                              //   suggestionsCallback: (pattern) {
+                              //     return provided.where((item) => item
+                              //         .toLowerCase()
+                              //         .contains(pattern.toLowerCase()));
+                              //   },
+                              //   itemBuilder: (context, suggestion) {
+                              //     return ListTile(
+                              //       title: Text(
+                              //         suggestion.toString(),
+                              //       ),
+                              //     );
+                              //   },
+                              //   onSuggestionSelected: (selectedItem) {
+                              //     setState(() {
+                              //       numberofclassController.text =
+                              //           selectedItem.toString();
+                              //     });
+                              //   },
+                              // ),
                             ),
                           ),
                         ),

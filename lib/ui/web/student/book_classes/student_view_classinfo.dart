@@ -973,7 +973,7 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
                                                                                 dueCancelDate(scheduledata!.schedule);
                                                                             print(dateresult);
                                                                             rescheduleclass(context,
-                                                                                filteredScheduleList[index]);
+                                                                                filteredScheduleList[index], widget.timezone);
                                                                           },
                                                                         )
                                                                   : TextButton(

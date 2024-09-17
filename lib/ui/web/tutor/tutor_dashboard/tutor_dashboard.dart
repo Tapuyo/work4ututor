@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:go_router/go_router.dart';
@@ -21,6 +22,7 @@ import '../../../../data_class/studentsEnrolledclass.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../data_class/user_class.dart';
 import '../../../../provider/init_provider.dart';
+import '../../../../services/getcurrentTimezone.dart';
 import '../../../../services/getenrolledclasses.dart';
 import '../../../../services/getmessages.dart';
 import '../../../../services/getschedules.dart';
@@ -41,6 +43,7 @@ import '../classes/tutor_students.dart';
 import '../mesages/messages.dart';
 import '../performance/tutor_performance.dart';
 import '../settings/tutor_settings.dart';
+import 'dart:html' as html;
 
 //for timer local time
 import 'package:timezone/browser.dart' as tz;
@@ -116,6 +119,11 @@ class _DashboardPageState extends State<DashboardPage> {
         GoRouter.of(context).go('/');
       }
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final timedatenotifier =
+          Provider.of<TutorNotifier>(context, listen: false);
+      timedatenotifier.getlistenToTutor(widget.uID.toString());
+    });
     super.initState();
   }
 
@@ -302,8 +310,8 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
     }
     return timezone == null
         ? SizedBox(
-          width: size.width,
-          height: size.height,
+            width: size.width,
+            height: size.height,
             child: Center(
               child: Container(
                 margin: const EdgeInsets.only(top: 0),
@@ -358,19 +366,73 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                       elevation: 4,
                       shadowColor: Colors.black,
                       automaticallyImplyLeading: false,
-                      title: Container(
-                        padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
-                        width: 240,
-                        child: Image.asset(
-                          "assets/images/worklogo.png",
-                          alignment: Alignment.topCenter,
-                          fit: BoxFit.cover,
+                      title: InkWell(
+                        onTap: () {
+                          html.window.location.reload();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
+                          width: 240,
+                          child: Image.asset(
+                            "assets/images/worklogo.png",
+                            alignment: Alignment.topCenter,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                       actions: [
                         ResponsiveBuilder.isDesktop(context)
                             ? Row(
                                 children: [
+                                  // Visibility(
+                                  //   visible: true,
+                                  //   child: Container(
+                                  //     decoration: BoxDecoration(
+                                  //       boxShadow: [
+                                  //         BoxShadow(
+                                  //           color: Colors.black.withOpacity(
+                                  //               0.5), // Shadow color
+                                  //           spreadRadius:
+                                  //               2.0, // How much the shadow spreads
+                                  //           blurRadius:
+                                  //               5.0, // Blur radius of the shadow
+                                  //           offset: const Offset(
+                                  //               0, 4), // Offset of the shadow
+                                  //         ),
+                                  //       ],
+                                  //     ),
+                                  //     child: RichText(
+                                  //       text: TextSpan(
+                                  //         children: <TextSpan>[
+                                  //           const TextSpan(
+                                  //             text:
+                                  //                 'Your timezone has been updated, click ',
+                                  //             style: TextStyle(
+                                  //                 color: Colors.white),
+                                  //           ),
+                                  //           TextSpan(
+                                  //             text: 'reload',
+                                  //             style: const TextStyle(
+                                  //               color: kColorLight,
+                                  //             ),
+                                  //             recognizer: TapGestureRecognizer()
+                                  //               ..onTap = () {
+                                  //                 html.window.location.reload();
+                                  //               },
+                                  //           ),
+                                  //           const TextSpan(
+                                  //             text: ' to reflect!',
+                                  //             style: TextStyle(
+                                  //                 color: Colors.white),
+                                  //           ),
+                                  //         ],
+                                  //       ),
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  // const SizedBox(
+                                  //   width: 15,
+                                  // ),
                                   Text(
                                     timezone == null
                                         ? ''
@@ -477,6 +539,12 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                             : ResponsiveBuilder.isTablet(context)
                                 ? Row(
                                     children: [
+                                      Text(
+                                        timezone == null
+                                            ? ''
+                                            : '$timezone ${utcZone(timezone!)}',
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
                                       Padding(
                                         padding: const EdgeInsets.fromLTRB(
                                             10, 10, 15, 10),
@@ -697,7 +765,9 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                                   //   ClassInquiry(widget.uID)
                                   // ]
                                   else if (menuIndex == 4) ...[
-                                    const StudentsEnrolled()
+                                    StudentsEnrolled(
+                                      timezone: timezone!,
+                                    )
                                   ] else if (menuIndex == 5) ...[
                                     PerformancePage(
                                       uID: widget.uID,
@@ -727,6 +797,76 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                               ],
                             ),
                           ),
+                    bottomSheet: Consumer<TutorNotifier>(
+                        builder: (context, tutorNotifier, child) {
+                      return Visibility(
+                        visible:tutorNotifier.timezone != timezone ,
+                        child: Container(
+                          width: double.infinity,
+                          height: 70,
+                          color: Colors.transparent,
+                          alignment: Alignment.bottomCenter,
+                          padding: const EdgeInsets.only(bottom: 20.0),
+                          child: InkWell(
+                            onTap: () {
+                              html.window.location.reload();
+                            },
+                            child: Container(
+                              width:
+                                  350, // Adjust the width to display all the text
+                              height: 50, // Adjust the height as needed
+                              decoration: BoxDecoration(
+                                color: kColorLight,
+                                borderRadius: BorderRadius.circular(
+                                    15.0), // Makes the button rounded
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black
+                                        .withOpacity(0.5), // Shadow color
+                                    spreadRadius:
+                                        2.0, // How much the shadow spreads
+                                    blurRadius: 5.0, // Blur radius of the shadow
+                                    offset: const Offset(
+                                        0, 4), // Offset of the shadow
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: RichText(
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(
+                                    children: <TextSpan>[
+                                      const TextSpan(
+                                        text: 'Timezone updated, click ',
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 14),
+                                      ),
+                                      TextSpan(
+                                        text: 'reload',
+                                        style: const TextStyle(
+                                          color: Colors.yellow,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            html.window.location.reload();
+                                          },
+                                      ),
+                                      const TextSpan(
+                                        text: ' to reflect!',
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
                   ),
                 ),
                 if (_showModal)
@@ -752,6 +892,7 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                               },
                               child: Container(
                                 width: 200,
+                                height: size.height / 2,
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
                                   color: Colors.white,

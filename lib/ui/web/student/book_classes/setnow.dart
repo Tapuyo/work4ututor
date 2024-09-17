@@ -60,10 +60,10 @@ class _SetNowState extends State<SetNow> {
   @override
   void initState() {
     super.initState();
-    selectedTimesched = initialTime('Asia/Dubai');
-    selectedTimeschedto = initialTime('Asia/Dubai');
-    selectedDatesched = initialDate('Asia/Dubai');
-    _selectedTimeZone.text = 'Asia/Dubai';
+    selectedTimesched = initialTime(widget.timezone);
+    selectedTimeschedto = initialTime(widget.timezone);
+    selectedDatesched = initialDate(widget.timezone);
+    _selectedTimeZone.text = widget.timezone;
     getTimezones();
     // getfutureclass();
     // print('Future Data: ${widget.uID}');
@@ -99,7 +99,7 @@ class _SetNowState extends State<SetNow> {
       context: context,
       initialDate: selectedDatesched,
       firstDate: DateTime(2022),
-      lastDate: DateTime(2025),
+      lastDate: DateTime(3000),
     );
 
     if (pickedDate != null) {
@@ -576,10 +576,6 @@ class _SetNowState extends State<SetNow> {
                                       selectedTimeschedto.hour,
                                       selectedTimeschedto.minute)),
                                 ).toString();
-                                print(updateTime(
-                                    widget.timezone, convertedtimefrom));
-                                print(updateTime(
-                                    widget.timezone, convertedtimeto));
 
                                 String selectedfrom = convertTo24HourFormat(
                                     updateTime(
@@ -587,6 +583,7 @@ class _SetNowState extends State<SetNow> {
                                 String selectedto = convertTo24HourFormat(
                                     updateTime(
                                         widget.timezone, convertedtimeto));
+
                                 final time = TimeOfDay(
                                   hour: int.parse(selectedfrom.split(':')[0]),
                                   minute: int.parse(selectedfrom.split(':')[1]),
@@ -670,8 +667,8 @@ class _SetNowState extends State<SetNow> {
                                     context: context,
                                     type: CoolAlertType.warning,
                                     width: 200,
-                                    title: 'Oops...',
-                                    text: 'Selected DATE is a tutor dayoff!',
+                                    title: '',
+                                    text: 'Selected DATE is a tutor dayoff.',
                                   );
                                 } else if (filteredSchedules.isNotEmpty) {
                                   if (isSelectable) {
@@ -680,7 +677,7 @@ class _SetNowState extends State<SetNow> {
                                         context: context,
                                         type: CoolAlertType.warning,
                                         width: 200,
-                                        title: 'Oops...',
+                                        title: '',
                                         text: 'Selected Time is in bookings!',
                                       );
                                     } else if (isTimeInterval) {
@@ -688,32 +685,98 @@ class _SetNowState extends State<SetNow> {
                                         context: context,
                                         type: CoolAlertType.warning,
                                         width: 200,
-                                        title: 'Oops...',
+                                        title: '',
                                         text: 'Selected Time interval is fine!',
                                       );
                                     } else {
-                                      print('Selected Time interval not fine!');
-                                      CoolAlert.show(
-                                        context: context,
-                                        type: CoolAlertType.warning,
-                                        width: 200,
-                                        title: 'Oops...',
-                                        text:
-                                            'Selected Time interval not fine!',
-                                      );
+                                      if (isTimeStartOutRange(time)) {
+                                        CoolAlert.show(
+                                          context: context,
+                                          type: CoolAlertType.warning,
+                                          width: 200,
+                                          title: 'Oops...',
+                                          text:
+                                              'Selected Time out of tutors schedule!',
+                                        );
+                                      } else if (isTimeToOutRange(timeto)) {
+                                        CoolAlert.show(
+                                          context: context,
+                                          type: CoolAlertType.warning,
+                                          width: 200,
+                                          title: 'Oops...',
+                                          text:
+                                              'Selected Time out of tutors schedule!',
+                                        );
+                                      } else {
+                                        String datefrom = formatTimewDatewZone(
+                                                DateFormat(
+                                                        'MMMM d, yyyy h:mm a')
+                                                    .format(DateTime.parse(
+                                                            convertedtimefrom)
+                                                        .toLocal()),
+                                                'Asia/Manila')
+                                            .toString();
+                                        String dateto = formatTimewDatewZone(
+                                                DateFormat(
+                                                        'MMMM d, yyyy h:mm a')
+                                                    .format(DateTime.parse(
+                                                            convertedtimeto)
+                                                        .toLocal()),
+                                                'Asia/Manila')
+                                            .toString();
+                                        String? result = await setClassSchedule(
+                                            widget.classID,
+                                            (int.parse(widget.session) + 1)
+                                                .toString(),
+                                            datefrom,
+                                            dateto,
+                                            selectedDatesched,
+                                            widget.data!.subjectID);
+                                        if (result == null) {
+                                          CoolAlert.show(
+                                            context: context,
+                                            type: CoolAlertType.error,
+                                            title: 'Oops...',
+                                            text: 'Something went wrong!',
+                                          );
+                                        } else {
+                                          setState(() {
+                                            if (result.toString() ==
+                                                "success") {
+                                              List<String> idList = [
+                                                widget.classID
+                                              ];
+                                              addNewNotification(
+                                                  'New Schedule', '', idList);
+                                              result =
+                                                  "Schedule succesfully save!";
+
+                                              Navigator.pop(context);
+                                            } else {
+                                              CoolAlert.show(
+                                                context: context,
+                                                type: CoolAlertType.error,
+                                                width: 200,
+                                                title: 'Oops...',
+                                                text: result,
+                                              );
+                                            }
+                                          });
+                                        }
+                                      }
                                     }
                                   } else {
-                                    print('Selected Time is out of range!');
                                     CoolAlert.show(
                                       context: context,
                                       type: CoolAlertType.warning,
                                       width: 200,
-                                      title: 'Oops...',
+                                      title: '',
                                       text: 'Selected Time is out of range!',
                                     );
                                   }
                                 } else {
                                   if (isTimeStartOutRange(time)) {
+                                    print(time);
                                     print('Selected Time interval not fine!');
                                     CoolAlert.show(
                                       context: context,
@@ -724,6 +787,7 @@ class _SetNowState extends State<SetNow> {
                                           'Selected Time out of tutors schedule!',
                                     );
                                   } else if (isTimeToOutRange(timeto)) {
+                                    print(timeto);
                                     print('Selected Time interval not fine!');
                                     CoolAlert.show(
                                       context: context,
@@ -739,13 +803,15 @@ class _SetNowState extends State<SetNow> {
                                                 .format(DateTime.parse(
                                                         convertedtimefrom)
                                                     .toLocal()),
-                                            'Asia/Manila').toString();
+                                            'Asia/Manila')
+                                        .toString();
                                     String dateto = formatTimewDatewZone(
                                             DateFormat('MMMM d, yyyy h:mm a')
                                                 .format(DateTime.parse(
                                                         convertedtimeto)
                                                     .toLocal()),
-                                            'Asia/Manila').toString();
+                                            'Asia/Manila')
+                                        .toString();
                                     String? result = await setClassSchedule(
                                         widget.classID,
                                         (int.parse(widget.session) + 1)

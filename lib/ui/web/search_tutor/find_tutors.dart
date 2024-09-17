@@ -26,7 +26,6 @@ import '../../../shared_components/responsive_builder.dart';
 import '../../../utils/themes.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 class FindTutor extends StatefulWidget {
   final String userid;
   const FindTutor({super.key, required this.userid});
@@ -116,24 +115,29 @@ class _FindTutorState extends State<FindTutor> {
       List<String> subjects) async {
     List<String> uids = [];
     try {
+      // Step 1: Fetch all tutors once
       QuerySnapshot tutorQuerySnapshot =
           await FirebaseFirestore.instance.collection('tutor').get();
 
-      for (QueryDocumentSnapshot doc in tutorQuerySnapshot.docs) {
-        QuerySnapshot coursesSnapshot = await doc.reference
+      // Step 2: Collect all Future queries for each tutor's subcollection
+      List<Future<QuerySnapshot>> futures = [];
+
+      for (QueryDocumentSnapshot tutorDoc in tutorQuerySnapshot.docs) {
+        Future<QuerySnapshot> future = tutorDoc.reference
             .collection('mycourses')
             .where('subjectname', whereIn: subjects)
             .get();
+        futures.add(future);
+      }
 
-        if (coursesSnapshot.docs.isNotEmpty) {
-          // Check if any of the courses' subject names match any of the provided subjects
-          for (QueryDocumentSnapshot courseDoc in coursesSnapshot.docs) {
-            String courseSubject = courseDoc.get('subjectname');
-            if (subjects.contains(courseSubject)) {
-              uids.add(doc.get('userID'));
-              break; // Once the UID is added, no need to check other courses for this tutor
-            }
-          }
+      // Step 3: Await all futures to execute concurrently
+      List<QuerySnapshot> results = await Future.wait(futures);
+
+      // Step 4: Extract user IDs based on course matches
+      for (int i = 0; i < results.length; i++) {
+        if (results[i].docs.isNotEmpty) {
+          String uid = tutorQuerySnapshot.docs[i].get('userID');
+          uids.add(uid); // Ensure we get the 'userID' from the tutor document
         }
       }
     } catch (e) {
@@ -165,12 +169,12 @@ class _FindTutorState extends State<FindTutor> {
     // Add more valid URLs as needed
   ];
   bool isSearchIconClicked = true;
-StudentInfoClass? tempinfo;
+  StudentInfoClass? tempinfo;
   @override
   Widget build(BuildContext context) {
     final List<TutorInformation> temptutorsinfo =
         Provider.of<List<TutorInformation>>(context);
-    final List<TutorInformation> tutorsinfo = temptutorsinfo;
+    List<TutorInformation> tutorsinfo = temptutorsinfo;
     List<String> countryNames = Provider.of<List<String>>(context);
     List<LanguageData> languagedata = Provider.of<List<LanguageData>>(context);
     final preferredTutorsNotifier =
@@ -200,10 +204,9 @@ StudentInfoClass? tempinfo;
                 ? '$firstname $lastname'
                 : '$firstname $middlename $lastname';
             studentID = studentdata.first.studentID;
-            timezone= studentdata.first.timezone;
+            timezone = studentdata.first.timezone;
             profileurl = studentdata.first.profilelink;
             tempinfo = studentdata.first;
-
           }
           return Scaffold(
             key: studentdeskkey,
@@ -540,7 +543,7 @@ StudentInfoClass? tempinfo;
                         elevation: 4,
                         child: SizedBox(
                           width: 260,
-                          height: size.height,
+                          height: size.height - 70,
                           child: SingleChildScrollView(
                             controller: ScrollController(),
                             child: Column(
@@ -642,21 +645,23 @@ StudentInfoClass? tempinfo;
                                       }
 
                                       setState(() {
-                                        viewpreferred[1] = !viewpreferred[1];
-                                        viewpreferred[2] = false;
-                                        viewpreferred[3] = false;
-                                        viewpreferred[4] = false;
-                                        viewpreferred[5] = false;
+                                        // viewpreferred[1] = !viewpreferred[1];
+                                        // viewpreferred[2] = false;
+                                        // viewpreferred[3] = false;
+                                        // viewpreferred[4] = false;
+                                        // viewpreferred[5] = false;
                                         if (myprefTutor.isNotEmpty) {
                                           myprefTutor.clear();
+                                          viewpreferred[1] = !viewpreferred[1];
                                         } else {
                                           myprefTutor = tempmyprefTutor;
+                                          viewpreferred[1] = !viewpreferred[1];
                                         }
 
-                                        servchoosen.clear();
-                                        cchoosen.clear();
-                                        subjectchoosen.clear();
-                                        languagechoosen.clear();
+                                        // servchoosen.clear();
+                                        // cchoosen.clear();
+                                        // subjectchoosen.clear();
+                                        // languagechoosen.clear();
                                       });
                                     },
                                     child: Padding(
@@ -744,15 +749,17 @@ StudentInfoClass? tempinfo;
                                     onPressed: () {
                                       setState(() {
                                         viewpreferred[2] = !viewpreferred[2];
-                                        viewpreferred[1] = false;
-                                        viewpreferred[3] = false;
-                                        viewpreferred[4] = false;
-                                        viewpreferred[5] = false;
-                                        myprefTutor.clear();
-                                        cchoosen.clear();
-                                        servchoosen.clear();
-                                        subjectchoosen.clear();
-                                        languagechoosen.clear();
+                                        // viewpreferred[1] = false;
+                                        // viewpreferred[3] = false;
+                                        // viewpreferred[4] = false;
+                                        // viewpreferred[5] = false;
+                                        // myprefTutor.clear();
+                                        if (cchoosen.isNotEmpty) {
+                                          cchoosen.clear();
+                                        }
+                                        // servchoosen.clear();
+                                        // subjectchoosen.clear();
+                                        // languagechoosen.clear();
                                       });
                                     },
                                     child: Padding(
@@ -807,24 +814,34 @@ StudentInfoClass? tempinfo;
                                       physics: const BouncingScrollPhysics(),
                                       itemCount: countryNames.length,
                                       itemBuilder: (context, index) {
+                                        // Create a combined list of selected and unselected country names
+                                        List<String> combinedList = [
+                                          ...cchoosen,
+                                          ...countryNames.where((name) =>
+                                              !cchoosen.contains(name)),
+                                        ];
+
                                         return CheckboxListTile(
+                                          activeColor: kColorPrimary,
+                                          checkColor: Colors.white,
                                           title: Text(
-                                            countryNames[index],
+                                            combinedList[index],
                                             style: GoogleFonts.roboto(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.normal),
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.normal,
+                                            ),
                                           ),
                                           value: cchoosen
-                                              .contains(countryNames[index]),
+                                              .contains(combinedList[index]),
                                           onChanged: (value) {
                                             setState(() {
                                               if (cchoosen.contains(
-                                                  countryNames[index])) {
+                                                  combinedList[index])) {
                                                 cchoosen.remove(
-                                                    countryNames[index]);
+                                                    combinedList[index]);
                                               } else {
                                                 cchoosen
-                                                    .add(countryNames[index]);
+                                                    .add(combinedList[index]);
                                               }
                                             });
                                           },
@@ -883,15 +900,18 @@ StudentInfoClass? tempinfo;
                                     onPressed: () {
                                       setState(() {
                                         viewpreferred[3] = !viewpreferred[3];
-                                        viewpreferred[1] = false;
-                                        viewpreferred[2] = false;
-                                        viewpreferred[4] = false;
-                                        viewpreferred[5] = false;
-                                        cchoosen.clear();
-                                        servchoosen.clear();
-                                        subjectchoosen.clear();
-                                        languagechoosen.clear();
-                                        myprefTutor.clear();
+                                        // viewpreferred[1] = false;
+                                        // viewpreferred[2] = false;
+                                        // viewpreferred[4] = false;
+                                        // viewpreferred[5] = false;
+                                        // cchoosen.clear();
+                                        // servchoosen.clear();
+                                        if (subjectchoosen.isNotEmpty) {
+                                          subjectchoosen.clear();
+                                        }
+
+                                        // languagechoosen.clear();
+                                        // myprefTutor.clear();
                                       });
                                     },
                                     child: Padding(
@@ -946,26 +966,40 @@ StudentInfoClass? tempinfo;
                                       physics: const BouncingScrollPhysics(),
                                       itemCount: subjects.length,
                                       itemBuilder: (context, index) {
+                                        // Combine selected and unselected subjects, with selected subjects appearing first
+                                        List<String> combinedSubjects = [
+                                          ...subjectchoosen,
+                                          ...subjects.where((subject) =>
+                                              !subjectchoosen
+                                                  .contains(subject)),
+                                        ];
+
                                         return CheckboxListTile(
+                                          activeColor: kColorPrimary,
+                                          checkColor: Colors.white,
                                           title: Text(
-                                            subjects[index],
+                                            combinedSubjects[index],
                                             style: GoogleFonts.roboto(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.normal),
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.normal,
+                                            ),
                                           ),
-                                          value: subjectchoosen
-                                              .contains(subjects[index]),
+                                          value: subjectchoosen.contains(
+                                              combinedSubjects[index]),
                                           onChanged: (value) async {
                                             setState(() {
-                                              if (subjectchoosen
-                                                  .contains(subjects[index])) {
-                                                subjectchoosen
-                                                    .remove(subjects[index]);
+                                              // Update the subjectchoosen list based on checkbox value
+                                              if (subjectchoosen.contains(
+                                                  combinedSubjects[index])) {
+                                                subjectchoosen.remove(
+                                                    combinedSubjects[index]);
                                               } else {
-                                                subjectchoosen
-                                                    .add(subjects[index]);
+                                                subjectchoosen.add(
+                                                    combinedSubjects[index]);
                                               }
                                             });
+
+                                            // Perform async operation to fetch subject UIDs when subjectchoosen is updated
                                             if (subjectchoosen.isNotEmpty) {
                                               List<String> tempsubjectuids =
                                                   await getDataFromTutorSubjectTeach(
@@ -978,8 +1012,6 @@ StudentInfoClass? tempinfo;
                                                 subjectuids = [];
                                               });
                                             }
-                                            print(subjectchoosen);
-                                            print(subjectuids);
                                           },
                                           controlAffinity: ListTileControlAffinity
                                               .leading, // Place checkbox before the title
@@ -1036,15 +1068,17 @@ StudentInfoClass? tempinfo;
                                     onPressed: () {
                                       setState(() {
                                         viewpreferred[4] = !viewpreferred[4];
-                                        viewpreferred[2] = false;
-                                        viewpreferred[3] = false;
-                                        viewpreferred[1] = false;
-                                        viewpreferred[5] = false;
-                                        servchoosen.clear();
-                                        cchoosen.clear();
-                                        subjectchoosen.clear();
-                                        myprefTutor.clear();
-                                        languagechoosen.clear();
+                                        // viewpreferred[2] = false;
+                                        // viewpreferred[3] = false;
+                                        // viewpreferred[1] = false;
+                                        // viewpreferred[5] = false;
+                                        // servchoosen.clear();
+                                        // cchoosen.clear();
+                                        // subjectchoosen.clear();
+                                        // myprefTutor.clear();
+                                        if (languagechoosen.isNotEmpty) {
+                                          languagechoosen.clear();
+                                        }
                                       });
                                     },
                                     child: Padding(
@@ -1099,29 +1133,41 @@ StudentInfoClass? tempinfo;
                                       physics: const BouncingScrollPhysics(),
                                       itemCount: languagedata.length,
                                       itemBuilder: (context, index) {
+                                        // Create a combined list of selected and unselected languages
+                                        List<dynamic> combinedLanguageData = [
+                                          ...languagedata.where((data) =>
+                                              languagechoosen.contains(
+                                                  data.languageNamesStream)),
+                                          ...languagedata.where((data) =>
+                                              !languagechoosen.contains(
+                                                  data.languageNamesStream)),
+                                        ];
+
                                         return CheckboxListTile(
+                                          activeColor: kColorPrimary,
+                                          checkColor: Colors.white,
                                           title: Text(
-                                            languagedata[index]
+                                            combinedLanguageData[index]
                                                 .languageNamesStream,
                                             style: GoogleFonts.roboto(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.normal),
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.normal,
+                                            ),
                                           ),
                                           value: languagechoosen.contains(
-                                              languagedata[index]
+                                              combinedLanguageData[index]
                                                   .languageNamesStream),
-
                                           onChanged: (value) {
                                             setState(() {
                                               if (languagechoosen.contains(
-                                                  languagedata[index]
+                                                  combinedLanguageData[index]
                                                       .languageNamesStream)) {
                                                 languagechoosen.remove(
-                                                    languagedata[index]
+                                                    combinedLanguageData[index]
                                                         .languageNamesStream);
                                               } else {
                                                 languagechoosen.add(
-                                                    languagedata[index]
+                                                    combinedLanguageData[index]
                                                         .languageNamesStream);
                                               }
                                             });
@@ -1181,15 +1227,17 @@ StudentInfoClass? tempinfo;
                                     onPressed: () {
                                       setState(() {
                                         viewpreferred[5] = !viewpreferred[5];
-                                        viewpreferred[2] = false;
-                                        viewpreferred[3] = false;
-                                        viewpreferred[4] = false;
-                                        viewpreferred[1] = false;
-                                        servchoosen.clear();
-                                        cchoosen.clear();
-                                        subjectchoosen.clear();
-                                        languagechoosen.clear();
-                                        myprefTutor.clear();
+                                        // viewpreferred[2] = false;
+                                        // viewpreferred[3] = false;
+                                        // viewpreferred[4] = false;
+                                        // viewpreferred[1] = false;
+                                        if (servchoosen.isNotEmpty) {
+                                          servchoosen.clear();
+                                        }
+                                        // cchoosen.clear();
+                                        // subjectchoosen.clear();
+                                        // languagechoosen.clear();
+                                        // myprefTutor.clear();
                                       });
                                     },
                                     child: Padding(
@@ -1249,6 +1297,8 @@ StudentInfoClass? tempinfo;
                                       itemCount: provided.length,
                                       itemBuilder: (context, index) {
                                         return CheckboxListTile(
+                                          activeColor: kColorPrimary,
+                                          checkColor: Colors.white,
                                           title: Text(
                                             provided[index],
                                             style: GoogleFonts.roboto(
@@ -2003,13 +2053,12 @@ StudentInfoClass? tempinfo;
                                     subject: subjectuids,
                                     tutorsinfo: tutorsinfo,
                                     temppreffered:
-                                        prefferedTutor.preferredTutors, studenttzone: timezone,
+                                        prefferedTutor.preferredTutors,
+                                    studenttzone: timezone,
                                   );
                                 });
                               }),
-                              const SizedBox(
-                                height: 10,
-                              ),
+
                               // SizedBox(
                               //     width: size.width - 300,
                               //     height: 200,
@@ -2060,49 +2109,6 @@ StudentInfoClass? tempinfo;
                               // const SizedBox(
                               //   height: 20,
                               // ),
-
-                              Container(
-                                height: 45,
-                                width: 200,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.rectangle,
-                                  // color: kColorLight,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20)),
-                                ),
-                                child: TextButton(
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    shape: const BeveledRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5))),
-                                    textStyle: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 15,
-                                      fontStyle: FontStyle.normal,
-                                      decoration: TextDecoration.none,
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      // Increase the displayed item count by 6 when the button is pressed
-                                      Provider.of<DisplayedItemCountProvider>(
-                                              context,
-                                              listen: false)
-                                          .incrementDisplayedItemCount(3);
-                                    });
-                                  },
-                                  child: const Text(
-                                    'Display More',
-                                    style: TextStyle(
-                                        color: kColorPrimary,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
                             ],
                           ),
                         ),

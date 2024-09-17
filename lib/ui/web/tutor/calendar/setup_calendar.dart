@@ -9,14 +9,21 @@ import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../services/getcalendardata.dart';
 import '../../../../services/timefromtimestamp.dart';
+import '../../../../services/timestampconverter.dart';
 import '../../../../utils/themes.dart';
 import '../../../auth/database.dart';
+import 'package:timezone/browser.dart' as tz;
 
 class CalendarSetup extends StatefulWidget {
   final TutorInformation userinfo;
   final List<ScheduleData> booking;
+  final String timezone;
+
   const CalendarSetup(
-      {super.key, required this.userinfo, required this.booking});
+      {super.key,
+      required this.userinfo,
+      required this.booking,
+      required this.timezone});
 
   @override
   State<CalendarSetup> createState() => _CalendarSetupState();
@@ -81,6 +88,19 @@ class _CalendarSetupState extends State<CalendarSetup> {
         }
       });
     }
+  }
+
+  String dateFormatted(String date) {
+    // Your input date string with timezone
+    String dateStr = date;
+
+    // Parse the date string to DateTime with original timezone
+    DateTime dateTime = DateTime.parse(dateStr).toLocal();
+    print(dateTime);
+    // Format the DateTime to the desired format, maintaining the original time and zone
+    String formattedDate = DateFormat('MMMM d, yyyy h:mm a').format(dateTime);
+
+    return formattedDate;
   }
 
   Future<void> _selectTimeavailableDate(BuildContext context) async {
@@ -218,7 +238,32 @@ class _CalendarSetupState extends State<CalendarSetup> {
       cartNotifier.getDataFromTutorScheduleCollectionAvailableTime(
           widget.userinfo.userId);
     });
+    _selectedDate = initialDate(widget.timezone);
+    _selectedTime = initialTime(widget.timezone);
     super.initState();
+  }
+
+  TimeOfDay initialTime(String timezone) {
+    final location = tz.getLocation(timezone);
+
+    // Get the current time in the specified timezone
+    final nowInSpecificTimeZone = tz.TZDateTime.now(location);
+
+    // Create a TimeOfDay from the timezone-adjusted DateTime
+    return TimeOfDay(
+      hour: nowInSpecificTimeZone.hour,
+      minute: nowInSpecificTimeZone.minute,
+    );
+  }
+
+  DateTime initialDate(String timezone) {
+    final location = tz.getLocation(timezone);
+
+    // Get the current time in the specified timezone
+    final nowInSpecificTimeZone = tz.TZDateTime.now(location);
+
+    // Create a TimeOfDay from the timezone-adjusted DateTime
+    return nowInSpecificTimeZone;
   }
 
   int calculateTimeDifferenceInMinutes(String time1, String time2) {
@@ -394,15 +439,29 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Padding(
-                                    padding: EdgeInsets.only(top: 2, bottom: 0),
-                                    child: Text(
-                                      'Days Off',
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: kColorWhite,
-                                          fontWeight: FontWeight.w600),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 2, bottom: 0),
+                                    child: Row(
+                                      children: [
+                                        const Text(
+                                          'Days Off',
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: kColorWhite,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          'Current Timezone: ${widget.timezone}',
+                                          textAlign: TextAlign.left,
+                                          style: const TextStyle(
+                                              fontSize: 16,
+                                              color: kColorWhite,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   const SizedBox(
@@ -498,10 +557,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       Visibility(
-                                        visible: canbeuseDayoff == 0 ||
-                                                canbeuseDayoff == 1
-                                            ? true
-                                            : false,
+                                        visible: _checkboxavailableday,
                                         child: Container(
                                           height: 40,
                                           width: 155,
@@ -573,7 +629,6 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                   _typeAheadController3.text =
                                                       tempDayoffselected; // Update text field with selected items
                                                 }
-                                                _typeAheadController3.text = '';
                                               });
                                             },
                                           ),
@@ -583,10 +638,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                         width: 10,
                                       ),
                                       Visibility(
-                                        visible: canbeuseDayoff == 0 ||
-                                                canbeuseDayoff == 2
-                                            ? true
-                                            : false,
+                                        visible: _checkboxavailabledate,
                                         child: Container(
                                           height: 40,
                                           width: 200,
@@ -629,70 +681,100 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                       const SizedBox(
                                         width: 5,
                                       ),
-                                      TextButton(
-                                        onPressed: () async {
-                                          // if (tempDayoffselected == '' &&
-                                          //     tempdateselected == null) {
-                                          //   CoolAlert.show(
-                                          //     context: context,
-                                          //     width: 200,
-                                          //     type: CoolAlertType.warning,
-                                          //     title: 'Nothing is selected!',
-                                          //     titleTextStyle: const TextStyle(
-                                          //         fontSize: 14,
-                                          //         fontWeight:
-                                          //             FontWeight.normal),
-                                          //   );
-                                          // } else {
-                                          setState(() {
-                                            if (tempDayoffselected != '') {
-                                              dayoffselected
-                                                  .add(tempDayoffselected);
+                                      Visibility(
+                                        visible: _checkboxavailableday ||
+                                            _checkboxavailabledate,
+                                        child: TextButton(
+                                          onPressed: () async {
+                                            // if (tempDayoffselected == '' &&
+                                            //     tempdateselected == null) {
+                                            //   CoolAlert.show(
+                                            //     context: context,
+                                            //     width: 200,
+                                            //     type: CoolAlertType.warning,
+                                            //     title: 'Nothing is selected!',
+                                            //     titleTextStyle: const TextStyle(
+                                            //         fontSize: 14,
+                                            //         fontWeight:
+                                            //             FontWeight.normal),
+                                            //   );
+                                            // } else {
+                                            // setState(() {
+                                            //   if (tempDayoffselected != '') {
+                                            //     dayoffselected
+                                            //         .add(tempDayoffselected);
+                                            //   }
+                                            //   if (tempdateselected != null) {
+                                            //     dateselected
+                                            //         .add(tempdateselected!);
+                                            //   }
+                                            //   tempDayoffselected = '';
+                                            //   tempdateselected = null;
+                                            // });
+                                            if (_checkboxavailabledate) {
+                                              final result =
+                                                  await addDayOffDates(
+                                                      widget.userinfo.userId,
+                                                      // tempDayoffselected,
+                                                      tempdateselected!,
+                                                      widget.timezone);
+                                              if (result == 'success') {
+                                              } else {
+                                                CoolAlert.show(
+                                                  context: context,
+                                                  width: 200,
+                                                  type: CoolAlertType.error,
+                                                  title: result.toString(),
+                                                  titleTextStyle:
+                                                      const TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight: FontWeight
+                                                              .normal),
+                                                );
+                                              }
+                                            } else if (_checkboxavailableday) {
+                                              final result =
+                                                  await addUpdateDayOffDates(
+                                                      widget.userinfo.userId,
+                                                      tempDayoffselected,
+                                                      // tempdateselected!,
+                                                      widget.timezone);
+                                              if (result == 'success') {
+                                              } else {
+                                                CoolAlert.show(
+                                                  context: context,
+                                                  width: 200,
+                                                  type: CoolAlertType.error,
+                                                  title: result.toString(),
+                                                  titleTextStyle:
+                                                      const TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight: FontWeight
+                                                              .normal),
+                                                );
+                                              }
+                                              _typeAheadController3.text = '';
                                             }
-                                            if (tempdateselected != null) {
-                                              dateselected
-                                                  .add(tempdateselected!);
-                                            }
-                                            tempDayoffselected = '';
-                                            tempdateselected = null;
-                                          });
-
-                                          final result = await addDayOffDates(
-                                              widget.userinfo.userId,
-                                              dayoffselected,
-                                              dateselected);
-                                          if (result == 'success') {
-                                          } else {
-                                            CoolAlert.show(
-                                              context: context,
-                                              width: 200,
-                                              type: CoolAlertType.error,
-                                              title: result.toString(),
-                                              titleTextStyle: const TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            );
-                                          }
-                                        },
-                                        style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all(
-                                                  Colors.transparent),
-                                          shape: MaterialStateProperty.all<
-                                              RoundedRectangleBorder>(
-                                            RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(15.0),
+                                          },
+                                          style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all(
+                                                    Colors.transparent),
+                                            shape: MaterialStateProperty.all<
+                                                RoundedRectangleBorder>(
+                                              RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(15.0),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        child: const Text(
-                                          'Add',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                              color: kColorPrimary),
+                                          child: const Text(
+                                            'Add',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                                color: kColorPrimary),
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -734,7 +816,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                             dayoffselected.isNotEmpty
                                                 ? Container(
                                                     width: 300,
-                                                    height: 100,
+                                                    height: 150,
                                                     padding: const EdgeInsets
                                                         .fromLTRB(10, 0, 10, 0),
                                                     child: RawScrollbar(
@@ -877,10 +959,11 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                             const SizedBox(
                                               height: 10,
                                             ),
-                                            dateselected.isNotEmpty
+                                            scheduletime.forlistdayoffsdate!
+                                                    .isNotEmpty
                                                 ? Container(
                                                     width: 300,
-                                                    height: 100,
+                                                    height: 150,
                                                     padding: const EdgeInsets
                                                         .fromLTRB(10, 0, 10, 0),
                                                     child: Scrollbar(
@@ -892,8 +975,9 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                             dateoffscroll, // Assign the ScrollController to the ListView
                                                         scrollDirection:
                                                             Axis.vertical,
-                                                        itemCount:
-                                                            dateselected.length,
+                                                        itemCount: scheduletime
+                                                            .forlistdayoffsdate!
+                                                            .length,
                                                         itemBuilder:
                                                             (context, index) {
                                                           return Padding(
@@ -923,10 +1007,10 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                                         .spaceBetween,
                                                                 children: [
                                                                   Text(
-                                                                      DateFormat(
-                                                                              'MMMM dd, yyyy')
-                                                                          .format(dateselected[
-                                                                              index]),
+                                                                      DateFormat('MMMM dd, yyyy').format(scheduletime
+                                                                          .forlistdayoffsdate![
+                                                                              index]
+                                                                          .selectedDate),
                                                                       style: const TextStyle(
                                                                           color:
                                                                               kColorWhite)),
@@ -942,14 +1026,24 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                                     ),
                                                                     onPressed:
                                                                         () async {
-                                                                      final result =
-                                                                          await deleteDateOff(
-                                                                        widget
-                                                                            .userinfo
-                                                                            .userId,
-                                                                        dateselected[
-                                                                            index],
-                                                                      );
+                                                                      print(scheduletime
+                                                                          .forlistdayoffsdate![
+                                                                              index]
+                                                                          .selectedDate);
+                                                                      print(scheduletime
+                                                                          .forlistdayoffsdate![
+                                                                              index]
+                                                                          .timeAvailableFrom);
+                                                                      print(scheduletime
+                                                                          .forlistdayoffsdate![
+                                                                              index]
+                                                                          .timeAvailableTo);
+                                                                      final result = await deleteDateOff(
+                                                                          widget.userinfo.userId,
+                                                                          // dateselected[
+                                                                          //     index],
+                                                                          scheduletime.forlistdayoffsdate![index],
+                                                                          widget.timezone);
                                                                       if (result ==
                                                                           'success') {
                                                                       } else {
@@ -1078,15 +1172,29 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Padding(
-                                    padding: EdgeInsets.only(top: 2, bottom: 0),
-                                    child: Text(
-                                      'Time Availability',
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: kColorGrey,
-                                          fontWeight: FontWeight.w600),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 2, bottom: 0),
+                                    child: Row(
+                                      children: [
+                                        const Text(
+                                          'Time Availability',
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: kColorGrey,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          'Current Timezone: ${widget.timezone}',
+                                          textAlign: TextAlign.left,
+                                          style: const TextStyle(
+                                              fontSize: 16,
+                                              color: kColorWhite,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                   Row(
@@ -1174,21 +1282,71 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                       ),
                                     ],
                                   ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Visibility(
-                                        visible: canbeuseTimeavailable == 0 ||
-                                                canbeuseTimeavailable == 2
-                                            ? true
-                                            : false,
-                                        child: Container(
+                                  Visibility(
+                                    visible: _checkboxavailabledateTime ||
+                                        _checkboxavailabledayTime,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Visibility(
+                                          visible: canbeuseTimeavailable == 0 ||
+                                                  canbeuseTimeavailable == 2
+                                              ? true
+                                              : false,
+                                          child: Container(
+                                            height: 40,
+                                            width: 200,
+                                            padding: const EdgeInsets.only(
+                                                right: 10, left: 15),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.rectangle,
+                                              color: Colors.white,
+                                              border: Border.all(
+                                                color: kColorGrey,
+                                              ),
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                Radius.circular(8),
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  DateFormat('MMMM dd, yyyy')
+                                                      .format(
+                                                          availabletimedate),
+                                                  style: const TextStyle(
+                                                      color: kColorGrey),
+                                                ),
+                                                IconButton(
+                                                  onPressed:
+                                                      canbeuseTimeavailable == 2
+                                                          ? () =>
+                                                              _selectTimeavailableDate(
+                                                                  context)
+                                                          : null,
+                                                  icon: const Icon(
+                                                      Icons.calendar_today),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Container(
                                           height: 40,
-                                          width: 200,
+                                          width: 125,
                                           padding: const EdgeInsets.only(
-                                              right: 10, left: 15),
+                                              right: 2, left: 5),
                                           alignment: Alignment.center,
                                           decoration: BoxDecoration(
                                             shape: BoxShape.rectangle,
@@ -1206,208 +1364,118 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                DateFormat('MMMM dd, yyyy')
-                                                    .format(availabletimedate),
+                                                selectedTime,
                                                 style: const TextStyle(
                                                     color: kColorGrey),
                                               ),
                                               IconButton(
-                                                onPressed: canbeuseTimeavailable ==
-                                                        2
-                                                    ? () =>
-                                                        _selectTimeavailableDate(
-                                                            context)
-                                                    : null,
+                                                onPressed: () =>
+                                                    _selectTime(context),
                                                 icon: const Icon(
-                                                    Icons.calendar_today),
+                                                    Icons.access_time_outlined),
                                               ),
                                             ],
                                           ),
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Container(
-                                        height: 40,
-                                        width: 125,
-                                        padding: const EdgeInsets.only(
-                                            right: 2, left: 5),
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.rectangle,
-                                          color: Colors.white,
-                                          border: Border.all(
-                                            color: kColorGrey,
-                                          ),
-                                          borderRadius: const BorderRadius.all(
-                                            Radius.circular(8),
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                        const SizedBox(
+                                          child: Text(
+                                            'to',
+                                            style: TextStyle(color: kColorGrey),
                                           ),
                                         ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              selectedTime,
-                                              style: const TextStyle(
-                                                  color: kColorGrey),
-                                            ),
-                                            IconButton(
-                                              onPressed: () =>
-                                                  _selectTime(context),
-                                              icon: const Icon(
-                                                  Icons.access_time_outlined),
-                                            ),
-                                          ],
+                                        const SizedBox(
+                                          width: 5,
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        width: 5,
-                                      ),
-                                      const SizedBox(
-                                        child: Text(
-                                          'to',
-                                          style: TextStyle(color: kColorGrey),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 5,
-                                      ),
-                                      Container(
-                                        height: 40,
-                                        width: 125,
-                                        padding: const EdgeInsets.only(
-                                            right: 2, left: 5),
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.rectangle,
-                                          color: Colors.white,
-                                          border: Border.all(
-                                            color: kColorGrey,
+                                        Container(
+                                          height: 40,
+                                          width: 125,
+                                          padding: const EdgeInsets.only(
+                                              right: 2, left: 5),
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.rectangle,
+                                            color: Colors.white,
+                                            border: Border.all(
+                                              color: kColorGrey,
+                                            ),
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                              Radius.circular(8),
+                                            ),
                                           ),
-                                          borderRadius: const BorderRadius.all(
-                                            Radius.circular(8),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                selectedTimeto,
+                                                style: const TextStyle(
+                                                    color: kColorGrey),
+                                              ),
+                                              IconButton(
+                                                onPressed: () =>
+                                                    _selectTimeto(context),
+                                                icon: const Icon(
+                                                    Icons.access_time_outlined),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              selectedTimeto,
-                                              style: const TextStyle(
-                                                  color: kColorGrey),
-                                            ),
-                                            IconButton(
-                                              onPressed: () =>
-                                                  _selectTimeto(context),
-                                              icon: const Icon(
-                                                  Icons.access_time_outlined),
-                                            ),
-                                          ],
+                                        const SizedBox(
+                                          width: 15,
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        width: 15,
-                                      ),
-                                      InkWell(
-                                        onTap: () async {
-                                          if (_checkboxavailabledayTime) {
-                                            if (selectedTime ==
-                                                selectedTimeto) {
-                                              CoolAlert.show(
-                                                context: context,
-                                                width: 200,
-                                                type: CoolAlertType.error,
-                                                title: 'Time selected error!',
-                                                titleTextStyle: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                        FontWeight.normal),
-                                              );
-                                            } else if (selectedTime == '' ||
-                                                selectedTimeto == '') {
-                                              CoolAlert.show(
-                                                context: context,
-                                                width: 200,
-                                                type: CoolAlertType.error,
-                                                title: 'No time selected!',
-                                                titleTextStyle: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                        FontWeight.normal),
-                                              );
-                                            } else {
-                                              TimeAvailability timeselected =
-                                                  TimeAvailability(
-                                                      timeAvailableFrom:
-                                                          selectedTime,
-                                                      timeAvailableTo:
-                                                          selectedTimeto);
-
-                                              final result =
-                                                  await addOrUpdateTimeAvailability(
-                                                      widget.userinfo.userId,
-                                                      timeselected);
-                                              if (result == 'success') {
-                                              } else {
+                                        InkWell(
+                                          onTap: () async {
+                                            if (_checkboxavailabledayTime) {
+                                              if (selectedTime ==
+                                                  selectedTimeto) {
                                                 CoolAlert.show(
                                                   context: context,
                                                   width: 200,
                                                   type: CoolAlertType.error,
-                                                  title: result.toString(),
+                                                  title: 'Time selected error!',
                                                   titleTextStyle:
                                                       const TextStyle(
                                                           fontSize: 14,
                                                           fontWeight: FontWeight
                                                               .normal),
                                                 );
-                                              }
+                                              } else if (selectedTime == '' ||
+                                                  selectedTimeto == '') {
+                                                CoolAlert.show(
+                                                  context: context,
+                                                  width: 200,
+                                                  type: CoolAlertType.error,
+                                                  title: 'No time selected!',
+                                                  titleTextStyle:
+                                                      const TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight: FontWeight
+                                                              .normal),
+                                                );
+                                              } else {
+                                                TimeAvailability timeselected =
+                                                    TimeAvailability(
+                                                        timeAvailableFrom:
+                                                            selectedTime,
+                                                        timeAvailableTo:
+                                                            selectedTimeto);
 
-                                              setState(() {
-                                                availabledateselected =
-                                                    timeselected;
-                                              });
-                                            }
-                                          } else if (_checkboxavailabledateTime) {
-                                            DateTimeAvailability
-                                                datetimeselected =
-                                                DateTimeAvailability(
-                                                    selectedDate:
-                                                        availabletimedate,
-                                                    timeAvailableFrom:
-                                                        selectedTime,
-                                                    timeAvailableTo:
-                                                        selectedTimeto);
-                                            setState(() async {
-                                              int time =
-                                                  calculateTimeDifferenceInMinutes(
-                                                      datetimeselected
-                                                          .timeAvailableFrom,
-                                                      datetimeselected
-                                                          .timeAvailableTo);
-                                              print(time);
-                                              if (time >= 50) {
-                                                if (dateavailabledateselected.any(
-                                                    (timeAvailable) =>
-                                                        timeAvailable
-                                                                .selectedDate ==
-                                                            datetimeselected
-                                                                .selectedDate &&
-                                                        isTimeWithinRange(
-                                                            datetimeselected
-                                                                .timeAvailableFrom,
-                                                            timeAvailable
-                                                                .timeAvailableFrom,
-                                                            timeAvailable
-                                                                .timeAvailableTo))) {
+                                                final result =
+                                                    await addOrUpdateTimeAvailability(
+                                                        widget.userinfo.userId,
+                                                        timeselected,
+                                                        widget.timezone);
+                                                if (result == 'success') {
+                                                } else {
                                                   CoolAlert.show(
                                                     context: context,
                                                     width: 200,
                                                     type: CoolAlertType.error,
-                                                    title:
-                                                        'Time is already selected, check the timings.',
+                                                    title: result.toString(),
                                                     titleTextStyle:
                                                         const TextStyle(
                                                             fontSize: 14,
@@ -1415,37 +1483,51 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                                 FontWeight
                                                                     .normal),
                                                   );
-                                                } else if (dateavailabledateselected
-                                                    .any((timeAvailable) =>
-                                                        timeAvailable
-                                                                .selectedDate ==
-                                                            datetimeselected
-                                                                .selectedDate &&
-                                                        isTimeWithinRange(
-                                                                datetimeselected
-                                                                    .timeAvailableFrom,
-                                                                timeAvailable
-                                                                    .timeAvailableFrom,
-                                                                timeAvailable
-                                                                    .timeAvailableTo) ==
-                                                            false)) {
-                                                  List<DateTimeAvailability>
-                                                      tempdateavailabledateselected =
-                                                      dateavailabledateselected;
-                                                  tempdateavailabledateselected
-                                                      .add(datetimeselected);
-                                                  final result1 =
-                                                      await addOrUpdateTimeAvailabilityWithDate(
-                                                          widget
-                                                              .userinfo.userId,
-                                                          datetimeselected);
-                                                  if (result1 == 'success') {
-                                                  } else {
+                                                }
+
+                                                setState(() {
+                                                  availabledateselected =
+                                                      timeselected;
+                                                });
+                                              }
+                                            } else if (_checkboxavailabledateTime) {
+                                              DateTimeAvailability
+                                                  datetimeselected =
+                                                  DateTimeAvailability(
+                                                      selectedDate:
+                                                          availabletimedate,
+                                                      timeAvailableFrom:
+                                                          selectedTime,
+                                                      timeAvailableTo:
+                                                          selectedTimeto);
+                                              setState(() async {
+                                                int time =
+                                                    calculateTimeDifferenceInMinutes(
+                                                        datetimeselected
+                                                            .timeAvailableFrom,
+                                                        datetimeselected
+                                                            .timeAvailableTo);
+                                                print(time);
+                                                if (time >= 50) {
+                                                  if (dateavailabledateselected.any(
+                                                      (timeAvailable) =>
+                                                          timeAvailable
+                                                                  .selectedDate ==
+                                                              datetimeselected
+                                                                  .selectedDate &&
+                                                          isTimeWithinRange(
+                                                              datetimeselected
+                                                                  .timeAvailableFrom,
+                                                              timeAvailable
+                                                                  .timeAvailableFrom,
+                                                              timeAvailable
+                                                                  .timeAvailableTo))) {
                                                     CoolAlert.show(
                                                       context: context,
                                                       width: 200,
                                                       type: CoolAlertType.error,
-                                                      title: result1.toString(),
+                                                      title:
+                                                          'Time is already selected, check the timings.',
                                                       titleTextStyle:
                                                           const TextStyle(
                                                               fontSize: 14,
@@ -1453,63 +1535,109 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                                   FontWeight
                                                                       .normal),
                                                     );
+                                                  } else if (dateavailabledateselected
+                                                      .any((timeAvailable) =>
+                                                          timeAvailable
+                                                                  .selectedDate ==
+                                                              datetimeselected
+                                                                  .selectedDate &&
+                                                          isTimeWithinRange(
+                                                                  datetimeselected
+                                                                      .timeAvailableFrom,
+                                                                  timeAvailable
+                                                                      .timeAvailableFrom,
+                                                                  timeAvailable
+                                                                      .timeAvailableTo) ==
+                                                              false)) {
+                                                    List<DateTimeAvailability>
+                                                        tempdateavailabledateselected =
+                                                        dateavailabledateselected;
+                                                    tempdateavailabledateselected
+                                                        .add(datetimeselected);
+                                                    final result1 =
+                                                        await addOrUpdateTimeAvailabilityWithDate(
+                                                            widget.userinfo
+                                                                .userId,
+                                                            datetimeselected,
+                                                            widget.timezone);
+                                                    if (result1 == 'success') {
+                                                    } else {
+                                                      CoolAlert.show(
+                                                        context: context,
+                                                        width: 200,
+                                                        type:
+                                                            CoolAlertType.error,
+                                                        title:
+                                                            result1.toString(),
+                                                        titleTextStyle:
+                                                            const TextStyle(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal),
+                                                      );
+                                                    }
+                                                  } else {
+                                                    List<DateTimeAvailability>
+                                                        tempdateavailabledateselected =
+                                                        dateavailabledateselected;
+                                                    tempdateavailabledateselected
+                                                        .add(datetimeselected);
+                                                    final result1 =
+                                                        await addOrUpdateTimeAvailabilityWithDate(
+                                                            widget.userinfo
+                                                                .userId,
+                                                            datetimeselected,
+                                                            widget.timezone);
+                                                    if (result1 == 'success') {
+                                                    } else {
+                                                      CoolAlert.show(
+                                                        context: context,
+                                                        width: 200,
+                                                        type:
+                                                            CoolAlertType.error,
+                                                        title:
+                                                            result1.toString(),
+                                                        titleTextStyle:
+                                                            const TextStyle(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal),
+                                                      );
+                                                    }
                                                   }
                                                 } else {
-                                                  List<DateTimeAvailability>
-                                                      tempdateavailabledateselected =
-                                                      dateavailabledateselected;
-                                                  tempdateavailabledateselected
-                                                      .add(datetimeselected);
-                                                  final result1 =
-                                                      await addOrUpdateTimeAvailabilityWithDate(
-                                                          widget
-                                                              .userinfo.userId,
-                                                          datetimeselected);
-                                                  if (result1 == 'success') {
-                                                  } else {
-                                                    CoolAlert.show(
-                                                      context: context,
-                                                      width: 200,
-                                                      type: CoolAlertType.error,
-                                                      title: result1.toString(),
-                                                      titleTextStyle:
-                                                          const TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .normal),
-                                                    );
-                                                  }
+                                                  CoolAlert.show(
+                                                    context: context,
+                                                    width: 200,
+                                                    type: CoolAlertType.error,
+                                                    title:
+                                                        'Time Range Error, minimum of 50 minutes.',
+                                                    titleTextStyle:
+                                                        const TextStyle(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal),
+                                                  );
                                                 }
-                                              } else {
-                                                CoolAlert.show(
-                                                  context: context,
-                                                  width: 200,
-                                                  type: CoolAlertType.error,
-                                                  title:
-                                                      'Time Range Error, minimum of 50 minutes.',
-                                                  titleTextStyle:
-                                                      const TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight: FontWeight
-                                                              .normal),
-                                                );
-                                              }
-                                            });
-                                          }
-                                        },
-                                        child: const Text(
-                                          'Add',
-                                          textAlign: TextAlign.left,
-                                          style: TextStyle(
-                                              // decoration:
-                                              //     TextDecoration.underline,
-                                              fontSize: 16,
-                                              color: kColorPrimary,
-                                              fontWeight: FontWeight.bold),
+                                              });
+                                            }
+                                          },
+                                          child: const Text(
+                                            'Add',
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                                // decoration:
+                                                //     TextDecoration.underline,
+                                                fontSize: 16,
+                                                color: kColorPrimary,
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                   const SizedBox(
                                     height: 10,
@@ -1653,7 +1781,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                             dateavailabledateselected.isNotEmpty
                                                 ? Container(
                                                     width: 450,
-                                                    height: 100,
+                                                    height: 150,
                                                     padding: const EdgeInsets
                                                         .fromLTRB(10, 0, 10, 0),
                                                     child: Row(
@@ -1718,11 +1846,10 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                                           ),
                                                                           onPressed:
                                                                               () async {
-                                                                            final result =
-                                                                                await deleteDateAvailability(
-                                                                              widget.userinfo.userId,
-                                                                              dateavailabledateselected[index],
-                                                                            );
+                                                                            final result = await deleteDateAvailability(
+                                                                                widget.userinfo.userId,
+                                                                                dateavailabledateselected[index],
+                                                                                widget.timezone);
                                                                             print(result);
                                                                             if (result ==
                                                                                 'success') {
@@ -1735,7 +1862,6 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                                                 titleTextStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
                                                                               );
                                                                             }
-                                                                          
                                                                           },
                                                                         ),
                                                                       ],
@@ -1766,99 +1892,6 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                       }),
                                     ],
                                   ),
-                                  const Spacer(),
-                                  // Padding(
-                                  //   padding: const EdgeInsets.fromLTRB(
-                                  //       5.0, 0.0, 5.0, 0.0),
-                                  //   child: Row(
-                                  //     mainAxisAlignment:
-                                  //         MainAxisAlignment.start,
-                                  //     children: [
-                                  //       TextButton(
-                                  //         onPressed: () {
-                                  //           if (widget.booking.isEmpty) {
-                                  //             CoolAlert.show(
-                                  //               context: context,
-                                  //               barrierDismissible: false,
-                                  //               width: 200,
-                                  //               type: CoolAlertType.confirm,
-                                  //               titleTextStyle: const TextStyle(
-                                  //                   fontSize: 14,
-                                  //                   fontWeight:
-                                  //                       FontWeight.normal),
-                                  //               title:
-                                  //                   'Procedd to clear schedule?',
-                                  //               confirmBtnText: 'Proceed',
-                                  //               confirmBtnColor:
-                                  //                   Colors.greenAccent,
-                                  //               cancelBtnText: 'Go back',
-                                  //               showCancelBtn: true,
-                                  //               cancelBtnTextStyle:
-                                  //                   const TextStyle(
-                                  //                       color: Colors.red),
-                                  //               onCancelBtnTap: () {
-                                  //                 Navigator.of(context).pop;
-                                  //               },
-                                  //               onConfirmBtnTap: () async {
-                                  //                 final result =
-                                  //                     await deleteAllTimeData(
-                                  //                   widget.userinfo.userId,
-                                  //                 );
-                                  //                 if (result == 'success') {
-                                  //                 } else {
-                                  //                   CoolAlert.show(
-                                  //                     context: context,
-                                  //                     width: 200,
-                                  //                     type: CoolAlertType.error,
-                                  //                     title: result.toString(),
-                                  //                     titleTextStyle:
-                                  //                         const TextStyle(
-                                  //                             fontSize: 14,
-                                  //                             fontWeight:
-                                  //                                 FontWeight
-                                  //                                     .normal),
-                                  //                   );
-                                  //                 }
-                                  //               },
-                                  //             );
-                                  //           } else {
-                                  //             CoolAlert.show(
-                                  //               context: context,
-                                  //               width: 200,
-                                  //               type: CoolAlertType.error,
-                                  //               title:
-                                  //                   'You already have bookings! Clear individually!',
-                                  //               titleTextStyle: const TextStyle(
-                                  //                   fontSize: 14,
-                                  //                   fontWeight:
-                                  //                       FontWeight.normal),
-                                  //             );
-                                  //           }
-                                  //         },
-                                  //         style: ButtonStyle(
-                                  //           backgroundColor:
-                                  //               MaterialStateProperty.all(
-                                  //                   Colors.transparent),
-                                  //           shape: MaterialStateProperty.all<
-                                  //               RoundedRectangleBorder>(
-                                  //             RoundedRectangleBorder(
-                                  //               borderRadius:
-                                  //                   BorderRadius.circular(15.0),
-                                  //             ),
-                                  //           ),
-                                  //         ),
-                                  //         child: const Text(
-                                  //           'Clear',
-                                  //           style: TextStyle(
-                                  //               fontSize: 16,
-                                  //               fontWeight: FontWeight.bold,
-                                  //               color: Colors.red),
-                                  //         ),
-                                  //       ),
-                                  //     ],
-                                  //   ),
-                                  // ),
-                                
                                 ],
                               ),
                             ),
@@ -2077,7 +2110,8 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                       await blockTimeWithDate(
                                                           widget
                                                               .userinfo.userId,
-                                                          datetimeselected);
+                                                          datetimeselected,
+                                                          widget.timezone);
                                                   if (result1 == 'success') {}
                                                 } else if (dayoffselected
                                                         .contains(DateFormat('EEEE').format(datetimeselected.blockDate)) ||
@@ -2100,7 +2134,8 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                       await blockTimeWithDate(
                                                           widget
                                                               .userinfo.userId,
-                                                          datetimeselected);
+                                                          datetimeselected,
+                                                          widget.timezone);
                                                   if (result1 == 'success') {}
                                                 }
                                               } else {
@@ -2156,6 +2191,9 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                     } else {
                                       blockdateselected = [];
                                     }
+                                    if (scheduletime.allblockdateselected !=
+                                        null) {
+                                    }
                                     return Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -2168,9 +2206,10 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                               color: kColorGrey,
                                               fontWeight: FontWeight.w600),
                                         ),
-                                        blockdateselected.isNotEmpty
+                                        scheduletime.allblockdateselected !=
+                                                null
                                             ? Container(
-                                                width: 450,
+                                                width: 600,
                                                 height: 120,
                                                 padding:
                                                     const EdgeInsets.fromLTRB(
@@ -2188,9 +2227,9 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                               blockdatetimescroll,
                                                           scrollDirection:
                                                               Axis.vertical,
-                                                          itemCount:
-                                                              blockdateselected
-                                                                  .length,
+                                                          itemCount: scheduletime
+                                                              .allblockdateselected!
+                                                              .length,
                                                           itemBuilder:
                                                               (context, index) {
                                                             return Padding(
@@ -2220,7 +2259,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                                           .spaceBetween,
                                                                   children: [
                                                                     Text(
-                                                                      '${DateFormat('MMMM dd, yyyy').format(blockdateselected[index].blockDate)}(From: ${blockdateselected[index].timeFrom} To: ${blockdateselected[index].timeTo})',
+                                                                      'From: ${DateFormat('MMMM d, yyyy h:mm a').format(formatTimewDatewZone(DateFormat('MMMM d, yyyy h:mm a').format(DateTime.parse(scheduletime.allblockdateselected![index].timeFrom).toLocal()), widget.timezone))} To: ${DateFormat('MMMM d, yyyy h:mm a').format(formatTimewDatewZone(DateFormat('MMMM d, yyyy h:mm a').format(DateTime.parse(scheduletime.allblockdateselected![index].timeTo).toLocal()), widget.timezone))}',
                                                                       style:
                                                                           const TextStyle(
                                                                         color:
@@ -2239,14 +2278,10 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                                       ),
                                                                       onPressed:
                                                                           () async {
-                                                                        final result =
-                                                                            await deleteBlockDate(
-                                                                          widget
-                                                                              .userinfo
-                                                                              .userId,
-                                                                          blockdateselected[
-                                                                              index],
-                                                                        );
+                                                                        final result = await deleteBlockDate(
+                                                                            widget.userinfo.userId,
+                                                                            scheduletime.allblockdateselected![index],
+                                                                            widget.timezone);
                                                                         if (result ==
                                                                             'success') {
                                                                         } else {
@@ -2370,7 +2405,6 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                   //     ],
                                   //   ),
                                   // ),
-                              
                                 ],
                               ),
                             ),

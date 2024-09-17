@@ -27,6 +27,7 @@ import 'package:work4ututor/services/getcart.dart';
 import 'package:work4ututor/services/getchatcall.dart';
 import 'package:work4ututor/services/getclassinfo.dart';
 import 'package:work4ututor/services/getcountries.dart';
+import 'package:work4ututor/services/getcurrentTimezone.dart';
 import 'package:work4ututor/services/getlanguages.dart';
 import 'package:work4ututor/services/getmyrating.dart';
 import 'package:work4ututor/services/getstudentinfo.dart';
@@ -62,13 +63,13 @@ import 'ui/web/signup/tutor_signup.dart';
 import 'ui/web/student/main_dashboard/student_dashboard.dart';
 import 'ui/web/tutor/tutor_dashboard/tutor_dashboard.dart';
 import 'ui/web/web_main.dart';
-import 'package:timezone/browser.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
-Future<void> setup() async {
-  // await tz.initializeTimeZone();
+// Future<void> setup() async {
+//   await tz.initializeTimeZone();
 
-  await tz.initializeTimeZone('packages/timezone/data/latest_all.tzf');
-}
+//   // await tz.initializeTimeZone('packages/timezone/data/latest_all.tzf');
+// }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await setupFlutterNotifications();
@@ -90,7 +91,7 @@ Future<void> setupFlutterNotifications() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setup();
+  tz.initializeTimeZones();
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
@@ -207,6 +208,8 @@ void main() async {
       ChangeNotifierProvider(create: (_) => SubjectInfoNotifier()),
       ChangeNotifierProvider(create: (_) => TutorScheduleProvider()),
       ChangeNotifierProvider(create: (_) => GetAllMaterialNotifier()),
+      ChangeNotifierProvider(create: (_) => TutorNotifier()),
+      ChangeNotifierProvider(create: (_) => StudentNotifier()),
     ],
     child: const MyApp(),
   ));
@@ -216,6 +219,7 @@ void main() async {
 final GoRouter _router = GoRouter(
   initialLocation: '/',
   debugLogDiagnostics: true,
+  errorBuilder: (context, state) => const LoginPage(),
   routes: [
     GoRoute(
       path: '/',
@@ -254,9 +258,12 @@ final GoRouter _router = GoRouter(
           builder: (context, state) {
             final Map<String, String> params =
                 state.pathParameters; // Retrieve parameters
+            final String? email =
+                state.extra as String?; // Retrieve email from extra parameter
+
             return TutorInfo(
               uid: params['uid'] ?? '',
-              email: params['email'] ?? '',
+              email: email ?? '',
             );
           },
         ),
@@ -348,16 +355,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'Work4ututor',
-      routerDelegate: _router.routerDelegate,
-      routeInformationParser: _router.routeInformationParser,
-      routeInformationProvider: _router.routeInformationProvider,
+      // routerDelegate: _router.routerDelegate,
+      // routeInformationParser: _router.routeInformationParser,
+      // routeInformationProvider: _router.routeInformationProvider,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: "Roboto",
         canvasColor: Colors.white,
         primarySwatch: Colors.indigo,
       ),
-      // routerConfig: _router,
+      routerConfig: _router,
     );
   }
 }

@@ -35,7 +35,6 @@ class TutorScheduleProvider with ChangeNotifier {
         notifyListeners();
       });
     } catch (e) {
-      print(e);
       _availableDateSelected = null; // Handle any exceptions by setting to null
       notifyListeners();
     }
@@ -99,8 +98,8 @@ class TutorScheduleProvider with ChangeNotifier {
   List<BlockDate>? _blockdateselected;
   List<BlockDate>? get blockdateselected => _blockdateselected;
 
-  List<String>? dayOffs;
-  List<DateTime>? dayOffsdate;
+  List<BlockDate>? _allblockdateselected;
+  List<BlockDate>? get allblockdateselected => _allblockdateselected;
 
   void getDataFromTutorScheduleCollectionBlockDateTime(
       String uid, targettimezone) async {
@@ -180,10 +179,32 @@ class TutorScheduleProvider with ChangeNotifier {
             } catch (e) {
               _blockdateselected = null;
             }
+            _allblockdateselected = timeDataList.map(
+              (e) {
+                return BlockDate(
+                  timeFrom: formatTimewDatewZone(
+                          DateFormat('MMMM d, yyyy h:mm a').format(
+                              DateTime.parse(e['timeAvailableFrom']).toLocal()),
+                          targettimezone)
+                      .toString(),
+                  timeTo: formatTimewDatewZone(
+                          DateFormat('MMMM d, yyyy h:mm a').format(
+                              DateTime.parse(e['timeAvailableTo']).toLocal()),
+                          targettimezone)
+                      .toString(),
+                  blockDate: formatTimewDatewZone(
+                      DateFormat('MMMM d, yyyy h:mm a').format(
+                          DateTime.parse(e['timeAvailableFrom']).toLocal()),
+                      targettimezone),
+                );
+              },
+            ).toList();
           } else {
+            _allblockdateselected = null;
             _blockdateselected = null;
           }
         } else {
+          _allblockdateselected = null;
           _blockdateselected = null;
         }
         notifyListeners(); // Move notifyListeners here to ensure it is called
@@ -194,157 +215,304 @@ class TutorScheduleProvider with ChangeNotifier {
     }
   }
 
+  List<String>? _dayOffs;
+  List<String>? get dayOffs => _dayOffs;
+
+  List<DateTime>? _dayOffsdate;
+  List<DateTime>? get dayOffsdate => _dayOffsdate;
+
+  List<DateTimeAvailability>? _forlistdayoffsdate;
+  List<DateTimeAvailability>? get forlistdayoffsdate => _forlistdayoffsdate;
+
   void getDataFromTutorScheduleCollection(String uid, String targetTimezone) {
-    FirebaseFirestore.instance
-        .collection('tutorSchedule')
-        .where('uid', isEqualTo: uid)
-        .snapshots()
-        .listen((querySnapshot) {
-      dayOffs = [];
-      dayOffsdate = [];
-
-      for (var doc in querySnapshot.docs) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-        List<dynamic> dateoffselected = data['dateoffselected'] != null
-            ? List<dynamic>.from(data['dateoffselected'])
-            : [];
+    try {
+      FirebaseFirestore.instance
+          .collection('tutorSchedule')
+          .doc(uid)
+          .snapshots()
+          .listen((DocumentSnapshot doc) {
+        List<String> tempdayOffslist = [];
         List<DateTime> tempdayOffsdate = [];
+        List<DateTimeAvailability> datetimeoff = [];
+        if (doc.exists) {
+          Map<String, dynamic>? docData = doc.data() as Map<String, dynamic>?;
+          List<dynamic>? dateoffselected =
+              docData?['dateoffselected'] as List<dynamic>?;
+          List<dynamic>? tempdayoffs = docData?['dayoffs'] as List<dynamic>?;
 
-        try {
-          List<BlockDate> timeAvailabilities = dateoffselected.expand((item) {
-            String datefrom = DateFormat('MMMM d, yyyy').format(
-                formatTimewDatewZone(
-                    DateFormat('MMMM d, yyyy h:mm a').format(
-                        DateTime.parse(item['timeAvailableFrom']).toLocal()),
-                    targetTimezone));
-            String dateto = DateFormat('MMMM d, yyyy').format(
-                formatTimewDatewZone(
-                    DateFormat('MMMM d, yyyy h:mm a').format(
-                        DateTime.parse(item['timeAvailableTo']).toLocal()),
-                    targetTimezone));
-
-            List<BlockDate> blockDates = [];
-
-            if (datefrom != dateto) {
-              BlockDate blockDate1 = BlockDate(
-                blockDate: formatTimewDatewZone(
-                    DateFormat('MMMM d, yyyy h:mm a').format(
-                        DateTime.parse(item['timeAvailableFrom']).toLocal()),
-                    targetTimezone),
-                timeFrom: updateTime(targetTimezone, item['timeAvailableFrom']),
-                timeTo: '11:59 PM',
-              );
-
-              BlockDate blockDate2 = BlockDate(
-                blockDate: formatTimewDatewZone(
-                    DateFormat('MMMM d, yyyy h:mm a').format(
-                        DateTime.parse(item['timeAvailableTo']).toLocal()),
-                    targetTimezone),
-                timeFrom: '12:00 AM',
-                timeTo: updateTime(targetTimezone, item['timeAvailableTo']),
-              );
-
-              blockDates.add(blockDate1);
-              blockDates.add(blockDate2);
-            } else {
-              tempdayOffsdate = dateoffselected
-                  .map(
-                    (dateString) => formatTimewDatewZone(
+          if (dateoffselected != null && dateoffselected.isNotEmpty) {
+            try {
+              List<BlockDate> timeAvailabilities =
+                  dateoffselected.expand((item) {
+                String datefrom = DateFormat('MMMM d, yyyy').format(
+                    formatTimewDatewZone(
                         DateFormat('MMMM d, yyyy h:mm a').format(
-                            DateTime.parse(dateString['selectedDate'])
+                            DateTime.parse(item['timeAvailableFrom'])
+                                .toLocal()),
+                        targetTimezone));
+                String dateto = DateFormat('MMMM d, yyyy').format(
+                    formatTimewDatewZone(
+                        DateFormat('MMMM d, yyyy h:mm a').format(
+                            DateTime.parse(item['timeAvailableTo']).toLocal()),
+                        targetTimezone));
+
+                List<BlockDate> blockDates = [];
+
+                if (datefrom != dateto) {
+                  BlockDate blockDate1 = BlockDate(
+                    blockDate: formatTimewDatewZone(
+                        DateFormat('MMMM d, yyyy h:mm a').format(
+                            DateTime.parse(item['timeAvailableFrom'])
                                 .toLocal()),
                         targetTimezone),
-                  )
-                  .toList();
+                    timeFrom:
+                        updateTime(targetTimezone, item['timeAvailableFrom']),
+                    timeTo: '11:59 PM',
+                  );
+
+                  BlockDate blockDate2 = BlockDate(
+                    blockDate: formatTimewDatewZone(
+                        DateFormat('MMMM d, yyyy h:mm a').format(
+                            DateTime.parse(item['timeAvailableTo']).toLocal()),
+                        targetTimezone),
+                    timeFrom: '12:00 AM',
+                    timeTo: updateTime(targetTimezone, item['timeAvailableTo']),
+                  );
+
+                  blockDates.add(blockDate1);
+                  blockDates.add(blockDate2);
+                } else {
+                  tempdayOffsdate = dateoffselected
+                      .map(
+                        (dateString) => formatTimewDatewZone(
+                            DateFormat('MMMM d, yyyy h:mm a').format(
+                                DateTime.parse(dateString['selectedDate'])
+                                    .toLocal()),
+                            targetTimezone),
+                      )
+                      .toList();
+                }
+
+                return blockDates;
+              }).toList();
+
+              timeAvailabilities
+                  .sort((a, b) => b.blockDate.compareTo(a.blockDate));
+              if (_blockdateselected == null) {
+                _blockdateselected == timeAvailabilities;
+                notifyListeners();
+              } else {
+                _blockdateselected!.addAll(timeAvailabilities);
+                notifyListeners();
+              }
+            } catch (e) {
+              tempdayOffsdate = [];
             }
-
-            return blockDates;
-          }).toList();
-
-          timeAvailabilities.sort((a, b) => b.blockDate.compareTo(a.blockDate));
-          print(timeAvailabilities.first.timeFrom);
-          if (_blockdateselected == null) {
-            _blockdateselected == timeAvailabilities;
-            notifyListeners();
+            datetimeoff = dateoffselected.map((item) {
+              return DateTimeAvailability(
+                selectedDate: formatTimewDatewZone(
+                    DateFormat('MMMM d, yyyy h:mm a').format(
+                        DateTime.parse(item['timeAvailableFrom']).toLocal()),
+                    targetTimezone),
+                timeAvailableFrom: formatTimewDatewZone(
+                        DateFormat('MMMM d, yyyy h:mm a').format(
+                            DateTime.parse(item['timeAvailableFrom'])
+                                .toLocal()),
+                        targetTimezone)
+                    .toString(),
+                timeAvailableTo: formatTimewDatewZone(
+                        DateFormat('MMMM d, yyyy h:mm a').format(
+                            DateTime.parse(item['timeAvailableTo']).toLocal()),
+                        targetTimezone)
+                    .toString(),
+              );
+            }).toList();
           } else {
-            _blockdateselected!.addAll(timeAvailabilities);
-            notifyListeners();
+            tempdayOffsdate = [];
+            datetimeoff = [];
           }
-        } catch (e) {
-          dayOffsdate = [];
+          if (tempdayoffs != [] && tempdayoffs!.isNotEmpty) {
+            List<String>? liststring =
+                tempdayoffs.map((item) => item as String).toList();
+            tempdayOffslist = liststring;
+          } else {
+            tempdayOffslist = [];
+          }
         }
 
-        dayOffs = List<String>.from(data['dayoffs'] ?? []);
-        dayOffsdate = tempdayOffsdate;
-      }
+        // Update state variables
+        _dayOffs = tempdayOffslist.isNotEmpty ? tempdayOffslist : [];
+        _dayOffsdate = tempdayOffsdate.isNotEmpty ? tempdayOffsdate : [];
+        _forlistdayoffsdate = datetimeoff.isNotEmpty ? datetimeoff : [];
 
+        notifyListeners();
+      });
+    } catch (e) {
+      _dayOffs = [];
+      _dayOffsdate = [];
+      _forlistdayoffsdate = [];
       notifyListeners();
-    });
+    }
   }
 
-  List<Schedule> finalschedule = [];
-
-  void fetchSchedule(String id, String type, String targetTimezone) async {
+  List<String>? _dayOffsday;
+  List<String>? get dayOffsday => _dayOffsday;
+  void getDataFromTutorScheduledayOffs(String uid) async {
     try {
-      List<Schedule> tempScheduleList = [];
+      FirebaseFirestore.instance
+          .collection('tutorSchedule')
+          .doc(uid)
+          .snapshots()
+          .listen((DocumentSnapshot doc) {
+        if (doc.exists) {
+          List<String>? docData = doc.data() as List<String>;
+          List<String>? timeData = docData;
 
-      QuerySnapshot<Map<String, dynamic>> classSnapshot = type == 'tutor'
-          ? await FirebaseFirestore.instance
-              .collection('classes')
-              .where('tutorID', isEqualTo: id)
-              .get()
-          : await FirebaseFirestore.instance
-              .collection('classes')
-              .where('studentID', isEqualTo: id)
-              .get();
+          if (timeData != null && timeData.isNotEmpty) {
+            _dayOffsday = timeData;
+          } else {
+            _dayOffsday = null; // Field is missing or empty
+          }
+        } else {
+          _dayOffsday = null; // Document doesn't exist
+        }
+        notifyListeners();
+      });
+    } catch (e) {
+      _dayOffsday = null; // Handle any exceptions by setting to null
+      notifyListeners();
+    }
+  }
+
+  // List<Schedule>? _finalschedule;
+  // List<Schedule>? get finalschedule => _finalschedule;
+
+  // void fetchSchedule(String id, String type, String targetTimezone) async {
+  //   try {
+  //     List<Schedule> tempScheduleList = [];
+
+  //     QuerySnapshot<Map<String, dynamic>> classSnapshot = type == 'tutor'
+  //         ? await FirebaseFirestore.instance
+  //             .collection('classes')
+  //             .where('tutorID', isEqualTo: id)
+  //             .get()
+  //         : await FirebaseFirestore.instance
+  //             .collection('classes')
+  //             .where('studentID', isEqualTo: id)
+  //             .get();
+  //     if (classSnapshot.docs.isNotEmpty || classSnapshot.docs != null) {
+  //       for (var classDoc in classSnapshot.docs) {
+  //         String snapshotId = classDoc.id;
+
+  //         QuerySnapshot<Map<String, dynamic>> scheduleSnapshot =
+  //             await FirebaseFirestore.instance
+  //                 .collection('schedule')
+  //                 .where('scheduleID', isEqualTo: snapshotId)
+  //                 .get();
+  //         if (scheduleSnapshot.docs.isNotEmpty ||
+  //             scheduleSnapshot.docs != null) {
+  //           for (var documentSnapshot in scheduleSnapshot.docs) {
+  //             var data = documentSnapshot.data();
+
+  //             String session = data['session'] ?? '';
+  //             DateTime schedule = formatTimewDatewZone(
+  //                 DateFormat('MMMM d, yyyy h:mm a')
+  //                     .format(DateTime.parse(data['schedule']).toLocal()),
+  //                 targetTimezone);
+  //             String timefrom = updateTime(targetTimezone, data['timefrom']);
+  //             String timeto = updateTime(targetTimezone, data['timeto']);
+
+  //             Schedule tempschedinfo = Schedule(
+  //               scheduleID: data['scheduleID'] ?? '',
+  //               session: session,
+  //               schedule: schedule,
+  //               timefrom: timefrom,
+  //               timeto: timeto,
+  //               classstatus: data['classstatus'] ?? '',
+  //               meetinglink: data['meetinglink'] ?? '',
+  //               rating: data['rating'] ?? '',
+  //               studentStatus: data['studentStatus'] ?? '',
+  //               tutorStatus: data['tutorStatus'] ?? '',
+  //             );
+  //             tempScheduleList.add(tempschedinfo);
+  //           }
+  //           _finalschedule = tempScheduleList;
+  //           notifyListeners();
+  //         } else {
+  //           _finalschedule = [];
+  //           notifyListeners();
+  //         }
+  //       }
+  //     } else {
+  //       _finalschedule = [];
+  //       notifyListeners();
+  //     }
+  //   } catch (error) {
+  //     _finalschedule = [];
+  //     notifyListeners();
+  //   }
+  // }
+  List<Schedule>? _finalschedule;
+List<Schedule>? get finalschedule => _finalschedule;
+
+void fetchSchedule(String id, String type, String targetTimezone) {
+  // Listen for real-time updates from the classes collection
+  FirebaseFirestore.instance
+      .collection('classes')
+      .where(type == 'tutor' ? 'tutorID' : 'studentID', isEqualTo: id)
+      .snapshots()
+      .listen((classSnapshot) {
+    if (classSnapshot.docs.isNotEmpty) {
+      List<Schedule> tempScheduleList = [];
 
       for (var classDoc in classSnapshot.docs) {
         String snapshotId = classDoc.id;
 
-        QuerySnapshot<Map<String, dynamic>> scheduleSnapshot =
-            await FirebaseFirestore.instance
-                .collection('schedule')
-                .where('scheduleID', isEqualTo: snapshotId)
-                .get();
-        if (scheduleSnapshot.docs.isNotEmpty || scheduleSnapshot.docs != null) {
-          for (var documentSnapshot in scheduleSnapshot.docs) {
-            var data = documentSnapshot.data();
+        // Listen for real-time updates from the schedule collection
+        FirebaseFirestore.instance
+            .collection('schedule')
+            .where('scheduleID', isEqualTo: snapshotId)
+            .snapshots()
+            .listen((scheduleSnapshot) {
+          tempScheduleList.clear(); // Clear previous list to avoid duplication
+          if (scheduleSnapshot.docs.isNotEmpty) {
+            for (var documentSnapshot in scheduleSnapshot.docs) {
+              var data = documentSnapshot.data();
 
-            String session = data['session'] ?? '';
-            DateTime schedule = formatTimewDatewZone(
-                DateFormat('MMMM d, yyyy h:mm a')
-                    .format(DateTime.parse(data['schedule']).toLocal()),
-                targetTimezone);
-            String timefrom = updateTime(targetTimezone, data['timefrom']);
-            String timeto = updateTime(targetTimezone, data['timeto']);
+              String session = data['session'] ?? '';
+              DateTime schedule = formatTimewDatewZone(
+                  DateFormat('MMMM d, yyyy h:mm a')
+                      .format(DateTime.parse(data['schedule']).toLocal()),
+                  targetTimezone);
+              String timefrom = updateTime(targetTimezone, data['timefrom']);
+              String timeto = updateTime(targetTimezone, data['timeto']);
 
-            Schedule tempschedinfo = Schedule(
-              scheduleID: data['scheduleID'] ?? '',
-              session: session,
-              schedule: schedule,
-              timefrom: timefrom,
-              timeto: timeto,
-              classstatus: data['classstatus'] ?? '',
-              meetinglink: data['meetinglink'] ?? '',
-              rating: data['rating'] ?? '',
-              studentStatus: data['studentStatus'] ?? '',
-              tutorStatus: data['tutorStatus'] ?? '',
-            );
-            tempScheduleList.add(tempschedinfo);
+              Schedule tempschedinfo = Schedule(
+                scheduleID: data['scheduleID'] ?? '',
+                session: session,
+                schedule: schedule,
+                timefrom: timefrom,
+                timeto: timeto,
+                classstatus: data['classstatus'] ?? '',
+                meetinglink: data['meetinglink'] ?? '',
+                rating: data['rating'] ?? '',
+                studentStatus: data['studentStatus'] ?? '',
+                tutorStatus: data['tutorStatus'] ?? '',
+              );
+              tempScheduleList.add(tempschedinfo);
+            }
+            _finalschedule = tempScheduleList;
+          } else {
+            _finalschedule = [];
           }
-          finalschedule = tempScheduleList;
           notifyListeners();
-        } else {
-          finalschedule = [];
-          notifyListeners();
-        }
+        });
       }
-
-      // Update finalschedule with the accumulated list
-    } catch (error) {
-      finalschedule = [];
+    } else {
+      _finalschedule = [];
       notifyListeners();
     }
-  }
+  });
+}
+
 }

@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:go_router/go_router.dart';
@@ -24,6 +25,7 @@ import '../../../../data_class/studentanalyticsclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/user_class.dart';
 import '../../../../provider/init_provider.dart';
+import '../../../../services/getcurrentTimezone.dart';
 import '../../../../services/getenrolledclasses.dart';
 import '../../../../services/getmessages.dart';
 import '../../../../services/getschedules.dart';
@@ -36,6 +38,8 @@ import '../../cart/mycart.dart';
 import '../../help/help.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:http/http.dart' as http;
+import 'dart:html' as html;
+
 
 import '../../tutor/calendar/tutor_calendar.dart';
 import '../../tutor/classes/classes_main.dart';
@@ -121,6 +125,11 @@ class _StudentDashboardPageState extends State<StudentDashboardPage> {
         GoRouter.of(context).go('/');
       }
     }
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final timedatenotifier =
+          Provider.of<StudentNotifier>(context, listen: false);
+      timedatenotifier.getlistenToTutor(widget.uID.toString());
+    });
     super.initState();
   }
 
@@ -359,18 +368,23 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                     key: studentdeskkey,
                     backgroundColor: const Color.fromRGBO(245, 247, 248, 1),
                     appBar: AppBar(
-                      toolbarHeight: 65,
+                        toolbarHeight: 65,
                       backgroundColor: kColorPrimary,
                       elevation: 4,
                       shadowColor: Colors.black,
                       automaticallyImplyLeading: false,
-                      title: Container(
-                        padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
-                        width: 240,
-                        child: Image.asset(
-                          "assets/images/worklogo.png",
-                          alignment: Alignment.topCenter,
-                          fit: BoxFit.cover,
+                      title: InkWell(
+                        onTap: () {
+                          html.window.location.reload();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
+                          width: 240,
+                          child: Image.asset(
+                            "assets/images/worklogo.png",
+                            alignment: Alignment.topCenter,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                       actions: [
@@ -380,8 +394,8 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                                   Text(
                                     timezone == null
                                         ? ''
-                                        : '$timezone/${utcZone(timezone!)}',
-                                    style: const TextStyle(fontSize: 18),
+                                        : '$timezone ${utcZone(timezone!)}',
+                                    style: const TextStyle(fontSize: 16),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(
@@ -776,6 +790,77 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                               ],
                             ),
                           ),
+                              bottomSheet: Consumer<StudentNotifier>(
+                        builder: (context, studentNotifier, child) {
+                      return Visibility(
+                        visible:studentNotifier.timezone != timezone ,
+                        child: Container(
+                          width: double.infinity,
+                          height: 70,
+                          color: Colors.transparent,
+                          alignment: Alignment.bottomCenter,
+                          padding: const EdgeInsets.only(bottom: 20.0),
+                          child: InkWell(
+                            onTap: () {
+                              html.window.location.reload();
+                            },
+                            child: Container(
+                              width:
+                                  350, // Adjust the width to display all the text
+                              height: 50, // Adjust the height as needed
+                              decoration: BoxDecoration(
+                                color: kColorLight,
+                                borderRadius: BorderRadius.circular(
+                                    15.0), // Makes the button rounded
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black
+                                        .withOpacity(0.5), // Shadow color
+                                    spreadRadius:
+                                        2.0, // How much the shadow spreads
+                                    blurRadius: 5.0, // Blur radius of the shadow
+                                    offset: const Offset(
+                                        0, 4), // Offset of the shadow
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: RichText(
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(
+                                    children: <TextSpan>[
+                                      const TextSpan(
+                                        text: 'Timezone updated, click ',
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 14),
+                                      ),
+                                      TextSpan(
+                                        text: 'reload',
+                                        style: const TextStyle(
+                                          color: Colors.yellow,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            html.window.location.reload();
+                                          },
+                                      ),
+                                      const TextSpan(
+                                        text: ' to reflect!',
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                 
                   ),
                 ),
                 if (_showModal)
