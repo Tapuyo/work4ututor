@@ -1,11 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
-import 'package:work4ututor/ui/web/signup/student_information_signup.dart';
+import 'package:work4ututor/alertbox/confirmationdialog.dart';
 
 import '../../../components/nav_bar.dart';
 import '../../../constant/constant.dart';
@@ -591,44 +590,61 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                     error = 'Please supply a valid email';
                                   });
                                 } else {
-                                  setState(() {
-                                    if (result.toString().contains(
-                                        "The email address is already in use by another account")) {
-                                      result =
-                                          "The email address is already in use by another account!\nPlease login to proceed.";
+                              setState(() {
+                                if (result.toString().contains(
+                                    "The email address is already in use by another account")) {
+                                  result =
+                                      "The email address is already in use by another account!\nPlease login to proceed.";
 
-                                      CoolAlert.show(
-                                        context: context,
-                                        type: CoolAlertType.error,
-                                        title: '',
-                                        width: 200,
-                                        text: result,
-                                      backgroundColor: kCalendarColorFB,
-                                      );
-                                    } else {
-                                      _auth.adduserInfo({
-                                        "userID": result.uid,
-                                        "role": result.role,
-                                        "userStatus": result.status
-                                      });
-                                      String resultdata =
-                                          "Account succesfully registered! Click okay to continue.";
-                                      setState(() {
-                                        CoolAlert.show(
-                                          context: context,
-                                          width: 200,
-                                          type: CoolAlertType.success,
-                                          text: resultdata,
-                                          autoCloseDuration:
-                                              const Duration(seconds: 1),
-                                        ).then((value) {
-                                          GoRouter.of(context).go(
-                                              '/studentsignup/${result.uid.toString()}');
-                                        });
-                                      });
-                                    }
+                                  // CoolAlert.show(
+                                  //   context: context,
+                                  //   type: CoolAlertType.error,
+                                  //   title: '',
+                                  //   width: 200,
+                                  //   text: result,
+                                  //   backgroundColor: kCalendarColorFB,
+                                  // );
+                                  showConfirmationDialog(
+                                    context,
+                                    '',
+                                    result,
+                                    () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  );
+                                } else {
+                                  _auth.adduserInfo({
+                                    "userID": result.uid,
+                                    "role": result.role,
+                                    "userStatus": result.status
+                                  });
+                                  String resultdata =
+                                      "Account succesfully registered! Click OK to continue.";
+                                  setState(() {
+                                    // CoolAlert.show(
+                                    //   context: context,
+                                    //   width: 200,
+                                    //   type: CoolAlertType.success,
+                                    //   text: resultdata,
+                                    //   autoCloseDuration:
+                                    //       const Duration(seconds: 1),
+                                    // ).then((value) {
+                                    //   GoRouter.of(context).go(
+                                    //       '/studentsignup/${result.uid.toString()}');
+                                    // });
+                                    showConfirmationDialog(
+                                      context,
+                                      '',
+                                      resultdata,
+                                      () {
+                                        Navigator.of(context).pop();
+                                        GoRouter.of(context).go(
+                                            '/studentsignup/${result.uid.toString()}');
+                                      },
+                                    );
                                   });
                                 }
+                              });  }
                               }
                             },
                       child: Text(
@@ -921,13 +937,21 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                   result =
                                       "The email address is already in use by another account!\nPlease login to proceed.";
 
-                                  CoolAlert.show(
-                                    context: context,
-                                    type: CoolAlertType.error,
-                                    title: '',
-                                    width: 200,
-                                    text: result,
-                                      backgroundColor: kCalendarColorFB,
+                                  // CoolAlert.show(
+                                  //   context: context,
+                                  //   type: CoolAlertType.error,
+                                  //   title: '',
+                                  //   width: 200,
+                                  //   text: result,
+                                  //   backgroundColor: kCalendarColorFB,
+                                  // );
+                                  showConfirmationDialog(
+                                    context,
+                                    '',
+                                    result,
+                                    () {
+                                      Navigator.of(context).pop();
+                                    },
                                   );
                                 } else {
                                   _auth.adduserInfo({
@@ -936,19 +960,29 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                     "userStatus": result.status
                                   });
                                   String resultdata =
-                                      "Account succesfully registered! Click okay to continue.";
+                                      "Account succesfully registered! Click OK to continue.";
                                   setState(() {
-                                    CoolAlert.show(
-                                      context: context,
-                                      width: 200,
-                                      type: CoolAlertType.success,
-                                      text: resultdata,
-                                      autoCloseDuration:
-                                          const Duration(seconds: 1),
-                                    ).then((value) {
-                                      GoRouter.of(context).go(
-                                          '/studentsignup/${result.uid.toString()}');
-                                    });
+                                    // CoolAlert.show(
+                                    //   context: context,
+                                    //   width: 200,
+                                    //   type: CoolAlertType.success,
+                                    //   text: resultdata,
+                                    //   autoCloseDuration:
+                                    //       const Duration(seconds: 1),
+                                    // ).then((value) {
+                                    //   GoRouter.of(context).go(
+                                    //       '/studentsignup/${result.uid.toString()}');
+                                    // });
+                                    showConfirmationDialog(
+                                      context,
+                                      '',
+                                      resultdata,
+                                      () {
+                                        Navigator.of(context).pop();
+                                        GoRouter.of(context).go(
+                                            '/studentsignup/${result.uid.toString()}');
+                                      },
+                                    );
                                   });
                                 }
                               });
@@ -1238,13 +1272,21 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                   result =
                                       "The email address is already in use by another account!\nPlease login to proceed.";
 
-                                  CoolAlert.show(
-                                    context: context,
-                                    type: CoolAlertType.error,
-                                    title: '',
-                                    width: 200,
-                                    text: result,
-                                      backgroundColor: kCalendarColorFB,
+                                  // CoolAlert.show(
+                                  //   context: context,
+                                  //   type: CoolAlertType.error,
+                                  //   title: '',
+                                  //   width: 200,
+                                  //   text: result,
+                                  //   backgroundColor: kCalendarColorFB,
+                                  // );
+                                  showConfirmationDialog(
+                                    context,
+                                    '',
+                                    result,
+                                    () {
+                                      Navigator.of(context).pop();
+                                    },
                                   );
                                 } else {
                                   _auth.adduserInfo({
@@ -1253,19 +1295,29 @@ class _StudentSignUpState extends State<StudentSignUp> {
                                     "userStatus": result.status
                                   });
                                   String resultdata =
-                                      "Account succesfully registered! Click okay to continue.";
+                                      "Account succesfully registered! Click OK to continue.";
                                   setState(() {
-                                    CoolAlert.show(
-                                      context: context,
-                                      width: 200,
-                                      type: CoolAlertType.success,
-                                      text: resultdata,
-                                      autoCloseDuration:
-                                          const Duration(seconds: 1),
-                                    ).then((value) {
-                                      GoRouter.of(context).go(
-                                          '/studentsignup/${result.uid.toString()}');
-                                    });
+                                    // CoolAlert.show(
+                                    //   context: context,
+                                    //   width: 200,
+                                    //   type: CoolAlertType.success,
+                                    //   text: resultdata,
+                                    //   autoCloseDuration:
+                                    //       const Duration(seconds: 1),
+                                    // ).then((value) {
+                                    //   GoRouter.of(context).go(
+                                    //       '/studentsignup/${result.uid.toString()}');
+                                    // });
+                                    showConfirmationDialog(
+                                      context,
+                                      '',
+                                      resultdata,
+                                      () {
+                                        Navigator.of(context).pop();
+                                        GoRouter.of(context).go(
+                                            '/studentsignup/${result.uid.toString()}');
+                                      },
+                                    );
                                   });
                                 }
                               });

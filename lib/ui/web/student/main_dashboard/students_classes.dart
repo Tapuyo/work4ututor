@@ -313,9 +313,9 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                             ),
                             borderRadius: BorderRadius.circular(5.0),
                           ),
-                          child: Row(
+                          child: const Row(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
                                 "Dashboard",
                                 style: TextStyle(
@@ -400,8 +400,7 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                                     ],
                                   ),
                                 ),
-                                const Spacer(
-                                ),
+                                const Spacer(),
                                 Container(
                                     height: MediaQuery.of(context).size.width *
                                         0.8, // Adjust height based on screen width
@@ -478,6 +477,7 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                             height: 20,
                           ),
                           Card(
+                            color: Colors.white,
                             margin: const EdgeInsets.fromLTRB(0, 0, 4, 0),
                             elevation: 4,
                             child: Row(
@@ -644,9 +644,9 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                             ),
                             borderRadius: BorderRadius.circular(5.0),
                           ),
-                          child: Row(
+                          child: const Row(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
                                 "Dashboard",
                                 style: TextStyle(
@@ -681,6 +681,8 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                               children: [
                                 ClipRect(
                                   child: Card(
+                                              color: Colors.white,
+
                                     margin:
                                         const EdgeInsets.fromLTRB(0, 0, 4, 0),
                                     elevation: 4,
@@ -831,9 +833,9 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                       ),
                       borderRadius: BorderRadius.circular(5.0),
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           "Dashboard",
                           style: TextStyle(
@@ -1039,6 +1041,8 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Card(
+                                        color: Colors.white,
+
                               elevation: 5,
                               child: Container(
                                 alignment: Alignment.center,
@@ -1095,6 +1099,8 @@ class _StudentMainDashboardState extends State<StudentMainDashboard> {
                               height: 5,
                             ),
                             Card(
+                                        color: Colors.white,
+
                               elevation: 5,
                               child: Container(
                                 alignment: Alignment.center,

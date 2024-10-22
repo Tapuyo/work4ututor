@@ -1,9 +1,8 @@
-// ignore_for_file: sized_box_for_whitespace
+// ignore_for_file: sized_box_for_whitespace, unused_import, unused_field
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import '../../../data_class/helpclass.dart';
@@ -40,7 +39,7 @@ class _HelpPageState extends State<HelpPage> {
     return categorylist;
   }
 
-  List<String> _dropdownValues = [
+  final List<String> _dropdownValues = [
     'Option 1',
     'Option 2',
     'Option 3',
@@ -110,6 +109,7 @@ class _HelpPageState extends State<HelpPage> {
         child: Column(
           children: <Widget>[
             Card(
+              color: Colors.white,
               margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
               elevation: 4,
               child: Container(
@@ -127,9 +127,9 @@ class _HelpPageState extends State<HelpPage> {
                   ),
                   borderRadius: BorderRadius.circular(5.0),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       "Help",
                       style: TextStyle(
@@ -147,6 +147,7 @@ class _HelpPageState extends State<HelpPage> {
               height: 10,
             ),
             Card(
+              color: Colors.white,
               margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
               elevation: 4,
               child: Container(
@@ -167,6 +168,7 @@ class _HelpPageState extends State<HelpPage> {
                         height: 10,
                       ),
                       Card(
+                        color: Colors.white,
                         elevation: 5,
                         child: DropdownButtonFormField(
                           iconEnabledColor: kColorPrimary,
@@ -208,6 +210,7 @@ class _HelpPageState extends State<HelpPage> {
                         height: 10,
                       ),
                       Card(
+                        color: Colors.white,
                         elevation: 5,
                         child: DropdownButtonFormField(
                           iconEnabledColor: kColorPrimary,
@@ -243,6 +246,7 @@ class _HelpPageState extends State<HelpPage> {
                         height: 10,
                       ),
                       Card(
+                        color: Colors.white,
                         elevation: 5,
                         child: Container(
                           width: 600,
@@ -275,7 +279,7 @@ class _HelpPageState extends State<HelpPage> {
                         children: [
                           SizedBox(
                             height: 50,
-                            width: 100,
+                            width: 120,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.white,
@@ -284,8 +288,8 @@ class _HelpPageState extends State<HelpPage> {
                                           Radius.circular(20))),
                                   elevation: 0),
                               onPressed: () {},
-                              child: Row(
-                                children: const [
+                              child: const Row(
+                                children: [
                                   Icon(
                                     Icons.attach_file,
                                     color: kColorPrimary,

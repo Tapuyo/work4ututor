@@ -68,6 +68,8 @@ class TutorService {
 }
 
 class TutorInformationScreen extends StatefulWidget {
+  const TutorInformationScreen({super.key});
+
   @override
   _TutorInformationScreenState createState() => _TutorInformationScreenState();
 }
@@ -90,7 +92,7 @@ class _TutorInformationScreenState extends State<TutorInformationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tutor Information'),
+        title: const Text('Tutor Information'),
       ),
       body: Center(
         child: Column(
@@ -103,13 +105,13 @@ class _TutorInformationScreenState extends State<TutorInformationScreen> {
               onPressed: () {
                 _fetchAllTutors(); // Replace with the actual tutor ID
               },
-              child: Text('Fetch Tutor Information'),
+              child: const Text('Fetch Tutor Information'),
             ),
             FutureBuilder<List<TutorInformation>>(
               future: _tutorsFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return const CircularProgressIndicator();
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.hasData) {
@@ -128,10 +130,10 @@ class _TutorInformationScreenState extends State<TutorInformationScreen> {
                       ),
                     );
                   } else {
-                    return Text('No tutors found');
+                    return const Text('No tutors found');
                   }
                 } else {
-                  return Text('Press the button to fetch tutors information');
+                  return const Text('Press the button to fetch tutors information');
                 }
               },
             ),

@@ -106,17 +106,18 @@ void main() async {
           storageBucket: firebaseConfig['storageBucket'].toString(),
         ),
       );
-    } else if (runas == 'devextra') {
-      await Firebase.initializeApp(
-        options: FirebaseOptions(
-          apiKey: firebaseConfig['apiKey'].toString(),
-          appId: firebaseConfig['appId'].toString(),
-          messagingSenderId: firebaseConfig['messagingSenderId'].toString(),
-          projectId: firebaseConfig['projectId'].toString(),
-          storageBucket: firebaseConfig['storageBucket'].toString(),
-        ),
-      );
-    } else {
+    // } else if (runas == 'devextra') {
+    //   await Firebase.initializeApp(
+    //     options: FirebaseOptions(
+    //       apiKey: firebaseConfig['apiKey'].toString(),
+    //       appId: firebaseConfig['appId'].toString(),
+    //       messagingSenderId: firebaseConfig['messagingSenderId'].toString(),
+    //       projectId: firebaseConfig['projectId'].toString(),
+    //       storageBucket: firebaseConfig['storageBucket'].toString(),
+    //     ),
+    //   );
+    }
+     else {
       await Firebase.initializeApp(
         options: const FirebaseOptions(
           apiKey: firebaseApiKey,
@@ -363,6 +364,7 @@ class MyApp extends StatelessWidget {
         fontFamily: "Roboto",
         canvasColor: Colors.white,
         primarySwatch: Colors.indigo,
+        primaryColor: Colors.white,
       ),
       routerConfig: _router,
     );

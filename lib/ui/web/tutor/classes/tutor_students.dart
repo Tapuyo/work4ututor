@@ -271,6 +271,7 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
         child: Column(
           children: <Widget>[
             Card(
+              color: Colors.white,
               margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
               elevation: 4,
               child: Container(
@@ -288,9 +289,9 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
                   ),
                   borderRadius: BorderRadius.circular(5.0),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       "Students Enrolled",
                       style: TextStyle(
@@ -323,6 +324,7 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
                         child: Column(
                           children: [
                             Card(
+                              color: Colors.white,
                               margin: EdgeInsets.zero,
                               elevation: 4,
                               child: SizedBox(
@@ -669,6 +671,7 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
                               height: 5,
                             ),
                             Card(
+                                color: Colors.white,
                                 elevation: 4.0,
                                 child: Column(
                                   children: [
@@ -1123,12 +1126,12 @@ class _StudentsEnrolledState extends State<StudentsEnrolled> {
                                             : Container(
                                                 width: 1235,
                                                 height: size.height - 230,
-                                                child: Column(
+                                                child: const Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.center,
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
-                                                  children: const [
+                                                  children: [
                                                     Icon(
                                                       Icons.list,
                                                       size: 50,

@@ -20,7 +20,6 @@ import '../../../../data_class/studentanalyticsclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/studentsEnrolledclass.dart';
 import '../../../../data_class/tutor_info_class.dart';
-import '../../../../data_class/user_class.dart';
 import '../../../../provider/init_provider.dart';
 import '../../../../services/getcurrentTimezone.dart';
 import '../../../../services/getenrolledclasses.dart';
@@ -28,16 +27,11 @@ import '../../../../services/getmessages.dart';
 import '../../../../services/getschedules.dart';
 import '../../../../services/getstudentclassesanalytics.dart';
 import '../../../../services/getstudentinfo.dart';
-import '../../../../services/getuser.dart';
 import '../../../../services/services.dart';
-import '../../../../services/timefromtimestamp.dart';
-import '../../../../services/timestampconverter.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
 import '../../help/help.dart';
-import '../calendar/tutor_calendar.dart';
 import '../calendar/tutor_schedule.dart';
-import '../classes/classes_inquiry.dart';
 import '../classes/classes_main.dart';
 import '../classes/tutor_students.dart';
 import '../mesages/messages.dart';
@@ -372,7 +366,7 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                         },
                         child: Container(
                           padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
-                          width: 240,
+                          width: 300,
                           child: Image.asset(
                             "assets/images/worklogo.png",
                             alignment: Alignment.topCenter,
@@ -380,6 +374,7 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                           ),
                         ),
                       ),
+                      centerTitle: false,
                       actions: [
                         ResponsiveBuilder.isDesktop(context)
                             ? Row(
@@ -437,7 +432,7 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                                     timezone == null
                                         ? ''
                                         : '$timezone ${utcZone(timezone!)}',
-                                    style: const TextStyle(fontSize: 16),
+                                    style: const TextStyle(fontSize: 16, color: Colors.white),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(
@@ -543,7 +538,7 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                                         timezone == null
                                             ? ''
                                             : '$timezone ${utcZone(timezone!)}',
-                                        style: const TextStyle(fontSize: 16),
+                                    style: const TextStyle(fontSize: 16, color: Colors.white),
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.fromLTRB(
@@ -800,7 +795,7 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                     bottomSheet: Consumer<TutorNotifier>(
                         builder: (context, tutorNotifier, child) {
                       return Visibility(
-                        visible:tutorNotifier.timezone != timezone ,
+                        visible: tutorNotifier.timezone != timezone,
                         child: Container(
                           width: double.infinity,
                           height: 70,
@@ -825,7 +820,8 @@ class _DashboardPageBodyState extends State<DashboardPageBody> {
                                         .withOpacity(0.5), // Shadow color
                                     spreadRadius:
                                         2.0, // How much the shadow spreads
-                                    blurRadius: 5.0, // Blur radius of the shadow
+                                    blurRadius:
+                                        5.0, // Blur radius of the shadow
                                     offset: const Offset(
                                         0, 4), // Offset of the shadow
                                   ),

@@ -266,7 +266,7 @@ Future<String?> deleteDayOff(String uid, String dayOffDate) async {
       List<String>? dayOffs = List<String>.from(doc['dayoffs']);
 
       // Check if the dayOffDate exists in the list
-      if (dayOffs != null && dayOffs.contains(dayOffDate)) {
+      if (dayOffs.contains(dayOffDate)) {
         dayOffs.remove(dayOffDate);
 
         await docRef.update({

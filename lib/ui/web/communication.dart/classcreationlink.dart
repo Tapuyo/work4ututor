@@ -6,7 +6,9 @@ class MeetingScreen extends StatefulWidget {
   final String appId =
       '841f6090e35844b1860e232bdbf4b325'; // Replace with your Agora App ID
   final String appCertificate =
-      '72f8f49b581f41b4a4fefa998beb484a'; // Replace with your Agora App Certificate
+      '72f8f49b581f41b4a4fefa998beb484a';
+
+  const MeetingScreen({super.key}); // Replace with your Agora App Certificate
 
   @override
   _MeetingScreenState createState() => _MeetingScreenState();
@@ -106,20 +108,9 @@ class _MeetingScreenState extends State<MeetingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (token == null) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Loading...'),
-        ),
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    // Implement your meeting UI and logic here using the generated token and channelName
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Meeting'),
+        title: const Text('Meeting'),
       ),
       body: Center(
         child: Column(
@@ -127,12 +118,12 @@ class _MeetingScreenState extends State<MeetingScreen> {
           children: [
             Text(
               'Token: $token',
-              style: TextStyle(fontSize: 20),
+              style: const TextStyle(fontSize: 20),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'Channel Name: $channelName',
-              style: TextStyle(fontSize: 20),
+              style: const TextStyle(fontSize: 20),
             ),
           ],
         ),

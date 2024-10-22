@@ -189,12 +189,12 @@ class _BookLessonBodyState extends State<BookLessonBody> {
                                 fit: BoxFit.cover,
                               ),
                             ),
-                            Flexible(
+                            const Flexible(
                               flex: 10,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
+                                children: [
                                   Text(
                                     'Payment Area',
                                     textAlign: TextAlign.left,
@@ -599,7 +599,7 @@ class SummaryItem extends StatelessWidget {
   final TextStyle? titleStyle;
   final TextStyle? amountStyle;
 
-  SummaryItem({
+  const SummaryItem({super.key, 
     required this.title,
     required this.amount,
     this.titleStyle,

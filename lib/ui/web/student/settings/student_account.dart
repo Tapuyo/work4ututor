@@ -176,7 +176,7 @@ class _StudentAccountsState extends State<StudentAccounts> {
                                   obscureText: obsnewpass,
                                   textAlignVertical: TextAlignVertical.top,
                                   decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
+                                      border: const OutlineInputBorder(),
                                       hintText: '**********',
                                       suffixIcon: IconButton(
                                         onPressed: () {
@@ -232,7 +232,7 @@ class _StudentAccountsState extends State<StudentAccounts> {
                                   obscureText: obscurrent,
                                   textAlignVertical: TextAlignVertical.top,
                                   decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
+                                      border: const OutlineInputBorder(),
                                       hintText: '**********',
                                       suffixIcon: IconButton(
                                         onPressed: () {

@@ -1,10 +1,9 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, unused_local_variable
 
 import 'package:flutter/material.dart';
 import 'package:work4ututor/ui/web/student/book_classes/reschednow.dart';
 
 import '../../../../data_class/classesdataclass.dart';
-import '../../../../services/cancelaccount.dart';
 import '../../../../utils/themes.dart';
 
 @override
@@ -14,8 +13,8 @@ rescheduleclass(BuildContext context, Schedule currentschedule, String timezone)
   showDialog(
     barrierDismissible: false,
     context: context,
-    builder: (_) => WillPopScope(
-      onWillPop: () => Future.value(false),
+    builder: (_) =>PopScope(
+      canPop: true,
       child: Dialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(25),
@@ -42,12 +41,12 @@ rescheduleclass(BuildContext context, Schedule currentschedule, String timezone)
                           icon: const Icon(
                             Icons.arrow_back,
                             size: 12.0,
-                            color: Colors.black,
+                            color: kColorGrey,
                           ),
                           label: const Text(
                             'Go back',
                             style: TextStyle(
-                              color: Colors.black,
+                              color: kColorGrey,
                             ),
                           ),
                         ),
@@ -59,7 +58,7 @@ rescheduleclass(BuildContext context, Schedule currentschedule, String timezone)
                         "You are trying to reschedule a class.",
                         style: TextStyle(
                           // textStyle: Theme.of(context).textTheme.headlineMedium,
-                          color: Colors.black,
+                          color: kColorGrey,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -70,18 +69,18 @@ rescheduleclass(BuildContext context, Schedule currentschedule, String timezone)
                         style: TextStyle(
                           // textStyle: Theme.of(context).textTheme.headlineMedium,
                           color: Colors.grey,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
                         ),
                         textAlign: TextAlign.left,
                       ),
                       const SizedBox(
                         height: 10,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 300,
                         child: Row(
-                          children: const [
+                          children: [
                             Icon(
                               Icons.info,
                               color: kColorPrimary,
@@ -113,7 +112,7 @@ rescheduleclass(BuildContext context, Schedule currentschedule, String timezone)
                           children: [
                             Container(
                               padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                              width: 180,
+                              width: 150,
                               height: 50,
                               child: TextButton(
                                 style: TextButton.styleFrom(
@@ -153,7 +152,7 @@ rescheduleclass(BuildContext context, Schedule currentschedule, String timezone)
                             ),
                             const Spacer(),
                             SizedBox(
-                              width: 100,
+                              width: 150,
                               child: TextButton(
                                 child: const Text(
                                   "No, thanks",
@@ -203,3 +202,9 @@ rescheduleclass(BuildContext context, Schedule currentschedule, String timezone)
     ),
   );
 }
+
+
+
+
+
+

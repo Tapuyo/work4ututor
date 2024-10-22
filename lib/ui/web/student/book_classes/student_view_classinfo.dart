@@ -12,7 +12,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:work4ututor/data_class/tutor_info_class.dart';
 import 'package:work4ututor/ui/web/student/book_classes/rateclass.dart';
-import 'package:work4ututor/ui/web/student/book_classes/ratetutor.dart';
 import 'package:work4ututor/ui/web/student/book_classes/setschedule.dart';
 
 import '../../../../data_class/classesdataclass.dart';
@@ -193,7 +192,7 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
         : widget.enrolledClass!.tutorinfo.first.imageID;
     // _updateResponse();
     List<ClassesMaterials>? materials =
-        widget.enrolledClass == null ? null : widget.enrolledClass!.materials;
+        widget.enrolledClass?.materials;
     materials!.sort((a, b) => a.session.compareTo(b.session));
     if (widget.enrolledClass == null) {
       return const Center(
@@ -527,6 +526,7 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
                                   color: Colors.deepPurple.shade300,
                                   borderRadius: BorderRadius.circular(15),
                                 ),
+                                indicatorSize: TabBarIndicatorSize.tab,
                                 indicatorColor: kColorPrimary,
                                 tabs: const [
                                   Tab(
@@ -935,7 +935,7 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
                                                                   'Cancelled'
                                                               ? const Center(
                                                                   child: Text(
-                                                                    'Cancelled Class',
+                                                                    'Class Cancelled',
                                                                     style:
                                                                         TextStyle(
                                                                       color:
@@ -1335,7 +1335,7 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
                                                                     .status ==
                                                                 'Cancelled'
                                                             ? const Text(
-                                                                'Cancelled Class',
+                                                                'Class Cancelled',
                                                                 style: TextStyle(
                                                                     fontSize:
                                                                         20,
@@ -1344,15 +1344,15 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
                                                               )
                                                             : Column(
                                                                 children: [
-                                                                  Padding(
-                                                                    padding: const EdgeInsets
+                                                                  const Padding(
+                                                                    padding: EdgeInsets
                                                                             .all(
                                                                         16.0),
                                                                     child: Row(
                                                                       mainAxisAlignment:
                                                                           MainAxisAlignment
                                                                               .start,
-                                                                      children: const [
+                                                                      children: [
                                                                         Text(
                                                                             'Files:'),
                                                                         Spacer()
@@ -2264,13 +2264,13 @@ class _StudentViewClassInfoState extends State<StudentViewClassInfo> {
                                                       Radius.circular(10),
                                                   bottomRight:
                                                       Radius.circular(10))),
-                                          child: Center(
+                                          child: const Center(
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.center,
-                                              children: const [
+                                              children: [
                                                 Icon(
                                                   EvaIcons.clockOutline,
                                                   color: kColorGrey,

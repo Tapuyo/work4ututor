@@ -10,7 +10,6 @@ import '../../../../data_class/tutor_info_class.dart';
 import '../../../../provider/init_provider.dart';
 import '../../../../provider/search_provider.dart';
 import '../../../../utils/themes.dart';
-import '../../search_tutor/tutor_list.dart';
 import '../../signup/tutor_signup.dart';
 
 class FindTutorLogin extends StatefulWidget {

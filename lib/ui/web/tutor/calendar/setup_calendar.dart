@@ -334,6 +334,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
         child: Column(
           children: [
             Card(
+              color: Colors.white,
               margin: EdgeInsets.zero,
               elevation: 4,
               child: Container(
@@ -384,7 +385,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                           color: Colors.deepPurple.shade300,
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        indicatorColor: kColorPrimary,
+                        indicatorSize: TabBarIndicatorSize.tab,
                         tabs: const [
                           Tab(
                             icon: Icon(Icons.event_available),
@@ -487,10 +488,10 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                             MaterialTapTargetSize.shrinkWrap,
                                         activeColor: Colors.grey,
                                         fillColor:
-                                            MaterialStateProperty.resolveWith(
+                                            WidgetStateProperty.resolveWith(
                                                 (states) {
-                                          if (states.contains(
-                                              MaterialState.selected)) {
+                                          if (states
+                                              .contains(WidgetState.selected)) {
                                             return Colors.grey;
                                           }
                                           return kColorGrey;
@@ -529,10 +530,10 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                             MaterialTapTargetSize.shrinkWrap,
                                         activeColor: Colors.grey,
                                         fillColor:
-                                            MaterialStateProperty.resolveWith(
+                                            WidgetStateProperty.resolveWith(
                                                 (states) {
-                                          if (states.contains(
-                                              MaterialState.selected)) {
+                                          if (states
+                                              .contains(WidgetState.selected)) {
                                             return Colors.grey;
                                           }
                                           return kColorGrey;
@@ -758,9 +759,9 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                           },
                                           style: ButtonStyle(
                                             backgroundColor:
-                                                MaterialStateProperty.all(
+                                                WidgetStateProperty.all(
                                                     Colors.transparent),
-                                            shape: MaterialStateProperty.all<
+                                            shape: WidgetStateProperty.all<
                                                 RoundedRectangleBorder>(
                                               RoundedRectangleBorder(
                                                 borderRadius:
@@ -846,13 +847,13 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                             return Padding(
                                                               padding:
                                                                   const EdgeInsets
-                                                                          .only(
+                                                                      .only(
                                                                       left: 5.0,
                                                                       right: 5),
                                                               child: Container(
                                                                 padding:
                                                                     const EdgeInsets
-                                                                            .fromLTRB(
+                                                                        .fromLTRB(
                                                                         5,
                                                                         0,
                                                                         5,
@@ -899,7 +900,6 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                                         if (result ==
                                                                             'success') {
                                                                         } else {
-                                                                          // ignore: use_build_context_synchronously
                                                                           CoolAlert
                                                                               .show(
                                                                             context:
@@ -983,13 +983,13 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                           return Padding(
                                                             padding:
                                                                 const EdgeInsets
-                                                                        .only(
+                                                                    .only(
                                                                     left: 5.0,
                                                                     right: 5),
                                                             child: Container(
                                                               padding:
                                                                   const EdgeInsets
-                                                                          .fromLTRB(
+                                                                      .fromLTRB(
                                                                       5,
                                                                       0,
                                                                       5,
@@ -1217,10 +1217,10 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                             MaterialTapTargetSize.shrinkWrap,
                                         activeColor: Colors.grey,
                                         fillColor:
-                                            MaterialStateProperty.resolveWith(
+                                            WidgetStateProperty.resolveWith(
                                                 (states) {
-                                          if (states.contains(
-                                              MaterialState.selected)) {
+                                          if (states
+                                              .contains(WidgetState.selected)) {
                                             return Colors.grey;
                                           }
                                           return kColorGrey;
@@ -1259,10 +1259,10 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                             MaterialTapTargetSize.shrinkWrap,
                                         activeColor: Colors.grey,
                                         fillColor:
-                                            MaterialStateProperty.resolveWith(
+                                            WidgetStateProperty.resolveWith(
                                                 (states) {
-                                          if (states.contains(
-                                              MaterialState.selected)) {
+                                          if (states
+                                              .contains(WidgetState.selected)) {
                                             return Colors.grey;
                                           }
                                           return kColorGrey;
@@ -1682,7 +1682,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                         height: 60,
                                                         padding:
                                                             const EdgeInsets
-                                                                    .fromLTRB(
+                                                                .fromLTRB(
                                                                 15, 10, 5, 0),
                                                         child: Row(
                                                           mainAxisAlignment:
@@ -1807,14 +1807,18 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                                   (context,
                                                                       index) {
                                                                 return Padding(
-                                                                  padding: const EdgeInsets
+                                                                  padding:
+                                                                      const EdgeInsets
                                                                           .only(
-                                                                      left: 5.0,
-                                                                      right: 5),
+                                                                          left:
+                                                                              5.0,
+                                                                          right:
+                                                                              5),
                                                                   child:
                                                                       Container(
                                                                     padding:
-                                                                        const EdgeInsets.fromLTRB(
+                                                                        const EdgeInsets
+                                                                            .fromLTRB(
                                                                             5,
                                                                             0,
                                                                             5,
@@ -2192,8 +2196,7 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                       blockdateselected = [];
                                     }
                                     if (scheduletime.allblockdateselected !=
-                                        null) {
-                                    }
+                                        null) {}
                                     return Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -2235,13 +2238,13 @@ class _CalendarSetupState extends State<CalendarSetup> {
                                                             return Padding(
                                                               padding:
                                                                   const EdgeInsets
-                                                                          .only(
+                                                                      .only(
                                                                       left: 5.0,
                                                                       right: 5),
                                                               child: Container(
                                                                 padding:
                                                                     const EdgeInsets
-                                                                            .fromLTRB(
+                                                                        .fromLTRB(
                                                                         5,
                                                                         0,
                                                                         5,

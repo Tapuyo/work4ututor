@@ -383,6 +383,7 @@ Future<String?> uploadTutorProfile(
   } catch (e) {
     print(e.toString());
   }
+  return null;
   // Return the Future from the Completer
 }
 

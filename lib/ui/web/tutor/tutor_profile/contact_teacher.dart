@@ -131,12 +131,12 @@ class _ContactTeacherBodyState extends State<ContactTeacherBody> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      Flexible(
+                      const Flexible(
                         flex: 10,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
                               'Custom Classes',
                               textAlign: TextAlign.left,

@@ -56,12 +56,12 @@ class _VoucherDataState extends State<VoucherData> {
     return Consumer<VoucherProvider>(
         builder: (context, voucherProvider, child) {
       if (voucherProvider.vouchers.isEmpty) {
-       return  SizedBox(
+       return  const SizedBox(
           height: 150,
           child: Center(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Icon(
                     Icons.receipt_long_sharp,
                     size: 50,

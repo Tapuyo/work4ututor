@@ -78,9 +78,10 @@ import 'package:universal_html/html.dart' as html;
 
 class StudentCalendar extends StatefulWidget {
   final String uID;
-    final String timezone;
+  final String timezone;
 
-  const StudentCalendar({Key? key, required this.uID, required this.timezone}) : super(key: key);
+  const StudentCalendar({Key? key, required this.uID, required this.timezone})
+      : super(key: key);
 
   @override
   State<StudentCalendar> createState() => _StudentCalendarState();
@@ -127,7 +128,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
   }
 
   List<bool> isHovered = [];
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  final CalendarFormat _calendarFormat = CalendarFormat.month;
 
   DateTime _focusedDay = DateTime.now();
 
@@ -140,8 +141,8 @@ class _StudentCalendarState extends State<StudentCalendar> {
 
   bool daystatus = false;
   ScrollController updatescrollController1 = ScrollController();
-  ScrollController _controller1 = ScrollController();
-  ScrollController _controller2 = ScrollController();
+  final ScrollController _controller1 = ScrollController();
+  final ScrollController _controller2 = ScrollController();
 
   ScheduleData? selectedbooking;
   ScheduleData? selectedbookingdata;
@@ -340,9 +341,9 @@ class _StudentCalendarState extends State<StudentCalendar> {
                 ),
                 borderRadius: BorderRadius.circular(5.0),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "Calendar",
                     style: TextStyle(
@@ -360,6 +361,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
             height: 10,
           ),
           Card(
+            color: Colors.white,
             margin: EdgeInsets.zero,
             elevation: 4,
             child: SizedBox(
@@ -391,10 +393,10 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                   .format(scheduleDate) ==
                               DateFormat('yyyy-MM-dd').format(_selectedDay);
                         }).toList();
- 
-                      //  for (var schedule in filteredSchedules) {
-                      //     isHovered.add(false);
-                      //   }
+
+                        //  for (var schedule in filteredSchedules) {
+                        //     isHovered.add(false);
+                        //   }
                         List<Schedule> scheduleList = scheduleListdata
                             .where((schedule) => enrolledlist.any((enrolled) =>
                                 enrolled.classid == schedule.scheduleID))
@@ -551,7 +553,8 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                         child: Text(
                                           '$count',
                                           style: const TextStyle(
-                                              color: Colors.black, fontSize: 10),
+                                              color: Colors.black,
+                                              fontSize: 10),
                                         ),
                                       ),
                                     ),
@@ -612,6 +615,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                       Visibility(
                         visible: selectedbooking == null,
                         child: Card(
+                          color: Colors.white,
                           margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                           elevation: 5,
                           child: Padding(
@@ -971,7 +975,8 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                               child: Container(
                                                                 padding:
                                                                     const EdgeInsets
-                                                                        .all(10),
+                                                                        .all(
+                                                                        10),
                                                                 width: currentbooking
                                                                             .type ==
                                                                         'blocked'
@@ -1146,6 +1151,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                       Visibility(
                         visible: selectedbooking != null,
                         child: Card(
+                          color: Colors.white,
                           margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                           elevation: 5,
                           child: Padding(
@@ -1400,7 +1406,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                               .toList();
                                                       if (materialsdata
                                                           .isEmpty) {
-                                                        return Container(
+                                                        return SizedBox(
                                                             width: 600,
                                                             child: Center(
                                                               child: Text(
@@ -1420,7 +1426,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                       return Padding(
                                                         padding:
                                                             const EdgeInsets
-                                                                    .only(
+                                                                .only(
                                                                 bottom: 10.0),
                                                         child: Column(
                                                           children: [
@@ -1429,7 +1435,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                 height: 120,
                                                                 padding:
                                                                     const EdgeInsets
-                                                                            .fromLTRB(
+                                                                        .fromLTRB(
                                                                         10,
                                                                         0,
                                                                         10,
@@ -1485,7 +1491,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                                 future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
                                                                                 builder: (context, snapshot) {
                                                                                   if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                    return Container(
+                                                                                    return SizedBox(
                                                                                         height: 60,
                                                                                         width: 60,
                                                                                         child: const Center(
@@ -1597,7 +1603,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                                 future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
                                                                                 builder: (context, snapshot) {
                                                                                   if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                    return Container(
+                                                                                    return SizedBox(
                                                                                         height: 60,
                                                                                         width: 60,
                                                                                         child: const Center(
@@ -1708,7 +1714,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                                 future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
                                                                                 builder: (context, snapshot) {
                                                                                   if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                    return Container(
+                                                                                    return SizedBox(
                                                                                         height: 60,
                                                                                         width: 60,
                                                                                         child: const Center(
@@ -1984,13 +1990,13 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                   ),
                                                 ],
                                               )
-                                            : Center(
+                                            : const Center(
                                                 child: Column(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.center,
-                                                  children: const [
+                                                  children: [
                                                     Icon(
                                                       Icons.block,
                                                       color: Colors.red,
@@ -2020,6 +2026,8 @@ class _StudentCalendarState extends State<StudentCalendar> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Card(
+                                                    color: Colors.white,
+
                         margin: const EdgeInsets.fromLTRB(0, 10, 10, 0),
                         elevation: 5,
                         child: Padding(
@@ -2136,12 +2144,11 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                     0
                                                                 ? timeText
                                                                 : '',
-                                                        textAlign:
-                                                            time.minute == 0
-                                                                ? TextAlign
-                                                                    .start
-                                                                : TextAlign
-                                                                    .center,
+                                                        textAlign: time
+                                                                    .minute ==
+                                                                0
+                                                            ? TextAlign.start
+                                                            : TextAlign.center,
                                                         style: textStyle,
                                                       ),
                                                     ),
@@ -2489,19 +2496,16 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                       : null,
                                                   child: Container(
                                                     width: ResponsiveBuilder
-                                                            .isDesktop(
-                                                                context)
+                                                            .isDesktop(context)
                                                         ? size.width - 780
                                                         : ResponsiveBuilder
                                                                 .isTablet(
                                                                     context)
                                                             ? size.width - 510
-                                                            : size.width -
-                                                                210,
-                                                    height:
-                                                        indexSelect == index
-                                                            ? 200
-                                                            : 12,
+                                                            : size.width - 210,
+                                                    height: indexSelect == index
+                                                        ? 200
+                                                        : 12,
                                                     color: isSelectable
                                                         ? indexSelect == index
                                                             ? Colors.blue
@@ -2527,6 +2531,8 @@ class _StudentCalendarState extends State<StudentCalendar> {
                         ),
                       ),
                       Card(
+                                                    color: Colors.white,
+
                         margin: const EdgeInsets.fromLTRB(5, 10, 0, 0),
                         elevation: 5,
                         child: Padding(
@@ -2755,7 +2761,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                                     .toString())
                                                             .toList();
                                                     if (materialsdata.isEmpty) {
-                                                      return Container(
+                                                      return SizedBox(
                                                           width: 600,
                                                           child: Center(
                                                             child: Text(
@@ -2782,7 +2788,7 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                               height: 120,
                                                               padding:
                                                                   const EdgeInsets
-                                                                          .fromLTRB(
+                                                                      .fromLTRB(
                                                                       10,
                                                                       0,
                                                                       10,
@@ -3393,13 +3399,13 @@ class _StudentCalendarState extends State<StudentCalendar> {
                                                 ),
                                               ],
                                             )
-                                          : Center(
+                                          : const Center(
                                               child: Column(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.center,
-                                                children: const [
+                                                children: [
                                                   Icon(
                                                     Icons.block,
                                                     color: Colors.red,
@@ -3461,10 +3467,10 @@ Widget tableLedger(BuildContext context) {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
           child: Row(
-            children: const [
+            children: [
               Text(
                 "Legend",
                 style: TextStyle(
@@ -3565,10 +3571,10 @@ Widget tableLedger(BuildContext context) {
         const SizedBox(
           height: 50,
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
           child: Row(
-            children: const [
+            children: [
               Text(
                 "Summary",
                 style: TextStyle(
@@ -3601,10 +3607,10 @@ Widget tableLedger(BuildContext context) {
                   color: Colors.green,
                 ),
               ),
-              Column(
+              const Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "Available Dates",
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -3637,10 +3643,10 @@ Widget tableLedger(BuildContext context) {
                   color: Colors.blue,
                 ),
               ),
-              Column(
+              const Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "Booked Dates",
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -3673,10 +3679,10 @@ Widget tableLedger(BuildContext context) {
                   color: Colors.red,
                 ),
               ),
-              Column(
+              const Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "Blocked Dates",
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -3713,9 +3719,9 @@ Widget listClasses(BuildContext context) {
               padding: const EdgeInsets.all(10.0),
               child: Column(children: <Widget>[
                 //todos Update the date strings here
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       "March, 27",
                       style: TextStyle(
@@ -3788,12 +3794,12 @@ Widget listClasses(BuildContext context) {
                                         const SizedBox(
                                           width: 10,
                                         ),
-                                        Column(
+                                        const Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
-                                          children: const [
+                                          children: [
                                             Text(
                                               "Melvin Jhon Selma",
                                               style: TextStyle(
@@ -3878,10 +3884,10 @@ Widget classClick(BuildContext context) {
                             const SizedBox(
                               width: 10,
                             ),
-                            Column(
+                            const Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
-                              children: const [
+                              children: [
                                 Text(
                                   "Melvin Jhon Selma",
                                   style: TextStyle(

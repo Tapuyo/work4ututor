@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:work4ututor/utils/themes.dart';
 
 class HeaderText extends StatelessWidget {
   const HeaderText(this.data, {Key? key}) : super(key: key);
@@ -11,6 +12,7 @@ class HeaderText extends StatelessWidget {
       style: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w700,
+        color: kColorGrey
       ),
     );
   }

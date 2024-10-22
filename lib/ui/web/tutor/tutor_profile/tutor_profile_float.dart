@@ -14,7 +14,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:work4ututor/ui/web/communication.dart/uploadrecording.dart';
 import 'package:work4ututor/ui/web/tutor/tutor_profile/viewschedule.dart';
 
-import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/subject_class.dart';
 import '../../../../services/addtocart.dart';
 import '../../../../services/getmyrating.dart';
@@ -229,7 +228,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                 ),
                                                 Visibility(
                                                   visible: widget.tutorsinfo[
-                                                      'presentation'],
+                                                      'presentation'].length > 0,
                                                   child: Padding(
                                                     padding:
                                                         const EdgeInsets.only(
@@ -242,90 +241,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                       children: [
                                                         InkWell(
                                                           onTap: () {
-                                                            // showDialog(
-                                                            //     barrierDismissible:
-                                                            //         false,
-                                                            //     context: context,
-                                                            //     builder:
-                                                            //         (BuildContext
-                                                            //             context) {
-                                                            //       var height =
-                                                            //           MediaQuery.of(
-                                                            //                   context)
-                                                            //               .size
-                                                            //               .height;
-                                                            //       return AlertDialog(
-                                                            //         shape:
-                                                            //             RoundedRectangleBorder(
-                                                            //           borderRadius:
-                                                            //               BorderRadius.circular(
-                                                            //                   15.0), // Adjust the radius as needed
-                                                            //         ),
-                                                            //         contentPadding:
-                                                            //             EdgeInsets
-                                                            //                 .zero,
-                                                            //         content:
-                                                            //             ClipRRect(
-                                                            //           borderRadius:
-                                                            //               BorderRadius.circular(
-                                                            //                   15.0), // Same radius as above
-                                                            //           child:
-                                                            //               Container(
-                                                            //             color: Colors
-                                                            //                 .white, // Set the background color of the circular content
-
-                                                            //             child:
-                                                            //                 Stack(
-                                                            //               children: <
-                                                            //                   Widget>[
-                                                            //                 SizedBox(
-                                                            //                   height:
-                                                            //                       height,
-                                                            //                   width:
-                                                            //                       900,
-                                                            //                   child:
-                                                            //                       VideoUploadWidget(
-                                                            //                     videolink: widget.tutorsinfo['presentation'].first,
-                                                            //                   ),
-                                                            //                 ),
-                                                            //                 Positioned(
-                                                            //                   top:
-                                                            //                       10.0,
-                                                            //                   right:
-                                                            //                       10.0,
-                                                            //                   child:
-                                                            //                       GestureDetector(
-                                                            //                     onTap: () {
-                                                            //                       Navigator.of(context).pop(false); // Close the dialog
-                                                            //                     },
-                                                            //                     child: const Icon(
-                                                            //                       Icons.close,
-                                                            //                       color: Colors.white,
-                                                            //                       size: 20,
-                                                            //                     ),
-                                                            //                   ),
-                                                            //                 ),
-                                                            //               ],
-                                                            //             ),
-                                                            //           ),
-                                                            //         ),
-                                                            //       );
-                                                            //     });
-                                                            // // showDialog(
-                                                            // //   barrierDismissible:
-                                                            // //       false,
-                                                            // //   context: context,
-                                                            // //   builder:
-                                                            // //       (BuildContext
-                                                            // //           context) {
-                                                            // //     return VideoUploadWidget(
-                                                            // //       videolink: widget
-                                                            // //           .tutorsinfo[
-                                                            // //               'presentation']
-                                                            // //           .first,
-                                                            // //     );
-                                                            // //   },
-                                                            // // );
+                                                          
                                                             showDialog(
                                                                 barrierDismissible:
                                                                     false,
@@ -485,7 +401,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                           child: Padding(
                                                             padding:
                                                                 const EdgeInsets
-                                                                        .only(
+                                                                    .only(
                                                                     left: 10.0,
                                                                     right: 10),
                                                             child: Row(
@@ -605,7 +521,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                           child: Padding(
                                                             padding:
                                                                 const EdgeInsets
-                                                                        .only(
+                                                                    .only(
                                                                     left: 10.0,
                                                                     right: 10),
                                                             child: Row(
@@ -715,7 +631,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                           child: Padding(
                                                             padding:
                                                                 const EdgeInsets
-                                                                        .only(
+                                                                    .only(
                                                                     left: 10.0,
                                                                     right: 10),
                                                             child: Row(
@@ -828,6 +744,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                     },
                                                   ),
                                                 ),
+                                              
                                                 IconButton(
                                                   iconSize: 12,
                                                   padding: EdgeInsets.zero,
@@ -954,7 +871,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                       child: Padding(
                                                         padding:
                                                             const EdgeInsets
-                                                                    .symmetric(
+                                                                .symmetric(
                                                                 horizontal: 5),
                                                         child: InkWell(
                                                           onTap: () {
@@ -996,6 +913,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                 );
                                               }),
                                         ),
+                                        
                                         const Padding(
                                           padding: EdgeInsets.fromLTRB(
                                               10.0, 5, 10, 5),
@@ -1141,7 +1059,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                                 Colors.white),
                                                     child: Padding(
                                                       padding: const EdgeInsets
-                                                              .symmetric(
+                                                          .symmetric(
                                                           horizontal: 5),
                                                       child: InkWell(
                                                         onTap: () {
@@ -1298,7 +1216,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                                 Colors.white),
                                                     child: Padding(
                                                       padding: const EdgeInsets
-                                                              .symmetric(
+                                                          .symmetric(
                                                           horizontal: 5),
                                                       child: InkWell(
                                                         onTap: () {
@@ -1455,7 +1373,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                                 Colors.white),
                                                     child: Padding(
                                                       padding: const EdgeInsets
-                                                              .symmetric(
+                                                          .symmetric(
                                                           horizontal: 5),
                                                       child: InkWell(
                                                         onTap: () {
@@ -1824,7 +1742,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                 ),
                                                 SizedBox(
                                                   height: 30,
-                                                  width: 120,
+                                                  width: 130,
                                                   // decoration: const BoxDecoration(
                                                   //   shape: BoxShape.rectangle,
                                                   //   color: kColorLight,
@@ -1891,8 +1809,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
 
                                                                       child:
                                                                           Stack(
-                                                                        children: <
-                                                                            Widget>[
+                                                                        children: <Widget>[
                                                                           SizedBox(
                                                                             height:
                                                                                 height - 100,
@@ -2355,14 +2272,14 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                                                     ),
                                                                   );
                                                                 })
-                                                            : Column(
+                                                            : const Column(
                                                                 mainAxisAlignment:
                                                                     MainAxisAlignment
                                                                         .center,
                                                                 crossAxisAlignment:
                                                                     CrossAxisAlignment
                                                                         .center,
-                                                                children: const [
+                                                                children: [
                                                                   Icon(
                                                                     Icons
                                                                         .announcement_outlined,
@@ -2395,6 +2312,7 @@ class _TutorProfileFloatState extends State<TutorProfileFloat> {
                                   ),
                                 ),
                               ),
+                         
                             ],
                           ),
                         ),

@@ -50,7 +50,7 @@ class CalendarDialog extends StatefulWidget {
 }
 
 class _CalendarDialogState extends State<CalendarDialog> {
-  DateTime _selectedDate = DateTime.now();
+  final DateTime _selectedDate = DateTime.now();
   final int startHour = 0;
   final int endHour = 24;
   String dateselected = '';
@@ -122,7 +122,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
             await tutorScheduleDoc.reference.collection('timeavailable').get();
 
         // Now, you can work with the documents in the "timeavailable" subcollection
-        timeAvailableQuerySnapshot.docs.forEach((timeAvailableDoc) {
+        for (var timeAvailableDoc in timeAvailableQuerySnapshot.docs) {
           // Access the data within each document in the subcollection
           Map<String, dynamic> data =
               timeAvailableDoc.data() as Map<String, dynamic>;
@@ -132,7 +132,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
             String timefrom = data['timeAvailableFrom'];
             String timeend = data['timeAvailableTo'];
           });
-        });
+        }
       });
     } catch (e) {
       print('Error fetching data from Firestore: $e');
@@ -147,7 +147,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
           .get();
 
       // Loop through the documents in the collection
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
         // Access the data fields you need
@@ -160,15 +160,13 @@ class _CalendarDialogState extends State<CalendarDialog> {
         setState(() {
           dayOffs = List<String>.from(data['dayoffs'] ?? []);
 
-          if (dateoffselected != null) {
-            dayOffsdate = dateoffselected
-                .map((dateString) => DateTime.tryParse(dateString))
-                .where((date) => date != null)
-                .cast<DateTime>()
-                .toList();
-          }
-        });
-      });
+          dayOffsdate = dateoffselected
+              .map((dateString) => DateTime.tryParse(dateString))
+              .where((date) => date != null)
+              .cast<DateTime>()
+              .toList();
+                });
+      }
     } catch (e) {
       print('Error fetching data: $e');
     }
@@ -197,7 +195,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
             await timeAvailableCollection.get();
 
         // Loop through the documents in the "timeavailable" subcollection
-        timeAvailableQuerySnapshot.docs.forEach((timeDoc) {
+        for (var timeDoc in timeAvailableQuerySnapshot.docs) {
           Map<String, dynamic> timeData =
               timeDoc.data() as Map<String, dynamic>;
 
@@ -209,7 +207,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
             timeFrom = timeAvailability.timeAvailableFrom;
             timeTo = timeAvailability.timeAvailableTo;
           });
-        });
+        }
       });
     } catch (e) {
       print('Error fetching data: $e');
@@ -394,9 +392,9 @@ class _CalendarDialogState extends State<CalendarDialog> {
     return isWithinRange;
   }
 
-  ScrollController _controller1 = ScrollController();
-  ScrollController _controller2 = ScrollController();
-  Set<int> selectedIndices = Set<int>();
+  final ScrollController _controller1 = ScrollController();
+  final ScrollController _controller2 = ScrollController();
+  Set<int> selectedIndices = <int>{};
   double containerX = 100.0; // Initial X position of the container
   double containerY = 100.0;
 
@@ -1473,11 +1471,11 @@ class _CalendarDialogState extends State<CalendarDialog> {
                             ),
                           ]),
                         )
-                      : Center(
+                      : const Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
-                            children: const [
+                            children: [
                               Icon(
                                 Icons.block,
                                 color: Colors.red,

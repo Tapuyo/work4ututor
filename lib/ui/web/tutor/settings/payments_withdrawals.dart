@@ -1,12 +1,11 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:work4ututor/alertbox/confirmationdialog.dart';
 
-import '../../../../data_class/atmclass.dart';
 import '../../../../services/addcarddetails.dart';
 import '../../../../services/getcarddetails.dart';
 import '../../../../utils/themes.dart';
@@ -83,7 +82,8 @@ class _PaymentsWithdrwalsState extends State<PaymentsWithdrwals> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Card(
+    return Card(          color: Colors.white,
+
       margin: EdgeInsets.zero,
       elevation: 4,
       shape: const RoundedRectangleBorder(
@@ -289,6 +289,8 @@ class _PaymentsWithdrwalsState extends State<PaymentsWithdrwals> {
                               return Padding(
                                 padding: const EdgeInsets.only(right: 15.0),
                                 child: Card(
+                                            color: Colors.white,
+
                                   margin: EdgeInsets.zero,
                                   elevation: 4,
                                   shape: const RoundedRectangleBorder(
@@ -367,7 +369,9 @@ class _PaymentsWithdrwalsState extends State<PaymentsWithdrwals> {
                     }),
                   ),
 
-                  DisbursementTable(userID: widget.userID,),
+                  Container(
+                    color: Colors.white,
+                    child: DisbursementTable(userID: widget.userID,)),
                 ],
               ),
             )),
@@ -496,7 +500,7 @@ class _AddBankDetailsDialogState extends State<AddBankDetailsDialog> {
               Tooltip(
                 message: 'Save Account',
                 child: Container(
-                  width: 120,
+                  width: 150,
                   height: 30,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
@@ -560,23 +564,17 @@ class _AddBankDetailsDialogState extends State<AddBankDetailsDialog> {
                   height: 30,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    // color: Colors
-                    //     .green
-                    //     .shade400,
+                   
                   ),
                   child: TextButton.icon(
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.all(10),
                       alignment: Alignment.center,
                       foregroundColor: const Color.fromRGBO(1, 118, 132, 1),
-                      // backgroundColor:
-                      //     Colors
-                      //         .green
-                      //         .shade200,
+                      
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24.0),
                       ),
-                      // ignore: prefer_const_constructors
                       textStyle: const TextStyle(
                         color: Colors.deepPurple,
                         fontSize: 12,
@@ -632,9 +630,9 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Column(
+      title: const Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
+        children: [
           Icon(
             Icons.lock_person_outlined,
             color: kColorPrimary,
@@ -738,6 +736,9 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
                         if (result != null) {
                           if (result == 'success') {
                             Navigator.of(context).pop();
+                            showConfirmationDialog(context, '', "Account Added", () {
+                              Navigator.of(context).pop();
+                            },);
                             CoolAlert.show(
                               context: context,
                               width: 200,

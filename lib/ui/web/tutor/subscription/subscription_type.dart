@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:intl/intl.dart';
-import 'package:table_calendar/table_calendar.dart';
 
-import '../../../../utils/themes.dart';
 
 class SubscriptionType extends StatefulWidget {
   const SubscriptionType({super.key});
@@ -14,7 +9,7 @@ class SubscriptionType extends StatefulWidget {
 }
 
 class _SubscriptionTypeState extends State<SubscriptionType> {
-  DateTime _selectedDate = DateTime.now();
+  final DateTime _selectedDate = DateTime.now();
   final int startHour = 0;
   final int endHour = 24;
   String dateselected = '';
@@ -93,10 +88,10 @@ class _SubscriptionTypeState extends State<SubscriptionType> {
                     decoration: const BoxDecoration(
                       color: Colors.white,
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
+                      children: [
                         Text(
                           '\$50',
                           style: TextStyle(
@@ -132,10 +127,10 @@ class _SubscriptionTypeState extends State<SubscriptionType> {
                         const SizedBox(
                           height: 10,
                         ),
-                        Row(
+                        const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: const [
+                          children: [
                             Icon(
                               Icons.check,
                               color: Colors.green,
@@ -155,10 +150,10 @@ class _SubscriptionTypeState extends State<SubscriptionType> {
                         const SizedBox(
                           height: 5,
                         ),
-                        Row(
+                        const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: const [
+                          children: [
                             Icon(
                               Icons.check,
                               color: Colors.green,
@@ -178,10 +173,10 @@ class _SubscriptionTypeState extends State<SubscriptionType> {
                         const SizedBox(
                           height: 5,
                         ),
-                        Row(
+                        const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: const [
+                          children: [
                             Icon(
                               Icons.check,
                               color: Colors.green,
@@ -298,10 +293,10 @@ class _SubscriptionTypeState extends State<SubscriptionType> {
                     decoration: const BoxDecoration(
                       color: Colors.white,
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: const [
+                      children: [
                         Text(
                           '\$499',
                           style: TextStyle(
@@ -337,10 +332,10 @@ class _SubscriptionTypeState extends State<SubscriptionType> {
                         const SizedBox(
                           height: 10,
                         ),
-                        Row(
+                        const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: const [
+                          children: [
                             Icon(
                               Icons.check,
                               color: Colors.green,
@@ -360,10 +355,10 @@ class _SubscriptionTypeState extends State<SubscriptionType> {
                         const SizedBox(
                           height: 5,
                         ),
-                        Row(
+                        const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: const [
+                          children: [
                             Icon(
                               Icons.check,
                               color: Colors.green,
@@ -383,10 +378,10 @@ class _SubscriptionTypeState extends State<SubscriptionType> {
                         const SizedBox(
                           height: 5,
                         ),
-                        Row(
+                        const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: const [
+                          children: [
                             Icon(
                               Icons.check,
                               color: Colors.green,

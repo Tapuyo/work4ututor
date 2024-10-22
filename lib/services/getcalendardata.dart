@@ -368,7 +368,7 @@ class TutorScheduleProvider with ChangeNotifier {
           List<String>? docData = doc.data() as List<String>;
           List<String>? timeData = docData;
 
-          if (timeData != null && timeData.isNotEmpty) {
+          if (timeData.isNotEmpty) {
             _dayOffsday = timeData;
           } else {
             _dayOffsday = null; // Field is missing or empty

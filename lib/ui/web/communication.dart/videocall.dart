@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_web_libraries_in_flutter
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html' as html;
@@ -19,9 +21,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:work4ututor/ui/web/communication.dart/whiteboard.dart';
 
-import '../../../data_class/subject_class.dart';
 import '../../../services/getchatcall.dart';
 import '../../../services/getclassinfo.dart';
 import '../../../services/getsubject.dart';
@@ -64,7 +64,7 @@ class _VideoCallState extends State<VideoCall> {
   bool _isRecording = false;
   late RtcEngine _engine;
   bool _isScreenSharing = false;
-  int _speakerUid = 0;
+  final int _speakerUid = 0;
   bool isRecording = false;
   bool isPreview = true;
   bool cameraInUse = false;
@@ -73,8 +73,8 @@ class _VideoCallState extends State<VideoCall> {
   bool viewChat = true;
   bool isVirtualBackGroundEnabled = false;
   bool _isEnabledVirtualBackgroundImage = false;
-  TextEditingController _textEditingController = TextEditingController();
-  ScrollController _scrollController = ScrollController();
+  final TextEditingController _textEditingController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   TextEditingController messageContent = TextEditingController();
   List<Offset> _points = [];
   int _seconds = 0;
@@ -98,22 +98,18 @@ class _VideoCallState extends State<VideoCall> {
   }
 
   void goFullscreen() {
-    if (html.document.documentElement!.requestFullscreen != null) {
-      html.document.documentElement!.requestFullscreen();
-      setState(() {
-        isFullScreen = true;
-      });
+    html.document.documentElement!.requestFullscreen();
+    setState(() {
+      isFullScreen = true;
+    });
     }
-  }
 
   void exitFullscreen() {
-    if (html.document.exitFullscreen != null) {
-      html.document.exitFullscreen();
-      setState(() {
-        isFullScreen = false;
-      });
+    html.document.exitFullscreen();
+    setState(() {
+      isFullScreen = false;
+    });
     }
-  }
 
   void _startTimer() {
     const oneSec = Duration(seconds: 1);
@@ -665,7 +661,7 @@ class _VideoCallState extends State<VideoCall> {
         true,
         virtualBackgroundSource = VirtualBackgroundSource(
             backgroundSourceType: VirtualBackgroundSourceType.Img,
-            source: "C:\Users\melvi\Downloads"));
+            source: "C:UsersmelviDownloads"));
   }
 
   Future<void> _enableVirtualBackground() async {
@@ -1225,7 +1221,7 @@ class _VideoCallState extends State<VideoCall> {
                                     builder:
                                         (context, cardDetailsNotifier, child) {
                                       if (cardDetailsNotifier.chats.isEmpty) {
-                                        return Column(
+                                        return const Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
                                           mainAxisAlignment:
@@ -1233,7 +1229,7 @@ class _VideoCallState extends State<VideoCall> {
                                           children: [
                                             Center(
                                               child: Column(
-                                                children: const [
+                                                children: [
                                                   Icon(
                                                     Icons.message_outlined,
                                                     color: kColorPrimary,
@@ -1848,10 +1844,10 @@ void showWhiteboard(BuildContext context) {
                 var height = MediaQuery.of(context).size.height;
                 var width = MediaQuery.of(context).size.width;
 
-                return Container(
+                return SizedBox(
                   height: height,
                   width: width - 400,
-                  child: const InteractiveWhiteboard(),
+                  child:  Container(),
                 );
               },
             ),

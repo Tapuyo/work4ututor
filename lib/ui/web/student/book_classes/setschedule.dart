@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, unused_local_variable
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -115,7 +115,7 @@ class _SetScheduleDataBodyState extends State<SetScheduleDataBody> {
   }
 
   CalendarFormat _calendarFormat = CalendarFormat.month;
-  CalendarFormat _calendarFormatmobile = CalendarFormat.week;
+  final CalendarFormat _calendarFormatmobile = CalendarFormat.week;
 
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
@@ -395,9 +395,9 @@ class _SetScheduleDataBodyState extends State<SetScheduleDataBody> {
     return isWithinRange;
   }
 
-  ScrollController _controller1 = ScrollController();
-  ScrollController _controller2 = ScrollController();
-  Set<int> selectedIndices = Set<int>();
+  final ScrollController _controller1 = ScrollController();
+  final ScrollController _controller2 = ScrollController();
+  Set<int> selectedIndices = <int>{};
   double containerX = 100.0; // Initial X position of the container
   double containerY = 100.0;
 
@@ -419,7 +419,7 @@ class _SetScheduleDataBodyState extends State<SetScheduleDataBody> {
           return SetNow(
             classID: widget.data!.classid,
             session: widget.session,
-            tutorscurrentschedule: [],
+            tutorscurrentschedule: const [],
             uID: widget.uID,
             data: null,
             timezone: widget.timezone,
@@ -481,7 +481,7 @@ class _SetScheduleDataBodyState extends State<SetScheduleDataBody> {
       });
     }
   }
-
+bool addedSchedule = false;
   @override
   Widget build(BuildContext context) {
     int itemCount = 24 * 60 ~/ 5; // Number of items in the list
@@ -582,53 +582,59 @@ class _SetScheduleDataBodyState extends State<SetScheduleDataBody> {
                         Padding(
                           padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
                           child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
                                 'Set Class Schedule',
                                 style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   color: Color.fromRGBO(55, 116, 135, 1),
-                                  fontWeight: FontWeight.w800,
+                                  fontWeight: FontWeight.w600,
                                 ),
+                                textAlign: TextAlign.center,
                               ),
                               Tooltip(
                                 message: 'Set Meeting',
-                                child: SizedBox(
-                                  width: 60,
-                                  height: 40,
-                                  child: ElevatedButton.icon(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.white,
-                                      shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(15))),
-                                    ),
-                                    onPressed: () async {
-                                      await showDialog(
-                                          barrierDismissible: false,
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return SetNow(
-                                              classID: widget.data!.classid,
-                                              session: widget.session,
-                                              tutorscurrentschedule:
-                                                  scheduleList,
-                                              uID: widget.uID,
-                                              data: widget.data,
-                                              timezone: widget.timezone,
-                                            );
-                                          });
-                                    },
-                                    icon: const Icon(
-                                      Icons.add_to_queue,
-                                      color: kColorPrimary,
-                                    ),
-                                    label: const Text(
-                                      '',
-                                      style: TextStyle(color: kColorPrimary),
-                                    ),
+                                child: ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 4,
+                                    backgroundColor: Colors.white,
+                                    shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15))),
+                                  ),
+                                  onPressed: () async {
+                                 dynamic accept =   await showDialog(
+                                        barrierDismissible: false,
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return SetNow(
+                                            classID: widget.data!.classid,
+                                            session: widget.session,
+                                            tutorscurrentschedule:
+                                                scheduleList,
+                                            uID: widget.uID,
+                                            data: widget.data,
+                                            timezone: widget.timezone,
+                                          );
+                                        });
+                                          setState(() {
+                                  if (accept != null) {
+                                    addedSchedule = accept;
+                                    if(accept == true){
+                                      Navigator.pop(context);
+                                    }
+                                  }
+                                });
+                                  },
+                                  icon: const Icon(
+                                    Icons.add_to_queue,
+                                    color: kColorPrimary,
+                                  ),
+                                  label: const Text(
+                                    'Add',
+                                    style: TextStyle(color: kColorGrey),
                                   ),
                                 ),
                               ),
@@ -1098,11 +1104,11 @@ class _SetScheduleDataBodyState extends State<SetScheduleDataBody> {
                                 const SizedBox(
                                   height: 20,
                                 ),
-                                Padding(
+                                const Padding(
                                   padding:
-                                      const EdgeInsets.fromLTRB(10, 5, 5, 0),
+                                      EdgeInsets.fromLTRB(10, 5, 5, 0),
                                   child: Row(
-                                    children: const [
+                                    children: [
                                       Text(
                                         'Tutor Calendar',
                                         style: TextStyle(
@@ -1579,7 +1585,7 @@ class _SetScheduleDataBodyState extends State<SetScheduleDataBody> {
                         ),
                       ),
                       const SizedBox(
-                        height: 5,
+                        height: 4,
                       ),
                       SizedBox(
                           width: constraints.maxWidth > 800
@@ -1665,16 +1671,16 @@ class _SetScheduleDataBodyState extends State<SetScheduleDataBody> {
                                               minute: (index * 5) % 60);
                                           final isSelectable =
                                               isTimeWithinRange(time);
-                                          final timeText = time.format(context);
+                                          // final timeText = time.format(context);
 
-                                          TextStyle textStyle = TextStyle(
-                                            fontWeight: time.minute == 0
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
-                                            fontSize: time.minute == 0
-                                                ? 12
-                                                : 8, // Adjust the font size as needed
-                                          );
+                                          // TextStyle textStyle = TextStyle(
+                                          //   fontWeight: time.minute == 0
+                                          //       ? FontWeight.bold
+                                          //       : FontWeight.normal,
+                                          //   fontSize: time.minute == 0
+                                          //       ? 12
+                                          //       : 8, // Adjust the font size as needed
+                                          // );
                                           // Check if the time is in the bookings list
                                           final isTimeInBookings =
                                               filteredSchedules.any((booking) {
@@ -2243,12 +2249,12 @@ class _SetScheduleDataBodyState extends State<SetScheduleDataBody> {
                                     ),
                                   ]),
                                 )
-                              : Center(
+                              : const Center(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
-                                    children: const [
+                                    children: [
                                       Icon(
                                         Icons.block,
                                         color: Colors.red,

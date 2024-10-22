@@ -49,6 +49,8 @@ const tabred = [
   Color.fromRGBO(237, 195, 206, 1)
 ];
 // const kColorGrey = Colors.grey;137,143,156,1
+Color myColor = const Color(0xFF7b808b);
+
 const kColorGrey = Color.fromRGBO(123, 128, 139, 1);
 const kColorWhite = Color.fromRGBO(123, 128, 139, 1);
 const calendarRed = Color.fromRGBO(243, 176, 175, 1);

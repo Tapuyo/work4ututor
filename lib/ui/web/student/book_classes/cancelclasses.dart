@@ -4,19 +4,16 @@ import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../services/bookingfunctions/setscheduletime.dart';
-import '../../../../services/cancelaccount.dart';
 import '../../../../services/notificationfunctions/sendnotifications.dart';
 import '../../../../utils/themes.dart';
 
 @override
 cancellclass(BuildContext context, String documentId) {
-  TextEditingController conreason = TextEditingController();
-  TextEditingController conemail = TextEditingController();
   showDialog(
     barrierDismissible: false,
     context: context,
-    builder: (_) => WillPopScope(
-      onWillPop: () => Future.value(false),
+    builder: (_) => PopScope(
+      canPop: true,
       child: Dialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(25),
@@ -43,12 +40,12 @@ cancellclass(BuildContext context, String documentId) {
                           icon: const Icon(
                             Icons.arrow_back,
                             size: 12.0,
-                            color: Colors.black,
+                            color: kColorGrey,
                           ),
                           label: const Text(
                             'Go back',
                             style: TextStyle(
-                              color: Colors.black,
+                              color: kColorGrey,
                             ),
                           ),
                         ),
@@ -60,7 +57,8 @@ cancellclass(BuildContext context, String documentId) {
                         "You are trying to cancel class schedule.",
                         style: TextStyle(
                           // textStyle: Theme.of(context).textTheme.headlineMedium,
-                          color: Colors.black,
+                          color: kColorGrey,
+
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -71,18 +69,18 @@ cancellclass(BuildContext context, String documentId) {
                         style: TextStyle(
                           // textStyle: Theme.of(context).textTheme.headlineMedium,
                           color: Colors.grey,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
                         ),
                         textAlign: TextAlign.left,
                       ),
                       const SizedBox(
                         height: 10,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 300,
                         child: Row(
-                          children: const [
+                          children: [
                             Icon(
                               Icons.info,
                               color: kColorPrimary,
@@ -106,7 +104,7 @@ cancellclass(BuildContext context, String documentId) {
                         ),
                       ),
                       const SizedBox(
-                        height: 10,
+                        height: 5,
                       ),
                       SizedBox(
                         width: 300,
@@ -114,7 +112,7 @@ cancellclass(BuildContext context, String documentId) {
                           children: [
                             Container(
                               padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                              width: 180,
+                              width: 150,
                               height: 50,
                               child: TextButton(
                                 style: TextButton.styleFrom(
@@ -132,58 +130,60 @@ cancellclass(BuildContext context, String documentId) {
                                   ),
                                 ),
                                 onPressed: () async {
-                                 String result = await updateStatus(
+                                  String result = await updateStatus(
                                     documentId,
                                     'Cancelled',
                                   );
-                                  
-                              if (result.toString() == "Success") {
-                                List<String> idList = [
-                                  documentId,
-                                ];
-                                addNewNotification('Cancelled Schedule', '', idList);
-                                result = "Succesfully cancelled";
-                                CoolAlert.show(
-                                        context: context,
-                                        width: 200,
-                                        type: CoolAlertType.success,
-                                        title: 'Success...',
-                                        text: result,
-                                        autoCloseDuration:
-                                            const Duration(seconds: 3))
-                                    .then(
-                                  (value) {
-                                    Navigator.of(context).pop(true);
-                                  },
-                                );
-                              } else if (result.toString().contains('completed')) {
-                                CoolAlert.show(
-                                  context: context,
-                                  type: CoolAlertType.warning,
-                                  width: 200,
-                                  title: 'Oops...',
-                                  text: result,
-                                  backgroundColor: Colors.black,
-                                );
-                              }else if (result.toString().contains('cancelled')) {
-                                CoolAlert.show(
-                                  context: context,
-                                  type: CoolAlertType.warning,
-                                  width: 200,
-                                  title: 'Oops...',
-                                  text: result,
-                                  backgroundColor: Colors.black,
-                                );
-                              } else {
-                                CoolAlert.show(
-                                  context: context,
-                                  type: CoolAlertType.error,
-                                  width: 200,
-                                  title: 'Oops...',
-                                  text: result,
-                                  backgroundColor: Colors.black,
-                                );
-                              }
+
+                                  if (result.toString() == "Success") {
+                                    List<String> idList = [
+                                      documentId,
+                                    ];
+                                    addNewNotification(
+                                        'Cancelled Schedule', '', idList);
+                                    result = "Succesfully cancelled";
+                                    // CoolAlert.show(
+                                    //         context: context,
+                                    //         width: 200,
+                                    //         type: CoolAlertType.success,
+                                    //         title: 'Success...',
+                                    //         text: result,
+                                    //         autoCloseDuration:
+                                    //             const Duration(seconds: 3))
+                                    //     .then(
+                                    //   (value) {
+                                        Navigator.of(context).pop(true);
+                                    //   },
+                                    // );
+                                  } else if (result
+                                      .toString()
+                                      .contains('completed')) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      type: CoolAlertType.warning,
+                                      width: 200,
+                                      text: result,
+                                      backgroundColor: Colors.black,
+                                    );
+                                  } else if (result
+                                      .toString()
+                                      .contains('cancelled')) {
+                                    CoolAlert.show(
+                                      context: context,
+                                      type: CoolAlertType.warning,
+                                      width: 200,
+                                      text: result,
+                                      backgroundColor: Colors.black,
+                                    );
+                                  } else {
+                                    CoolAlert.show(
+                                      context: context,
+                                      type: CoolAlertType.error,
+                                      width: 200,
+                                      text: result,
+                                      backgroundColor: Colors.black,
+                                    );
+                                  }
                                 },
                                 child: const Text(
                                   style: TextStyle(
@@ -196,7 +196,7 @@ cancellclass(BuildContext context, String documentId) {
                             ),
                             const Spacer(),
                             SizedBox(
-                              width: 100,
+                              width: 150,
                               child: TextButton(
                                 child: const Text(
                                   "No, thanks",
@@ -214,6 +214,8 @@ cancellclass(BuildContext context, String documentId) {
                                   // //   html.window.alert(
                                   // //       'You will be charge to cancel');
                                   // // }
+                                                                          Navigator.of(context).pop(true);
+
                                 },
                               ),
                             ),

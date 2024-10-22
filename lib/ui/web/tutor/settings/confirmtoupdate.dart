@@ -84,10 +84,10 @@ confirmtoUpdate(BuildContext context, String tutorId) {
                       const SizedBox(
                         height: 15,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 300,
                         child: Row(
-                          children: const [
+                          children: [
                             Icon(
                               Icons.info,
                               color: kColorLight,

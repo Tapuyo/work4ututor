@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, unused_field
 
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +23,7 @@ class DeclineInquiry extends StatefulWidget {
 }
 
 class _DeclineInquiryState extends State<DeclineInquiry> {
-  DateTime _selectedDate = DateTime.now();
+  final DateTime _selectedDate = DateTime.now();
 
   final TextEditingController _typeAheadController3 = TextEditingController();
 
@@ -77,12 +77,12 @@ class _DeclineInquiryState extends State<DeclineInquiry> {
                       fit: BoxFit.cover,
                     ),
                   ),
-                  Flexible(
+                  const Flexible(
                     flex: 10,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           'Decline Offer',
                           textAlign: TextAlign.left,

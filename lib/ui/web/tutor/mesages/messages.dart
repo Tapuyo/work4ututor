@@ -22,6 +22,8 @@ class _MessagePageState extends State<MessagePage> {
       child: Column(
         children: <Widget>[
           Card(
+                      color: Colors.white,
+
             margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
             elevation: 4,
             child: Container(
@@ -39,9 +41,9 @@ class _MessagePageState extends State<MessagePage> {
                 ),
                 borderRadius: BorderRadius.circular(5.0),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "Messages",
                     style: TextStyle(
@@ -65,6 +67,8 @@ class _MessagePageState extends State<MessagePage> {
                 child: SizedBox(
                   height: size.height - 138,
                   child: Card(
+                              color: Colors.white,
+
                     margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
                     elevation: 0,
                     shape: const RoundedRectangleBorder(
