@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:country_pickers/country.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
@@ -834,8 +833,8 @@ class _InputInfoState extends State<InputInfo> {
                           const SizedBox(
                             height: 10,
                           ),
-                          Row(
-                            children: const [
+                          const Row(
+                            children: [
                               Text(
                                 "Tutor Identification Number",
                                 style: TextStyle(
@@ -897,8 +896,8 @@ class _InputInfoState extends State<InputInfo> {
                           const SizedBox(
                             height: 15,
                           ),
-                          Row(
-                            children: const [
+                          const Row(
+                            children: [
                               Text(
                                 "Personal Information",
                                 style: TextStyle(
@@ -1272,10 +1271,10 @@ class _InputInfoState extends State<InputInfo> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
+                                  const Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    children: const [
+                                    children: [
                                       Text(
                                         "Citizenship",
                                         style: TextStyle(
@@ -2040,9 +2039,9 @@ class _InputInfoState extends State<InputInfo> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
+                              const Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
+                                children: [
                                   Text(
                                     "Languages",
                                     style: TextStyle(
@@ -2328,8 +2327,8 @@ class _InputInfoState extends State<InputInfo> {
                           const SizedBox(
                             height: 50,
                           ),
-                          Row(
-                            children: const [
+                          const Row(
+                            children: [
                               Text(
                                 "Subjects you teach and pricing",
                                 style: TextStyle(
@@ -3091,8 +3090,8 @@ class _InputInfoState extends State<InputInfo> {
                           const SizedBox(
                             height: 5,
                           ),
-                          Row(
-                            children: const [
+                          const Row(
+                            children: [
                               Text(
                                 "(You can select more than one subject you teach.)",
                                 overflow: TextOverflow.ellipsis,
@@ -3108,8 +3107,8 @@ class _InputInfoState extends State<InputInfo> {
                           const SizedBox(
                             height: 50,
                           ),
-                          Row(
-                            children: const [
+                          const Row(
+                            children: [
                               Text(
                                 "What services are you able to provide?",
                                 style: TextStyle(
@@ -3510,8 +3509,8 @@ class _InputInfoState extends State<InputInfo> {
                           const SizedBox(
                             height: 50,
                           ),
-                          Row(
-                            children: const [
+                          const Row(
+                            children: [
                               Text(
                                 "Upload your documents.",
                                 style: TextStyle(
@@ -4178,10 +4177,10 @@ class _InputInfoState extends State<InputInfo> {
                           const SizedBox(
                             height: 30,
                           ),
-                          Column(
+                          const Column(
                             children: [
                               Row(
-                                children: const [
+                                children: [
                                   Text(
                                     'Describe your skills, your approach, your teaching method, and tell',
                                     style: TextStyle(
@@ -4194,7 +4193,7 @@ class _InputInfoState extends State<InputInfo> {
                                 ],
                               ),
                               Row(
-                                children: const [
+                                children: [
                                   Text(
                                     'us why a student should choose you! (max 5000 characters)',
                                     style: TextStyle(

@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, unused_field
 
 import 'package:flutter/material.dart';
 
@@ -35,7 +35,7 @@ class _CustomGifPageViewState extends State<CustomGifPageView> {
       height: 200, // Adjust the height as needed
       child: PageView.custom(
         controller: _pageController,
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         onPageChanged: (index) {
           setState(() {
             _currentPageIndex = index;
@@ -60,7 +60,7 @@ class _CustomGifPageViewState extends State<CustomGifPageView> {
                   );
                 },
                 errorBuilder: (context, error, stackTrace) {
-                  return Icon(Icons.error);
+                  return const Icon(Icons.error);
                 },
                 fit: BoxFit.cover,
               ),

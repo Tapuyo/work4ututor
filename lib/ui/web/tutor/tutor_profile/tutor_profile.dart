@@ -341,8 +341,8 @@ class _TutorProfileState extends State<TutorProfile> {
                                                 itemBuilder:
                                                     (BuildContext context,
                                                         int index) {
-                                                  return Row(
-                                                    children: const [
+                                                  return const Row(
+                                                    children: [
                                                       Radio(
                                                         value: true,
                                                         groupValue: true,
@@ -359,10 +359,10 @@ class _TutorProfileState extends State<TutorProfile> {
                                       ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(10),
+                                  const Padding(
+                                    padding: EdgeInsets.all(10),
                                     child: Row(
-                                      children: const [
+                                      children: [
                                         Text(
                                           'Students Enrolled:',
                                           style: TextStyle(
@@ -625,11 +625,11 @@ class _TutorProfileState extends State<TutorProfile> {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  Row(
+                                  const Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    children: const [
+                                    children: [
                                       Text(
                                         'Price: \$ 10.00',
                                         textAlign: TextAlign.justify,
@@ -916,7 +916,7 @@ class _TutorProfileState extends State<TutorProfile> {
                                       const SizedBox(
                                         height: 5,
                                       ),
-                                      Container(
+                                      SizedBox(
                                         height: 30,
                                         width:
                                             MediaQuery.of(context).size.width,
@@ -955,7 +955,7 @@ class _TutorProfileState extends State<TutorProfile> {
                                       const SizedBox(
                                         height: 5,
                                       ),
-                                      Container(
+                                      SizedBox(
                                         height: 30,
                                         width:
                                             MediaQuery.of(context).size.width,

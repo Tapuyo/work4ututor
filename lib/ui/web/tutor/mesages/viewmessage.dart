@@ -12,7 +12,6 @@ import '../../../../data_class/chatmessageclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/subject_class.dart';
 import '../../../../data_class/tutor_info_class.dart';
-import '../../../../provider/chatmessagedisplay.dart';
 import '../../../../services/addtocart.dart';
 import '../../../../services/getmessages.dart';
 import '../../../../services/getstudentinfo.dart';
@@ -4900,6 +4899,8 @@ class _ViewMessageBodyState extends State<ViewMessageBody> {
               Align(
                 alignment: Alignment.bottomLeft,
                 child: Card(
+                            color: Colors.white,
+
                   elevation: 2,
                   child: Container(
                     padding:

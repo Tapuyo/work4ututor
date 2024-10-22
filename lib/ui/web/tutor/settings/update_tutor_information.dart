@@ -468,6 +468,7 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
     Size size = MediaQuery.of(context).size;
 
     return Card(
+      color: Colors.white,
       margin: const EdgeInsets.fromLTRB(5, 0, 5, 0),
       elevation: 5,
       child: Container(
@@ -672,17 +673,17 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                         height: 50,
                         width: 500,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                        child: Row(
+                        child: const Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.card_membership,
                               color: kColorLight,
                               size: 24.0,
                             ),
-                            const SizedBox(width: 10.0),
+                            SizedBox(width: 10.0),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const <Widget>[
+                              children: <Widget>[
                                 Text(
                                   'Valid ID/s',
                                   style: TextStyle(
@@ -692,7 +693,7 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                 ),
                               ],
                             ),
-                            const Spacer(),
+                            Spacer(),
                           ],
                         ),
                       ),
@@ -770,79 +771,72 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                     children: [
                                                       InkWell(
                                                         onTap: () {
-                                                                 showDialog(
-                                                            barrierDismissible:
-                                                                false,
-                                                            context: context,
-                                                            builder:
-                                                                (BuildContext
-                                                                    context) {
-                                                              var height =
-                                                                  MediaQuery.of(
-                                                                          context)
-                                                                      .size
-                                                                      .height;
-                                                              return AlertDialog(
-                                                                shape:
-                                                                    RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              15.0), // Adjust the radius as needed
-                                                                ),
-                                                                contentPadding:
-                                                                    EdgeInsets
-                                                                        .zero,
-                                                                content:
-                                                                    ClipRRect(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              15.0), // Same radius as above
-                                                                  child:
-                                                                      Container(
-                                                                    color: Colors
-                                                                        .white, // Set the background color of the circular content
-
+                                                          showDialog(
+                                                              barrierDismissible:
+                                                                  false,
+                                                              context: context,
+                                                              builder:
+                                                                  (BuildContext
+                                                                      context) {
+                                                                var height =
+                                                                    MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .height;
+                                                                return AlertDialog(
+                                                                  shape:
+                                                                      RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            15.0), // Adjust the radius as needed
+                                                                  ),
+                                                                  contentPadding:
+                                                                      EdgeInsets
+                                                                          .zero,
+                                                                  content:
+                                                                      ClipRRect(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            15.0), // Same radius as above
                                                                     child:
-                                                                        Stack(
-                                                                      children: <
-                                                                          Widget>[
-                                                                        SizedBox(
-                                                                          height:
-                                                                              height,
-                                                                          width:
-                                                                              900,
-                                                                          child:
-                                                                              ViewFile(imageURL: snapshot.data
-                                                                .toString()),
-                                                                        ),
-                                                                        Positioned(
-                                                                          top:
-                                                                              10.0,
-                                                                          right:
-                                                                              10.0,
-                                                                          child:
-                                                                              GestureDetector(
-                                                                            onTap:
-                                                                                () {
-                                                                              Navigator.of(context).pop(false); // Close the dialog
-                                                                            },
+                                                                        Container(
+                                                                      color: Colors
+                                                                          .white, // Set the background color of the circular content
+
+                                                                      child:
+                                                                          Stack(
+                                                                        children: <Widget>[
+                                                                          SizedBox(
+                                                                            height:
+                                                                                height,
+                                                                            width:
+                                                                                900,
                                                                             child:
-                                                                                const Icon(
-                                                                              Icons.close,
-                                                                              color: Colors.white,
-                                                                              size: 20,
+                                                                                ViewFile(imageURL: snapshot.data.toString()),
+                                                                          ),
+                                                                          Positioned(
+                                                                            top:
+                                                                                10.0,
+                                                                            right:
+                                                                                10.0,
+                                                                            child:
+                                                                                GestureDetector(
+                                                                              onTap: () {
+                                                                                Navigator.of(context).pop(false); // Close the dialog
+                                                                              },
+                                                                              child: const Icon(
+                                                                                Icons.close,
+                                                                                color: Colors.white,
+                                                                                size: 20,
+                                                                              ),
                                                                             ),
                                                                           ),
-                                                                        ),
-                                                                      ],
+                                                                        ],
+                                                                      ),
                                                                     ),
                                                                   ),
-                                                                ),
-                                                              );
-                                                            });
-                                                      
+                                                                );
+                                                              });
                                                         },
                                                         child: Container(
                                                           height: 80,
@@ -934,9 +928,9 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                               size: 24.0,
                             ),
                             const SizedBox(width: 10.0),
-                            Column(
+                            const Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const <Widget>[
+                              children: <Widget>[
                                 Text(
                                   'Certificates',
                                   style: TextStyle(
@@ -1077,8 +1071,7 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
 
                                                                         child:
                                                                             Stack(
-                                                                          children: <
-                                                                              Widget>[
+                                                                          children: <Widget>[
                                                                             SizedBox(
                                                                               height: height,
                                                                               width: 900,
@@ -1234,10 +1227,10 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                   if (snapshot
                                                           .connectionState ==
                                                       ConnectionState.waiting) {
-                                                    return Container(
+                                                    return const SizedBox(
                                                         height: 25,
                                                         width: 25,
-                                                        child: const Center(
+                                                        child: Center(
                                                             child:
                                                                 CircularProgressIndicator(
                                                           strokeWidth: 2,
@@ -1335,10 +1328,10 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                   if (snapshot
                                                           .connectionState ==
                                                       ConnectionState.waiting) {
-                                                    return Container(
+                                                    return const SizedBox(
                                                         height: 25,
                                                         width: 25,
-                                                        child: const Center(
+                                                        child: Center(
                                                             child:
                                                                 CircularProgressIndicator(
                                                           strokeWidth: 2,
@@ -1397,8 +1390,7 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
 
                                                                         child:
                                                                             Stack(
-                                                                          children: <
-                                                                              Widget>[
+                                                                          children: <Widget>[
                                                                             SizedBox(
                                                                               height: height,
                                                                               width: 900,
@@ -2193,9 +2185,9 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                               size: 24.0,
                             ),
                             const SizedBox(width: 10.0),
-                            Column(
+                            const Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const <Widget>[
+                              children: <Widget>[
                                 Text(
                                   'My Videos',
                                   style: TextStyle(
@@ -2428,8 +2420,7 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
 
                                                                     child:
                                                                         Stack(
-                                                                      children: <
-                                                                          Widget>[
+                                                                      children: <Widget>[
                                                                         SizedBox(
                                                                           height:
                                                                               height,
@@ -2560,17 +2551,17 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                         height: 50,
                         width: 500,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                        child: Row(
+                        child: const Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.person,
                               color: kColorLight,
                               size: 24.0,
                             ),
-                            const SizedBox(width: 10.0),
+                            SizedBox(width: 10.0),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const <Widget>[
+                              children: <Widget>[
                                 Text(
                                   'About Me',
                                   style: TextStyle(
@@ -2587,6 +2578,7 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                         height: 10,
                       ),
                       Card(
+                        color: Colors.white,
                         elevation: 5,
                         child: Container(
                           width: 500,
@@ -2618,17 +2610,17 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                         height: 50,
                         width: 500,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                        child: Row(
+                        child: const Row(
                           children: [
-                            const Icon(
+                            Icon(
                               FontAwesomeIcons.handHoldingHeart,
                               color: kColorLight,
                               size: 24.0,
                             ),
-                            const SizedBox(width: 10.0),
+                            SizedBox(width: 10.0),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const <Widget>[
+                              children: <Widget>[
                                 Text(
                                   'Services Provided',
                                   style: TextStyle(
@@ -3227,17 +3219,17 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                         //   color: const Color.fromRGBO(55, 116, 135, 1),
                         //   borderRadius: BorderRadius.circular(5),
                         // ),
-                        child: Row(
+                        child: const Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.card_membership,
                               color: kColorLight,
                               size: 24.0,
                             ),
-                            const SizedBox(width: 10.0),
+                            SizedBox(width: 10.0),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const <Widget>[
+                              children: <Widget>[
                                 Text(
                                   'Valid ID/s',
                                   style: TextStyle(
@@ -3333,6 +3325,11 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                                           context)
                                                                       .size
                                                                       .height;
+                                                                      var width =
+                                                                  MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width;
                                                               return AlertDialog(
                                                                 shape:
                                                                     RoundedRectangleBorder(
@@ -3357,13 +3354,12 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
 
                                                                     child:
                                                                         Stack(
-                                                                      children: <
-                                                                          Widget>[
+                                                                      children: <Widget>[
                                                                         SizedBox(
                                                                           height:
                                                                               height,
                                                                           width:
-                                                                              900,
+                                                                              width,
                                                                           child:
                                                                               ViewFile(imageURL: snapshot.data.toString()),
                                                                         ),
@@ -3461,17 +3457,17 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                         //   color: const Color.fromRGBO(55, 116, 135, 1),
                         //   borderRadius: BorderRadius.circular(5),
                         // ),
-                        child: Row(
+                        child: const Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.note_alt_outlined,
                               color: kColorLight,
                               size: 24.0,
                             ),
-                            const SizedBox(width: 10.0),
+                            SizedBox(width: 10.0),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const <Widget>[
+                              children: <Widget>[
                                 Text(
                                   'Certificates',
                                   style: TextStyle(
@@ -3572,6 +3568,11 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                                             context)
                                                                         .size
                                                                         .height;
+                                                                            var width =
+                                                                  MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width;
                                                                 return AlertDialog(
                                                                   shape:
                                                                       RoundedRectangleBorder(
@@ -3594,13 +3595,12 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
 
                                                                       child:
                                                                           Stack(
-                                                                        children: <
-                                                                            Widget>[
+                                                                        children: <Widget>[
                                                                           SizedBox(
                                                                             height:
                                                                                 height,
                                                                             width:
-                                                                                900,
+                                                                                width,
                                                                             child:
                                                                                 ViewFile(imageURL: snapshot.data.toString()),
                                                                           ),
@@ -4114,17 +4114,17 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                         height: 50,
                         width: 500,
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                        child: Row(
+                        child: const Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.video_collection_outlined,
                               color: kColorLight,
                               size: 24.0,
                             ),
-                            const SizedBox(width: 10.0),
+                            SizedBox(width: 10.0),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const <Widget>[
+                              children: <Widget>[
                                 Text(
                                   'My Videos',
                                   style: TextStyle(
@@ -4193,6 +4193,11 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                                     context)
                                                                 .size
                                                                 .height;
+                                                                    var width =
+                                                                  MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width;
                                                         return FutureBuilder(
                                                             future: FirebaseStorage
                                                                 .instance
@@ -4252,13 +4257,12 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
 
                                                                     child:
                                                                         Stack(
-                                                                      children: <
-                                                                          Widget>[
+                                                                      children: <Widget>[
                                                                         SizedBox(
                                                                           height:
                                                                               height,
                                                                           width:
-                                                                              900,
+                                                                              width,
                                                                           child:
                                                                               VideoUploadWidget(
                                                                             videolink:
@@ -4374,17 +4378,17 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                         //   color: const Color.fromRGBO(55, 116, 135, 1),
                         //   borderRadius: BorderRadius.circular(5),
                         // ),
-                        child: Row(
+                        child: const Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.person,
                               color: kColorLight,
                               size: 24.0,
                             ),
-                            const SizedBox(width: 10.0),
+                            SizedBox(width: 10.0),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const <Widget>[
+                              children: <Widget>[
                                 Text(
                                   'About Me',
                                   style: TextStyle(
@@ -4401,6 +4405,7 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                         height: 10,
                       ),
                       Card(
+                        color: Colors.white,
                         elevation: 5,
                         child: Container(
                           width: 500,
@@ -4435,17 +4440,17 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                         //   color: const Color.fromRGBO(55, 116, 135, 1),
                         //   borderRadius: BorderRadius.circular(5),
                         // ),
-                        child: Row(
+                        child: const Row(
                           children: [
-                            const Icon(
+                            Icon(
                               FontAwesomeIcons.handHoldingHeart,
                               color: kColorLight,
                               size: 24.0,
                             ),
-                            const SizedBox(width: 10.0),
+                            SizedBox(width: 10.0),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const <Widget>[
+                              children: <Widget>[
                                 Text(
                                   'Services Provided',
                                   style: TextStyle(
@@ -4739,66 +4744,66 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                           const Spacer(),
                           Row(
                             children: [
-                              StreamBuilder<double>(
-                                stream: _progressController.stream,
-                                builder: (context, snapshot) {
-                                  return Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (snapshot.hasData)
-                                        Visibility(
-                                          visible: snapshot.data! > 0,
-                                          child: Row(
-                                            children: [
-                                              SizedBox(
-                                                width: 150,
-                                                child: LinearProgressIndicator(
-                                                    minHeight: 8,
-                                                    valueColor:
-                                                        const AlwaysStoppedAnimation<
-                                                                Color>(
-                                                            Colors.greenAccent),
-                                                    semanticsValue:
-                                                        '${(snapshot.data! * 100).toStringAsFixed(2)}%',
-                                                    semanticsLabel:
-                                                        '${(snapshot.data! * 100).toStringAsFixed(2)}%',
-                                                    value: snapshot.data),
-                                              ),
-                                              Text(
-                                                '${(snapshot.data! * 100).toStringAsFixed(2)}%',
-                                                style: const TextStyle(
-                                                    fontWeight: FontWeight.w400,
-                                                    color: kColorGrey),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting)
-                                        Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 150,
-                                              child: LinearProgressIndicator(
-                                                  minHeight: 8,
-                                                  valueColor:
-                                                      AlwaysStoppedAnimation<
-                                                              Color>(
-                                                          Colors.greenAccent),
-                                                  value: 0),
-                                            ),
-                                            Text(
-                                              '${(0 * 100).toStringAsFixed(2)}%',
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.w400,
-                                                  color: kColorGrey),
-                                            ),
-                                          ],
-                                        ),
-                                    ],
-                                  );
-                                },
-                              ),
+                              // StreamBuilder<double>(
+                              //   stream: _progressController.stream,
+                              //   builder: (context, snapshot) {
+                              //     return Column(
+                              //       mainAxisSize: MainAxisSize.min,
+                              //       children: [
+                              //         if (snapshot.hasData)
+                              //           Visibility(
+                              //             visible: snapshot.data! > 0,
+                              //             child: Row(
+                              //               children: [
+                              //                 SizedBox(
+                              //                   width: 150,
+                              //                   child: LinearProgressIndicator(
+                              //                       minHeight: 8,
+                              //                       valueColor:
+                              //                           const AlwaysStoppedAnimation<
+                              //                                   Color>(
+                              //                               Colors.greenAccent),
+                              //                       semanticsValue:
+                              //                           '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                              //                       semanticsLabel:
+                              //                           '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                              //                       value: snapshot.data),
+                              //                 ),
+                              //                 Text(
+                              //                   '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                              //                   style: const TextStyle(
+                              //                       fontWeight: FontWeight.w400,
+                              //                       color: kColorGrey),
+                              //                 ),
+                              //               ],
+                              //             ),
+                              //           ),
+                              //         if (snapshot.connectionState ==
+                              //             ConnectionState.waiting)
+                              //           Row(
+                              //             children: [
+                              //               const SizedBox(
+                              //                 width: 150,
+                              //                 child: LinearProgressIndicator(
+                              //                     minHeight: 8,
+                              //                     valueColor:
+                              //                         AlwaysStoppedAnimation<
+                              //                                 Color>(
+                              //                             Colors.greenAccent),
+                              //                     value: 0),
+                              //               ),
+                              //               Text(
+                              //                 '${(0 * 100).toStringAsFixed(2)}%',
+                              //                 style: const TextStyle(
+                              //                     fontWeight: FontWeight.w400,
+                              //                     color: kColorGrey),
+                              //               ),
+                              //             ],
+                              //           ),
+                              //       ],
+                              //     );
+                              //   },
+                              // ),
                               Tooltip(
                                 message: 'Add Certificate', // The hint text
                                 child: IconButton(
@@ -5112,10 +5117,10 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                           builder: (context, snapshot) {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.waiting) {
-                                              return Container(
+                                              return const SizedBox(
                                                   height: 25,
                                                   width: 25,
-                                                  child: const Center(
+                                                  child: Center(
                                                       child:
                                                           CircularProgressIndicator(
                                                     strokeWidth: 2,
@@ -5136,17 +5141,17 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                                 children: [
                                                   InkWell(
                                                     onTap: () {
-                                                      showDialog(
-                                                          barrierDismissible:
-                                                              false,
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return ViewFile(
-                                                                imageURL: tutor
-                                                                        .certificates[
-                                                                    index]);
-                                                          });
+                                                      // showDialog(
+                                                      //     barrierDismissible:
+                                                      //         false,
+                                                      //     context: context,
+                                                      //     builder: (BuildContext
+                                                      //         context) {
+                                                      //       return ViewFile(
+                                                      //           imageURL: tutor
+                                                      //                   .certificates[
+                                                      //               index]);
+                                                      //     });
                                                     },
                                                     child: Container(
                                                       height: 80,
@@ -5202,16 +5207,16 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                           children: [
                                             InkWell(
                                               onTap: () {
-                                                showDialog(
-                                                    barrierDismissible: false,
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return ViewFile(
-                                                          imageURL: tutor
-                                                                  .certificates[
-                                                              index]);
-                                                    });
+                                                // showDialog(
+                                                //     barrierDismissible: false,
+                                                //     context: context,
+                                                //     builder:
+                                                //         (BuildContext context) {
+                                                //       return ViewFile(
+                                                //           imageURL: tutor
+                                                //                   .certificates[
+                                                //               index]);
+                                                //     });
                                               },
                                               child: Container(
                                                 height: 80,
@@ -5263,16 +5268,16 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                           children: [
                                             InkWell(
                                               onTap: () {
-                                                showDialog(
-                                                    barrierDismissible: false,
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return ViewFile(
-                                                          imageURL: tutor
-                                                                  .certificates[
-                                                              index]);
-                                                    });
+                                                // showDialog(
+                                                //     barrierDismissible: false,
+                                                //     context: context,
+                                                //     builder:
+                                                //         (BuildContext context) {
+                                                //       return ViewFile(
+                                                //           imageURL: tutor
+                                                //                   .certificates[
+                                                //               index]);
+                                                //     });
                                               },
                                               child: Container(
                                                 height: 80,
@@ -5898,63 +5903,63 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                           const Spacer(),
                           Row(
                             children: [
-                              StreamBuilder<double>(
-                                stream: _progressController1.stream,
-                                builder: (context, snapshot) {
-                                  return Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (snapshot.hasData)
-                                        Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 150,
-                                              child: LinearProgressIndicator(
-                                                  minHeight: 8,
-                                                  valueColor:
-                                                      const AlwaysStoppedAnimation<
-                                                              Color>(
-                                                          Colors.greenAccent),
-                                                  semanticsValue:
-                                                      '${(snapshot.data! * 100).toStringAsFixed(2)}%',
-                                                  semanticsLabel:
-                                                      '${(snapshot.data! * 100).toStringAsFixed(2)}%',
-                                                  value: snapshot.data),
-                                            ),
-                                            Text(
-                                              '${(snapshot.data! * 100).toStringAsFixed(2)}%',
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.w400,
-                                                  color: kColorGrey),
-                                            ),
-                                          ],
-                                        ),
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting)
-                                        Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 150,
-                                              child: LinearProgressIndicator(
-                                                  minHeight: 8,
-                                                  valueColor:
-                                                      AlwaysStoppedAnimation<
-                                                              Color>(
-                                                          Colors.greenAccent),
-                                                  value: 0),
-                                            ),
-                                            Text(
-                                              '${(0 * 100).toStringAsFixed(2)}%',
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.w400,
-                                                  color: kColorGrey),
-                                            ),
-                                          ],
-                                        ),
-                                    ],
-                                  );
-                                },
-                              ),
+                              // StreamBuilder<double>(
+                              //   stream: _progressController1.stream,
+                              //   builder: (context, snapshot) {
+                              //     return Column(
+                              //       mainAxisSize: MainAxisSize.min,
+                              //       children: [
+                              //         if (snapshot.hasData)
+                              //           Row(
+                              //             children: [
+                              //               SizedBox(
+                              //                 width: 150,
+                              //                 child: LinearProgressIndicator(
+                              //                     minHeight: 8,
+                              //                     valueColor:
+                              //                         const AlwaysStoppedAnimation<
+                              //                                 Color>(
+                              //                             Colors.greenAccent),
+                              //                     semanticsValue:
+                              //                         '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                              //                     semanticsLabel:
+                              //                         '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                              //                     value: snapshot.data),
+                              //               ),
+                              //               Text(
+                              //                 '${(snapshot.data! * 100).toStringAsFixed(2)}%',
+                              //                 style: const TextStyle(
+                              //                     fontWeight: FontWeight.w400,
+                              //                     color: kColorGrey),
+                              //               ),
+                              //             ],
+                              //           ),
+                              //         if (snapshot.connectionState ==
+                              //             ConnectionState.waiting)
+                              //           Row(
+                              //             children: [
+                              //               const SizedBox(
+                              //                 width: 150,
+                              //                 child: LinearProgressIndicator(
+                              //                     minHeight: 8,
+                              //                     valueColor:
+                              //                         AlwaysStoppedAnimation<
+                              //                                 Color>(
+                              //                             Colors.greenAccent),
+                              //                     value: 0),
+                              //               ),
+                              //               Text(
+                              //                 '${(0 * 100).toStringAsFixed(2)}%',
+                              //                 style: const TextStyle(
+                              //                     fontWeight: FontWeight.w400,
+                              //                     color: kColorGrey),
+                              //               ),
+                              //             ],
+                              //           ),
+                              //       ],
+                              //     );
+                              //   },
+                              // ),
                               Tooltip(
                                 message: 'Add Video', // The hint text
                                 child: IconButton(
@@ -6017,10 +6022,10 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                                           builder: (context, snapshot) {
                                             if (snapshot.connectionState ==
                                                 ConnectionState.waiting) {
-                                              return Container(
+                                              return const SizedBox(
                                                   height: 25,
                                                   width: 25,
-                                                  child: const Center(
+                                                  child: Center(
                                                       child:
                                                           CircularProgressIndicator(
                                                     strokeWidth: 2,
@@ -6192,6 +6197,7 @@ class _UpdateTutorSevicesState extends State<UpdateTutorSevices> {
                     height: 10,
                   ),
                   Card(
+                    color: Colors.white,
                     elevation: 5,
                     child: Container(
                       width: 500,

@@ -106,7 +106,7 @@ class _ResetPageState extends State<ResetPage> {
                     ),
                     Container(
                       height: 45,
-                      width: 200,
+                      width: 210,
                       decoration: const BoxDecoration(
                         shape: BoxShape.rectangle,
                         color: Color.fromRGBO(1, 118, 132, 1),
@@ -118,7 +118,6 @@ class _ResetPageState extends State<ResetPage> {
                           shape: const BeveledRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(5))),
-                          // ignore: prefer_const_constructors
                           textStyle: TextStyle(
                             color: Colors.black,
                             // fontFamily: 'Avenir',
@@ -154,7 +153,6 @@ class _ResetPageState extends State<ResetPage> {
                           shape: const BeveledRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(5))),
-                          // ignore: prefer_const_constructors
                           textStyle: TextStyle(
                             color: Colors.black,
                             // fontFamily: 'Avenir',
@@ -190,7 +188,6 @@ class _ResetPageState extends State<ResetPage> {
                           shape: const BeveledRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(5))),
-                          // ignore: prefer_const_constructors
                           textStyle: TextStyle(
                             color: Colors.black,
                             // fontFamily: 'Avenir',

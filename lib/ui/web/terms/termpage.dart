@@ -1,10 +1,9 @@
-// ignore_for_file: unused_field
+// ignore_for_file: unused_field, unused_local_variable
 
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:work4ututor/utils/themes.dart';
 
-import '../../../shared_components/header_text.dart';
 
 /// Represents Homepage for Navigation
 class TermPage extends StatefulWidget {
@@ -39,8 +38,15 @@ class _TermPage extends State<TermPage> {
             ),
           ),
         ),
-        title: HeaderText(
-            widget.pdfurl == '' ? 'Terms & Condition' : 'Tutor Certificate'),
+        title: Text(
+          widget.pdfurl == '' ? 'Terms & Condition' : 'Tutor Certificate',
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: false,
       ),
       body: Container(
         height: height,
@@ -56,7 +62,6 @@ class _TermPage extends State<TermPage> {
                         ? SfPdfViewer.network(
                             widget.pdfurl.toString(),
                             onDocumentLoadFailed: (details) {
-                              print(details.error);
                             },
                             initialZoomLevel: 1.5,
                           )

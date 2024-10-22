@@ -119,9 +119,9 @@ class ClassInquiry extends HookWidget {
                 color: kColorPrimary,
                 borderRadius: BorderRadius.circular(5.0),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "CLASS INQUIRY",
                     style: TextStyle(

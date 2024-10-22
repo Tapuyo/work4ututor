@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, sized_box_for_whitespace
+// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, sized_box_for_whitespace, unused_import
 
 import 'dart:math';
 
@@ -12,7 +12,6 @@ import 'package:provider/provider.dart';
 import 'package:work4ututor/shared_components/responsive_builder.dart';
 import 'dart:html' as html;
 
-import '../../../data_class/studentinfoclass.dart';
 import '../../../data_class/tutor_info_class.dart';
 import '../../../provider/displaycount.dart';
 import '../../../services/addpreftutor.dart';
@@ -520,6 +519,8 @@ Future<List<Map<String, dynamic>>> getDataFromTutorSubjectTeach() async {
                                 constraints.maxWidth > 240.0;
                             return ClipRRect(
                               child: Card(
+                                                      color: Colors.white,
+
                                 elevation: 2,
                                 child: InkWell(
                                   onTap: () {
@@ -563,6 +564,7 @@ Future<List<Map<String, dynamic>>> getDataFromTutorSubjectTeach() async {
                                                         studenttinfo: widget
                                                             .studenttzone,
                                                       ),
+                                                  
                                                       Positioned(
                                                         top: 10.0,
                                                         right: 10.0,
@@ -974,7 +976,7 @@ Future<List<Map<String, dynamic>>> getDataFromTutorSubjectTeach() async {
                                         ),
                                         ConstrainedBox(
                                           constraints: const BoxConstraints(
-                                              maxHeight: 45, minHeight: 20),
+                                              maxHeight: 38, minHeight: 20),
                                           child: Text(
                                             _foundUsers[index]
                                                     .promotionalMessage
@@ -1099,8 +1101,8 @@ Future<List<Map<String, dynamic>>> getDataFromTutorSubjectTeach() async {
 
 class MyCustomScrollBehavior extends ScrollBehavior {
   @override
-  Widget buildViewportChrome(
-      BuildContext context, Widget child, AxisDirection axisDirection) {
-    return child; // Removes the default scrollbar
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child; // Removes the default overscroll indicator
   }
 }

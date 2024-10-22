@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:work4ututor/ui/web/student/settings/payments_history.dart';
 import 'package:work4ututor/ui/web/student/settings/student_information.dart';
 import 'package:work4ututor/ui/web/student/settings/transactionspaginated.dart';
 
@@ -38,6 +37,8 @@ class _StudentSettingsPageState extends State<StudentSettingsPage> {
       child: Column(
         children: <Widget>[
           Card(
+                      color: Colors.white,
+
             margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
             elevation: 4,
             child: Container(
@@ -55,9 +56,9 @@ class _StudentSettingsPageState extends State<StudentSettingsPage> {
                 ),
                 borderRadius: BorderRadius.circular(5.0),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "Settings",
                     style: TextStyle(

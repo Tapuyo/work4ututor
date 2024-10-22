@@ -76,7 +76,7 @@ class DisbursementTable extends StatelessWidget {
     );
   }
 
-  List<int> _selectedItems = [];
+  final List<int> _selectedItems = [];
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +137,8 @@ class DisbursementTable extends StatelessWidget {
         behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
         child: SingleChildScrollView(
           controller: ScrollController(),
-          child: SizedBox(
+          child: Container(
+            color: Colors.white,
             height: 520,
             width: size.width,
             child: PaginatedDataTable(
@@ -277,8 +278,7 @@ class DisbursementTableDataSource extends DataTableSource {
   //   notifyListeners();
   // }
   Future<String?> getToken(String username, String password) async {
-    final url =
-        Uri.parse('http://localhost:21021/api/TokenAuth/Authenticate');
+    final url = Uri.parse('http://localhost:21021/api/TokenAuth/Authenticate');
 
     final headers = {
       'Content-Type': 'application/json',
@@ -859,9 +859,9 @@ class _AccounntUseDialogState extends State<AccounntUseDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Column(
+      title: const Column(
         mainAxisAlignment: MainAxisAlignment.start,
-        children: const [
+        children: [
           Icon(
             Icons.credit_card,
             color: kColorPrimary,
@@ -1226,7 +1226,8 @@ class SummaryItem extends StatelessWidget {
   final TextStyle? titleStyle;
   final TextStyle? amountStyle;
 
-  SummaryItem({
+  const SummaryItem({
+    super.key,
     required this.title,
     required this.amount,
     this.titleStyle,

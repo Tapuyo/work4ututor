@@ -378,15 +378,16 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                           html.window.location.reload();
                         },
                         child: Container(
-                          padding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
-                          width: 240,
+                          padding: const EdgeInsets.fromLTRB(0, 10, 10, 10),
+                          width: 300,
                           child: Image.asset(
                             "assets/images/worklogo.png",
-                            alignment: Alignment.topCenter,
+                            alignment: Alignment.topLeft,
                             fit: BoxFit.cover,
                           ),
                         ),
                       ),
+                      centerTitle: false,
                       actions: [
                         ResponsiveBuilder.isDesktop(context)
                             ? Row(
@@ -395,7 +396,8 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                                     timezone == null
                                         ? ''
                                         : '$timezone ${utcZone(timezone!)}',
-                                    style: const TextStyle(fontSize: 16),
+                                    style: const TextStyle(fontSize: 16, color: Colors.white),
+
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(
@@ -723,7 +725,9 @@ class _MainPageBodyPageState extends State<MainPageBody> {
                             visible: ResponsiveBuilder.isDesktop(context),
                             child: SingleChildScrollView(
                               controller: ScrollController(),
-                              child: StudentsMenu(widget.uID),
+                              child: Container(
+                                color: Colors.white,
+                                child: StudentsMenu(widget.uID)),
                             ),
                           ),
                           SizedBox(

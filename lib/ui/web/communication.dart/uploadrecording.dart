@@ -3,8 +3,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:video_player/video_player.dart';
 import 'package:work4ututor/utils/themes.dart';
 
-import '../../../shared_components/header_text.dart';
-
 class VideoUploadWidget extends StatefulWidget {
   final String videolink;
   const VideoUploadWidget({super.key, required this.videolink});
@@ -27,50 +25,6 @@ class _VideoUploadWidgetState extends State<VideoUploadWidget> {
     _initializeVideoPlayer();
   }
 
-  // Future<String> uploadFile(html.File file) async {
-  //   final String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-
-  //   try {
-  //     final Reference videoRef = storageRef.child('videos/$fileName');
-
-  //     final reader = html.FileReader();
-  //     reader.readAsArrayBuffer(file);
-  //     await reader.onLoad.first;
-  //     final Uint8List fileBytes = reader.result as Uint8List;
-
-  //     final UploadTask uploadTask = videoRef.putData(fileBytes);
-
-  //     uploadTask.snapshotEvents.listen((TaskSnapshot snapshot) {
-  //       setState(() {
-  //         _progress = snapshot.bytesTransferred / snapshot.totalBytes;
-  //       });
-  //     });
-
-  //     final TaskSnapshot uploadSnapshot =
-  //         await uploadTask.whenComplete(() => null);
-  //     final String downloadUrl = await uploadSnapshot.ref.getDownloadURL();
-
-  //     return downloadUrl;
-  //   } catch (e) {
-  //     print(e.toString());
-  //     throw Exception('Error uploading video');
-  //   }
-  // }
-
-  // void _handleFileUpload(html.File file) {
-  //   uploadFile(file).then((String downloadUrl) {
-  //     setState(() {
-  //       _downloadUrl = downloadUrl;
-  //     });
-  //     // Handle successful upload
-  //     print('Video uploaded successfully. Download URL: $downloadUrl');
-  //     _initializeVideoPlayer();
-  //   }).catchError((e) {
-  //     // Handle upload failure
-  //     print('Error uploading video: $e');
-  //   });
-  // }
-
   void _initializeVideoPlayer() {
     _videoPlayerController =
         VideoPlayerController.networkUrl(Uri.parse(widget.videolink))
@@ -88,18 +42,6 @@ class _VideoUploadWidgetState extends State<VideoUploadWidget> {
       }
     });
   }
-
-  // void _openFilePicker() {
-  //   final uploadInput = html.FileUploadInputElement();
-  //   uploadInput.multiple = false;
-  //   uploadInput.accept = 'video/*';
-  //   uploadInput.click();
-
-  //   uploadInput.onChange.listen((e) {
-  //     final html.File file = (uploadInput.files! as List<html.File>)[0];
-  //     _handleFileUpload(file);
-  //   });
-  // }
 
   void _pauseVideo() {
     if (_videoPlayerController!.value.isPlaying) {
@@ -169,26 +111,24 @@ class _VideoUploadWidgetState extends State<VideoUploadWidget> {
             ),
           ),
         ),
-        title: const HeaderText('Tutor Presentation'),
+        title: const Text(
+          'Tutor Presentation',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: false,
       ),
-      body: Container(
-        height: height,
-        alignment: Alignment.center,
-        child: SingleChildScrollView(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // ElevatedButton(
-            //   onPressed: _openFilePicker,
-            //   child: const Text('Upload Video'),
-            // ),
-            // const SizedBox(height: 16.0),
-            // LinearProgressIndicator(
-            //   value: _progress,
-            // ),
-            // const SizedBox(height: 16.0),
-            if (widget.videolink.isNotEmpty && _videoPlayerController != null)
-              GestureDetector(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (widget.videolink.isNotEmpty && _videoPlayerController != null)
+            SizedBox(
+              height: height - 104,
+              width: width,
+              child: GestureDetector(
                 onTap: () {
                   if (_videoPlayerController!.value.isPlaying) {
                     _videoPlayerController!.pause();
@@ -249,32 +189,29 @@ class _VideoUploadWidgetState extends State<VideoUploadWidget> {
                   ),
                 ),
               ),
-            if (widget.videolink.isNotEmpty)
-              Card(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: _seekBackward,
-                      icon: const Icon(Icons.replay_10),
-                    ),
-                    IconButton(
-                      onPressed: _pauseVideo,
-                      icon: Icon(
-                        _videoPlayerController!.value.isPlaying
-                            ? Icons.pause
-                            : Icons.play_arrow,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: _seekForward,
-                      icon: const Icon(Icons.forward_10),
-                    ),
-                  ],
-                ),
-              ),
-          ],
-        )),
+            ),
+        ],
+      ),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            onPressed: _seekBackward,
+            icon: const Icon(Icons.replay_10),
+          ),
+          IconButton(
+            onPressed: _pauseVideo,
+            icon: Icon(
+              _videoPlayerController!.value.isPlaying
+                  ? Icons.pause
+                  : Icons.play_arrow,
+            ),
+          ),
+          IconButton(
+            onPressed: _seekForward,
+            icon: const Icon(Icons.forward_10),
+          ),
+        ],
       ),
     );
   }

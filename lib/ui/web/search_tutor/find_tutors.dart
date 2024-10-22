@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, unused_field
 
 import 'dart:async';
 import 'dart:typed_data';
@@ -16,7 +16,6 @@ import '../../../constant/constant.dart';
 import '../../../data_class/studentinfoclass.dart';
 import '../../../data_class/subject_class.dart';
 import '../../../data_class/tutor_info_class.dart';
-import '../../../provider/displaycount.dart';
 import '../../../provider/init_provider.dart';
 import '../../../provider/search_provider.dart';
 import '../../../services/addpreftutor.dart';
@@ -36,7 +35,7 @@ class FindTutor extends StatefulWidget {
 
 class _FindTutorState extends State<FindTutor> {
   late PageController _pageController;
-  int _currentPageIndex = 0;
+  final int _currentPageIndex = 0;
   late Timer _timer;
   @override
   void initState() {
@@ -539,6 +538,7 @@ class _FindTutorState extends State<FindTutor> {
                     visible: ResponsiveBuilder.isDesktop(context),
                     child: SingleChildScrollView(
                       child: Card(
+                        color: Colors.white,
                         margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
                         elevation: 4,
                         child: SizedBox(
@@ -558,6 +558,8 @@ class _FindTutorState extends State<FindTutor> {
                                     provider.setMenuIndex(0);
                                   },
                                   child: Card(
+                                                          color: Colors.white,
+
                                     margin:
                                         const EdgeInsets.fromLTRB(4, 0, 4, 4),
                                     elevation: 0,
@@ -619,19 +621,19 @@ class _FindTutorState extends State<FindTutor> {
                                         ),
                                   child: ElevatedButton(
                                     style: ButtonStyle(
-                                      shape: MaterialStateProperty.all<
+                                      shape: WidgetStateProperty.all<
                                           RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(20.0),
                                         ),
                                       ),
-                                      minimumSize: MaterialStateProperty.all(
+                                      minimumSize: WidgetStateProperty.all(
                                           const Size(220, 50)),
                                       backgroundColor:
-                                          MaterialStateProperty.all(
+                                          WidgetStateProperty.all(
                                               Colors.transparent),
-                                      shadowColor: MaterialStateProperty.all(
+                                      shadowColor: WidgetStateProperty.all(
                                           Colors.transparent),
                                     ),
                                     onPressed: () async {
@@ -731,19 +733,19 @@ class _FindTutorState extends State<FindTutor> {
                                         ),
                                   child: ElevatedButton(
                                     style: ButtonStyle(
-                                      shape: MaterialStateProperty.all<
+                                      shape: WidgetStateProperty.all<
                                           RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(20.0),
                                         ),
                                       ),
-                                      minimumSize: MaterialStateProperty.all(
+                                      minimumSize: WidgetStateProperty.all(
                                           const Size(220, 50)),
                                       backgroundColor:
-                                          MaterialStateProperty.all(
+                                          WidgetStateProperty.all(
                                               Colors.transparent),
-                                      shadowColor: MaterialStateProperty.all(
+                                      shadowColor: WidgetStateProperty.all(
                                           Colors.transparent),
                                     ),
                                     onPressed: () {
@@ -766,7 +768,7 @@ class _FindTutorState extends State<FindTutor> {
                                       padding: const EdgeInsets.only(
                                         top: 10,
                                         bottom: 10,
-                                        left: 35,
+                                        left: 30,
                                       ),
                                       child: Row(
                                         mainAxisAlignment:
@@ -882,19 +884,19 @@ class _FindTutorState extends State<FindTutor> {
                                         ),
                                   child: ElevatedButton(
                                     style: ButtonStyle(
-                                      shape: MaterialStateProperty.all<
+                                      shape: WidgetStateProperty.all<
                                           RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(20.0),
                                         ),
                                       ),
-                                      minimumSize: MaterialStateProperty.all(
+                                      minimumSize: WidgetStateProperty.all(
                                           const Size(220, 50)),
                                       backgroundColor:
-                                          MaterialStateProperty.all(
+                                          WidgetStateProperty.all(
                                               Colors.transparent),
-                                      shadowColor: MaterialStateProperty.all(
+                                      shadowColor: WidgetStateProperty.all(
                                           Colors.transparent),
                                     ),
                                     onPressed: () {
@@ -918,7 +920,7 @@ class _FindTutorState extends State<FindTutor> {
                                       padding: const EdgeInsets.only(
                                         top: 10,
                                         bottom: 10,
-                                        left: 35,
+                                        left: 30,
                                       ),
                                       child: Row(
                                         mainAxisAlignment:
@@ -1050,19 +1052,19 @@ class _FindTutorState extends State<FindTutor> {
                                         ),
                                   child: ElevatedButton(
                                     style: ButtonStyle(
-                                      shape: MaterialStateProperty.all<
+                                      shape: WidgetStateProperty.all<
                                           RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(20.0),
                                         ),
                                       ),
-                                      minimumSize: MaterialStateProperty.all(
+                                      minimumSize: WidgetStateProperty.all(
                                           const Size(220, 50)),
                                       backgroundColor:
-                                          MaterialStateProperty.all(
+                                          WidgetStateProperty.all(
                                               Colors.transparent),
-                                      shadowColor: MaterialStateProperty.all(
+                                      shadowColor: WidgetStateProperty.all(
                                           Colors.transparent),
                                     ),
                                     onPressed: () {
@@ -1085,7 +1087,7 @@ class _FindTutorState extends State<FindTutor> {
                                       padding: const EdgeInsets.only(
                                         top: 10,
                                         bottom: 10,
-                                        left: 35,
+                                        left: 30,
                                       ),
                                       child: Row(
                                         mainAxisAlignment:
@@ -1209,19 +1211,19 @@ class _FindTutorState extends State<FindTutor> {
                                         ),
                                   child: ElevatedButton(
                                     style: ButtonStyle(
-                                      shape: MaterialStateProperty.all<
+                                      shape: WidgetStateProperty.all<
                                           RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(20.0),
                                         ),
                                       ),
-                                      minimumSize: MaterialStateProperty.all(
+                                      minimumSize: WidgetStateProperty.all(
                                           const Size(220, 50)),
                                       backgroundColor:
-                                          MaterialStateProperty.all(
+                                          WidgetStateProperty.all(
                                               Colors.transparent),
-                                      shadowColor: MaterialStateProperty.all(
+                                      shadowColor: WidgetStateProperty.all(
                                           Colors.transparent),
                                     ),
                                     onPressed: () {
@@ -1244,7 +1246,7 @@ class _FindTutorState extends State<FindTutor> {
                                       padding: const EdgeInsets.only(
                                         top: 10,
                                         bottom: 10,
-                                        left: 35,
+                                        left: 30,
                                       ),
                                       child: Row(
                                         mainAxisAlignment:
@@ -1265,7 +1267,7 @@ class _FindTutorState extends State<FindTutor> {
                                             width: 8,
                                           ),
                                           Text(
-                                            'Services Provided',
+                                            'Service Provided',
                                             style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: viewpreferred[5]
@@ -1912,6 +1914,8 @@ class _FindTutorState extends State<FindTutor> {
                     child: SingleChildScrollView(
                       controller: scrollController,
                       child: Card(
+                                              color: Colors.white,
+
                         margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
                         elevation: 4,
                         child: Container(
@@ -1942,6 +1946,8 @@ class _FindTutorState extends State<FindTutor> {
                                                 : size.width - 65,
                                         height: 50,
                                         child: Card(
+                                                                color: Colors.white,
+
                                           elevation: 4,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
@@ -2005,6 +2011,8 @@ class _FindTutorState extends State<FindTutor> {
                                       child: SizedBox(
                                         height: 50,
                                         child: Card(
+                                                                color: Colors.white,
+
                                           elevation: 4,
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(

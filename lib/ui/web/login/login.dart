@@ -5,23 +5,18 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
-import 'package:work4ututor/ui/web/login/resetpassword.dart';
+import 'package:work4ututor/alertbox/confirmationdialog.dart';
 
 import '../../../components/nav_bar.dart';
 import '../../../constant/constant.dart';
-import '../../../data_class/user_class.dart';
-import '../../../shared_components/alphacode3.dart';
 import '../../../shared_components/responsive_builder.dart';
 import '../../../utils/themes.dart';
 import '../../auth/auth.dart';
-import '../signup/student_information_signup.dart';
-import '../signup/student_signup.dart';
-import '../signup/tutor_information_signup.dart';
-import '../signup/tutor_signup.dart';
-import '../student/main_dashboard/student_dashboard.dart';
 import '../terms/termpage.dart';
-import '../tutor/tutor_dashboard/tutor_dashboard.dart';
 import 'dart:html' as html;
+
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -105,8 +100,8 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     Container(
-                      margin: const EdgeInsets.only(top: 0),
-                      width: 240,
+                      margin: const EdgeInsets.only(top: 0, bottom: 10),
+                      width: 300,
                       child: Image.asset(
                         "assets/images/WORK4U_NO_BG.png",
                         alignment: Alignment.topCenter,
@@ -130,7 +125,6 @@ class _LoginPageState extends State<LoginPage> {
                           shape: const BeveledRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(5))),
-                          // ignore: prefer_const_constructors
                           textStyle: TextStyle(
                             color: Colors.black,
                             // fontFamily: 'Avenir',
@@ -162,7 +156,6 @@ class _LoginPageState extends State<LoginPage> {
                           shape: const BeveledRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(5))),
-                          // ignore: prefer_const_constructors
                           textStyle: TextStyle(
                             color: Colors.black,
                             // fontFamily: 'Avenir',
@@ -194,7 +187,6 @@ class _LoginPageState extends State<LoginPage> {
                           shape: const BeveledRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(5))),
-                          // ignore: prefer_const_constructors
                           textStyle: TextStyle(
                             color: Colors.black,
                             // fontFamily: 'Avenir',
@@ -253,7 +245,7 @@ class LogScreen extends StatelessWidget {
                       padding: const EdgeInsets.only(right: kSpacing / 2),
                       child: ClipRRect(
                         child: SizedBox(
-                          width: 240,
+                          width: 300,
                           child: Image.asset(
                             "assets/images/WORK4U_NO_BG.png",
                             alignment: Alignment.topCenter,
@@ -296,7 +288,7 @@ class LogScreen extends StatelessWidget {
                       padding: const EdgeInsets.only(right: kSpacing / 2),
                       child: ClipRRect(
                         child: SizedBox(
-                          width: 240,
+                          width: 300,
                           child: Image.asset(
                             "assets/images/WORK4U_NO_BG.png",
                             alignment: Alignment.topCenter,
@@ -387,18 +379,23 @@ class _SigniNState extends State<SigniN> {
                   key: formKey,
                   child: Column(
                     children: [
-                      Container(
-                        alignment: Alignment.center,
-                        padding: EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(
-                          // color: const Color.fromRGBO(1, 118, 132, 1),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Image.asset(
-                          'assets/images/login.png',
-                          width: 300.0,
-                          height: 100.0,
-                          fit: BoxFit.contain,
+                      InkWell(
+                        onTap: () {
+                          // authenticateUser('admin', '123qwe');
+                        },
+                        child: Container(
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.only(top: 10),
+                          decoration: BoxDecoration(
+                            // color: const Color.fromRGBO(1, 118, 132, 1),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Image.asset(
+                            'assets/images/login.png',
+                            width: 300.0,
+                            height: 100.0,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                       Container(
@@ -704,8 +701,27 @@ class _SigniNState extends State<SigniN> {
                                         showDialog(
                                             barrierDismissible: false,
                                             context: context,
-                                            builder: (_) => TermPage(
-                                                  pdfurl: '',
+                                            builder: (_) => Stack(
+                                                  children: [
+                                                    TermPage(
+                                                      pdfurl: '',
+                                                    ),
+                                                    Positioned(
+                                                      top: 10.0,
+                                                      right: 10.0,
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          Navigator.of(context).pop(
+                                                              false); // Close the dialog
+                                                        },
+                                                        child: const Icon(
+                                                          Icons.close,
+                                                          color: Colors.white,
+                                                          size: 20,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ));
                                       });
                                     }),
@@ -726,8 +742,27 @@ class _SigniNState extends State<SigniN> {
                                         showDialog(
                                             barrierDismissible: false,
                                             context: context,
-                                            builder: (_) => TermPage(
-                                                  pdfurl: '',
+                                            builder: (_) => Stack(
+                                                  children: [
+                                                    TermPage(
+                                                      pdfurl: '',
+                                                    ),
+                                                    Positioned(
+                                                      top: 10.0,
+                                                      right: 10.0,
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          Navigator.of(context).pop(
+                                                              false); // Close the dialog
+                                                        },
+                                                        child: const Icon(
+                                                          Icons.close,
+                                                          color: Colors.white,
+                                                          size: 20,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ));
                                       });
                                     }),
@@ -1061,8 +1096,27 @@ class _SigniNState extends State<SigniN> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage(
-                                              pdfurl: '',
+                                        builder: (_) => Stack(
+                                              children: [
+                                                TermPage(
+                                                  pdfurl: '',
+                                                ),
+                                                Positioned(
+                                                  top: 10.0,
+                                                  right: 10.0,
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.of(context).pop(
+                                                          false); // Close the dialog
+                                                    },
+                                                    child: const Icon(
+                                                      Icons.close,
+                                                      color: Colors.white,
+                                                      size: 20,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ));
                                   });
                                 }),
@@ -1083,8 +1137,27 @@ class _SigniNState extends State<SigniN> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage(
-                                              pdfurl: '',
+                                        builder: (_) => Stack(
+                                              children: [
+                                                TermPage(
+                                                  pdfurl: '',
+                                                ),
+                                                Positioned(
+                                                  top: 10.0,
+                                                  right: 10.0,
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.of(context).pop(
+                                                          false); // Close the dialog
+                                                    },
+                                                    child: const Icon(
+                                                      Icons.close,
+                                                      color: Colors.white,
+                                                      size: 20,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ));
                                   });
                                 }),
@@ -1111,18 +1184,32 @@ class _SigniNState extends State<SigniN> {
               key: formKey,
               child: Column(
                 children: [
-                  Container(
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.only(top: 10),
-                    decoration: BoxDecoration(
-                      // color: const Color.fromRGBO(1, 118, 132, 1),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Image.asset(
-                      'assets/images/login.png',
-                      width: 300.0,
-                      height: 100.0,
-                      fit: BoxFit.contain,
+                  InkWell(
+                    onTap: () {
+                      // authenticateUser('admin', '123qwe');
+                      // fetchToken("96116696-12011", "Tutor-0031", 1);
+                      showConfirmationDialog(
+                        context,
+                        '',
+                        'This is the alert message is a confirmation dialog.',
+                        () {
+                          print('OK pressed!');
+                        },
+                      );
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.only(top: 10),
+                      decoration: BoxDecoration(
+                        // color: const Color.fromRGBO(1, 118, 132, 1),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Image.asset(
+                        'assets/images/login.png',
+                        width: 300.0,
+                        height: 100.0,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                   // Container(
@@ -1419,8 +1506,27 @@ class _SigniNState extends State<SigniN> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage(
-                                              pdfurl: '',
+                                        builder: (_) => Stack(
+                                              children: [
+                                                TermPage(
+                                                  pdfurl: '',
+                                                ),
+                                                Positioned(
+                                                  top: 10.0,
+                                                  right: 10.0,
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.of(context).pop(
+                                                          false); // Close the dialog
+                                                    },
+                                                    child: const Icon(
+                                                      Icons.close,
+                                                      color: Colors.white,
+                                                      size: 20,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ));
                                   });
                                 }),
@@ -1441,8 +1547,27 @@ class _SigniNState extends State<SigniN> {
                                     showDialog(
                                         barrierDismissible: false,
                                         context: context,
-                                        builder: (_) => TermPage(
-                                              pdfurl: '',
+                                        builder: (_) => Stack(
+                                              children: [
+                                                TermPage(
+                                                  pdfurl: '',
+                                                ),
+                                                Positioned(
+                                                  top: 10.0,
+                                                  right: 10.0,
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.of(context).pop(
+                                                          false); // Close the dialog
+                                                    },
+                                                    child: const Icon(
+                                                      Icons.close,
+                                                      color: Colors.white,
+                                                      size: 20,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ));
                                   });
                                 }),
@@ -1457,5 +1582,111 @@ class _SigniNState extends State<SigniN> {
         },
       ),
     );
+  }
+
+  Future<void> authenticateUser(String username, String password) async {
+    final url =
+        Uri.parse("http://180.191.42.44/accapi/api/TokenAuth/Authenticate");
+
+    // Request body
+    final body = jsonEncode({
+      "userNameOrEmailAddress": username,
+      "password": password,
+      "rememberClient": true
+    });
+
+    try {
+      // Send the POST request
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: body,
+      );
+
+      // Check if the request was successful
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        print("Full Response: $responseData");
+
+        // Check for 'accessToken' at different possible levels
+        final accessToken = responseData["accessToken"] ??
+            responseData["result"]?["accessToken"] ??
+            responseData["data"]?["accessToken"];
+
+        if (accessToken != null) {
+          print("Token received: $accessToken");
+          // Use this token as needed
+        } else {
+          print("accessToken not found in response.");
+        }
+      } else {
+        print("Failed to authenticate: ${response.body}");
+      }
+    } catch (error) {
+      print("Error occurred: $error");
+    }
+  }
+}
+
+Future<void> fetchToken(String roomUuid, String userUuid, int role) async {
+  const url =
+      'https://52.65.17.238/fetch_education_token'; // Ensure this is correct
+
+  try {
+    // Log the request for debugging
+    print('Sending request to $url');
+    print('Payload: ${json.encode({
+          'roomUuid': roomUuid,
+          'userUuid': userUuid,
+          'role': role,
+        })}');
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'roomUuid': roomUuid,
+        'userUuid': userUuid,
+        'role': role,
+      }),
+    );
+
+    // Log the response status for debugging
+    print('Response Status: ${response.statusCode}');
+
+    if (response.statusCode == 200) {
+      // Request successful
+      final data = json.decode(response.body);
+      print('Token: ${data['token']}'); // Access the token here
+    } else {
+      // Handle specific status codes
+      switch (response.statusCode) {
+        case 400:
+          print('Bad Request: ${response.body}');
+          break;
+        case 401:
+          print('Unauthorized: ${response.body}');
+          break;
+        case 403:
+          print('Forbidden: ${response.body}');
+          break;
+        case 404:
+          print('Not Found: ${response.body}');
+          break;
+        case 500:
+          print('Server Error: ${response.body}');
+          break;
+        default:
+          print('Error: ${response.statusCode} ${response.body}');
+      }
+    }
+  } catch (error) {
+    // Handle different types of errors separately if needed
+    if (error is http.ClientException) {
+      print('HTTP Error: $error');
+    } else {
+      print(
+          'General Error: $error'); // Log any other errors (network issues, etc.)
+    }
   }
 }

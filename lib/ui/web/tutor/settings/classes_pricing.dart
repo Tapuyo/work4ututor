@@ -2,8 +2,6 @@
 
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:provider/provider.dart';
 import 'package:work4ututor/data_class/subject_teach_pricing.dart';
 import 'package:work4ututor/provider/update_tutor_provider.dart';
@@ -37,13 +35,14 @@ class _ClassesPricingState extends State<ClassesPricing> {
     List<SubjectTeach> tutorinfodata = Provider.of<List<SubjectTeach>>(context);
     List<TutorInformation> tutorinfo =
         Provider.of<List<TutorInformation>>(context);
-    print(tutorinfo.length);
     // textFieldEnabled = List.generate(tutorinfodata.length, (index) => false);
     const Color background = Color.fromRGBO(55, 116, 135, 1);
     final bool model =
         context.select((TutorInformationPricing p) => p.updateDisplay);
     Size size = MediaQuery.of(context).size;
     return Card(
+                color: Colors.white,
+
       margin: EdgeInsets.zero,
       elevation: 4,
       shape: const RoundedRectangleBorder(
@@ -182,6 +181,8 @@ class _ClassesPricingState extends State<ClassesPricing> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Card(
+                                        color: Colors.white,
+
                               margin: EdgeInsets.zero,
                               elevation: 5,
                               child: Column(
@@ -702,7 +703,8 @@ class _ClassesPricingState extends State<ClassesPricing> {
                             ),
                             const Spacer(),
                             if (secondColumnIndex != null)
-                              Card(
+                              Card(          color: Colors.white,
+
                                 margin: EdgeInsets.zero,
                                 elevation: 5,
                                 child: Column(

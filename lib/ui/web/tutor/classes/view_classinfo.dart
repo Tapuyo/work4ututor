@@ -499,7 +499,8 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                         color: Colors.deepPurple.shade300,
                                         borderRadius: BorderRadius.circular(15),
                                       ),
-                                      indicatorColor: kColorPrimary,
+                                      indicatorSize: TabBarIndicatorSize.tab,
+                                      indicatorColor: Colors.transparent,
                                       tabs: const [
                                         Tab(
                                           icon: Icon(
@@ -955,6 +956,8 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                                     .only(
                                                                 bottom: 10.0),
                                                         child: Card(
+                                                                    color: Colors.white,
+
                                                           child: ExpansionTile(
                                                             title: Text(
                                                               (() {
@@ -1713,6 +1716,8 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                 child: Column(
                                   children: [
                                     Card(
+                                                color: Colors.white,
+
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(
                                             10.0), //<-- SEE HERE
@@ -1930,6 +1935,8 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                             ),
                                             const Spacer(),
                                             Card(
+                                                        color: Colors.white,
+
                                               shape: RoundedRectangleBorder(
                                                 borderRadius:
                                                     BorderRadius.circular(
@@ -1951,7 +1958,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                             bottomRight:
                                                                 Radius.circular(
                                                                     10))),
-                                                child: Center(
+                                                child: const Center(
                                                   child: Row(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment
@@ -1959,7 +1966,7 @@ class _ViewClassInfoState extends State<ViewClassInfo> {
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment
                                                             .center,
-                                                    children: const [
+                                                    children: [
                                                       Icon(
                                                         EvaIcons.clockOutline,
                                                         color: kColorGrey,

@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import '../../../../data_class/studentinfoclass.dart';
 import '../../../../provider/update_tutor_provider.dart';
-import '../../../../services/getstudentinfo.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
 import '../../tutor/tutor_profile/view_file.dart';

@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -5,12 +7,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:work4ututor/provider/performacefilter.dart';
 
-import '../../../../data_class/reviewclass.dart';
-import '../../../../provider/tutor_reviews_provider.dart';
 import '../../../../services/getmyrating.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 
 class PerformancePage extends HookWidget {
   final String uID;
@@ -127,9 +126,9 @@ class PerformancePage extends HookWidget {
           if (reviewdata!.isNotEmpty) {
             double totalRating = 0;
 
-            reviewdata.forEach((review) {
+            for (var review in reviewdata) {
               totalRating += review['totalRating'] ?? 0;
-            });
+            }
 
             averageRating = totalRating / reviewdata.length;
             if (fromdate != null && todate != null) {
@@ -155,6 +154,8 @@ class PerformancePage extends HookWidget {
                   child: Column(
                     children: <Widget>[
                       Card(
+                                  color: Colors.white,
+
                         margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                         elevation: 4,
                         child: Container(
@@ -172,9 +173,9 @@ class PerformancePage extends HookWidget {
                             ),
                             borderRadius: BorderRadius.circular(5.0),
                           ),
-                          child: Row(
+                          child: const Row(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
                                 "Performance",
                                 style: TextStyle(
@@ -468,6 +469,8 @@ class PerformancePage extends HookWidget {
                           Flexible(
                               flex: 60,
                               child: Card(
+                                          color: Colors.white,
+
                                 margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                                 elevation: 4,
                                 shape: const RoundedRectangleBorder(
@@ -861,6 +864,8 @@ class PerformancePage extends HookWidget {
                         height: 5,
                       ),
                       Card(
+                                  color: Colors.white,
+
                         margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                         elevation: 4,
                         child: SizedBox(
@@ -998,13 +1003,13 @@ class PerformancePage extends HookWidget {
                     ],
                   ),
                 )
-              : Container(
+              : SizedBox(
                   width: size.width - 320,
                   height: size.height - 75,
-                  child: Column(
+                  child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Icon(
                         Icons.list,
                         size: 50,

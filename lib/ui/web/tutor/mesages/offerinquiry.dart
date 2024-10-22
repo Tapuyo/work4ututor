@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, unused_field
 
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +20,7 @@ class OfferInquiry extends StatefulWidget {
 }
 
 class _OfferInquiryState extends State<OfferInquiry> {
-  DateTime _selectedDate = DateTime.now();
+  final DateTime _selectedDate = DateTime.now();
 
   final TextEditingController _typeAheadController3 = TextEditingController();
 
@@ -80,12 +80,12 @@ class _OfferInquiryState extends State<OfferInquiry> {
                       fit: BoxFit.cover,
                     ),
                   ),
-                  Flexible(
+                  const Flexible(
                     flex: 10,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           'Offer Custom Classes',
                           textAlign: TextAlign.left,

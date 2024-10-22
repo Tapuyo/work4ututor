@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 
 import '../../../../data_class/atmclass.dart';
 import '../../../../utils/themes.dart';
@@ -340,7 +338,7 @@ class _PaymentsHistorysState extends State<PaymentsHistory> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Container(
+                  SizedBox(
                     height: 200,
                     child: ListView.builder(
                         scrollDirection: Axis.horizontal,
@@ -409,7 +407,7 @@ class _PaymentsHistorysState extends State<PaymentsHistory> {
                             borderRadius: BorderRadius.all(Radius.circular(8))),
                         columnSpacing: 100,
                         showBottomBorder: true,
-                        headingRowColor: MaterialStateColor.resolveWith(
+                        headingRowColor: WidgetStateColor.resolveWith(
                             (states) => Colors.grey[100]!),
                         border: const TableBorder(
                             borderRadius:

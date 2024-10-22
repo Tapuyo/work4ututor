@@ -42,9 +42,9 @@ class _StudentInquirysPageState extends State<StudentInquirysPage> {
                 color: kColorPrimary,
                 borderRadius: BorderRadius.circular(5.0),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "SETTINGS",
                     style: TextStyle(

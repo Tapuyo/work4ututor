@@ -57,7 +57,7 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    var serviceWorkerVersion = null;
+    var serviceWorkerVersion = '{{flutter_service_worker_version}}'; // Use single or double quotes
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
@@ -76,7 +76,8 @@
   <script src="assets/packages/libphonenumber_plugin/js/libphonenumber.js"></script>
   <script src="assets/packages/libphonenumber_plugin/js/stringbuffer.js"></script>
   <script>
-    var serviceWorkerVersion = null;
+  var serviceWorkerVersion = '{{flutter_service_worker_version}}'; // Use single or double quotes
+
     var scriptLoaded = false;
     function loadMainDartJs() {
       if (scriptLoaded) {
@@ -97,7 +98,6 @@
             function waitForActivation(serviceWorker) {
               serviceWorker.addEventListener('statechange', () => {
                 if (serviceWorker.state == 'activated') {
-                  console.log('Installed new service worker.');
                   loadMainDartJs();
                 }
               });

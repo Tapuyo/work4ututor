@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, prefer_final_fields
+// ignore_for_file: use_build_context_synchronously, prefer_final_fields, unused_local_variable
 
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
@@ -414,7 +414,7 @@ class _SetNowState extends State<SetNow> {
                       },
                       child: Text(
                         DateFormat('MMM dd yyyy').format(selectedDatesched),
-                        style: const TextStyle(color: Colors.black87),
+                        style: const TextStyle(color: kColorGrey),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -431,7 +431,7 @@ class _SetNowState extends State<SetNow> {
                               DateTime(2022, 1, 1, selectedTimesched.hour,
                                   selectedTimesched.minute),
                             ),
-                            style: const TextStyle(color: Colors.black87),
+                            style: const TextStyle(color: kColorGrey),
                           ),
                         ),
                         const Text(
@@ -452,7 +452,7 @@ class _SetNowState extends State<SetNow> {
                                 1,
                                 selectedTimeschedto.hour,
                                 selectedTimeschedto.minute)),
-                            style: const TextStyle(color: Colors.black87),
+                            style: const TextStyle(color: kColorGrey),
                           ),
                         ),
                       ],
@@ -505,7 +505,7 @@ class _SetNowState extends State<SetNow> {
                             },
                             itemBuilder: (context, String suggestion) {
                               return ListTile(
-                                title: Text(suggestion),
+                                title: Text(suggestion, style:const  TextStyle(color: kColorGrey),),
                               );
                             },
                             onSuggestionSelected: (String suggestion) {
@@ -534,7 +534,7 @@ class _SetNowState extends State<SetNow> {
                         children: [
                           Container(
                             padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                            width: 130,
+                            width: 100,
                             height: 50,
                             child: TextButton(
                               style: TextButton.styleFrom(
@@ -751,7 +751,8 @@ class _SetNowState extends State<SetNow> {
                                               result =
                                                   "Schedule succesfully save!";
 
-                                              Navigator.pop(context);
+                                               Navigator.of(context).pop(
+                                                          true); 
                                             } else {
                                               CoolAlert.show(
                                                 context: context,
@@ -837,7 +838,8 @@ class _SetNowState extends State<SetNow> {
                                               'New Schedule', '', idList);
                                           result = "Schedule succesfully save!";
 
-                                          Navigator.pop(context);
+                                            Navigator.of(context).pop(
+                                                          true); 
                                         } else {
                                           CoolAlert.show(
                                             context: context,
@@ -863,7 +865,7 @@ class _SetNowState extends State<SetNow> {
                           ),
                           const Spacer(),
                           SizedBox(
-                            width: 70,
+                            width: 80,
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                               child: TextButton(
@@ -877,7 +879,8 @@ class _SetNowState extends State<SetNow> {
                                   ),
                                 ),
                                 onPressed: () {
-                                  Navigator.pop(context);
+                                  Navigator.of(context).pop(
+                                                          false); 
                                 },
                               ),
                             ),

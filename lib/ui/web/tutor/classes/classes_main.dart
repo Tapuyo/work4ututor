@@ -259,6 +259,7 @@ class _ClassesMainState extends State<ClassesMain> {
         //   ),
         // ),
         Card(
+          color: Colors.white,
           margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
           elevation: 4,
           child: Container(
@@ -277,9 +278,9 @@ class _ClassesMainState extends State<ClassesMain> {
               ),
               borderRadius: BorderRadius.circular(5.0),
             ),
-            child: Row(
+            child: const Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
                   "Dashboard",
                   style: TextStyle(
@@ -314,7 +315,8 @@ class _ClassesMainState extends State<ClassesMain> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Card(
+                      Card(          color: Colors.white,
+
                         margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                         elevation: 4,
                         child: Container(
@@ -368,7 +370,8 @@ class _ClassesMainState extends State<ClassesMain> {
                         ),
                       ),
                       const Spacer(),
-                      Card(
+                      Card(          color: Colors.white,
+
                         margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                         elevation: 4,
                         child: Container(
@@ -422,7 +425,8 @@ class _ClassesMainState extends State<ClassesMain> {
                         ),
                       ),
                       const Spacer(),
-                      Card(
+                      Card(          color: Colors.white,
+
                         margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                         elevation: 4,
                         child: Container(
@@ -476,7 +480,8 @@ class _ClassesMainState extends State<ClassesMain> {
                         ),
                       ),
                       const Spacer(),
-                      Card(
+                      Card(          color: Colors.white,
+
                         margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                         elevation: 4,
                         child: Container(
@@ -530,7 +535,8 @@ class _ClassesMainState extends State<ClassesMain> {
                         ),
                       ),
                       const Spacer(),
-                      Card(
+                      Card(          color: Colors.white,
+
                         margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                         elevation: 4,
                         child: Container(
@@ -584,7 +590,8 @@ class _ClassesMainState extends State<ClassesMain> {
                         ),
                       ),
                       const Spacer(),
-                      Card(
+                      Card(          color: Colors.white,
+
                         margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                         elevation: 4,
                         child: Container(
@@ -650,7 +657,8 @@ class _ClassesMainState extends State<ClassesMain> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Card(
+                        Card(          color: Colors.white,
+
                           margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                           elevation: 4,
                           child: Container(
@@ -711,7 +719,8 @@ class _ClassesMainState extends State<ClassesMain> {
                           ),
                         ),
                         const Spacer(),
-                        Card(
+                        Card(          color: Colors.white,
+
                           margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                           elevation: 4,
                           child: Container(
@@ -772,7 +781,8 @@ class _ClassesMainState extends State<ClassesMain> {
                           ),
                         ),
                         const Spacer(),
-                        Card(
+                        Card(          color: Colors.white,
+
                           margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                           elevation: 4,
                           child: Container(
@@ -844,7 +854,8 @@ class _ClassesMainState extends State<ClassesMain> {
                         : size.width - 30,
                     child: Row(
                       children: [
-                        Card(
+                        Card(          color: Colors.white,
+
                           margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                           elevation: 4,
                           child: Container(
@@ -905,7 +916,8 @@ class _ClassesMainState extends State<ClassesMain> {
                           ),
                         ),
                         const Spacer(),
-                        Card(
+                        Card(          color: Colors.white,
+
                           margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                           elevation: 4,
                           child: Container(
@@ -966,7 +978,8 @@ class _ClassesMainState extends State<ClassesMain> {
                           ),
                         ),
                         const Spacer(),
-                        Card(
+                        Card(          color: Colors.white,
+
                           margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
                           elevation: 4,
                           child: Container(

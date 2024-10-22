@@ -1,6 +1,6 @@
 // import 'package:camera/camera.dart';
 // import 'package:chatapp/CustomUI/CameraUI.dart';
-// ignore_for_file: library_private_types_in_public_api, prefer_final_fields
+// ignore_for_file: library_private_types_in_public_api, prefer_final_fields, unrelated_type_equality_checks, unused_field
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../../../data_class/chatmessageclass.dart';
-import '../../../../data_class/classesdataclass.dart';
 import '../../../../services/getmessages.dart';
 
 class IndividualPage extends StatefulWidget {
@@ -165,10 +164,10 @@ class _IndividualPageBodyState extends State<IndividualPageBody> {
                 onTap: () {},
                 child: Container(
                   margin: const EdgeInsets.all(6),
-                  child: Column(
+                  child: const Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'Melvin',
                         style: TextStyle(
@@ -225,7 +224,7 @@ class _IndividualPageBodyState extends State<IndividualPageBody> {
               ],
             ),
           ),
-          body: Container(
+          body: SizedBox(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             child: WillPopScope(
@@ -254,21 +253,24 @@ class _IndividualPageBodyState extends State<IndividualPageBody> {
                           //   time: messages[index].time,
                           // );
                         }
+                        return null;
                       },
                     ),
                   ),
                   Align(
                     alignment: Alignment.bottomCenter,
-                    child: Container(
+                    child: SizedBox(
                       height: 70,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Row(
                             children: [
-                              Container(
+                              SizedBox(
                                 width: MediaQuery.of(context).size.width - 60,
                                 child: Card(
+                                            color: Colors.white,
+
                                   margin: const EdgeInsets.only(
                                       left: 2, right: 2, bottom: 8),
                                   shape: RoundedRectangleBorder(
@@ -282,7 +284,7 @@ class _IndividualPageBodyState extends State<IndividualPageBody> {
                                     maxLines: 5,
                                     minLines: 1,
                                     onChanged: (value) {
-                                      if (value.length > 0) {
+                                      if (value.isNotEmpty) {
                                         setState(() {
                                           sendButton = true;
                                         });
@@ -402,10 +404,12 @@ class _IndividualPageBodyState extends State<IndividualPageBody> {
   }
 
   Widget bottomSheet() {
-    return Container(
+    return SizedBox(
       height: 278,
       width: MediaQuery.of(context).size.width,
       child: Card(
+                  color: Colors.white,
+
         margin: const EdgeInsets.all(18.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: Padding(

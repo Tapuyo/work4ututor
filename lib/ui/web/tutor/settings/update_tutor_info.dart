@@ -242,6 +242,8 @@ class UpdateTutorState extends State<UpdateTutor> {
         tutorInformationToJson(widget.tutordata);
     Size size = MediaQuery.of(context).size;
     return Card(
+                color: Colors.white,
+
       margin: EdgeInsets.zero,
       elevation: 4,
       shape: const RoundedRectangleBorder(
@@ -507,7 +509,8 @@ class UpdateTutorState extends State<UpdateTutor> {
                                               ),
                                             ),
                                           ),
-                                          Card(
+                                          Card(          color: Colors.white,
+
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -581,7 +584,8 @@ class UpdateTutorState extends State<UpdateTutor> {
                                               ),
                                             ),
                                           ),
-                                          Card(
+                                          Card(          color: Colors.white,
+
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -707,7 +711,8 @@ class UpdateTutorState extends State<UpdateTutor> {
                                               ),
                                             ),
                                           ),
-                                          Card(
+                                          Card(          color: Colors.white,
+
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -831,7 +836,8 @@ class UpdateTutorState extends State<UpdateTutor> {
                                               ),
                                             ),
                                           ),
-                                          Card(
+                                          Card(          color: Colors.white,
+
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -954,7 +960,8 @@ class UpdateTutorState extends State<UpdateTutor> {
                                               ),
                                             ),
                                           ),
-                                          Card(
+                                          Card(          color: Colors.white,
+
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -1013,7 +1020,8 @@ class UpdateTutorState extends State<UpdateTutor> {
                                               ),
                                             ),
                                           ),
-                                          Card(
+                                          Card(          color: Colors.white,
+
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -1270,7 +1278,8 @@ class UpdateTutorState extends State<UpdateTutor> {
                                               ),
                                             ),
                                           ),
-                                          Card(
+                                          Card(          color: Colors.white,
+
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -1409,7 +1418,8 @@ class UpdateTutorState extends State<UpdateTutor> {
                                               ),
                                             ),
                                           ),
-                                          Card(
+                                          Card(          color: Colors.white,
+
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -1527,7 +1537,8 @@ class UpdateTutorState extends State<UpdateTutor> {
                                             ),
                                           ),
                                         ),
-                                        Card(
+                                        Card(          color: Colors.white,
+
                                           margin: EdgeInsets.zero,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
@@ -1670,7 +1681,8 @@ class UpdateTutorState extends State<UpdateTutor> {
                                             ),
                                           ),
                                         ),
-                                        Card(
+                                        Card(          color: Colors.white,
+
                                           margin: EdgeInsets.zero,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
@@ -1788,7 +1800,8 @@ class UpdateTutorState extends State<UpdateTutor> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
                                         children: [
-                                          Card(
+                                          Card(          color: Colors.white,
+
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -1997,7 +2010,8 @@ class UpdateTutorState extends State<UpdateTutor> {
                                                                     .only(
                                                                 left: 10.0,
                                                                 right: 10),
-                                                        child: Card(
+                                                        child: Card(          color: Colors.white,
+
                                                           margin:
                                                               EdgeInsets.zero,
                                                           shape:
@@ -2141,16 +2155,16 @@ class UpdateTutorState extends State<UpdateTutor> {
                   ElevatedButton(
                    style: ButtonStyle(
                       backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.transparent),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          WidgetStateProperty.all<Color>(Colors.transparent),
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                         ),
                       ),
-                      elevation: MaterialStateProperty.all<double>(0),
-                      overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                        (Set<MaterialState> states) {
-                          if (states.contains(MaterialState.hovered)) {
+                      elevation: WidgetStateProperty.all<double>(0),
+                      overlayColor: WidgetStateProperty.resolveWith<Color?>(
+                        (Set<WidgetState> states) {
+                          if (states.contains(WidgetState.hovered)) {
                             return Colors.white
                                 .withOpacity(0.3); // Hover color
                           }
@@ -2211,16 +2225,16 @@ class UpdateTutorState extends State<UpdateTutor> {
                   ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.transparent),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          WidgetStateProperty.all<Color>(Colors.transparent),
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                         ),
                       ),
-                      elevation: MaterialStateProperty.all<double>(0),
-                      overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                        (Set<MaterialState> states) {
-                          if (states.contains(MaterialState.hovered)) {
+                      elevation: WidgetStateProperty.all<double>(0),
+                      overlayColor: WidgetStateProperty.resolveWith<Color?>(
+                        (Set<WidgetState> states) {
+                          if (states.contains(WidgetState.hovered)) {
                             return Colors.white
                                 .withOpacity(0.3); // Hover color
                           }

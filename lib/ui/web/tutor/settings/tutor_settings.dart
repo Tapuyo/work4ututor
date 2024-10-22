@@ -26,6 +26,8 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Column(
         children: <Widget>[
           Card(
+                      color: Colors.white,
+
             margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
             elevation: 4,
             child: Container(
@@ -43,9 +45,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 borderRadius: BorderRadius.circular(5.0),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "Settings",
                     style: TextStyle(
@@ -324,6 +326,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           color: Colors.deepPurple.shade300,
                           borderRadius: BorderRadius.circular(15),
                         ),
+                        indicatorSize: TabBarIndicatorSize.tab,
                         indicatorColor: kColorPrimary,
                         // isScrollable: true,
                         tabs: [

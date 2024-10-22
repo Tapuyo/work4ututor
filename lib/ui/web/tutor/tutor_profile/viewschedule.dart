@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -85,7 +84,7 @@ class _CalendarDialogState extends State<CalendarDialog> {
   }
 
   CalendarFormat _calendarFormat = CalendarFormat.month;
-  CalendarFormat _calendarFormatmobile = CalendarFormat.week;
+  final CalendarFormat _calendarFormatmobile = CalendarFormat.week;
 
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
@@ -364,9 +363,9 @@ class _CalendarDialogState extends State<CalendarDialog> {
     return isWithinRange;
   }
 
-  ScrollController _controller1 = ScrollController();
-  ScrollController _controller2 = ScrollController();
-  Set<int> selectedIndices = Set<int>();
+  final ScrollController _controller1 = ScrollController();
+  final ScrollController _controller2 = ScrollController();
+  Set<int> selectedIndices = <int>{};
   double containerX = 100.0; // Initial X position of the container
   double containerY = 100.0;
 
@@ -492,10 +491,10 @@ class _CalendarDialogState extends State<CalendarDialog> {
                           const SizedBox(
                             height: 20,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 5, 5, 0),
+                          const Padding(
+                            padding: EdgeInsets.fromLTRB(10, 5, 5, 0),
                             child: Row(
-                              children: const [
+                              children: [
                                 Text(
                                   'Tutor Calendar',
                                   style: TextStyle(
@@ -946,11 +945,11 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Padding(
+                                  const Padding(
                                     padding:
-                                        const EdgeInsets.fromLTRB(10, 5, 5, 0),
+                                        EdgeInsets.fromLTRB(10, 5, 5, 0),
                                     child: Row(
-                                      children: const [
+                                      children: [
                                         Text(
                                           'Tutor Calendar',
                                           style: TextStyle(
@@ -2093,13 +2092,13 @@ class _CalendarDialogState extends State<CalendarDialog> {
                                       ),
                                     ]),
                                   )
-                                : Center(
+                                : const Center(
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
-                                      children: const [
+                                      children: [
                                         Icon(
                                           Icons.block,
                                           color: Colors.red,

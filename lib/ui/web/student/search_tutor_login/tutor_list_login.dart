@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, sized_box_for_whitespace
+// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, sized_box_for_whitespace, unused_import
 
 import 'dart:math';
 
@@ -258,11 +258,11 @@ class _TutorListLoginState extends State<TutorListLogin> {
                               const Spacer(
                                 flex: 1,
                               ),
-                              Padding(
+                              const Padding(
                                 padding:
-                                    const EdgeInsets.fromLTRB(5.0, 0, 5, 2),
+                                    EdgeInsets.fromLTRB(5.0, 0, 5, 2),
                                 child: Row(
-                                  children: const [
+                                  children: [
                                     Text(
                                       "Starting from \$25 per classes ",
                                       textAlign: TextAlign.left,

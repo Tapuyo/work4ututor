@@ -1,12 +1,12 @@
 // ignore_for_file: avoid_print, avoid_web_libraries_in_flutter, unnecessary_null_comparison
 
-import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
+import 'package:work4ututor/alertbox/confirmationdialog.dart';
 
 import '../provider/chatmessagedisplay.dart';
 import '../provider/classinfo_provider.dart';
@@ -64,6 +64,7 @@ class StudentsMenu extends HookWidget {
           height: 10,
         ),
         Card(
+          color: Colors.white,
           margin: const EdgeInsets.fromLTRB(4, 0, 4, 0),
           elevation: 4,
           child: SizedBox(
@@ -74,7 +75,7 @@ class StudentsMenu extends HookWidget {
                   height: 10,
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                   child: Container(
                     width: 220,
                     decoration: menuIndex != 0
@@ -100,19 +101,18 @@ class StudentsMenu extends HookWidget {
                           ),
                     child: ElevatedButton(
                       style: ButtonStyle(
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
                           ),
                         ),
                         minimumSize:
-                            MaterialStateProperty.all(const Size(220, 50)),
+                            WidgetStateProperty.all(const Size(220, 50)),
                         backgroundColor:
-                            MaterialStateProperty.all(Colors.transparent),
+                            WidgetStateProperty.all(Colors.transparent),
                         // elevation: MaterialStateProperty.all(3),
                         shadowColor:
-                            MaterialStateProperty.all(Colors.transparent),
+                            WidgetStateProperty.all(Colors.transparent),
                       ),
                       onPressed: () {
                         final provider = context.read<InitProvider>();
@@ -185,18 +185,16 @@ class StudentsMenu extends HookWidget {
                         ),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
-                      minimumSize:
-                          MaterialStateProperty.all(const Size(220, 50)),
+                      minimumSize: WidgetStateProperty.all(const Size(220, 50)),
                       backgroundColor:
-                          MaterialStateProperty.all(Colors.transparent),
+                          WidgetStateProperty.all(Colors.transparent),
                       // elevation: MaterialStateProperty.all(3),
-                      shadowColor:
-                          MaterialStateProperty.all(Colors.transparent),
+                      shadowColor: WidgetStateProperty.all(Colors.transparent),
                     ),
                     onPressed: () {
                       final provider = context.read<InitProvider>();
@@ -271,18 +269,16 @@ class StudentsMenu extends HookWidget {
                         ),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
-                      minimumSize:
-                          MaterialStateProperty.all(const Size(220, 50)),
+                      minimumSize: WidgetStateProperty.all(const Size(220, 50)),
                       backgroundColor:
-                          MaterialStateProperty.all(Colors.transparent),
+                          WidgetStateProperty.all(Colors.transparent),
                       // elevation: MaterialStateProperty.all(3),
-                      shadowColor:
-                          MaterialStateProperty.all(Colors.transparent),
+                      shadowColor: WidgetStateProperty.all(Colors.transparent),
                     ),
                     onPressed: () {
                       final provider = context.read<InitProvider>();
@@ -354,18 +350,16 @@ class StudentsMenu extends HookWidget {
                         ),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
-                      minimumSize:
-                          MaterialStateProperty.all(const Size(220, 50)),
+                      minimumSize: WidgetStateProperty.all(const Size(220, 50)),
                       backgroundColor:
-                          MaterialStateProperty.all(Colors.transparent),
+                          WidgetStateProperty.all(Colors.transparent),
                       // elevation: MaterialStateProperty.all(3),
-                      shadowColor:
-                          MaterialStateProperty.all(Colors.transparent),
+                      shadowColor: WidgetStateProperty.all(Colors.transparent),
                     ),
                     onPressed: () {
                       final provider = context.read<InitProvider>();
@@ -439,18 +433,16 @@ class StudentsMenu extends HookWidget {
                         ),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
-                      minimumSize:
-                          MaterialStateProperty.all(const Size(220, 50)),
+                      minimumSize: WidgetStateProperty.all(const Size(220, 50)),
                       backgroundColor:
-                          MaterialStateProperty.all(Colors.transparent),
+                          WidgetStateProperty.all(Colors.transparent),
                       // elevation: MaterialStateProperty.all(3),
-                      shadowColor:
-                          MaterialStateProperty.all(Colors.transparent),
+                      shadowColor: WidgetStateProperty.all(Colors.transparent),
                     ),
                     onPressed: () {
                       final provider = context.read<InitProvider>();
@@ -525,18 +517,16 @@ class StudentsMenu extends HookWidget {
                         ),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
-                      minimumSize:
-                          MaterialStateProperty.all(const Size(220, 50)),
+                      minimumSize: WidgetStateProperty.all(const Size(220, 50)),
                       backgroundColor:
-                          MaterialStateProperty.all(Colors.transparent),
+                          WidgetStateProperty.all(Colors.transparent),
                       // elevation: MaterialStateProperty.all(3),
-                      shadowColor:
-                          MaterialStateProperty.all(Colors.transparent),
+                      shadowColor: WidgetStateProperty.all(Colors.transparent),
                     ),
                     onPressed: () {
                       final provider = context.read<InitProvider>();
@@ -611,18 +601,16 @@ class StudentsMenu extends HookWidget {
                         ),
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
-                      minimumSize:
-                          MaterialStateProperty.all(const Size(220, 50)),
+                      minimumSize: WidgetStateProperty.all(const Size(220, 50)),
                       backgroundColor:
-                          MaterialStateProperty.all(Colors.transparent),
+                          WidgetStateProperty.all(Colors.transparent),
                       // elevation: MaterialStateProperty.all(3),
-                      shadowColor:
-                          MaterialStateProperty.all(Colors.transparent),
+                      shadowColor: WidgetStateProperty.all(Colors.transparent),
                     ),
                     onPressed: () {
                       final provider = context.read<InitProvider>();
@@ -709,9 +697,9 @@ class StudentsMenu extends HookWidget {
                     ),
                   ),
                 ),
-                // const SizedBox(
-                //   height: 5,
-                // ),
+                const SizedBox(
+                  height: 15,
+                ),
                 SizedBox(
                   height: 50,
                   width: 220,
@@ -727,21 +715,37 @@ class StudentsMenu extends HookWidget {
                       elevation: 0,
                     ),
                     onPressed: () {
-                      CoolAlert.show(
-                        context: context,
-                        barrierDismissible: false,
-                        width: 200,
-                        type: CoolAlertType.confirm,
-                        text: 'Are you sure you want to logout?',
-                        confirmBtnText: 'Proceed',
-                        confirmBtnColor: Colors.greenAccent,
-                        cancelBtnText: 'Go back',
-                        showCancelBtn: true,
-                        cancelBtnTextStyle: const TextStyle(color: Colors.red),
-                        onCancelBtnTap: () {
-                          Navigator.of(context).pop;
-                        },
-                        onConfirmBtnTap: () async {
+                      // CoolAlert.show(
+                      //   context: context,
+                      //   barrierDismissible: false,
+                      //   width: 200,
+                      //   type: CoolAlertType.confirm,
+                      //   title: 'Are you sure you want to logout?',
+                      //   titleTextStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
+                      //   confirmBtnText: 'Proceed',
+                      //   confirmBtnColor: Colors.greenAccent,
+                      //   cancelBtnText: 'Go back',
+                      //   showCancelBtn: true,
+                      //   cancelBtnTextStyle: const TextStyle(color: Colors.red),
+                      //   onCancelBtnTap: () {
+                      //     Navigator.of(context).pop;
+                      //   },
+                      //   onConfirmBtnTap: () async {
+                      //     final provider = context.read<ChatDisplayProvider>();
+                      //     provider.setOpenMessage(false);
+                      //     final provider1 = context.read<InitProvider>();
+                      //     provider1.setMenuIndex(0);
+                      //     await _auth.signOutAnon();
+                      //     deleteAllData();
+                      //     // ignore: use_build_context_synchronously
+                      //     GoRouter.of(context).go('/');
+                      //   },
+                      // );
+                      showConfirmationDialog1(
+                        context,
+                        '',
+                        'Are you sure you want to logout?',
+                        () async {
                           final provider = context.read<ChatDisplayProvider>();
                           provider.setOpenMessage(false);
                           final provider1 = context.read<InitProvider>();
@@ -750,6 +754,9 @@ class StudentsMenu extends HookWidget {
                           deleteAllData();
                           // ignore: use_build_context_synchronously
                           GoRouter.of(context).go('/');
+                        },
+                        () {
+                          Navigator.of(context).pop;
                         },
                       );
                     },

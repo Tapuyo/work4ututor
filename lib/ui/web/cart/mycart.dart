@@ -1,4 +1,4 @@
-// ignore_for_file: unused_element, unused_local_variable, sized_box_for_whitespace
+// ignore_for_file: unused_element, unused_local_variable, sized_box_for_whitespace, unused_field
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +7,6 @@ import 'package:work4ututor/services/getcart.dart';
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../provider/classinfo_provider.dart';
-
 
 import '../../../../utils/themes.dart';
 import '../../../data_class/subject_class.dart';
@@ -206,6 +205,7 @@ class _MyCartState extends State<MyCart> {
                   height: size.height,
                   child: const Center(child: CircularProgressIndicator()))
               : Card(
+                  color: Colors.white,
                   margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
                   elevation: 4,
                   child: Container(
@@ -213,10 +213,10 @@ class _MyCartState extends State<MyCart> {
                         ? size.width - 290
                         : size.width - 30,
                     height: size.height,
-                    child: Center(
+                    child: const Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(
                             Icons.shopping_cart_outlined,
                             size: 50,
@@ -243,6 +243,7 @@ class _MyCartState extends State<MyCart> {
         child: Column(
           children: <Widget>[
             Card(
+              color: Colors.white,
               margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
               elevation: 4,
               child: Container(
@@ -262,9 +263,9 @@ class _MyCartState extends State<MyCart> {
                   ),
                   borderRadius: BorderRadius.circular(5.0),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       "My Cart",
                       style: TextStyle(
@@ -282,6 +283,7 @@ class _MyCartState extends State<MyCart> {
               height: 10,
             ),
             Card(
+              color: Colors.white,
               margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
               elevation: 4,
               child: Container(
@@ -339,6 +341,7 @@ class _MyCartState extends State<MyCart> {
                                             cart[firstColumnIndex]['subjectid'],
                                       );
                                       return Card(
+                                        color: Colors.white,
                                         elevation: 4,
                                         child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
@@ -420,6 +423,8 @@ class _MyCartState extends State<MyCart> {
                                                                   });
                                                                 },
                                                                 child: Card(
+                                                                  color: Colors
+                                                                      .white,
                                                                   elevation: 4,
                                                                   child:
                                                                       Container(
@@ -526,8 +531,8 @@ class _MyCartState extends State<MyCart> {
                                                                                 1100 &&
                                                                             size.width <
                                                                                 1130
-                                                                        ? 150
-                                                                        : 150,
+                                                                        ? 165
+                                                                        : 165,
                                                                     child: Row(
                                                                       crossAxisAlignment:
                                                                           CrossAxisAlignment
@@ -563,10 +568,11 @@ class _MyCartState extends State<MyCart> {
                                                                             child:
                                                                                 const Text(
                                                                               'Buy Now',
-                                                                              style: TextStyle(color: kColorPrimary, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                                                                              style: TextStyle(color: kColorPrimary, fontSize: 15, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
                                                                             ),
                                                                           ),
                                                                         ),
+                                                                        const SizedBox(width: 5, ),
                                                                         Tooltip(
                                                                           message:
                                                                               'Cancel',
@@ -579,7 +585,7 @@ class _MyCartState extends State<MyCart> {
                                                                             child:
                                                                                 const Text(
                                                                               'Cancel',
-                                                                              style: TextStyle(color: kColorDarkRed, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                                                                              style: TextStyle(color: kColorDarkRed, fontSize: 15, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
                                                                             ),
                                                                           ),
                                                                         ),
@@ -631,6 +637,7 @@ class _MyCartState extends State<MyCart> {
                                                   ['subjectid'],
                                         );
                                         return Card(
+                                          color: Colors.white,
                                           elevation: 4,
                                           child: SingleChildScrollView(
                                             scrollDirection: Axis.horizontal,
@@ -717,6 +724,8 @@ class _MyCartState extends State<MyCart> {
                                                                     });
                                                                   },
                                                                   child: Card(
+                                                                    color: Colors
+                                                                        .white,
                                                                     elevation:
                                                                         4,
                                                                     child:
@@ -819,8 +828,8 @@ class _MyCartState extends State<MyCart> {
                                                                         SizedBox(
                                                                       width: size.width >= 1100 &&
                                                                               size.width < 1130
-                                                                          ? 150
-                                                                          : 150,
+                                                                          ? 165
+                                                                          : 165,
                                                                       child:
                                                                           Row(
                                                                         children: [
@@ -849,10 +858,11 @@ class _MyCartState extends State<MyCart> {
                                                                               },
                                                                               child: const Text(
                                                                                 'Buy Now',
-                                                                                style: TextStyle(color: kColorPrimary, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                                                                                style: TextStyle(color: kColorPrimary, fontSize: 15, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
                                                                               ),
                                                                             ),
                                                                           ),
+                                                                          const SizedBox(width: 5, ),
                                                                           Tooltip(
                                                                             message:
                                                                                 'Cancel',
@@ -863,7 +873,7 @@ class _MyCartState extends State<MyCart> {
                                                                               },
                                                                               child: const Text(
                                                                                 'Cancel',
-                                                                                style: TextStyle(color: kColorDarkRed, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                                                                                style: TextStyle(color: kColorDarkRed, fontSize: 15, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
                                                                               ),
                                                                             ),
                                                                           ),
@@ -1219,6 +1229,7 @@ class _MyCartState extends State<MyCart> {
                                                     ['subjectid'],
                                           );
                                           return Card(
+                                            color: Colors.white,
                                             elevation: 4,
                                             child: SingleChildScrollView(
                                               scrollDirection: Axis.horizontal,
@@ -1306,6 +1317,8 @@ class _MyCartState extends State<MyCart> {
                                                                       });
                                                                     },
                                                                     child: Card(
+                                                                      color: Colors
+                                                                          .white,
                                                                       elevation:
                                                                           4,
                                                                       child:
@@ -1403,8 +1416,8 @@ class _MyCartState extends State<MyCart> {
                                                                           SizedBox(
                                                                         width: size.width >= 1100 &&
                                                                                 size.width < 1130
-                                                                            ? 150
-                                                                            : 150,
+                                                                            ? 165
+                                                                            : 165,
                                                                         child:
                                                                             Row(
                                                                           crossAxisAlignment:
@@ -1435,10 +1448,11 @@ class _MyCartState extends State<MyCart> {
                                                                                 },
                                                                                 child: const Text(
                                                                                   'Buy Now',
-                                                                                  style: TextStyle(color: kColorPrimary, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                                                                                  style: TextStyle(color: kColorPrimary, fontSize: 15, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
                                                                                 ),
                                                                               ),
                                                                             ),
+                                                                            const SizedBox(width: 5, ),
                                                                             Tooltip(
                                                                               message: 'Cancel',
                                                                               child: TextButton(
@@ -1447,7 +1461,7 @@ class _MyCartState extends State<MyCart> {
                                                                                 },
                                                                                 child: const Text(
                                                                                   'Cancel',
-                                                                                  style: TextStyle(color: kColorDarkRed, fontSize: 16, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
+                                                                                  style: TextStyle(color: kColorDarkRed, fontSize: 15, fontStyle: FontStyle.normal, fontWeight: FontWeight.bold),
                                                                                 ),
                                                                               ),
                                                                             ),
@@ -1499,6 +1513,7 @@ class _MyCartState extends State<MyCart> {
                                                       ['subjectid'],
                                             );
                                             return Card(
+                                              color: Colors.white,
                                               elevation: 4,
                                               child: SingleChildScrollView(
                                                 scrollDirection:
@@ -1587,6 +1602,8 @@ class _MyCartState extends State<MyCart> {
                                                                         });
                                                                       },
                                                                       child: Card(
+                                                                        color: Colors
+                                                                            .white,
                                                                         elevation:
                                                                             4,
                                                                         child:
@@ -1709,6 +1726,7 @@ class _MyCartState extends State<MyCart> {
                                                                                   ),
                                                                                 ),
                                                                               ),
+                                                                              const SizedBox(width: 5, ),
                                                                               Tooltip(
                                                                                 message: 'Cancel',
                                                                                 child: TextButton(
@@ -1772,6 +1790,7 @@ class _MyCartState extends State<MyCart> {
                                       );
                                       return ClipRect(
                                         child: Card(
+                                          color: Colors.white,
                                           elevation: 4,
                                           child: SingleChildScrollView(
                                             scrollDirection: Axis.horizontal,
@@ -1847,6 +1866,8 @@ class _MyCartState extends State<MyCart> {
                                                                     });
                                                                   },
                                                                   child: Card(
+                                                                    color: Colors
+                                                                        .white,
                                                                     elevation:
                                                                         4,
                                                                     child:
@@ -1970,6 +1991,7 @@ class _MyCartState extends State<MyCart> {
                                                                               ),
                                                                             ),
                                                                           ),
+                                                                          const SizedBox(width: 5, ),
                                                                           Tooltip(
                                                                             message:
                                                                                 'Cancel',

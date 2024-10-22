@@ -273,7 +273,8 @@ class _UserListState extends State<UserList> {
             flex: size.width > 1350 ? 4 : 5,
             child: SizedBox(
               height: size.height - 130,
-              child: Card(
+              child: Card(          color: Colors.white,
+
                 margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                 elevation: 2,
                 shape: const RoundedRectangleBorder(
@@ -401,7 +402,7 @@ class _UserListState extends State<UserList> {
                                         highlightColor: kColorLight,
                                         hoverColor: kColorLight,
                                         mouseCursor:
-                                            MaterialStateMouseCursor.clickable,
+                                            WidgetStateMouseCursor.clickable,
                                         onPressed: () {
                                           if (_items.first['role'] ==
                                               'student') {
@@ -472,11 +473,11 @@ class _UserListState extends State<UserList> {
               flex: 10,
               child: SizedBox(
                 child: openChat != true
-                    ? Center(
+                    ? const Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
-                          children: const [
+                          children: [
                             Icon(
                               Icons.wechat_rounded,
                               color: kColorPrimary,
@@ -516,7 +517,7 @@ class _UserListState extends State<UserList> {
   }
 
   void _requestFocus() {
-    if (_searchFocusNode != null && !_searchFocusNode.hasFocus) {
+    if (!_searchFocusNode.hasFocus) {
       FocusScope.of(context).requestFocus(_searchFocusNode);
     }
   }

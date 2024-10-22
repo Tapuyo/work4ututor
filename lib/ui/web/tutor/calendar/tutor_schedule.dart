@@ -1,6 +1,5 @@
 // ignore_for_file: unused_local_variable, prefer_final_fields, avoid_print
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -13,11 +12,9 @@ import 'package:work4ututor/ui/web/tutor/calendar/setup_calendar.dart';
 
 import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/tutor_info_class.dart';
-import '../../../../provider/init_provider.dart';
 import '../../../../services/getcalendardata.dart';
 import '../../../../services/getmaterials.dart';
 import '../../../../services/timefromtimestamp.dart';
-import '../../../../services/timestampconverter.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
 import '../../terms/termpage.dart';
@@ -361,7 +358,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
   ScrollController _controller2 = ScrollController();
   ScrollController controller3 = ScrollController();
 
-  Set<int> selectedIndices = Set<int>();
+  Set<int> selectedIndices = <int>{};
   double containerX = 100.0; // Initial X position of the container
   double containerY = 100.0;
   String getFileNameFromUrl(String downloadUrl) {
@@ -467,6 +464,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
       child: Column(
         children: [
           Card(
+            color: Colors.white,
             margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
             elevation: 4,
             child: Container(
@@ -485,9 +483,9 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                 ),
                 borderRadius: BorderRadius.circular(5.0),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "Calendar",
                     style: TextStyle(
@@ -505,6 +503,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
             height: 10,
           ),
           Card(
+             color: Colors.white,
             margin: EdgeInsets.zero,
             elevation: 4,
             child: SizedBox(
@@ -523,6 +522,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                   : size.width - 30,
                           height: 500,
                           child: Card(
+                            color: Colors.white,
                             elevation: 1,
                             child: Consumer<TutorScheduleProvider>(
                                 builder: (context, scheduletime, _) {
@@ -1432,6 +1432,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                       Visibility(
                         visible: selectedbooking == null,
                         child: Card(
+                          color: Colors.white,
                           margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                           elevation: 5,
                           child: Padding(
@@ -2248,6 +2249,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                       Visibility(
                         visible: selectedbooking != null,
                         child: Card(
+                          color: Colors.white,
                           margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                           elevation: 5,
                           child: Padding(
@@ -2533,7 +2535,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                                                     .toString())
                                                             .toList();
                                                     if (materialsdata.isEmpty) {
-                                                      return Container(
+                                                      return SizedBox(
                                                           width: 600,
                                                           child: Center(
                                                             child: Text(
@@ -2729,7 +2731,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                                                               future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
                                                                               builder: (context, snapshot) {
                                                                                 if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                  return Container(
+                                                                                  return SizedBox(
                                                                                       height: 60,
                                                                                       width: 60,
                                                                                       child: const Center(
@@ -2840,7 +2842,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                                                               future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
                                                                               builder: (context, snapshot) {
                                                                                 if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                  return Container(
+                                                                                  return SizedBox(
                                                                                       height: 60,
                                                                                       width: 60,
                                                                                       child: const Center(
@@ -3132,13 +3134,13 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                                   ),
                                                 ],
                                               )
-                                            : Center(
+                                            : const Center(
                                                 child: Column(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.center,
-                                                  children: const [
+                                                  children: [
                                                     Icon(
                                                       Icons.block,
                                                       color: Colors.red,
@@ -3168,6 +3170,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Card(
+                        color: Colors.white,
                         margin: const EdgeInsets.fromLTRB(0, 10, 10, 0),
                         elevation: 5,
                         child: Padding(
@@ -3989,6 +3992,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                         ),
                       ),
                       Card(
+                        color: Colors.white,
                         margin: const EdgeInsets.fromLTRB(5, 10, 0, 0),
                         elevation: 5,
                         child: Padding(
@@ -4217,7 +4221,7 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                                                     .toString())
                                                             .toList();
                                                     if (materialsdata.isEmpty) {
-                                                      return Container(
+                                                      return SizedBox(
                                                           width: 600,
                                                           child: Center(
                                                             child: Text(
@@ -4834,13 +4838,13 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                                                 ),
                                               ],
                                             )
-                                          : Center(
+                                          : const Center(
                                               child: Column(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.center,
-                                                children: const [
+                                                children: [
                                                   Icon(
                                                     Icons.block,
                                                     color: Colors.red,
@@ -4937,12 +4941,12 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
           child: Card(
             color: kCalendarColorAB,
             margin: const EdgeInsets.fromLTRB(20.0, 6.0, 20.0, 0.0),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [
+                children: [
                   // CircleAvatar(
                   //   radius: 25.0,
                   //   backgroundColor: Colors.transparent,
@@ -5078,8 +5082,8 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                           );
                         });
                   },
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Text(
                         "Setup Calendar",
                         style: TextStyle(
@@ -5116,10 +5120,10 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                         const SizedBox(
                           width: 10,
                         ),
-                        Column(
+                        const Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
                               "Available",
                               style: TextStyle(
@@ -5149,10 +5153,10 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                         const SizedBox(
                           width: 10,
                         ),
-                        Column(
+                        const Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
                               "Booked",
                               style: TextStyle(
@@ -5182,10 +5186,10 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                         const SizedBox(
                           width: 10,
                         ),
-                        Column(
+                        const Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
                               "Blocked",
                               style: TextStyle(
@@ -5263,8 +5267,8 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                           );
                         });
                   },
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Text(
                         "Setup Calendar",
                         style: TextStyle(
@@ -5299,10 +5303,10 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                     const SizedBox(
                       width: 10,
                     ),
-                    Column(
+                    const Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           "Available Dates",
                           style: TextStyle(
@@ -5331,10 +5335,10 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                     const SizedBox(
                       width: 10,
                     ),
-                    Column(
+                    const Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           "Booked Dates",
                           style: TextStyle(
@@ -5363,10 +5367,10 @@ class _TableBasicsExample1State extends State<TableBasicsExample1> {
                     const SizedBox(
                       width: 10,
                     ),
-                    Column(
+                    const Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           "Blocked Dates",
                           style: TextStyle(
@@ -5464,9 +5468,9 @@ Widget listClasses(BuildContext context) {
               padding: const EdgeInsets.all(10.0),
               child: Column(children: <Widget>[
                 //todos Update the date strings here
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       "March, 27",
                       style: TextStyle(
@@ -5539,12 +5543,12 @@ Widget listClasses(BuildContext context) {
                                         const SizedBox(
                                           width: 10,
                                         ),
-                                        Column(
+                                        const Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
-                                          children: const [
+                                          children: [
                                             Text(
                                               "Melvin Jhon Selma",
                                               style: TextStyle(
@@ -5629,10 +5633,10 @@ Widget classClick(BuildContext context) {
                             const SizedBox(
                               width: 10,
                             ),
-                            Column(
+                            const Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
-                              children: const [
+                              children: [
                                 Text(
                                   "Melvin Jhon Selma",
                                   style: TextStyle(

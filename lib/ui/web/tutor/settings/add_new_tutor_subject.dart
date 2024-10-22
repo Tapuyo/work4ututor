@@ -8,7 +8,6 @@ import '../../../../data_class/subject_class.dart';
 import '../../../../data_class/subject_teach_pricing.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../services/update_tutorinformations_services.dart';
-import '../../../../shared_components/header_text.dart';
 import '../../../../utils/themes.dart';
 
 class AddNewSubject extends StatefulWidget {
@@ -48,7 +47,11 @@ class _AddNewSubjectState extends State<AddNewSubject> {
             ),
           ),
         ),
-        title: const HeaderText('Add New Subject to Teach'),
+        title: const Text(
+          'Add New Subject to Teach',
+          style: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
+        ),
       ),
       body: ClipRect(
         child: Container(
@@ -124,7 +127,7 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                                           MainAxisAlignment.start,
                                       children: [
                                         SizedBox(
-                                          width: 580,
+                                          width: 500,
                                           height: 45,
                                           child: Align(
                                             alignment: Alignment.center,
@@ -196,8 +199,7 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                                                 decoration:
                                                     const InputDecoration(
                                                   border: InputBorder.none,
-                                                  fillColor: Colors.grey,
-                                                  hintText: '',
+  fillColor:       Colors.white,                                                  hintText: '',
                                                   hintStyle: TextStyle(
                                                       color: Colors.black),
                                                   prefixIcon:
@@ -205,7 +207,7 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                                                 ),
                                                 keyboardType:
                                                     const TextInputType
-                                                            .numberWithOptions(
+                                                        .numberWithOptions(
                                                         decimal: true),
                                                 validator: (val) {
                                                   if (val!.isEmpty) {
@@ -269,7 +271,8 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                                                 decoration:
                                                     const InputDecoration(
                                                   border: InputBorder.none,
-                                                  fillColor: Colors.grey,
+                                                  fillColor:       Colors.white,
+
                                                   hintText: '',
                                                   hintStyle: TextStyle(
                                                       color: Colors.black),
@@ -278,7 +281,7 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                                                 ),
                                                 keyboardType:
                                                     const TextInputType
-                                                            .numberWithOptions(
+                                                        .numberWithOptions(
                                                         decimal: true),
                                                 validator: (val) {
                                                   if (val!.isEmpty) {
@@ -342,8 +345,7 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                                                 decoration:
                                                     const InputDecoration(
                                                   border: InputBorder.none,
-                                                  fillColor: Colors.grey,
-                                                  hintText: '',
+  fillColor:       Colors.white,                                                  hintText: '',
                                                   hintStyle: TextStyle(
                                                       color: Colors.black),
                                                   prefixIcon:
@@ -351,7 +353,7 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                                                 ),
                                                 keyboardType:
                                                     const TextInputType
-                                                            .numberWithOptions(
+                                                        .numberWithOptions(
                                                         decimal: true),
                                                 validator: (val) {
                                                   if (val!.isEmpty) {
@@ -734,7 +736,10 @@ class _AddNewSubjectState extends State<AddNewSubject> {
                     );
                   }
                 },
-                child: const Text('Add Subject'),
+                child: const Text(
+                  'Add Subject',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ),

@@ -1,6 +1,5 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
@@ -14,9 +13,7 @@ import '../../../../data_class/classesdataclass.dart';
 import '../../../../data_class/studentinfoclass.dart';
 import '../../../../data_class/tutor_info_class.dart';
 import '../../../../provider/init_provider.dart';
-import '../../../../services/getcalendardata.dart';
 import '../../../../services/getenrolledclasses.dart';
-import '../../../../services/timefromtimestamp.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
 import '../../terms/termpage.dart';
@@ -74,7 +71,7 @@ List<DateTimeAvailability> dateavailabledateselected = [];
   }
 
   List<bool> isHovered = [];
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  final CalendarFormat _calendarFormat = CalendarFormat.month;
 
   DateTime _focusedDay = DateTime.now();
 
@@ -87,8 +84,8 @@ List<DateTimeAvailability> dateavailabledateselected = [];
 
   bool daystatus = false;
   ScrollController updatescrollController1 = ScrollController();
-  ScrollController _controller1 = ScrollController();
-  ScrollController _controller2 = ScrollController();
+  final ScrollController _controller1 = ScrollController();
+  final ScrollController _controller2 = ScrollController();
 
   ScheduleData? selectedbooking;
   ScheduleData? selectedbookingdata;
@@ -269,6 +266,8 @@ List<DateTimeAvailability> dateavailabledateselected = [];
       child: Column(
         children: [
           Card(
+                          color: Colors.white,
+
             margin: const EdgeInsets.fromLTRB(4, 0, 4, 4),
             elevation: 4,
             child: Container(
@@ -287,9 +286,9 @@ List<DateTimeAvailability> dateavailabledateselected = [];
                 ),
                 borderRadius: BorderRadius.circular(5.0),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "Calendar",
                     style: TextStyle(
@@ -307,6 +306,8 @@ List<DateTimeAvailability> dateavailabledateselected = [];
             height: 10,
           ),
           Card(
+                          color: Colors.white,
+
             margin: EdgeInsets.zero,
             elevation: 4,
             child: SizedBox(
@@ -559,6 +560,8 @@ List<DateTimeAvailability> dateavailabledateselected = [];
                       Visibility(
                         visible: selectedbooking == null,
                         child: Card(
+                                        color: Colors.white,
+
                           margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                           elevation: 5,
                           child: Padding(
@@ -1092,7 +1095,8 @@ List<DateTimeAvailability> dateavailabledateselected = [];
                       ),
                       Visibility(
                         visible: selectedbooking != null,
-                        child: Card(
+                        child: Card(              color: Colors.white,
+
                           margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                           elevation: 5,
                           child: Padding(
@@ -1347,7 +1351,7 @@ List<DateTimeAvailability> dateavailabledateselected = [];
                                                               .toList();
                                                       if (materialsdata
                                                           .isEmpty) {
-                                                        return Container(
+                                                        return SizedBox(
                                                             width: 600,
                                                             child: Center(
                                                               child: Text(
@@ -1432,7 +1436,7 @@ List<DateTimeAvailability> dateavailabledateselected = [];
                                                                                 future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
                                                                                 builder: (context, snapshot) {
                                                                                   if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                    return Container(
+                                                                                    return SizedBox(
                                                                                         height: 60,
                                                                                         width: 60,
                                                                                         child: const Center(
@@ -1544,7 +1548,7 @@ List<DateTimeAvailability> dateavailabledateselected = [];
                                                                                 future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
                                                                                 builder: (context, snapshot) {
                                                                                   if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                    return Container(
+                                                                                    return SizedBox(
                                                                                         height: 60,
                                                                                         width: 60,
                                                                                         child: const Center(
@@ -1655,7 +1659,7 @@ List<DateTimeAvailability> dateavailabledateselected = [];
                                                                                 future: FirebaseStorage.instance.ref(materialsdata[index]['reference']).getDownloadURL(),
                                                                                 builder: (context, snapshot) {
                                                                                   if (snapshot.connectionState == ConnectionState.waiting) {
-                                                                                    return Container(
+                                                                                    return SizedBox(
                                                                                         height: 60,
                                                                                         width: 60,
                                                                                         child: const Center(
@@ -1931,13 +1935,13 @@ List<DateTimeAvailability> dateavailabledateselected = [];
                                                   ),
                                                 ],
                                               )
-                                            : Center(
+                                            : const Center(
                                                 child: Column(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.center,
-                                                  children: const [
+                                                  children: [
                                                     Icon(
                                                       Icons.block,
                                                       color: Colors.red,
@@ -1966,7 +1970,8 @@ List<DateTimeAvailability> dateavailabledateselected = [];
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Card(
+                      Card(              color: Colors.white,
+
                         margin: const EdgeInsets.fromLTRB(0, 10, 10, 0),
                         elevation: 5,
                         child: Padding(
@@ -2488,7 +2493,8 @@ List<DateTimeAvailability> dateavailabledateselected = [];
                               ]),
                         ),
                       ),
-                      Card(
+                      Card(              color: Colors.white,
+
                         margin: const EdgeInsets.fromLTRB(5, 10, 0, 0),
                         elevation: 5,
                         child: Padding(
@@ -2717,7 +2723,7 @@ List<DateTimeAvailability> dateavailabledateselected = [];
                                                                     .toString())
                                                             .toList();
                                                     if (materialsdata.isEmpty) {
-                                                      return Container(
+                                                      return SizedBox(
                                                           width: 600,
                                                           child: Center(
                                                             child: Text(
@@ -3355,13 +3361,13 @@ List<DateTimeAvailability> dateavailabledateselected = [];
                                                 ),
                                               ],
                                             )
-                                          : Center(
+                                          : const Center(
                                               child: Column(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.center,
-                                                children: const [
+                                                children: [
                                                   Icon(
                                                     Icons.block,
                                                     color: Colors.red,
@@ -3423,10 +3429,10 @@ Widget tableLedger(BuildContext context) {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
           child: Row(
-            children: const [
+            children: [
               Text(
                 "Legend",
                 style: TextStyle(
@@ -3527,10 +3533,10 @@ Widget tableLedger(BuildContext context) {
         const SizedBox(
           height: 50,
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
           child: Row(
-            children: const [
+            children: [
               Text(
                 "Summary",
                 style: TextStyle(
@@ -3563,10 +3569,10 @@ Widget tableLedger(BuildContext context) {
                   color: Colors.green,
                 ),
               ),
-              Column(
+              const Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "Available Dates",
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -3599,10 +3605,10 @@ Widget tableLedger(BuildContext context) {
                   color: Colors.blue,
                 ),
               ),
-              Column(
+              const Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "Booked Dates",
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -3635,10 +3641,10 @@ Widget tableLedger(BuildContext context) {
                   color: Colors.red,
                 ),
               ),
-              Column(
+              const Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "Blocked Dates",
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -3670,14 +3676,16 @@ Widget listClasses(BuildContext context) {
         Flexible(
           flex: 6,
           child: Card(
+                          color: Colors.white,
+
             elevation: 5,
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Column(children: <Widget>[
                 //todos Update the date strings here
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       "March, 27",
                       style: TextStyle(
@@ -3750,12 +3758,12 @@ Widget listClasses(BuildContext context) {
                                         const SizedBox(
                                           width: 10,
                                         ),
-                                        Column(
+                                        const Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
-                                          children: const [
+                                          children: [
                                             Text(
                                               "Melvin Jhon Selma",
                                               style: TextStyle(
@@ -3799,6 +3807,8 @@ Widget classClick(BuildContext context) {
     child: SizedBox(
       width: 600,
       child: Card(
+                      color: Colors.white,
+
         elevation: 5,
         child: Padding(
           padding: const EdgeInsets.all(10.0),
@@ -3840,10 +3850,10 @@ Widget classClick(BuildContext context) {
                             const SizedBox(
                               width: 10,
                             ),
-                            Column(
+                            const Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
-                              children: const [
+                              children: [
                                 Text(
                                   "Melvin Jhon Selma",
                                   style: TextStyle(

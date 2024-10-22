@@ -17,7 +17,6 @@ import '../../../../data_class/studentinfoclass.dart';
 import '../../../../provider/update_tutor_provider.dart';
 import '../../../../services/getlanguages.dart';
 import '../../../../services/getstudentinfo.dart';
-import '../../../../services/update_tutorinformations_services.dart';
 import '../../../../services/updatestudentinfo.dart';
 import '../../../../shared_components/responsive_builder.dart';
 import '../../../../utils/themes.dart';
@@ -205,6 +204,7 @@ class _StudentInformationState extends State<StudentInformation> {
     return Stack(
       children: [
         Card(
+          color: Colors.white,
           margin: EdgeInsets.zero,
           elevation: 4,
           shape: const RoundedRectangleBorder(
@@ -583,6 +583,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                             ),
                                           ),
                                           Card(
+                                            color: Colors.white,
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -607,7 +608,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                                         fontSize: 15),
                                                     contentPadding:
                                                         const EdgeInsets
-                                                                .symmetric(
+                                                            .symmetric(
                                                             vertical: 12,
                                                             horizontal: 10),
                                                     border: OutlineInputBorder(
@@ -657,6 +658,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                             ),
                                           ),
                                           Card(
+                                            color: Colors.white,
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -682,7 +684,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                                         fontSize: 15),
                                                     contentPadding:
                                                         const EdgeInsets
-                                                                .symmetric(
+                                                            .symmetric(
                                                             vertical: 12,
                                                             horizontal: 10),
                                                     border: OutlineInputBorder(
@@ -787,6 +789,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                             ),
                                           ),
                                           Card(
+                                            color: Colors.white,
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -811,7 +814,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                                         fontSize: 15),
                                                     contentPadding:
                                                         const EdgeInsets
-                                                                .symmetric(
+                                                            .symmetric(
                                                             vertical: 12,
                                                             horizontal: 10),
                                                     border: OutlineInputBorder(
@@ -918,6 +921,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                             ),
                                           ),
                                           Card(
+                                            color: Colors.white,
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -1041,6 +1045,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                             ),
                                           ),
                                           Card(
+                                            color: Colors.white,
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -1100,6 +1105,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                             ),
                                           ),
                                           Card(
+                                            color: Colors.white,
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -1164,6 +1170,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                             MainAxisAlignment.start,
                                         children: [
                                           Card(
+                                            color: Colors.white,
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -1183,7 +1190,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                                         color: Colors.grey),
                                                     contentPadding:
                                                         const EdgeInsets
-                                                                .symmetric(
+                                                            .symmetric(
                                                             vertical: 12,
                                                             horizontal: 10),
                                                     border: OutlineInputBorder(
@@ -1356,10 +1363,11 @@ class _StudentInformationState extends State<StudentInformation> {
                                                       return Padding(
                                                         padding:
                                                             const EdgeInsets
-                                                                    .only(
+                                                                .only(
                                                                 left: 10.0,
                                                                 right: 10),
                                                         child: Card(
+                                                          color: Colors.white,
                                                           margin:
                                                               EdgeInsets.zero,
                                                           shape:
@@ -1373,7 +1381,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                                           child: Container(
                                                             padding:
                                                                 const EdgeInsets
-                                                                        .fromLTRB(
+                                                                    .fromLTRB(
                                                                     5, 0, 5, 0),
                                                             decoration: selectedcitizenship ==
                                                                     index
@@ -1421,10 +1429,11 @@ class _StudentInformationState extends State<StudentInformation> {
                                                                     color: Colors
                                                                         .white),
                                                             child: Padding(
-                                                              padding: const EdgeInsets
+                                                              padding:
+                                                                  const EdgeInsets
                                                                       .symmetric(
-                                                                  horizontal:
-                                                                      5),
+                                                                      horizontal:
+                                                                          5),
                                                               child: InkWell(
                                                                 onTap: () {
                                                                   setState(() {
@@ -1769,6 +1778,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                             ),
                                           ),
                                           Card(
+                                            color: Colors.white,
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -1794,7 +1804,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                                         color: Colors.grey),
                                                     contentPadding:
                                                         const EdgeInsets
-                                                                .symmetric(
+                                                            .symmetric(
                                                             vertical: 12,
                                                             horizontal: 10),
                                                     border: OutlineInputBorder(
@@ -1912,6 +1922,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                             ),
                                           ),
                                           Card(
+                                            color: Colors.white,
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -1931,7 +1942,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                                       fontSize: 15),
                                                   contentPadding:
                                                       const EdgeInsets
-                                                              .symmetric(
+                                                          .symmetric(
                                                           vertical: 12,
                                                           horizontal: 10),
                                                   border: OutlineInputBorder(
@@ -2033,6 +2044,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                           ),
                                         ),
                                         Card(
+                                          color: Colors.white,
                                           margin: EdgeInsets.zero,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
@@ -2057,7 +2069,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                                       color: Colors.grey),
                                                   contentPadding:
                                                       const EdgeInsets
-                                                              .symmetric(
+                                                          .symmetric(
                                                           vertical: 12,
                                                           horizontal: 10),
                                                   border: OutlineInputBorder(
@@ -2179,6 +2191,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                           ),
                                         ),
                                         Card(
+                                          color: Colors.white,
                                           margin: EdgeInsets.zero,
                                           shape: RoundedRectangleBorder(
                                             borderRadius:
@@ -2297,6 +2310,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                             MainAxisAlignment.start,
                                         children: [
                                           Card(
+                                            color: Colors.white,
                                             margin: EdgeInsets.zero,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -2317,7 +2331,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                                         color: Colors.grey),
                                                     contentPadding:
                                                         const EdgeInsets
-                                                                .symmetric(
+                                                            .symmetric(
                                                             vertical: 12,
                                                             horizontal: 10),
                                                     border: OutlineInputBorder(
@@ -2505,10 +2519,11 @@ class _StudentInformationState extends State<StudentInformation> {
                                                       return Padding(
                                                         padding:
                                                             const EdgeInsets
-                                                                    .only(
+                                                                .only(
                                                                 left: 10.0,
                                                                 right: 10),
                                                         child: Card(
+                                                          color: Colors.white,
                                                           margin:
                                                               EdgeInsets.zero,
                                                           shape:
@@ -2522,7 +2537,7 @@ class _StudentInformationState extends State<StudentInformation> {
                                                           child: Container(
                                                             padding:
                                                                 const EdgeInsets
-                                                                        .fromLTRB(
+                                                                    .fromLTRB(
                                                                     5, 0, 5, 0),
                                                             decoration: selectedindex ==
                                                                     index
@@ -2570,10 +2585,11 @@ class _StudentInformationState extends State<StudentInformation> {
                                                                     color: Colors
                                                                         .white),
                                                             child: Padding(
-                                                              padding: const EdgeInsets
+                                                              padding:
+                                                                  const EdgeInsets
                                                                       .symmetric(
-                                                                  horizontal:
-                                                                      5),
+                                                                      horizontal:
+                                                                          5),
                                                               child: InkWell(
                                                                 onTap: () {
                                                                   setState(() {
@@ -2694,16 +2710,16 @@ class _StudentInformationState extends State<StudentInformation> {
                 ElevatedButton(
                   style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.transparent),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        WidgetStateProperty.all<Color>(Colors.transparent),
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                       const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                     ),
-                    elevation: MaterialStateProperty.all<double>(0),
-                    overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                      (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.hovered)) {
+                    elevation: WidgetStateProperty.all<double>(0),
+                    overlayColor: WidgetStateProperty.resolveWith<Color?>(
+                      (Set<WidgetState> states) {
+                        if (states.contains(WidgetState.hovered)) {
                           return Colors.white.withOpacity(0.3); // Hover color
                         }
                         return null; // Use the default color for other states
@@ -2754,16 +2770,16 @@ class _StudentInformationState extends State<StudentInformation> {
                 ElevatedButton(
                   style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.transparent),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        WidgetStateProperty.all<Color>(Colors.transparent),
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                       const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                       ),
                     ),
-                    elevation: MaterialStateProperty.all<double>(0),
-                    overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                      (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.hovered)) {
+                    elevation: WidgetStateProperty.all<double>(0),
+                    overlayColor: WidgetStateProperty.resolveWith<Color?>(
+                      (Set<WidgetState> states) {
+                        if (states.contains(WidgetState.hovered)) {
                           return Colors.white.withOpacity(0.3); // Hover color
                         }
                         return null; // Use the default color for other states

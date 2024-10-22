@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, use_build_context_synchronously, prefer_final_fields
+// ignore_for_file: avoid_web_libraries_in_flutter, avoid_print, use_build_context_synchronously, prefer_final_fields, unused_field
 
 import 'dart:async';
 import 'dart:convert';
@@ -32,7 +32,6 @@ import 'dart:html' as html;
 
 import '../../../utils/themes.dart';
 import '../../auth/auth.dart';
-import '../login/login.dart';
 import '../terms/termpage.dart';
 
 class StudentInfo extends StatefulWidget {
@@ -513,8 +512,8 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                     width: 680,
                     child: Column(
                       children: <Widget>[
-                        Row(
-                          children: const [
+                        const Row(
+                          children: [
                             Text(
                               "Student Identification Number",
                               style: TextStyle(
@@ -568,8 +567,8 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                         const SizedBox(
                           height: 15,
                         ),
-                        Row(
-                          children: const [
+                        const Row(
+                          children: [
                             Text(
                               "Student Information.",
                               style: TextStyle(
@@ -1061,9 +1060,9 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
+                                const Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
+                                  children: [
                                     Text(
                                       "Citizenship",
                                       style: TextStyle(
@@ -1501,9 +1500,9 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
+                            const Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
+                              children: [
                                 Text(
                                   "Language",
                                   style: TextStyle(
@@ -1791,8 +1790,8 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                               const SizedBox(
                                 height: 50,
                               ),
-                              Row(
-                                children: const [
+                              const Row(
+                                children: [
                                   Text(
                                     "Guardians Information.",
                                     style: TextStyle(
@@ -2020,8 +2019,8 @@ class _StudentInfoBodyState extends State<StudentInfoBody> {
                               const SizedBox(
                                 height: 50,
                               ),
-                              Row(
-                                children: const [
+                              const Row(
+                                children: [
                                   Text(
                                     "Upload Guardian documents.",
                                     style: TextStyle(

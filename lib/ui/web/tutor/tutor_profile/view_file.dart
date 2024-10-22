@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../shared_components/header_text.dart';
 import '../../../../utils/themes.dart';
 
 class ViewFile extends StatefulWidget {
@@ -28,7 +27,15 @@ class _ViewFileState extends State<ViewFile> {
             ),
           ),
         ),
-        title: const HeaderText('Tutor Certificate'),
+        title: const Text(
+          'View File',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: false,
       ),
       body: Container(
         height: height,
@@ -40,7 +47,7 @@ class _ViewFileState extends State<ViewFile> {
                 image: NetworkImage(
                   widget.imageURL.toString(),
                 ),
-                fit: BoxFit.fill)),
+                fit: BoxFit.contain)),
       ),
     );
   }

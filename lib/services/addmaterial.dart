@@ -18,10 +18,6 @@ Future<bool> uploadMaterialProfile(
   String classno,
   Function(int progress)? onProgress,
 ) async {
-  if (selectedImage == null) {
-    return false;
-  }
-
   Reference storageReference = FirebaseStorage.instance
       .ref()
       .child("classesData/$uid/materials/$classno/$filename");
@@ -91,10 +87,6 @@ Future<bool> uploadCerticate(
   String classno,
   Function(int progress)? onProgress,
 ) async {
-  if (selectedImage == null) {
-    return false;
-  }
-
   Reference storageReference = FirebaseStorage.instance
       .ref()
       .child("$uid/Certificates/$filename");

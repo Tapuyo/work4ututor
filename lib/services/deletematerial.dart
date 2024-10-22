@@ -3,7 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 Future<bool> deleteMaterial(String classno, String path) async {
   try {
-    if (path != null && path.isNotEmpty) {
+    if (path.isNotEmpty) {
       await FirebaseStorage.instance.ref().child(path).delete();
     }
 
